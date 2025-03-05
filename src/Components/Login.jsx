@@ -177,7 +177,7 @@ const Login = () => {
         {/* Right Column - Dynamic Category & Subcategory List */}
         <div className="w-3/5 p-8 bg-white shadow-lg border border-gray-200 overflow-y-auto max-h-[80vh] rounded-lg">
           <h2 className="text-2xl text-[#00234E] font-bold mb-4 text-center">
-            Government Document Services
+            Government Document
           </h2>
           <ul className="grid grid-cols-2 gap-6">
             {categories.map((category) => (
