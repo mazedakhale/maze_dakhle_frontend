@@ -1,0 +1,22 @@
+@keyframes rotateImages {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* This rotates all images around the center */
+.rotate-container {
+  animation: rotateImages 10s linear infinite;
+}
+
+/* Ensures the images move in a circle */
+.rotating-image {
+  position: absolute;
+}
+/* html, body {
+  overflow: hidden;
+  height: 100%;
+} */
