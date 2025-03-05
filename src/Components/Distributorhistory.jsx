@@ -201,14 +201,14 @@ const ErrorRequests = () => {
                     <td className="border px-4 py-2 text-center">
                       <span
                         className={`px-3 py-1 rounded-full text-white text-sm flex items-center justify-center gap-1 ${request.request_status === "Completed"
-                            ? "bg-yellow-500"
-                            : request.request_status === "Approved"
-                              ? "bg-green-500"
-                              : request.request_status === "Distributor Rejected"
-                                ? "bg-red-500"
-                                : request.request_status === "Uploaded"
-                                  ? "bg-purple-500"
-                                  : "bg-gray-500"
+                          ? "bg-yellow-500"
+                          : request.request_status === "Approved"
+                            ? "bg-green-500"
+                            : request.request_status === "Distributor Rejected"
+                              ? "bg-red-500"
+                              : request.request_status === "Uploaded"
+                                ? "bg-purple-500"
+                                : "bg-gray-500"
                           }`}
                       >
                         ⬤ {request.request_status}

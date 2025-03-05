@@ -145,92 +145,90 @@ const VerifyDocuments = () => {
 
   return (
     <div className="ml-[250px] flex flex-col items-center min-h-screen p-6 bg-gray-100">
-  <div className="w-[90%] max-w-6xl bg-white shadow-md rounded-lg">
-    <div className="bg-[#f5f0eb] border-t-4 shadow-md rounded border-orange-400 p-4">
-      <h2 className="text-xl font-bold text-center text-gray-800">
-        Manage Distributor List
-      </h2>
+      <div className="w-[90%] max-w-6xl bg-white shadow-md rounded-lg">
+        <div className="bg-[#f5f0eb] border-t-4 shadow-md rounded border-orange-400 p-4">
+          <h2 className="text-xl font-bold text-center text-gray-800">
+            Manage Distributor List
+          </h2>
+        </div>
+        <div className="p-6 overflow-x-auto">
+          <table className="w-full border border-gray-300">
+            <thead className="bg-[#f5f0eb]">
+              <tr>
+                {[
+                  "Application ID",
+                  "Category",
+                  "Subcategory",
+                  "Verification",
+                  "Actions",
+                  "View",
+                  "Upload Certificate",
+                ].map((header, index) => (
+                  <th
+                    key={index}
+                    className="border border-gray-300 p-3 text-center font-semibold text-black"
+                  >
+                    {header}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {documents.map((doc, index) => (
+                <tr
+                  key={doc.document_id}
+                  className={`border border-gray-300 ${index % 2 === 0 ? "bg-[#fffaf4]" : "bg-white"
+                    }`}
+                >
+                  <td className="border p-3 text-center">{doc.application_id}</td>
+                  <td className="border p-3 text-center">{doc.category_name}</td>
+                  <td className="border p-3 text-center">{doc.subcategory_name}</td>
+                  <td className="border p-3 text-center">
+                    <span
+                      className={`px-3 py-1 rounded-full text-white text-sm ${doc.status === "Processing"
+                          ? "bg-orange-500"
+                          : doc.status === "Rejected"
+                            ? "bg-red-500"
+                            : doc.status === "Uploaded"
+                              ? "bg-blue-500"
+                              : "bg-yellow-500"
+                        }`}
+                    >
+                      {doc.status}
+                    </span>
+                  </td>
+                  <td className="border p-3 text-center">
+                    <button
+                      onClick={() => handleViewInvoice(doc.document_id)}
+                      className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition"
+                    >
+                      Action
+                    </button>
+                  </td>
+                  <td className="border p-3 text-center">
+                    <button
+                      onClick={() => handleView(doc.document_id)}
+                      className="bg-indigo-500 text-white px-3 py-1 rounded hover:bg-indigo-600 transition"
+                    >
+                      View
+                    </button>
+                  </td>
+                  <td className="border p-3 text-center">
+                    <input
+                      type="file"
+                      className="mb-2 border p-2 rounded text-sm w-40"
+                    />
+                    <button className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 transition">
+                      Upload
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
-    <div className="p-6 overflow-x-auto">
-      <table className="w-full border border-gray-300">
-        <thead className="bg-[#f5f0eb]">
-          <tr>
-            {[
-              "Application ID",
-              "Category",
-              "Subcategory",
-              "Verification",
-              "Actions",
-              "View",
-              "Upload Certificate",
-            ].map((header, index) => (
-              <th
-                key={index}
-                className="border border-gray-300 p-3 text-center font-semibold text-black"
-              >
-                {header}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {documents.map((doc, index) => (
-            <tr
-              key={doc.document_id}
-              className={`border border-gray-300 ${
-                index % 2 === 0 ? "bg-[#fffaf4]" : "bg-white"
-              }`}
-            >
-              <td className="border p-3 text-center">{doc.application_id}</td>
-              <td className="border p-3 text-center">{doc.category_name}</td>
-              <td className="border p-3 text-center">{doc.subcategory_name}</td>
-              <td className="border p-3 text-center">
-                <span
-                  className={`px-3 py-1 rounded-full text-white text-sm ${
-                    doc.status === "Processing"
-                      ? "bg-orange-500"
-                      : doc.status === "Rejected"
-                      ? "bg-red-500"
-                      : doc.status === "Uploaded"
-                      ? "bg-blue-500"
-                      : "bg-yellow-500"
-                  }`}
-                >
-                  {doc.status}
-                </span>
-              </td>
-              <td className="border p-3 text-center">
-                <button
-                  onClick={() => handleViewInvoice(doc.document_id)}
-                  className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition"
-                >
-                  Action
-                </button>
-              </td>
-              <td className="border p-3 text-center">
-                <button
-                  onClick={() => handleView(doc.document_id)}
-                  className="bg-indigo-500 text-white px-3 py-1 rounded hover:bg-indigo-600 transition"
-                >
-                  View
-                </button>
-              </td>
-              <td className="border p-3 text-center">
-                <input
-                  type="file"
-                  className="mb-2 border p-2 rounded text-sm w-40"
-                />
-                <button className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 transition">
-                  Upload
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  </div>
-</div>
 
 
   );

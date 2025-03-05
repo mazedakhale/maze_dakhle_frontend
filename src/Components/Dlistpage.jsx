@@ -124,12 +124,12 @@ const ElistPage = () => {
                         {/* Styled Status Badge */}
                         <span
                           className={`px-3 py-1 rounded-full text-white text-sm ${document.status === "Approved"
-                              ? "bg-green-500"
-                              : document.status === "Pending"
-                                ? "bg-yellow-500"
-                                : document.status === "Rejected"
-                                  ? "bg-red-500"
-                                  : "bg-blue-500"
+                            ? "bg-green-500"
+                            : document.status === "Pending"
+                              ? "bg-yellow-500"
+                              : document.status === "Rejected"
+                                ? "bg-red-500"
+                                : "bg-blue-500"
                             }`}
                         >
                           {document.status}

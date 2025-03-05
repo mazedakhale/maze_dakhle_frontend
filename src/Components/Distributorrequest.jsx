@@ -44,7 +44,7 @@ const ErrorRequests = () => {
       const filteredRequests = response.data.filter(
         (request) => request.request_status !== "Distributor Rejected" && request.request_status !== "Completed"
       );
-      
+
       setErrorRequests(filteredRequests);
     } catch (error) {
       console.error("Error fetching error requests:", error);
@@ -112,67 +112,67 @@ const ErrorRequests = () => {
 
 
 
-const handleRejectStatus = async (requestId) => {
+  const handleRejectStatus = async (requestId) => {
     const { value: rejectionReason } = await Swal.fire({
-        title: "Enter Rejection Reason",
-        input: "text",
-        inputPlaceholder: "Type your reason here...",
-        showCancelButton: true,
-        confirmButtonText: "Reject",
-        cancelButtonText: "Cancel",
-        inputValidator: (value) => {
-            if (!value.trim()) {
-                return "Rejection reason is required!";
-            }
+      title: "Enter Rejection Reason",
+      input: "text",
+      inputPlaceholder: "Type your reason here...",
+      showCancelButton: true,
+      confirmButtonText: "Reject",
+      cancelButtonText: "Cancel",
+      inputValidator: (value) => {
+        if (!value.trim()) {
+          return "Rejection reason is required!";
         }
+      }
     });
 
     // Ensure rejection reason is captured correctly
     if (!rejectionReason || rejectionReason.trim() === "") {
-        console.error("❌ No rejection reason provided.");
-        return;
+      console.error("❌ No rejection reason provided.");
+      return;
     }
 
     try {
-        console.log(`🔹 Rejecting request ID: ${requestId} with reason: ${rejectionReason}`);
+      console.log(`🔹 Rejecting request ID: ${requestId} with reason: ${rejectionReason}`);
 
-        const response = await axios.patch(`https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/request-errors/update-status/${requestId}`, {
-            request_status: "Distributor Rejected",
-            rejectionReason: rejectionReason.trim(), // Ensure it's not undefined
-        });
+      const response = await axios.patch(`https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/request-errors/update-status/${requestId}`, {
+        request_status: "Distributor Rejected",
+        rejectionReason: rejectionReason.trim(), // Ensure it's not undefined
+      });
 
-        console.log("✅ API Response:", response.data);
+      console.log("✅ API Response:", response.data);
 
-        fetchErrorRequests(distributorId);
+      fetchErrorRequests(distributorId);
 
-        Swal.fire({
-            icon: "success",
-            title: "Updated!",
-            text: "Request has been rejected successfully.",
-            confirmButtonText: "OK",
-        });
+      Swal.fire({
+        icon: "success",
+        title: "Updated!",
+        text: "Request has been rejected successfully.",
+        confirmButtonText: "OK",
+      });
 
     } catch (error) {
-        console.error("❌ Error updating request status:", error);
+      console.error("❌ Error updating request status:", error);
 
-        if (error.response) {
-            console.error("🛑 Server Response:", error.response.data);
-            Swal.fire({
-                icon: "error",
-                title: "Error",
-                text: `Failed to reject request: ${error.response.data.message || "Unknown error"}`,
-                confirmButtonText: "OK",
-            });
-        } else {
-            Swal.fire({
-                icon: "error",
-                title: "Error",
-                text: "Failed to reject request. Please try again later.",
-                confirmButtonText: "OK",
-            });
-        }
+      if (error.response) {
+        console.error("🛑 Server Response:", error.response.data);
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: `Failed to reject request: ${error.response.data.message || "Unknown error"}`,
+          confirmButtonText: "OK",
+        });
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Failed to reject request. Please try again later.",
+          confirmButtonText: "OK",
+        });
+      }
     }
-};
+  };
 
 
 
@@ -237,7 +237,7 @@ const handleRejectStatus = async (requestId) => {
         <div className="bg-[#f5f0eb] border-t-4 shadow-md rounded border-orange-400 p-4">
           <h2 className="text-xl font-bold text-center text-gray-800">Error Requests</h2>
         </div>
-  
+
         {/* Search Bar */}
         <div className="p-4 flex justify-between items-center">
           <input
@@ -248,7 +248,7 @@ const handleRejectStatus = async (requestId) => {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-  
+
         {/* Table */}
         <div className="p-6 overflow-x-auto">
           <table className="w-full border border-gray-300">
@@ -278,9 +278,8 @@ const handleRejectStatus = async (requestId) => {
                 filteredRequests.map((request, index) => (
                   <tr
                     key={request.request_id}
-                    className={`border border-gray-300 ${
-                      index % 2 === 0 ? "bg-[#fffaf4]" : "bg-white"
-                    } hover:bg-gray-100`}
+                    className={`border border-gray-300 ${index % 2 === 0 ? "bg-[#fffaf4]" : "bg-white"
+                      } hover:bg-gray-100`}
                   >
                     <td className="border p-3 text-center">{request.request_id}</td>
                     <td className="border p-3 text-center">{request.application_id}</td>
@@ -294,29 +293,28 @@ const handleRejectStatus = async (requestId) => {
                         View Document
                       </a>
                     </td>
-  
+
                     <td className="border p-3 text-center">
                       <span
-                        className={`px-3 py-1 rounded-full text-white text-sm ${
-                          request.request_status === "Approved"
+                        className={`px-3 py-1 rounded-full text-white text-sm ${request.request_status === "Approved"
                             ? "bg-green-500"
                             : request.request_status === "Distributor Rejected"
-                            ? "bg-red-500"
-                            : request.request_status === "Completed"
-                            ? "bg-blue-500"
-                            : request.request_status === "Uploaded"
-                            ? "bg-purple-500"
-                            : "bg-yellow-500"
-                        }`}
+                              ? "bg-red-500"
+                              : request.request_status === "Completed"
+                                ? "bg-blue-500"
+                                : request.request_status === "Uploaded"
+                                  ? "bg-purple-500"
+                                  : "bg-yellow-500"
+                          }`}
                       >
                         {request.request_status}
                       </span>
                     </td>
-  
+
                     <td className="border p-3 text-center">
                       {new Date(request.request_date).toLocaleString()}
                     </td>
-  
+
                     <td className="border p-3 text-center">
                       <button
                         onClick={() => handleRejectStatus(request.request_id)}
@@ -325,7 +323,7 @@ const handleRejectStatus = async (requestId) => {
                         Distributor Rejected
                       </button>
                     </td>
-  
+
                     <td className="border p-3 text-center">
                       <input
                         type="file"
@@ -356,7 +354,7 @@ const handleRejectStatus = async (requestId) => {
       </div>
     </div>
   );
-  
+
 };
 
 export default ErrorRequests;
