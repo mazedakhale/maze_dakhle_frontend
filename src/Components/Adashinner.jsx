@@ -4,6 +4,7 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend, BarElement, CategoryScal
 import { FaHourglassHalf, FaCheckCircle, FaTimesCircle, FaUsers, FaStore, FaFileAlt, FaCogs, FaBoxes, FaClipboardList } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { Link } from "react-router-dom";
 // Register the chart.js components
 ChartJS.register(ArcElement, Tooltip, Legend, BarElement, CategoryScale, LinearScale, PointElement, LineElement);
 
