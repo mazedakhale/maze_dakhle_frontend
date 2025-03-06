@@ -297,14 +297,14 @@ const ErrorRequests = () => {
                     <td className="border p-3 text-center">
                       <span
                         className={`px-3 py-1 rounded-full text-white text-sm ${request.request_status === "Approved"
-                            ? "bg-green-500"
-                            : request.request_status === "Distributor Rejected"
-                              ? "bg-red-500"
-                              : request.request_status === "Completed"
-                                ? "bg-blue-500"
-                                : request.request_status === "Uploaded"
-                                  ? "bg-purple-500"
-                                  : "bg-yellow-500"
+                          ? "bg-green-500"
+                          : request.request_status === "Distributor Rejected"
+                            ? "bg-red-500"
+                            : request.request_status === "Completed"
+                              ? "bg-blue-500"
+                              : request.request_status === "Uploaded"
+                                ? "bg-purple-500"
+                                : "bg-yellow-500"
                           }`}
                       >
                         {request.request_status}

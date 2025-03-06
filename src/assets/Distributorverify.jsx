@@ -186,12 +186,12 @@ const VerifyDocuments = () => {
                   <td className="border p-3 text-center">
                     <span
                       className={`px-3 py-1 rounded-full text-white text-sm ${doc.status === "Processing"
-                          ? "bg-orange-500"
-                          : doc.status === "Rejected"
-                            ? "bg-red-500"
-                            : doc.status === "Uploaded"
-                              ? "bg-blue-500"
-                              : "bg-yellow-500"
+                        ? "bg-orange-500"
+                        : doc.status === "Rejected"
+                          ? "bg-red-500"
+                          : doc.status === "Uploaded"
+                            ? "bg-blue-500"
+                            : "bg-yellow-500"
                         }`}
                     >
                       {doc.status}

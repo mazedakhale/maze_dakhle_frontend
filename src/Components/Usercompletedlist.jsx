@@ -99,82 +99,80 @@ const CompletedApplicationsList = () => {
 
   return (
     <div className="ml-[300px] flex flex-col items-center min-h-screen p-10 bg-gray-100">
-      <div className="w-full p-6">
-        {/* Increased container width */}
-        <div className="w-full max-w-[1800px] bg-white p-6 shadow-lg">
-          {/* Heading and Search Bar */}
-          <div className="flex w-full justify-between items-center mb-4">
-            <h2 className="text-2xl font-bold">Completed Applications</h2>
-            <input
-              type="text"
-              placeholder="Search in table..."
-              value={searchQuery}
-              onChange={handleSearch}
-              className="px-4 py-2 border border-gray-300 rounded w-64"
-            />
-          </div>
+      <div className="w-full max-w-[1400px] bg-white p-6 shadow-lg">
+        {/* Heading and Search Bar */}
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-2xl font-bold">Completed Applications</h2>
+          <input
+            type="text"
+            placeholder="Search in table..."
+            value={searchQuery}
+            onChange={handleSearch}
+            className="px-4 py-2 border border-gray-300 rounded w-64"
+          />
+        </div>
 
-          {/* Force table to expand and allow horizontal scrolling */}
-          <div className="overflow-x-auto max-h-[600px] overflow-y-auto">
-            <table className="min-w-[1200px] table-auto bg-white rounded shadow">
-              <thead className="sticky top-0 bg-gray-200">
-                <tr>
-                  <th className="px-6 py-3 border">Document ID</th>
-                  <th className="px-6 py-3 border">Category</th>
-                  <th className="px-6 py-3 border">Subcategory</th>
-                  <th className="px-6 py-3 border">Email</th>
-                  <th className="px-6 py-3 border">Status</th>
-                  <th className="px-6 py-3 border">Uploaded At</th>
-                  <th className="px-6 py-3 border">Document Fields</th>
-                  <th className="px-6 py-3 border">Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredDocuments.length > 0 ? (
-                  filteredDocuments.map((document) => (
-                    <tr key={document.document_id}>
-                      <td className="px-6 py-3 border">{document.document_id}</td>
-                      <td className="px-6 py-3 border">{document.category_name}</td>
-                      <td className="px-6 py-3 border">{document.subcategory_name}</td>
-                      <td className="px-6 py-3 border">{document.email}</td>
-                      <td className="px-6 py-3 border">{document.status}</td>
-                      <td className="px-6 py-3 border">
-                        {new Date(document.uploaded_at).toLocaleString()}
-                      </td>
-                      <td className="px-6 py-3 border">
-                        {Object.entries(document.document_fields).map(([key, value]) => (
-                          <p key={key}>
-                            <strong>{key}:</strong> {value}
-                          </p>
-                        ))}
-                      </td>
-                      <td className="p-3 flex justify-center">
-                        {getCertificateByDocumentId(document.document_id) ? (
-                          <button
-                            onClick={() => handleViewCertificate(document.document_id)}
-                            className="bg-blue-500 text-white px-3 py-1 rounded"
-                          >
-                            View
-                          </button>
-                        ) : (
-                          <span className="text-gray-500">Not Available</span>
-                        )}
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan="8" className="px-6 py-3 border text-center">
-                      No completed applications found.
+        {/* Table container with proper overflow handling */}
+        <div className="overflow-x-auto">
+          <table className="w-full bg-white rounded shadow">
+            <thead className="sticky top-0 bg-gray-200">
+              <tr>
+                <th className="px-4 py-3 border">Document ID</th>
+                <th className="px-4 py-3 border">Category</th>
+                <th className="px-4 py-3 border">Subcategory</th>
+                <th className="px-4 py-3 border">Email</th>
+                <th className="px-4 py-3 border">Status</th>
+                <th className="px-4 py-3 border">Uploaded At</th>
+                <th className="px-4 py-3 border">Document Fields</th>
+                <th className="px-4 py-3 border">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredDocuments.length > 0 ? (
+                filteredDocuments.map((document) => (
+                  <tr key={document.document_id}>
+                    <td className="px-4 py-3 border">{document.document_id}</td>
+                    <td className="px-4 py-3 border">{document.category_name}</td>
+                    <td className="px-4 py-3 border">{document.subcategory_name}</td>
+                    <td className="px-4 py-3 border">{document.email}</td>
+                    <td className="px-4 py-3 border">{document.status}</td>
+                    <td className="px-4 py-3 border">
+                      {new Date(document.uploaded_at).toLocaleString()}
+                    </td>
+                    <td className="px-4 py-3 border">
+                      {Object.entries(document.document_fields).map(([key, value]) => (
+                        <p key={key}>
+                          <strong>{key}:</strong> {value}
+                        </p>
+                      ))}
+                    </td>
+                    <td className="p-3 flex justify-center">
+                      {getCertificateByDocumentId(document.document_id) ? (
+                        <button
+                          onClick={() => handleViewCertificate(document.document_id)}
+                          className="bg-blue-500 text-white px-3 py-1 rounded"
+                        >
+                          View
+                        </button>
+                      ) : (
+                        <span className="text-gray-500">Not Available</span>
+                      )}
                     </td>
                   </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="8" className="px-4 py-3 border text-center">
+                    No completed applications found.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
+
   );
 };
 
