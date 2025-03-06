@@ -3,7 +3,7 @@ import axios from "axios";
 import { FaEdit, FaTrash, FaPlus } from "react-icons/fa";
 import Swal from "sweetalert2";
 
-const Subcategories = () => {
+const Addsubcategory = () => {
   const [subcategories, setSubcategories] = useState([]);
   const [categories, setCategories] = useState([]);
   const [newSubcategory, setNewSubcategory] = useState({ subcategory_name: "", category_id: "" });
@@ -258,4 +258,4 @@ const Subcategories = () => {
   );
 };
 
-export default Subcategories;
+export default Addsubcategory;

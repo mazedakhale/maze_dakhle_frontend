@@ -51,7 +51,7 @@ const Sidebar = ({ onNavigate }) => {
             { icon: <FaFileAlt />, label: "History", path: "/Customerhistory" },
             { icon: <FaFileAlt />, label: "Request History", path: "/Customererrorhistory" },
 
-            { icon: <FaClipboardList />, label: "Applications", path: "/customerapply" },  // Clipboard/list icon for applications
+            { icon: <FaClipboardList />, label: "Applications", path: "/Customerapply" },  // Clipboard/list icon for applications
             { icon: <FaFileAlt />, label: " Feedback", path: "/Feedback" },
 
             // { icon: <FaCheckCircle />, label: "Status", path: "/status" },  // Check-circle icon for status updates

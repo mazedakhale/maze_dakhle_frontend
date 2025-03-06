@@ -3,7 +3,7 @@ import axios from "axios";
 import { FaRegFileAlt, FaDownload, FaFileInvoice, FaCheck, FaTimes } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
-const VerifyDocuments = () => {
+const VerifyDocumentshistory = () => {
   const [distributors, setDistributors] = useState([]);
   const [certificates, setCertificates] = useState([]);
   const navigate = useNavigate();
@@ -243,4 +243,4 @@ const VerifyDocuments = () => {
   );
 };
 
-export default VerifyDocuments;
+export default VerifyDocumentshistory;

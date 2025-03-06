@@ -75,11 +75,11 @@ function App() {
         <Route path="/Customerlist" element={<Admindashboard><Customerlist /></Admindashboard>} />
         <Route path="/Addcategory" element={<Admindashboard><Addcategory /></Admindashboard>} />
         <Route path="/Addsubcategory" element={<Admindashboard><Addsubcategory /></Admindashboard>} />
-        <Route path="/requireddocuments" element={<Admindashboard><RequiredDocuments /></Admindashboard>} />
-        <Route path="/documenttable" element={<Admindashboard><DocumentTable /></Admindashboard>} />
+        <Route path="/Requireddocuments" element={<Admindashboard><RequiredDocuments /></Admindashboard>} />
+        <Route path="/Documenttable" element={<Admindashboard><DocumentTable /></Admindashboard>} />
         <Route path="/Addfieldname" element={<Admindashboard><Addfieldname /></Admindashboard>} />
         <Route path="/Verifydocuments" element={<Admindashboard><Verifydocuments /></Admindashboard>} />
-        <Route path="/distributorlist" element={<Admindashboard><DistributorList /></Admindashboard>} />
+        <Route path="/Distributorlist" element={<Admindashboard><DistributorList /></Admindashboard>} />
         <Route path="/Distributorregister" element={<Admindashboard><Distributorregister /></Admindashboard>} />
         <Route path="/Recentapplications" element={<Admindashboard><Recentapplications /></Admindashboard>} />
         <Route path="/Userlist" element={<Admindashboard><Userlist /></Admindashboard>} />

@@ -42,13 +42,13 @@ const Sidebar = ({ onNavigate }) => {
               { icon: <FaList />, label: "Subcategory", path: "/Addsubcategory" }, // List Icon
               { icon: <FaExclamationTriangle />, label: "Error Request", path: "/Adminrequest" }, // Error Icon
               { icon: <FaHistory />, label: "Error Request History", path: "/Adminerrorhistory" }, // History Icon
-              { icon: <FaUserShield />, label: "Distributor Credentials", path: "/distributorlist" }, // Shield User Icon
+              { icon: <FaUserShield />, label: "Distributor Credentials", path: "/Distributorlist" }, // Shield User Icon
               { icon: <FaUserShield />, label: "Customer Credentials", path: "/Customerlist" },
               { icon: <FaBell />, label: "Notifications", path: "/Addnotifications" }, // Notification Bell
-              { icon: <FaFileAlt />, label: "Required Documents", path: "/requireddocuments" }, // Document Icon
+              { icon: <FaFileAlt />, label: "Required Documents", path: "/Requireddocuments" }, // Document Icon
               // { icon: <FaFileUpload />, label: "Add Services", path: "/documenttable" }, // Upload File Icon
               { icon: <FaShapes />, label: "Field Names", path: "/Addfieldname" }, // Shapes Icon (for fields)
-              { icon: <FaExchangeAlt />, label: "Transaction", path: "/transactions" }, // Exchange Icon
+              // { icon: <FaExchangeAlt />, label: "Transaction", path: "/transactions" }, // Exchange Icon
               { icon: <FaCheckCircle />, label: "Verify Documents", path: "/Verifydocuments" }, // Check Circle (Verification)
               { icon: <FaCheckCircle />, label: "Verify Documents History", path: "/Verifydocumentshistory" },
               { icon: <FaCheckCircle />, label: " Assigned Distributor List", path: "/Assigndistributorlist" },
@@ -77,7 +77,7 @@ const Sidebar = ({ onNavigate }) => {
   );
 };
 
-const AdminDashboard = ({ children }) => {
+const Admindashboard = ({ children }) => {
   const [userEmail, setUserEmail] = useState("");
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const navigate = useNavigate();
@@ -152,5 +152,5 @@ const AdminDashboard = ({ children }) => {
   );
 };
 
-export default AdminDashboard;
+export default Admindashboard;
 
