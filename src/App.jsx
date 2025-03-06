@@ -12,7 +12,7 @@ import DocumentTable from './Components/DocumentTable';
 import Distributordashboard from './Components/Distributordashboard';
 import Ddashinner from './Components/Ddashinner';
 import Customerdashboard from './Components/Customerdashboard';
-import AssignedDistributorsList from "./Components/Assigndistributorlist";
+import Assigndistributorlist from "./Components/Assigndistributorlist";
 // import Home from './Components/Home';
 // import About from './Components/About';
 // import Contact from './Components/Contact';
@@ -90,7 +90,7 @@ function App() {
         <Route path="/FeedbackList" element={<Admindashboard><FeedbackList /></Admindashboard>} />
 
         <Route path="/Verifydocumentshistory" element={<Admindashboard><Verifydocumentshistory /></Admindashboard>} />
-        <Route path="/AssignedDistributorsList" element={<Admindashboard><AssignedDistributorsList></AssignedDistributorsList></Admindashboard>} />
+        <Route path="/Assigndistributorlist" element={<Admindashboard><Assigndistributorlist></Assigndistributorlist></Admindashboard>} />
 
 
         <Route path="/Customerdashboard" element={<Customerdashboard />} />
