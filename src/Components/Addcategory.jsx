@@ -1,6 +1,5 @@
-/* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from "react";
-import { FaTag, FaEdit, FaTrash } from "react-icons/fa";
+import { FaTag, FaEdit, FaTrash, FaPlus } from "react-icons/fa";
 import Swal from "sweetalert2";
 import axios from "axios";
 
@@ -9,6 +8,7 @@ const AddCategory = () => {
   const [categories, setCategories] = useState([]);
   const [editingId, setEditingId] = useState(null);
   const [updatedName, setUpdatedName] = useState("");
+  const [isAdding, setIsAdding] = useState(false);
 
   const apiUrl = "https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/categories";
 
@@ -16,7 +16,6 @@ const AddCategory = () => {
     fetchCategories();
   }, []);
 
-  // Fetch Categories
   const fetchCategories = async () => {
     try {
       const response = await axios.get(apiUrl);
@@ -26,7 +25,6 @@ const AddCategory = () => {
     }
   };
 
-  // Add Category
   const handleAddCategory = async () => {
     if (!categoryName.trim()) {
       Swal.fire("Error", "Category name cannot be empty!", "error");
@@ -34,9 +32,10 @@ const AddCategory = () => {
     }
 
     try {
-      const response = await axios.post(apiUrl, { category_name: categoryName });
-      setCategories([...categories, response.data]);
+      await axios.post(apiUrl, { category_name: categoryName });
       setCategoryName("");
+      setIsAdding(false);
+      fetchCategories();
       Swal.fire("Success", "Category added successfully!", "success");
     } catch (error) {
       console.error("Error adding category:", error);
@@ -44,13 +43,11 @@ const AddCategory = () => {
     }
   };
 
-  // Start Editing Category
   const handleEditCategory = (id, currentName) => {
     setEditingId(id);
     setUpdatedName(currentName);
   };
 
-  // Update Category
   const handleUpdateCategory = async (id) => {
     if (!updatedName.trim()) {
       Swal.fire("Error", "Category name cannot be empty!", "error");
@@ -58,10 +55,10 @@ const AddCategory = () => {
     }
 
     try {
-      const response = await axios.patch(`${apiUrl}/${id}`, { category_name: updatedName });
+      await axios.patch(`${apiUrl}/${id}`, { category_name: updatedName });
 
-      setCategories(
-        categories.map((category) =>
+      setCategories((prev) =>
+        prev.map((category) =>
           category.category_id === id ? { ...category, category_name: updatedName } : category
         )
       );
@@ -75,21 +72,16 @@ const AddCategory = () => {
     }
   };
 
-  // Delete Category with Code Verification
   const handleDeleteCategory = async (id) => {
     const confirmDelete = await Swal.fire({
       title: "Enter Deletion Code",
       text: "Please enter the code to confirm deletion.",
       input: "text",
       inputPlaceholder: "Enter code here...",
-      inputAttributes: {
-        autocapitalize: "off"
-      },
       showCancelButton: true,
       confirmButtonColor: "#d33",
       cancelButtonColor: "#3085d6",
       confirmButtonText: "Delete",
-      showLoaderOnConfirm: true,
       preConfirm: (inputValue) => {
         if (inputValue !== "0000") {
           Swal.showValidationMessage("Incorrect code! Deletion not allowed.");
@@ -97,13 +89,12 @@ const AddCategory = () => {
         }
         return true;
       },
-      allowOutsideClick: () => !Swal.isLoading()
     });
 
     if (confirmDelete.isConfirmed) {
       try {
         await axios.delete(`${apiUrl}/${id}`);
-        setCategories(categories.filter((category) => category.category_id !== id));
+        setCategories((prev) => prev.filter((category) => category.category_id !== id));
         Swal.fire("Deleted!", "Category has been deleted.", "success");
       } catch (error) {
         console.error("Error deleting category:", error);
@@ -113,97 +104,113 @@ const AddCategory = () => {
   };
 
   return (
-    <div className="ml-[330px] flex flex-col items-center min-h-screen p-10 bg-gray-100">
-      {/* Add Category Section */}
-      <div className="w-full">
-        <div className="w-full max-w-7xl bg-white p-3 shadow-lg">
-          <h2 className="text-2xl font-bold text-center mb-2 text-gray-800">Category</h2>
+    <div className="ml-[300px] mt-[80px] p-6 w-[calc(100%-260px)] overflow-x-hidden">
 
-          <div className="flex items-center border-2 border-gray-300 rounded-lg shadow-md overflow-hidden">
-            <FaTag className="text-purple-800 p-3 text-2xl" />
+      <div className="relative bg-white shadow-lg rounded-lg border border-gray-300 overflow-hidden">
+        {/* Header */}
+        <div className="border-t-4 border-orange-400 bg-[#F4F4F4] text-center p-4 rounded-t-lg relative">
+          <h2 className="text-2xl font-bold text-gray-800">Category List</h2>
+          <div className="absolute bottom-[-2px] left-0 w-full h-1 bg-gray-300 shadow-md"></div>
+        </div>
+
+        {/* Add Button */}
+        <div className="p-4 flex justify-end">
+          <button
+            onClick={() => setIsAdding(true)}
+            className="bg-orange-500 text-white px-4 py-2 rounded flex items-center gap-2 hover:bg-orange-600 transition duration-200"
+          >
+            <FaPlus /> Add Category
+          </button>
+        </div>
+
+        {/* Table */}
+        <div className="p-6 overflow-x-auto">
+          <table className="w-full border border-[#776D6DA8] text-sm bg-white shadow-md rounded-md">
+            <thead className="bg-[#F58A3B14] border-b-2 border-[#776D6DA8]">
+              <tr>
+                {["ID", "Category Name", "Actions"].map((header, index) => (
+                  <th key={index} className="px-4 py-3 border border-[#776D6DA8] text-black font-semibold text-center">
+                    {header}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {categories.length > 0 ? (
+                categories.map((category, index) => (
+                  <tr
+                    key={category.category_id}
+                    className={`${index % 2 === 0 ? "bg-[#FFFFFF]" : "bg-[#F58A3B14]"} hover:bg-orange-100 transition duration-200`}
+                  >
+                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">{category.category_id}</td>
+                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">
+                      {editingId === category.category_id ? (
+                        <input
+                          type="text"
+                          value={updatedName}
+                          onChange={(e) => setUpdatedName(e.target.value)}
+                          className="border border-gray-400 p-2 rounded w-full"
+                        />
+                      ) : (
+                        category.category_name
+                      )}
+                    </td>
+                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">
+                      {editingId === category.category_id ? (
+                        <button
+                          onClick={() => handleUpdateCategory(category.category_id)}
+                          className="bg-orange-500 text-white px-3 py-1 rounded mr-2 hover:bg-orange-600"
+                        >
+                          Save
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => handleEditCategory(category.category_id, category.category_name)}
+                          className="bg-blue-500 text-white px-3 py-1 rounded mr-2 hover:bg-blue-600"
+                        >
+                          <FaEdit />
+                        </button>
+                      )}
+                      <button
+                        onClick={() => handleDeleteCategory(category.category_id)}
+                        className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+                      >
+                        <FaTrash />
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="3" className="px-4 py-3 border border-[#776D6DA8] text-center">
+                    No categories found.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {isAdding && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-[400px]">
+            <h2 className="text-xl font-bold text-gray-800 mb-4">Add Category</h2>
+
             <input
               type="text"
-              placeholder="Enter category name"
+              placeholder="Enter Category Name"
               value={categoryName}
               onChange={(e) => setCategoryName(e.target.value)}
-              className="flex-grow p-3 text-lg border-none outline-none"
+              className="w-full p-2 border border-gray-300 rounded mb-4"
             />
-            <button
-              onClick={handleAddCategory}
-              className="bg-[#00234E] text-white px-5 py-3 text-lg rounded-r-lg hover:opacity-90 transition duration-200 ml-4"
-            >
-              Add Category
+
+            <button onClick={handleAddCategory} className="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600">
+              Save
             </button>
           </div>
         </div>
-
-        {/* Categories Table */}
-        <div className="w-full mt-5 bg-white p-5 shadow-lg">
-          <h2 className="text-xl font-bold text-center mb-4 text-gray-800">Category List</h2>
-
-          <div className="overflow-y-auto max-h-70 border border-gray-300">
-            <table className="w-full border-collapse">
-              <thead className="bg-gray-300 text-black sticky top-0">
-                <tr>
-                  <th className="p-3 text-left border-r border-gray-400">ID</th>
-                  <th className="p-3 text-left border-r border-gray-400">Category Name</th>
-                  <th className="p-3 text-center">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {categories.length > 0 ? (
-                  categories.map((category, index) => (
-                    <tr key={category.category_id} className={index % 2 === 0 ? "bg-gray-100" : "bg-white"}>
-                      <td className="p-3 border-r border-gray-400">{category.category_id}</td>
-                      <td className="p-3 border-r border-gray-400">
-                        {editingId === category.category_id ? (
-                          <input
-                            type="text"
-                            value={updatedName}
-                            onChange={(e) => setUpdatedName(e.target.value)}
-                            className="border border-gray-400 p-2 rounded w-full"
-                          />
-                        ) : (
-                          category.category_name
-                        )}
-                      </td>
-                      <td className="p-3 text-center flex justify-center space-x-2">
-                        {editingId === category.category_id ? (
-                          <button
-                            onClick={() => handleUpdateCategory(category.category_id)}
-                            className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
-                          >
-                            Save
-                          </button>
-                        ) : (
-                          <button
-                            onClick={() => handleEditCategory(category.category_id, category.category_name)}
-                            className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
-                          >
-                            <FaEdit />
-                          </button>
-                        )}
-                        <button
-                          onClick={() => handleDeleteCategory(category.category_id)}
-                          className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-                        >
-                          <FaTrash />
-                        </button>
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan="3" className="p-3 text-center text-gray-500">
-                      No categories found
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
+      )}
     </div>
   );
 };

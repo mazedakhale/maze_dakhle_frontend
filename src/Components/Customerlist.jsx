@@ -50,7 +50,7 @@ const CustomerList = () => {
                 title: "Updated",
                 text: "Customer password updated successfully!",
                 icon: "success",
-                timer: 1500, // Faster SweetAlert2 success message
+                timer: 1000,
                 showConfirmButton: false
             });
         } catch (error) {
@@ -127,26 +127,24 @@ const CustomerList = () => {
     };
 
     return (
-        <div className="ml-[330px] flex flex-col items-center min-h-screen p-10 bg-gray-100">
-            {/* Customer List Section */}
-            <div className="w-full max-w-9xl bg-white p-6 shadow-lg">
+        <div className="ml-[300px] mt-[80px] p-6 w-[calc(100%-260px)] overflow-x-hidden">
+            <div className="relative bg-white shadow-lg rounded-lg border border-gray-300 overflow-hidden">
                 {/* Header */}
-                <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-xl font-bold text-gray-800">Customer List</h2>
+                <div className="border-t-4 border-orange-400 bg-[#F4F4F4] text-center p-4 rounded-t-lg relative">
+                    <h2 className="text-2xl font-bold text-gray-800">Customer List</h2>
+                    <div className="absolute bottom-[-2px] left-0 w-full h-1 bg-gray-300 shadow-md"></div>
                 </div>
 
-                {/* Scrollable Table Wrapper */}
-                <div className="overflow-y-auto max-h-[70vh] border border-gray-300">
-                    <table className="w-full border-collapse">
-                        <thead className="bg-gray-300 text-black sticky top-0">
+                {/* Table */}
+                <div className="p-6 overflow-x-auto">
+                    <table className="w-full border border-[#776D6DA8] text-sm bg-white shadow-md rounded-md">
+                        <thead className="bg-[#F58A3B14] border-b-2 border-[#776D6DA8]">
                             <tr>
-                                <th className="p-3 text-left border-r border-gray-400">ID</th>
-                                <th className="p-3 text-left border-r border-gray-400">Name</th>
-                                <th className="p-3 text-left border-r border-gray-400">Email</th>
-                                <th className="p-3 text-left border-r border-gray-400">Password</th>
-                                <th className="p-3 text-left border-r border-gray-400">Status</th>
-                                <th className="p-3 text-left border-r border-gray-400">Update</th>
-                                <th className="p-3 text-center">Actions</th>
+                                {["ID", "Name", "Email", "Password", "Status", "Update", "Actions"].map((header, index) => (
+                                    <th key={index} className="px-4 py-3 border border-[#776D6DA8] text-black font-semibold text-center">
+                                        {header}
+                                    </th>
+                                ))}
                             </tr>
                         </thead>
                         <tbody>
@@ -154,12 +152,12 @@ const CustomerList = () => {
                                 customers.map((customer, index) => (
                                     <tr
                                         key={customer.user_id}
-                                        className={index % 2 === 0 ? "bg-gray-100" : "bg-white"}
+                                        className={`${index % 2 === 0 ? "bg-[#FFFFFF]" : "bg-[#F58A3B14]"} hover:bg-orange-100 transition duration-200`}
                                     >
-                                        <td className="p-3 border-r border-gray-400">{customer.user_id}</td>
-                                        <td className="p-3 border-r border-gray-400">{customer.name}</td>
-                                        <td className="p-3 border-r border-gray-400">{customer.email}</td>
-                                        <td className="p-3 border-r border-gray-400">
+                                        <td className="px-4 py-3 border border-[#776D6DA8] text-center">{customer.user_id}</td>
+                                        <td className="px-4 py-3 border border-[#776D6DA8] text-center">{customer.name}</td>
+                                        <td className="px-4 py-3 border border-[#776D6DA8] text-center">{customer.email}</td>
+                                        <td className="px-4 py-3 border border-[#776D6DA8] text-center">
                                             {editingId === customer.user_id ? (
                                                 <input
                                                     type="text"
@@ -171,39 +169,60 @@ const CustomerList = () => {
                                                 customer.password
                                             )}
                                         </td>
-                                        <td className="p-3 border-r border-gray-400">{customer.user_login_status}</td>
-                                        <td className="p-3 border-r border-gray-400 text-center">
+                                        <td className="px-4 py-3 border border-[#776D6DA8] text-center">{customer.user_login_status}</td>
+                                        <td className="px-4 py-3 border border-[#776D6DA8] text-center">
                                             <button
                                                 onClick={() => handleStatusChange(customer.user_id, "Active")}
-                                                className="px-3 py-1 rounded bg-green-500 text-white mr-2 hover:bg-green-600"
+                                                className={`px-3 py-1 rounded text-white mr-2 ${customer.user_login_status === "Active"
+                                                    ? "bg-green-500 cursor-default"
+                                                    : "bg-gray-500 hover:bg-green-600"
+                                                    }`}
+                                                disabled={customer.user_login_status === "Active"}
                                             >
                                                 Active
                                             </button>
                                             <button
                                                 onClick={() => handleStatusChange(customer.user_id, "Inactive")}
-                                                className="px-3 py-1 rounded bg-red-500 text-white hover:bg-red-600"
+                                                className={`px-3 py-1 rounded text-white ${customer.user_login_status === "Inactive"
+                                                    ? "bg-red-500 cursor-default"
+                                                    : "bg-gray-500 hover:bg-red-600"
+                                                    }`}
+                                                disabled={customer.user_login_status === "Inactive"}
                                             >
                                                 Inactive
                                             </button>
                                         </td>
-                                        <td className="p-3 text-center">
+                                        <td className="px-4 py-3 border border-[#776D6DA8] text-center">
                                             {editingId === customer.user_id ? (
-                                                <button onClick={() => handleUpdateCustomer(customer.user_id)} className="bg-green-500 text-white px-3 py-1 rounded mr-2 hover:bg-green-600">
+                                                <button
+                                                    onClick={() => handleUpdateCustomer(customer.user_id)}
+                                                    className="bg-green-500 text-white px-3 py-1 rounded mr-2 hover:bg-green-600"
+                                                >
                                                     Save
                                                 </button>
                                             ) : (
-                                                <button onClick={() => handleEditCustomer(customer.user_id, customer.password)} className="bg-blue-500 text-white px-3 py-1 rounded mr-2 hover:bg-blue-600">
+                                                <button
+                                                    onClick={() => handleEditCustomer(customer.user_id, customer.password)}
+                                                    className="bg-blue-500 text-white px-3 py-1 rounded mr-2 hover:bg-blue-600"
+                                                >
                                                     <FaEdit />
                                                 </button>
                                             )}
-                                            <button onClick={() => handleDeleteCustomer(customer.user_id)} className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">
+                                            <button
+                                                onClick={() => handleDeleteCustomer(customer.user_id)}
+                                                className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+                                            >
                                                 <FaTrash />
                                             </button>
                                         </td>
                                     </tr>
                                 ))
                             ) : (
-                                <tr><td colSpan="6" className="p-3 text-center text-gray-500">No customers found</td></tr>
+                                <tr>
+                                    <td colSpan="7" className="px-4 py-3 border border-[#776D6DA8] text-center">
+                                        No customers found.
+                                    </td>
+                                </tr>
                             )}
                         </tbody>
                     </table>
@@ -211,6 +230,7 @@ const CustomerList = () => {
             </div>
         </div>
     );
+
 };
 
 export default CustomerList;

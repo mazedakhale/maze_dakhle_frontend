@@ -35,7 +35,7 @@ const ErrorRequests = () => {
     try {
       console.log(`Fetching error requests for distributor ID: ${distributorId}`);
       const response = await axios.get(
-        `https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/request-errors/distributor/${distributorId}`
+        `http://localhost:3000request-errors/distributor/${distributorId}`
       );
       console.log("Error Requests API Response:", response.data);
 
@@ -54,7 +54,7 @@ const ErrorRequests = () => {
   const fetchCertificates = async () => {
     try {
       console.log("Fetching certificates...");
-      const response = await axios.get("https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/certificates");
+      const response = await axios.get("http://localhost:3000certificates");
       console.log("Certificates API Response:", response.data);
       setCertificates(response.data);
     } catch (error) {
@@ -80,7 +80,7 @@ const ErrorRequests = () => {
     }
     try {
       console.log(`Fetching certificate for Certificate ID: ${certificateId}`);
-      const response = await axios.get(`https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/certificates/${certificateId}`);
+      const response = await axios.get(`http://localhost:3000certificates/${certificateId}`);
       console.log("View Certificate API Response:", response.data);
 
       if (response.data && response.data.file_url) {
@@ -108,7 +108,7 @@ const ErrorRequests = () => {
   const handleDownloadCertificate = async (documentId, requestName) => {
     try {
       const response = await axios.get(
-        `https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/download-certificate/${documentId}`,
+        `http://localhost:3000download-certificate/${documentId}`,
         {
           responseType: "blob", // Important to handle file downloads
         }
@@ -136,7 +136,7 @@ const ErrorRequests = () => {
       <div className="w-[90%] max-w-6xl bg-white shadow-md rounded-lg">
 
         {/* Header Section */}
-        <div className="bg-[#f5f0eb] border-t-4 shadow-md rounded border-orange-400 p-4">
+        <div className="bg-[#F4F4F4] border-t-4 shadow-md rounded border-orange-400 p-4">
           <h2 className="text-xl font-bold text-center text-gray-800">Error Requests History</h2>
         </div>
 
@@ -151,16 +151,14 @@ const ErrorRequests = () => {
           />
         </div>
 
-        {/* Table */}
-        <div className="overflow-x-auto">
-          <table className="min-w-full border border-gray-300">
-
-            {/* Table Header */}
-            <thead className="bg-gray-100 border-t-4 border-orange-500">
+        <div className="p-6 overflow-x-auto">
+          <table className="w-full border border-gray-300">
+            <thead className="bg-[#F58A3B14]">
               <tr>
                 {[
                   "Request ID",
                   "Application ID",
+                  "Application Name",
                   "Description",
                   "Error Document",
                   "Request Status",
@@ -168,59 +166,80 @@ const ErrorRequests = () => {
                   "Certificate",
                   "Download Certificate",
                 ].map((header, index) => (
-                  <th key={index} className="border px-4 py-2 text-center font-semibold text-gray-700">
+                  <th
+                    key={index}
+                    className="border border-gray-300 p-3 text-center font-semibold text-black"
+                  >
                     {header}
                   </th>
                 ))}
               </tr>
             </thead>
-
-            {/* Table Body */}
             <tbody>
               {filteredRequests.length > 0 ? (
                 filteredRequests.map((request, index) => (
                   <tr
                     key={request.request_id}
-                    className={`hover:bg-gray-100 ${index % 2 === 0 ? "bg-orange-50" : "bg-white"}`}
+                    className={`border border-gray-300 ${index % 2 === 0 ? "bg-[#ffffff]" : "bg-[#F58A3B14]"
+                      } hover:bg-gray-100`}
                   >
-                    <td className="border px-4 py-2 text-center">{request.request_id}</td>
-                    <td className="border px-4 py-2 text-center">{request.application_id}</td>
-                    <td className="border px-4 py-2">{request.request_description}</td>
-                    <td className="border px-4 py-2 text-center">
+                    <td className="border p-3 text-center">{request.request_id}</td>
+                    <td className="border p-3 text-center">{request.application_id}</td>
+                    <td className="px-4 py-2 border">
+                      {document?.document_fields ? ( // Use `document` instead of `doc`
+                        Array.isArray(document.document_fields) ? (
+                          document.document_fields.find((field) => field.field_name === "APPLICANT NAME") ? (
+                            <p>{document.document_fields.find((field) => field.field_name === "APPLICANT NAME").field_value}</p>
+                          ) : (
+                            <p className="text-gray-500">No applicant name available</p>
+                          )
+                        ) : (
+                          document.document_fields["APPLICANT NAME"] ? (
+                            <p>{document.document_fields["APPLICANT NAME"]}</p>
+                          ) : (
+                            <p className="text-gray-500">No applicant name available</p>
+                          )
+                        )
+                      ) : (
+                        <p className="text-gray-500">No fields available</p>
+                      )}
+                    </td>
+                    <td className="border p-3">{request.request_description}</td>
+                    <td className="border p-3 text-center">
                       <a
                         href={request.error_document}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-blue-500 font-semibold underline"
+                        className="text-blue-500 underline"
                       >
                         View Document
                       </a>
                     </td>
 
                     {/* Status Badge */}
-                    <td className="border px-4 py-2 text-center">
+                    <td className="border p-3 text-center">
                       <span
-                        className={`px-3 py-1 rounded-full text-white text-sm flex items-center justify-center gap-1 ${request.request_status === "Completed"
-                          ? "bg-yellow-500"
-                          : request.request_status === "Approved"
-                            ? "bg-green-500"
-                            : request.request_status === "Distributor Rejected"
-                              ? "bg-red-500"
+                        className={`px-3 py-1 rounded-full text-white text-sm ${request.request_status === "Approved"
+                          ? "bg-green-500"
+                          : request.request_status === "Distributor Rejected"
+                            ? "bg-red-500"
+                            : request.request_status === "Completed"
+                              ? "bg-blue-500"
                               : request.request_status === "Uploaded"
                                 ? "bg-purple-500"
-                                : "bg-gray-500"
+                                : "bg-yellow-500"
                           }`}
                       >
-                        ⬤ {request.request_status}
+                        {request.request_status}
                       </span>
                     </td>
 
-                    <td className="border px-4 py-2 text-center">
+                    <td className="border p-3 text-center">
                       {new Date(request.request_date).toLocaleString()}
                     </td>
 
                     {/* View Certificate */}
-                    <td className="border px-4 py-2 text-center">
+                    <td className="border p-3 text-center">
                       {["Uploaded", "Completed"].includes(request.request_status) &&
                         getCertificateByDocumentId(request.document_id) ? (
                         <button
@@ -235,7 +254,7 @@ const ErrorRequests = () => {
                     </td>
 
                     {/* Download Certificate */}
-                    <td className="border p-2 text-center">
+                    <td className="border p-3 text-center">
                       {getCertificateByDocumentId(request.document_id) ? (
                         <button
                           onClick={() =>
@@ -261,11 +280,9 @@ const ErrorRequests = () => {
             </tbody>
           </table>
         </div>
-
       </div>
     </div>
   );
-
 
 };
 

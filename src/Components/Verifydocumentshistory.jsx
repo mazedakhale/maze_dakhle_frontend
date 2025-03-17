@@ -3,15 +3,17 @@ import axios from "axios";
 import { FaRegFileAlt, FaDownload, FaFileInvoice, FaCheck, FaTimes } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
-const VerifyDocumentshistory = () => {
+import "../styles/style.css"; // Import the CSS file
+const Verifydocumentshistory = () => {
   const [distributors, setDistributors] = useState([]);
   const [certificates, setCertificates] = useState([]);
-  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [documents, setDocuments] = useState([]);
   const [users, setUsers] = useState([]);
+  const navigate = useNavigate();
 
+  // Fetch assigned documents from the new API
   useEffect(() => {
     axios
       .get("https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/documents/list")
@@ -23,18 +25,22 @@ const VerifyDocumentshistory = () => {
       })
       .catch((error) => console.error("Error fetching documents:", error));
 
+
+    // Fetch distributors
     axios
-      .get("https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/users/distributors")
+      .get(`https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/users/distributors`)
       .then((response) => setDistributors(response.data))
       .catch((error) => console.error("Error fetching distributors:", error));
 
+    // Fetch certificates
     axios
-      .get("https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/certificates")
+      .get('https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/certificates')
       .then((response) => setCertificates(response.data))
       .catch((error) => console.error("Error fetching certificates:", error));
 
+    // Fetch users
     axios
-      .get("https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/users/register")
+      .get('https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/users/register')
       .then((response) => setUsers(response.data))
       .catch((error) => console.error("Error fetching users:", error));
   }, []);
@@ -46,9 +52,46 @@ const VerifyDocumentshistory = () => {
   const handleSearchQueryChange = (e) => {
     setSearchQuery(e.target.value);
   };
+  const handleDownloadReceipt = (receiptUrl, documentName) => {
+    try {
+      // Extract the file extension from the URL (e.g., "pdf", "jpg", "png")
+      const fileExtension = receiptUrl.split('.').pop().toLowerCase();
+
+      // Generate the file name (e.g., "MyDocument_receipt.pdf")
+      const fileName = `${documentName}_receipt.${fileExtension}`;
+
+      // Create a temporary <a> element to trigger the download
+      const link = document.createElement("a");
+      link.href = receiptUrl;
+      link.download = fileName; // Set the file name for the download
+      link.style.display = "none"; // Hide the link element
+      document.body.appendChild(link); // Add the link to the DOM
+      link.click(); // Trigger the download
+      document.body.removeChild(link); // Clean up by removing the link
+    } catch (error) {
+      console.error("Error downloading receipt:", error);
+      Swal.fire("Error", "Failed to download receipt. Please try again.", "error");
+    }
+  };
+  // Update document status
+  const handleUpdateStatus = async (documentId, newStatus) => {
+    try {
+      await axios.put(`https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/documents/update-status/${documentId}`, {
+        status: newStatus,
+      });
+      setDocuments((prev) =>
+        prev.map((doc) =>
+          doc.document_id === documentId ? { ...doc, status: newStatus } : doc
+        )
+      );
+    } catch (error) {
+      console.error("Error updating status:", error);
+      alert("Failed to update status.");
+    }
+  };
 
   const filteredDocuments = documents
-    .filter((doc) => doc.status === "Completed" || doc.status === "Rejected") // Only Rejected or Completed
+    .filter((doc) => doc.status === "Completed") // Only include documents with status "Uploaded"
     .filter((doc) =>
       statusFilter ? doc.status?.toLowerCase() === statusFilter.toLowerCase() : true
     )
@@ -86,8 +129,6 @@ const VerifyDocumentshistory = () => {
     return matchedCertificate ? matchedCertificate.certificate_id : null;
   };
 
-
-
   const handleViewCertificate = async (documentId) => {
     const certificateId = getCertificateByDocumentId(documentId);
     if (!certificateId) {
@@ -107,9 +148,11 @@ const VerifyDocumentshistory = () => {
     }
   };
 
-
   const handleDownloadCertificate = async (documentId, name) => {
     try {
+      console.log("Downloading file for documentId:", documentId, "with name:", name); // Debugging
+
+      // Make the API call to download the file
       const response = await axios.get(
         `https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/download-certificate/${documentId}`,
         {
@@ -117,68 +160,101 @@ const VerifyDocumentshistory = () => {
         }
       );
 
+      console.log("API Response:", response); // Debugging
+
+      // Extract the file name and extension from the response headers
+      const contentDisposition = response.headers["content-disposition"];
+      let fileName = `${name}`; // Default file name
+
+      if (contentDisposition && contentDisposition.includes("filename=")) {
+        // Extract the file name from the Content-Disposition header
+        fileName = contentDisposition
+          .split("filename=")[1]
+          .replace(/['"]/g, ""); // Remove quotes
+      }
+
       // Create a downloadable link
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement("a");
       link.href = url;
-      link.setAttribute("download", `${name}.zip`); // Set ZIP file name based on user name
+      link.setAttribute("download", fileName); // Set the file name
       document.body.appendChild(link);
       link.click();
+
+      // Clean up
       link.parentNode.removeChild(link);
+      window.URL.revokeObjectURL(url);
+
+      console.log("Download initiated successfully"); // Debugging
     } catch (error) {
-      console.error("Error downloading certificate:", error);
-      alert("Failed to download certificate.");
+      console.error("Error downloading file:", error);
+      alert("Failed to download file.");
     }
   };
 
   return (
-    <div className="ml-[295px] flex flex-col items-center min-h-screen p-10 bg-gray-100">
-      <div className="w-full p-6 bg-white rounded-lg shadow-lg">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-bold text-gray-800">Verify Documents</h2>
+    <div className="w-[calc(90%-330px)] ml-[330px] mt-[80px] p-6">
+      {/* Outer Container */}
+      <div className=" bg-white shadow-lg rounded-lg border border-gray-300 ">
 
-          <div className="flex items-center space-x-4">
-            <div>
-              <label htmlFor="statusFilter" className="mr-2">Filter by Status:</label>
-              <select
-                id="statusFilter"
-                value={statusFilter}
-                onChange={handleStatusFilterChange}
-                className="p-2 border rounded"
-              >
-                <option value="">All</option>
-                <option value="Approved">Approved</option>
-                <option value="Rejected">Rejected</option>
-                <option value="Completed">Completed</option>
-              </select>
-            </div>
+        {/* Header */}
+        <div className="border-t-4 border-orange-400 bg-[#F4F4F4] text-center p-4 rounded-t-lg ">
+          <h2 className="text-xl font-bold text-center text-gray-800">
+            Completed Application List
 
-            <input
-              type="text"
-              placeholder="Search documents..."
-              value={searchQuery}
-              onChange={handleSearchQueryChange}
-              className="p-2 border rounded w-[200px]"
-            />
-          </div>
+          </h2>
         </div>
 
-        <div className="table-container border border-gray-300 rounded-lg shadow-md">
-          <table className="table border-collapse border border-gray-300 min-w-full">
+        {/* Filters */}
+        <div className="p-4 flex justify-between items-center bg-gray-100 border-b border-gray-300">
+          <div className="flex items-center space-x-4">
+            <label htmlFor="statusFilter" className="text-sm font-medium">Filter by Status:</label>
+            <select
+              id="statusFilter"
+              value={statusFilter}
+              onChange={handleStatusFilterChange}
+              className="border border-orange-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-400 text-sm"
+            >
+              <option value="">All</option>
+              <option value="Approved">Approved</option>
+              <option value="Rejected">Rejected</option>
+              <option value="Completed">Completed</option>
+              <option value="Pending">Pending</option>
+            </select>
+          </div>
+
+          <input
+            type="text"
+            placeholder="Search documents..."
+            value={searchQuery}
+            onChange={handleSearchQueryChange}
+            className="border border-orange-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-400 w-64 text-sm"
+          />
+        </div>
+
+        <div className="table-container border border-gray-300 rounded-lg shadow-md overflow-x-auto p-6">
+          <table className="table border-collapse border border-gray-300 min-w-full text-sm">
             <thead className="bg-gray-300">
               <tr>
                 <th className="border p-2 text-center font-bold">Sr No.</th>
                 <th className="border p-2 text-center font-bold">Application Id</th>
+                <th className="border p-2 text-center font-bold">Datetime</th>
+                <th className="border p-2 text-center font-bold">Applicant Name</th>
+
                 <th className="border p-2 font-bold">Category</th>
                 <th className="border p-2 font-bold">Subcategory</th>
-                <th className="border p-2 font-bold">Name</th>
-                <th className="border p-2 font-bold">Email</th>
-                <th className="border p-2 font-bold">Assign Distributor</th>
+                <th className="border p-2 font-bold">VLE Name</th>
+                <th className="border p-2 font-bold">VLE Email</th>
+                <th className="border p-2 font-bold">VLE Phone no</th>
+
+                <th className="border p-2 font-bold">Assigned Distributor</th>
                 <th className="border p-2 font-bold">Verification</th>
-                <th className="border p-2 font-bold">Action</th>
+
+                {/* <th className="border p-2 font-bold">Action</th> */}
                 <th className="border p-2 font-bold">View</th>
+                <th className="border p-2 font-bold">Download Receipt</th>
+
                 <th className="border p-2 font-bold">Certificate</th>
-                <th className="border p-2 font-bold">Download Certificate</th>
               </tr>
             </thead>
             <tbody>
@@ -189,47 +265,104 @@ const VerifyDocumentshistory = () => {
                 >
                   <td className="border p-2 text-center">{index + 1}</td>
                   <td className="border p-2 text-center">{doc.application_id}</td>
+                  <td className="border p-2">
+                    {new Date(doc.uploaded_at).toLocaleString('en-US', {
+                      year: 'numeric',
+                      month: '2-digit',
+                      day: '2-digit',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                      second: '2-digit',  // Added seconds
+                      hour12: true, // Use AM/PM
+                    })}
+                  </td>
+                  <td className="px-4 py-2 border text-sm">
+                    {doc?.document_fields && typeof doc.document_fields === "object"
+                      ? (doc.document_fields["APPLICANT NAME"]
+                        ? <p>{doc.document_fields["APPLICANT NAME"]}</p>
+                        : <p className="text-gray-500">No applicant name available</p>)
+                      : <p className="text-gray-500">No fields available</p>}
+                  </td>
+
                   <td className="border p-2">{doc.category_name}</td>
                   <td className="border p-2">{doc.subcategory_name}</td>
                   <td className="border p-2">{doc.name}</td>
                   <td className="border p-2 break-words">{doc.email}</td>
+                  <td className="border p-2 break-words">{doc.phone}</td>
+
                   <td className="border p-2">{getDistributorName(doc.distributor_id)}</td>
-
                   <td className="border p-2">
-                    <span className={`px-3 py-1 rounded-full text-white text-sm ${doc.status === "Completed" ? "bg-green-500" : "bg-red-500"}`}>
-                      {doc.status}
-                    </span>
-                  </td>
-
-                  <td className="border p-2 text-center">
-                    <button onClick={() => handleViewInvoice(doc.document_id)} className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition">
-                      <FaFileInvoice className="mr-1" /> Action
-                    </button>
-                  </td>
-
-                  <td className="border p-2 text-center">
-                    <button onClick={() => handleView(doc.document_id)} className="bg-indigo-500 text-white px-3 py-1 rounded hover:bg-indigo-600 transition">
-                      <FaFileInvoice className="mr-1" /> View
-                    </button>
-                  </td>
-
-
-
-
-
-                  <td className="border p-2">{getCertificateByDocumentId(doc.document_id) ? <button onClick={() => handleViewCertificate(doc.document_id)} className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 transition">Certificate</button> : <span>No Certificate</span>}</td>
-
-
-                  <td className="border p-2 text-center">
-                    {getCertificateByDocumentId(doc.document_id) ? (
-                      <button
-                        onClick={() => handleDownloadCertificate(doc.document_id, doc.name)}
-                        className="bg-green-500 text-white px-3 py-1 rounded flex justify-center items-center hover:bg-green-600 transition"
+                    <div className="flex flex-col gap-1">
+                      {/* Status Badge */}
+                      <span
+                        className={`px-3 py-1 rounded-full text-white text-xs ${doc.status === "Approved"
+                          ? "bg-green-500"
+                          : doc.status === "Rejected"
+                            ? "bg-red-500"
+                            : doc.status === "Completed"
+                              ? "bg-yellow-500" // Color for Completed
+                              : "bg-blue-500" // Default color
+                          }`}
                       >
-                        <FaDownload className="mr-1" /> Download
+                        {doc.status}
+                      </span>
+
+                      {/* Latest Status Date and Time */}
+                      {doc.status_history
+                        ?.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at)) // Sort by latest date
+                        .slice(0, 1) // Take the first entry (latest status)
+                        .map((statusEntry, index) => (
+                          <div key={index} className="text-xs text-gray-600">
+                            {new Date(statusEntry.updated_at).toLocaleString("en-US", {
+                              year: "numeric",
+                              month: "2-digit",
+                              day: "2-digit",
+                              hour: "2-digit",
+                              minute: "2-digit",
+                              second: "2-digit", // Added seconds
+                              hour12: true, // Use AM/PM
+                            })}
+                          </div>
+                        ))}
+                    </div>
+                  </td>
+
+
+                  {/* <td className="border p-2 text-center">
+                                        <button
+                                            onClick={() => handleViewInvoice(doc.document_id)}
+                                            className="bg-red-500 text-white px-3 py-1 rounded flex justify-center items-center hover:bg-red-600 transition text-xs"
+                                        >
+                                            <FaFileInvoice className="mr-1" /> Action
+                                        </button>
+                                    </td> */}
+                  <td className="border p-2 text-center">
+                    <button onClick={() => handleView(doc.document_id, doc.category_id, doc.subcategory_id)} className="bg-indigo-500 text-white px-3 py-1 rounded hover:bg-indigo-600 transition text-xs">
+                      <FaRegFileAlt className="mr-1" /> View
+                    </button>
+                  </td>
+                  <td className="border p-3 text-center">
+                    {doc.receipt_url ? ( // Check if receipt_url exists
+                      <button
+                        onClick={() => handleDownloadReceipt(doc.receipt_url, doc.name)}
+                        className="bg-blue-500 text-white px-3 py-1 rounded flex justify-center items-center hover:bg-blue-600 transition"
+                      >
+                        <FaDownload className="mr-1" />  Receipt
                       </button>
                     ) : (
                       <span className="text-gray-500 text-center">Not Available</span>
+                    )}
+                  </td>
+                  <td className="border p-2 text-center">
+                    {getCertificateByDocumentId(doc.document_id) ? (
+                      <button
+                        onClick={() => handleViewCertificate(doc.document_id)}
+                        className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 transition text-xs"
+                      >
+                        <FaCheck className="mr-1" /> Certificate
+                      </button>
+                    ) : (
+                      <span className="text-gray-500">Not Available</span>
                     )}
                   </td>
 
@@ -243,4 +376,4 @@ const VerifyDocumentshistory = () => {
   );
 };
 
-export default VerifyDocumentshistory;
+export default Verifydocumentshistory;

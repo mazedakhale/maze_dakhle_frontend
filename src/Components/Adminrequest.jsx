@@ -121,10 +121,16 @@ const ErrorRequests = () => {
     );
 
   return (
-    <div className="ml-[300px] p-6">
-      <div className="bg-white shadow-md p-4 rounded-md">
-        <div className="flex justify-between items-center mb-4">
-          <h1 className="text-2xl font-bold">Error Requests</h1>
+    <div className="ml-[300px] mt-[80px] p-6 w-[calc(100%-260px)] overflow-x-hidden">
+      <div className="relative bg-white shadow-lg rounded-lg border border-gray-300 overflow-hidden">
+        {/* Header */}
+        <div className="border-t-4 border-orange-400 bg-[#F4F4F4] text-center p-4 rounded-t-lg relative">
+          <h2 className="text-2xl font-bold text-gray-800">Error Requests</h2>
+          <div className="absolute bottom-[-2px] left-0 w-full h-1 bg-gray-300 shadow-md"></div>
+        </div>
+
+        {/* Search Bar */}
+        <div className="p-4 flex justify-end">
           <input
             type="text"
             placeholder="Search..."
@@ -134,31 +140,29 @@ const ErrorRequests = () => {
           />
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="min-w-full bg-white border border-gray-300">
-            <thead className="bg-gray-200">
+        {/* Table */}
+        <div className="p-6 overflow-x-auto">
+          <table className="w-full border border-[#776D6DA8] text-sm bg-white shadow-md rounded-md">
+            <thead className="bg-[#F58A3B14] border-b-2 border-[#776D6DA8]">
               <tr>
-                <th className="border px-4 py-2">Request ID</th>
-                <th className="border px-4 py-2">Application ID</th>
-                <th className="border px-4 py-2">Description</th>
-                <th className="border px-4 py-2">Error Document</th>
-                <th className="border px-4 py-2">Document ID</th>
-                <th className="border px-4 py-2">User ID</th>
-                <th className="border px-4 py-2">Distributor ID</th>
-                <th className="border px-4 py-2">Request Status</th>
-                <th className="border px-4 py-2">Request Date</th>
-                <th className="border px-4 py-2">Certificate</th>
-                <th className="border px-4 py-2">Actions</th>
+                {["Request ID", "Application ID", "Description", "Error Document", "Document ID", "User ID", "Distributor ID", "Request Status", "Request Date", "Certificate", "Actions"].map((header, index) => (
+                  <th key={index} className="px-4 py-3 border border-[#776D6DA8] text-black font-semibold text-center">
+                    {header}
+                  </th>
+                ))}
               </tr>
             </thead>
             <tbody>
               {filteredRequests.length > 0 ? (
-                filteredRequests.map((request) => (
-                  <tr key={request.request_id} className="hover:bg-gray-100">
-                    <td className="border px-4 py-2 text-center">{request.request_id}</td>
-                    <td className="border px-4 py-2 text-center">{request.application_id}</td>
-                    <td className="border px-4 py-2">{request.request_description}</td>
-                    <td className="border px-4 py-2 text-center">
+                filteredRequests.map((request, index) => (
+                  <tr
+                    key={request.request_id}
+                    className={`${index % 2 === 0 ? "bg-[#FFFFFF]" : "bg-[#F58A3B14]"} hover:bg-orange-100 transition duration-200`}
+                  >
+                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">{request.request_id}</td>
+                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">{request.application_id}</td>
+                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">{request.request_description}</td>
+                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">
                       <a
                         href={request.error_document}
                         target="_blank"
@@ -168,10 +172,10 @@ const ErrorRequests = () => {
                         View Document
                       </a>
                     </td>
-                    <td className="border px-4 py-2 text-center">{request.document_id}</td>
-                    <td className="border px-4 py-2 text-center">{request.user_id}</td>
-                    <td className="border px-4 py-2 text-center">{request.distributor_id}</td>
-                    <td className="border px-4 py-2 text-center">
+                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">{request.document_id}</td>
+                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">{request.user_id}</td>
+                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">{request.distributor_id}</td>
+                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">
                       <span
                         className={`px-3 py-1 rounded-full text-white text-sm ${request.request_status === "Approved"
                           ? "bg-green-500"
@@ -185,10 +189,10 @@ const ErrorRequests = () => {
                         {request.request_status}
                       </span>
                     </td>
-                    <td className="border px-4 py-2 text-center">
+                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">
                       {new Date(request.request_date).toLocaleString()}
                     </td>
-                    <td className="border px-4 py-2 text-center">
+                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">
                       {["Uploaded", "Completed"].includes(request.request_status) &&
                         getCertificateByDocumentId(request.document_id) ? (
                         <button
@@ -201,7 +205,7 @@ const ErrorRequests = () => {
                         <span>No Certificate</span>
                       )}
                     </td>
-                    <td className="border px-4 py-2 text-center">
+                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">
                       <select
                         className="border p-1 rounded"
                         value={request.request_status}
@@ -211,14 +215,13 @@ const ErrorRequests = () => {
                         <option value="Approved">Approved</option>
                         <option value="Rejected">Rejected</option>
                         <option value="Completed">Completed</option>
-
                       </select>
                     </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan="10" className="text-center py-4">
+                  <td colSpan="11" className="px-4 py-3 border border-[#776D6DA8] text-center">
                     No error requests found.
                   </td>
                 </tr>

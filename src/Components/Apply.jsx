@@ -5,12 +5,11 @@ import Swal from 'sweetalert2';
 
 const Apply = () => {
   const [documentNames, setDocumentNames] = useState([]);
-  const [fieldNames, setFieldNames] = useState([]);
   const [selectedFiles, setSelectedFiles] = useState({});
   const [errors, setErrors] = useState({});
   const location = useLocation();
   const { categoryId, categoryName, subcategoryId, subcategoryName } = location.state || {};
-
+  const [fieldNames, setFieldNames] = useState([]);
   const token = localStorage.getItem("token");
   const [userData, setUserData] = useState({
     user_id: "",
@@ -140,7 +139,6 @@ const Apply = () => {
     if (!formData.name) newErrors.name = "Full Name is required.";
     if (!formData.email) newErrors.email = "Email is required.";
     if (!formData.phone) newErrors.phone = "Phone Number is required.";
-    // if (!formData.address) newErrors.address = "Address is required.";
 
     fieldNames.forEach((field) => {
       if (!formData.document_fields[field]) {
@@ -170,12 +168,6 @@ const Apply = () => {
       return;
     }
 
-    // if (!validateForm()) {
-    //   return;
-    // }
-
-
-
     Swal.fire({
       title: 'Processing...',
       text: 'Please wait while your application is being submitted.',
@@ -185,14 +177,25 @@ const Apply = () => {
       }
     });
 
+    // Create an ordered array of field objects
+    const orderedDocumentFields = fieldNames.map(fieldName => ({
+      field_name: fieldName,
+      field_value: formData.document_fields[fieldName] || ""
+    }));
 
     const formDataToSend = new FormData();
+
+    // Add the ordered document fields
+    formDataToSend.append('document_fields', JSON.stringify(orderedDocumentFields));
+
+    // Add other form data
     Object.entries(formData).forEach(([key, value]) => {
       if (key === "document_fields") {
-        formDataToSend.append(key, JSON.stringify(value));
+        // Skip this as we've already added the ordered version
       } else if (key === "files") {
         Object.entries(value).forEach(([fileKey, file]) => {
           formDataToSend.append("files", file);
+          formDataToSend.append("document_types", fileKey); // Add document name (e.g., "Aadhaar Card")
         });
       } else {
         formDataToSend.append(key, value);
@@ -203,7 +206,10 @@ const Apply = () => {
       const response = await axios.post(
         "https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/documents/upload",
         formDataToSend,
-        { headers: { "Content-Type": "multipart/form-data" } }
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+          timeout: 30000, // Set timeout to 30 seconds
+        }
       );
 
       Swal.fire({
@@ -220,9 +226,7 @@ const Apply = () => {
       });
     }
   };
-
   return (
-    // <div className="flex min-h-screen bg-white overflow-hidden">
     <div className="ml-[320px] flex flex-col items-center min-h-screen p-10 bg-gray-100">
       <div className="flex-1 flex justify-center pt-9 bg-white items-center py-9 px-9">
         <form
@@ -250,7 +254,7 @@ const Apply = () => {
 
             <div>
               <label className="block text-gray-700 font-medium text-lg">
-                Full Name <span className="text-red-500">*</span>
+                VLE Name <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
@@ -267,7 +271,7 @@ const Apply = () => {
           <div className="grid grid-cols-3 gap-6 mb-6">
             <div>
               <label className="block text-gray-700 font-medium text-lg">
-                Email Address <span className="text-red-500">*</span>
+                VLE Email  <span className="text-red-500">*</span>
               </label>
               <input
                 type="email"
@@ -282,7 +286,7 @@ const Apply = () => {
 
             <div>
               <label className="block text-gray-700 font-medium text-lg">
-                Phone Number <span className="text-red-500">*</span>
+                VLE Phone  <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
@@ -294,30 +298,18 @@ const Apply = () => {
               />
               {errors.phone && <p className="text-red-500 text-sm">{errors.phone}</p>}
             </div>
-
-            {/* <div>
-              <label className="block text-gray-700 font-medium text-lg">
-                Address <span className="text-red-500">*</span>
-              </label>
-              <textarea
-                name="address"
-                onChange={handleChange}
-                value={formData.address || ""}
-                className={`w-full mt-2 p-3 border ${errors.address ? 'border-red-500' : 'border-gray-300'} rounded-lg bg-white shadow-md`}
-                placeholder="Enter Address"
-              />
-              {errors.address && <p className="text-red-500 text-sm">{errors.address}</p>}
-            </div> */}
           </div>
 
           <div className="mb-6">
-            <label className="block text-gray-700 font-semibold text-lg">
-              Applicant Information <span className="text-red-500">*</span>
+            <label className="block text-gray-700 font-bold text-lg text-center">
+              APPLICANT  INFORMATION <span className="text-red-500">*</span>
             </label>
             <div className="grid grid-cols-3 gap-6">
               {fieldNames.map((field, index) => (
                 <div key={index} className="mt-2">
-                  <label className="block text-gray-600 mb-1 font-medium">{field} <span className="text-red-500">*</span></label>
+                  <label className="block text-gray-600 mb-1 font-medium">
+                    {field} <span className="text-red-500">*</span>
+                  </label>
                   <input
                     type="text"
                     value={formData.document_fields[field] || ""}
@@ -325,14 +317,14 @@ const Apply = () => {
                     className={`w-full p-3 border ${errors[field] ? 'border-red-500' : 'border-gray-300'} rounded-lg shadow-md`}
                     placeholder={`Enter ${field}`}
                   />
-                  {errors[field] && <p className="text-red-500 text-sm">{errors[field]}</p>}
+                  {errors[field] && <p className="text-red-500 text-sm mt-1">{errors[field]}</p>}
                 </div>
               ))}
             </div>
           </div>
 
           <div className="mb-6">
-            <label className="block text-gray-700 font-semibold text-lg">Upload Documents <span className="text-red-500">*</span></label>
+            <label className="block text-gray-700 font-bold text-lg text-center">UPLOAD DOCUMENTS <span className="text-red-500">*</span></label>
             <div className="grid grid-cols-3 gap-6">
               {documentNames.map((docName, index) => (
                 <div key={index} className="mb-2">

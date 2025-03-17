@@ -1,21 +1,29 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
 import { useParams, useLocation } from 'react-router-dom';
-import { FaCheck, FaTimes, FaUserPlus } from 'react-icons/fa';
+import { FaCheck, FaTimes, FaUserPlus, FaFileAlt } from 'react-icons/fa';
 import logo1 from '../assets/logo.png';
 import jwtDecode from 'jwt-decode';
 import { FaUserCircle, FaDownload } from 'react-icons/fa';
 import Draggable from "react-draggable";
 import { useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
-
+import Swal from "sweetalert2";
 
 
 const InvoicePage = () => {
   const { documentId } = useParams();
+  const [documents, setDocuments] = useState([]);
+  const [isProcessing, setIsProcessing] = useState(false); // Define the state
+  const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
   const location = useLocation();
   const { categoryId: stateCategoryId, subcategoryId: stateSubcategoryId } = location.state || {};
-
+  const [showPreview, setShowPreview] = useState(false);
+  const [previewFile, setPreviewFile] = useState(null);
+  const [certificatePreviewUrl, setCertificatePreviewUrl] = useState(null);
+  const [showCertificatePreview, setShowCertificatePreview] = useState(false);
   const [documentData, setDocumentData] = useState(null);
   const [documentNames, setDocumentNames] = useState({});
   const [selectedDocument, setSelectedDocument] = useState(null);
@@ -29,22 +37,193 @@ const InvoicePage = () => {
   const [openContainer, setOpenContainer] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedDistributor, setSelectedDistributor] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null); // New state for file upload
+  const [selectedReceiptFile, setSelectedReceiptFile] = useState(null); // State for receipt file
+  const [previewReceiptFile, setPreviewReceiptFile] = useState(null); // State for receipt preview
   const nodeRef = useRef(null);
+  const navigate = useNavigate(); // Use navigate instead of history
+  const [isLoading, setIsLoading] = useState(false);
 
-  const filteredDistributors = distributors.filter((dist) =>
-    dist.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
 
-  const handleCheckboxChange = (userId) => {
-    setSelectedDistributor(userId === selectedDistributor ? null : userId);
+  // Handle receipt file selection
+  const handleReceiptFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const fileURL = URL.createObjectURL(file);
+      setSelectedReceiptFile(file);
+      setPreviewReceiptFile(fileURL);
+      setShowPreview(true);
+
+    }
+  };
+  // Get certificate by document_id
+
+
+  // View certificate
+
+  // Handle receipt file cancellation
+  const handleCancelReceiptFile = () => {
+    if (previewReceiptFile) {
+      URL.revokeObjectURL(previewReceiptFile);
+    }
+    setSelectedReceiptFile(null);
+    setPreviewReceiptFile(null);
+    setShowPreview(false);
+  };
+  const handleUploadReceipt = async () => {
+    if (!selectedReceiptFile) {
+      Swal.fire("Warning", "Please select a receipt file first", "warning");
+      return;
+    }
+
+    // Allowed file types and size validation
+    const allowedTypes = ["image/jpeg", "image/png", "application/pdf"];
+    const maxSize = 5 * 1024 * 1024; // 5 MB
+
+    if (!allowedTypes.includes(selectedReceiptFile.type)) {
+      Swal.fire("Error", "Only JPEG, PNG, and PDF files are allowed.", "error");
+      return;
+    }
+
+    if (selectedReceiptFile.size > maxSize) {
+      Swal.fire("Error", "File size must be less than 5 MB.", "error");
+      return;
+    }
+
+    // Show a loading alert
+    Swal.fire({
+      title: "Uploading...",
+      text: "Please wait while your receipt is being uploaded.",
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      }
+    });
+
+    const formData = new FormData();
+    formData.append("receipt", selectedReceiptFile);
+    formData.append("document_id", documentId.toString());
+
+    try {
+      // Step 1: Upload the receipt
+      const response = await axios.post(
+        `https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/documents/upload-receipt/${documentId}`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      console.log("Upload Response:", response.data);
+
+      // Step 2: Update the status to "Uploaded"
+      await axios.put(
+        `https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/documents/update-status/${documentId}`,
+        { status: "Sent" },
+        { timeout: 30000 }  // Increase timeout to 30 seconds
+      );
+
+      Swal.fire({
+        title: "Success",
+        text: "Receipt uploaded successfully!",
+        icon: "success",
+        confirmButtonText: "OK"
+      }).then(() => {
+        navigate('/Distributorverify'); // Redirect to Distributor Verify page
+      });
+
+      handleCancelReceiptFile(); // Reset file input
+    } catch (error) {
+      console.error("Error uploading receipt:", error);
+      console.error("Server response:", error.response?.data);
+
+      Swal.fire({
+        title: "Error",
+        text: "Failed to upload receipt. Please try again.",
+        icon: "error"
+      });
+    }
   };
 
-  const handleSaveClick = (userId) => {
-    handleAssignDistributor(userId);
-    // setSelectedDistributor(null);
-    // alert("Distributor selected successfully!");
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const fileURL = URL.createObjectURL(file);
+      setSelectedFile(file);
+      setPreviewFile(fileURL);
+      setShowPreview(true);
+    }
   };
 
+  const handleCancelFile = () => {
+    if (previewFile) {
+      URL.revokeObjectURL(previewFile);
+    }
+    setSelectedFile(null);
+    setPreviewFile(null);
+    setShowPreview(false);
+  };
+
+  const handleUploadCertificate = async () => {
+    if (!selectedFile) {
+      Swal.fire("Warning", "Please select a file first", "warning");
+      return;
+    }
+
+    if (!documentData || !documentData.user_id || !documentData.distributor_id || !documentData.application_id || !documentData.name) {
+      Swal.fire("Error", "Required document information is missing", "error");
+      return;
+    }
+
+    Swal.fire({
+      title: 'Uploading...',
+      text: 'Please wait while we upload your certificate',
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      }
+    });
+
+    const formData = new FormData();
+    formData.append("file", selectedFile);
+    formData.append("document_id", documentId.toString());
+    formData.append("user_id", documentData.user_id.toString());
+    formData.append("distributor_id", documentData.distributor_id.toString());
+    formData.append("application_id", documentData.application_id.toString());
+    formData.append("name", documentData.name.toString());
+
+    try {
+      // Increased timeout
+      const response = await axios.post(
+        'https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/certificates/upload',
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+          timeout: 30000, // Timeout increased to 30 seconds
+        }
+      );
+
+      Swal.fire({
+        title: "Success",
+        text: "Certificate uploaded successfully!",
+        icon: "success",
+        confirmButtonText: "OK"
+      }).then(() => {
+        navigate('/Distributorverify');
+      });
+
+      handleCancelFile();
+    } catch (error) {
+      console.error("Error uploading certificate:", error);
+      Swal.fire(
+        "Error",
+        error.response?.data?.message || "Failed to upload certificate. Please try again.",
+        "error"
+      );
+    }
+  };;
 
 
   useEffect(() => {
@@ -64,59 +243,279 @@ const InvoicePage = () => {
 
 
   const handleDocumentClick = (filePath, index) => {
-    setSelectedDocument(filePath); // Show the document
-    setCheckedDocs((prev) => ({ ...prev, [index]: true })); // Check the checkbox
+    setSelectedDocument(filePath);
+    setShowDocumentViewer(true);
+    setCheckedDocs((prev) => ({ ...prev, [index]: true }));
   };
   const handleUpdateStatus = async (newStatus) => {
-    if (newStatus === "Rejected" && !rejectionReason.trim()) {
-      alert("Please enter a reason for rejection.");
+    setIsUpdatingStatus(true); // Set loading state to true
+
+    if (newStatus === 'Rejected' && !rejectionReason.trim()) {
+      alert('Please enter a reason for rejection.');
+      setIsUpdatingStatus(false); // Reset loading state
       return;
     }
 
     try {
-      await axios.put(`https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/documents/update-status/${documentId}`, {
+      const payload = {
         status: newStatus,
-        rejectionReason: newStatus === "Rejected" ? rejectionReason : undefined,
+        rejectionReason: rejectionReason,
+        selectedDocumentNames: documentData.documents
+          .filter((_, index) => checkedDocs[index])
+          .map((doc) => documentNames[doc.document_type] || doc.document_type),
+      };
+
+      // Show loading alert
+      Swal.fire({
+        title: "Updating Status...",
+        text: "Please wait while we update the status.",
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        },
       });
 
-      setDocumentData((prev) => ({ ...prev, status: newStatus }));
-      alert(`Status updated to ${newStatus}`);
+      const response = await axios.put(
+        `https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/documents/update-status/${documentId}`,
+        payload,
+        { timeout: 30000 }
+      );
 
-      // Reset the rejection input field after sending
-      setShowRejectionInput(false);
-      setRejectionReason('');
-      // setRejectionReason("");
-      setOpenContainer(null);
+      // Close loading alert
+      Swal.close();
+
+      // Show success message
+      Swal.fire({
+        title: "Success",
+        text: "Status updated successfully!",
+        icon: "success",
+        confirmButtonText: "OK",
+      }).then(() => {
+        navigate('/Distributorverify'); // Redirect after success
+      });
     } catch (error) {
-      console.error("Error updating status:", error);
-      alert("Failed to update status.");
+      console.error('Error updating status:', error);
+
+      // Show error message
+      Swal.fire({
+        title: "Error",
+        text: error.response?.data?.message || "Failed to update status. Please try again.",
+        icon: "error",
+      });
+    } finally {
+      setIsUpdatingStatus(false); // Reset loading state
     }
   };
+  // Fetch certificates
+  const fetchCertificates = async () => {
+    try {
+      console.log("Fetching certificates...");
+      const response = await axios.get("https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/certificates", {
+        timeout: 30000
+      }); console.log("Certificates API Response:", response.data);
+      setCertificates(response.data);
+    } catch (error) {
+      console.error("Error fetching certificates:", error);
+    }
+  }
+  //   };const fetchCertificates = async () => {
+  //   try {
+  //     setLoading(true);
+  //     const response = await axios.get("https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/certificates", {
+  //       timeout: 30000
+  //     });
+  //     setCertificates(response.data);
+  //   } catch (error) {
+  //     console.error("Error fetching certificates:", error);
+  //     setCertificates([]); // Set empty array as fallback
+  //     // Show user-friendly error
+  //     toast.error("Could not load certificates. Please try again later.");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
+  // Get certificate by document_id
+  const getCertificateByDocumentId = (documentId) => {
+    console.log("Looking for document ID:", documentId);
+    console.log("Available certificates:", certificates);
+    // Convert both to strings for comparison to avoid type issues
+    return certificates.find((cert) => String(cert.document_id) === String(documentId));
+  };
+
+  // View certificate
+  const handleViewCertificate = async (documentId) => {
+    const certificate = getCertificateByDocumentId(documentId);
+    if (!certificate) {
+      Swal.fire("Error", "Certificate not found.", "error");
+      return;
+    }
+
+    // Open the link first before fetching data (avoids popup blocker)
+    const newTab = window.open("", "_blank");
+
+    try {
+      console.log(`Fetching certificate for Certificate ID: ${certificate.certificate_id}`);
+      const response = await axios.get(`https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/certificates/${certificate.certificate_id}`);
+      console.log("View Certificate API Response:", response.data);
+
+      if (response.data && response.data.file_url) {
+        newTab.location.href = response.data.file_url; // Set the URL in the new tab
+      } else {
+        newTab.close(); // Close the tab if no file is found
+        Swal.fire("Error", "Certificate not found.", "error");
+      }
+    } catch (error) {
+      newTab.close(); // Close the tab if an error occurs
+      console.error("Error fetching certificate:", error);
+      Swal.fire("Error", "Failed to fetch certificate.", "error");
+    }
+  };
 
   // Add this function inside your InvoicePage component
   const handleDownloadAllDocuments = async () => {
     try {
-      const response = await axios.get(`https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/download/${documentId}`, {
-        responseType: 'blob', // Handle binary data
+      // Show loading indicator
+      setIsLoading(true);
+      const loadingToast = Swal.fire({
+        title: "Preparing download...",
+        text: "Please wait while we prepare your documents. This may take a moment.",
+        icon: "info",
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        didOpen: () => {
+          Swal.showLoading();
+        }
       });
 
+      // Make the API call to download the ZIP file with increased timeout
+      const response = await axios.get(`https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/download/${documentId}`, {
+        responseType: 'blob', // Handle binary data
+        timeout: 60000, // Increase timeout to 60 seconds
+        onDownloadProgress: (progressEvent) => {
+          if (progressEvent.total) {
+            const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+            Swal.update({
+              title: "Downloading...",
+              text: `${percentCompleted}% complete`,
+            });
+          }
+        }
+      });
+
+      // Close the loading toast
+      loadingToast.close();
+
+      // Extract the filename from Content-Disposition header
+      let filename = '';
+      const contentDisposition = response.headers['content-disposition'];
+
+      if (contentDisposition) {
+        // Extract filename from Content-Disposition header
+        const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+        const matches = filenameRegex.exec(contentDisposition);
+        if (matches != null && matches[1]) {
+          // Remove quotes if present
+          filename = matches[1].replace(/['"]/g, '');
+        }
+      }
+
+      // If no filename was found in the header, use a fallback
+      if (!filename) {
+        // Try to get applicant name from document_fields if available
+        let applicantName = '';
+
+        // Safely check if document_fields exists and is an array
+        if (documentData &&
+          documentData.document_fields &&
+          Array.isArray(documentData.document_fields)) {
+
+          const applicantField = documentData.document_fields.find(
+            field => field.field_name === 'APPLICANT NAME'
+          );
+
+          if (applicantField && applicantField.field_value) {
+            applicantName = applicantField.field_value;
+          }
+        }
+
+        // If applicant name was found, use it for the filename
+        if (applicantName) {
+          filename = `${applicantName.replace(/\s+/g, '_')}.zip`;
+        } else {
+          // Use "Document_ID" when applicant name isn't available
+          filename = `Document_${documentId}.zip`;
+        }
+      }
+
+      // Create a temporary URL for the downloaded file
       const url = window.URL.createObjectURL(new Blob([response.data]));
+
+      // Create a hidden anchor element to trigger the download
       const link = document.createElement('a');
       link.href = url;
-      link.setAttribute('download', `${documentData.name || `documents_${documentId}`}.zip`);
+      link.setAttribute('download', filename);
       document.body.appendChild(link);
-      link.click();
-      link.remove();
 
-      // alert('Download started!');
+      // Trigger the download
+      link.click();
+
+      // Clean up the DOM and revoke the object URL
+      link.remove();
+      window.URL.revokeObjectURL(url);
+
+      // Show success notification
+      Swal.fire({
+        title: "Success",
+        text: "Documents downloaded successfully!",
+        icon: "success",
+      });
     } catch (error) {
       console.error('Error downloading documents:', error);
-      alert('Failed to download documents.');
+
+      // Show error notification with detailed message
+      let errorMessage = "Failed to download documents. Please try again.";
+
+      if (error.code === "ECONNABORTED" || error.message.includes("timeout")) {
+        errorMessage = "Download timed out. The file might be too large or the server is busy. Please try again later.";
+      } else if (error.response) {
+        // Check if the response is a blob that contains error information
+        if (error.response.data instanceof Blob && error.response.data.type === 'application/json') {
+          try {
+            // Read the blob as text and parse it as JSON
+            const errorText = await new Response(error.response.data).text();
+            const errorData = JSON.parse(errorText);
+            errorMessage = errorData.message || errorMessage;
+          } catch (parseError) {
+            console.error('Error parsing error response:', parseError);
+          }
+        } else if (error.response.status === 404) {
+          errorMessage = "No documents found for download.";
+        } else if (error.response.status === 500) {
+          errorMessage = "Server error. Please try again later.";
+        } else {
+          errorMessage = error.response.data?.message || errorMessage;
+        }
+      } else if (error.request) {
+        // Handle network errors
+        errorMessage = "Network error. Please check your connection.";
+      } else {
+        // Handle other unexpected errors
+        errorMessage = error.message || errorMessage;
+      }
+
+      // Show error notification
+      Swal.fire({
+        title: "Error",
+        text: errorMessage,
+        icon: "error",
+      });
+    } finally {
+      // Hide loading indicator
+      setIsLoading(false);
     }
   };
-
-
   const handleAssignDistributor = async (distributorId) => {
     if (!distributorId) return;
     try {
@@ -150,8 +549,66 @@ const InvoicePage = () => {
     localStorage.removeItem("token");
     window.location.href = "/";
   };
+  // Add these state variables
+  const [certificates, setCertificates] = useState([]);
+
+  // Fetch certificates
 
 
+  // Download certificate
+  const handleDownloadCertificate = async () => {
+    try {
+      const response = await axios.get(
+        `https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/download-certificate/${documentId}`,
+        {
+          responseType: "blob",
+        }
+      );
+
+      // Create a downloadable link
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", `${documentData?.name || 'certificate'}.zip`);
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode.removeChild(link);
+    } catch (error) {
+      console.error("Error downloading certificate:", error);
+      Swal.fire("Error", "Failed to download certificate.", "error");
+    }
+  };
+  // View certificate - updated to accept a document ID parameter
+
+  // Download receipt
+  const handleDownloadReceipt = () => {
+    if (!documentData?.receipt_url) {
+      Swal.fire("Error", "No receipt available for download.", "error");
+      return;
+    }
+
+    try {
+      const fileExtension = documentData.receipt_url.split('.').pop().toLowerCase();
+      const fileName = `${documentData.name || 'document'}_receipt.${fileExtension}`;
+
+      const link = document.createElement("a");
+      link.href = documentData.receipt_url;
+      link.download = fileName;
+      link.style.display = "none";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      console.error("Error downloading receipt:", error);
+      Swal.fire("Error", "Failed to download receipt. Please try again.", "error");
+    }
+  };
+  useEffect(() => {
+    // Your existing code for fetching document data
+
+    // Add this line to fetch certificates
+    fetchCertificates();
+  }, [documentId, fetchCertificates]);
 
   const fetchDocumentData = useCallback(async () => {
     try {
@@ -177,10 +634,162 @@ const InvoicePage = () => {
     }
   }, [documentId, fetchDocumentData]);
 
+  useEffect(() => {
+    // Your existing code for fetching document data
 
+    // Add this line to fetch certificates
+    fetchCertificates();
+  }, [documentId, fetchCertificates]);
 
   if (!documentData) return <div className="text-center text-lg mt-10">Loading Invoice...</div>;
+  // View certificate - updated to accept a document ID parameter
+  // View certificate - updated to accept a document ID parameter
+  // In your React component
+  const DownloadAllDocuments = async () => {
+    try {
+      // Show loading indicator
+      setIsLoading(true);
 
+      // Add a loading notification with progress
+      const loadingToast = Swal.fire({
+        title: "Preparing download...",
+        text: "Please wait while we prepare your documents, receipts, and certificates.",
+        icon: "info",
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        didOpen: () => {
+          Swal.showLoading();
+        }
+      });
+
+      // Make the API call to download the ZIP file
+      const response = await axios.get(
+        `https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/download/all/${documentId}`,
+        {
+          responseType: "blob",
+          timeout: 120000, // 2 minutes timeout
+          onDownloadProgress: (progressEvent) => {
+            if (progressEvent.total) {
+              const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+              Swal.update({
+                title: "Downloading...",
+                text: `${percentCompleted}% complete`,
+              });
+            }
+          }
+        }
+      );
+
+      // Close the loading toast
+      loadingToast.close();
+
+      // Extract the filename from Content-Disposition header
+      let filename = '';
+      const contentDisposition = response.headers['content-disposition'];
+
+      if (contentDisposition) {
+        // Extract filename from Content-Disposition header
+        const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+        const matches = filenameRegex.exec(contentDisposition);
+        if (matches != null && matches[1]) {
+          // Remove quotes if present
+          filename = matches[1].replace(/['"]/g, '');
+        }
+      }
+
+      // If no filename was found in the header, use a fallback
+      if (!filename) {
+        // Try to get applicant name from document_fields if available
+        let applicantName = '';
+
+        // Safely check if document_fields exists and is an array
+        if (documentData &&
+          documentData.document_fields &&
+          Array.isArray(documentData.document_fields)) {
+
+          const applicantField = documentData.document_fields.find(
+            field => field.field_name === 'APPLICANT NAME'
+          );
+
+          if (applicantField && applicantField.field_value) {
+            applicantName = applicantField.field_value;
+          }
+        }
+
+        // If applicant name was found, use it for the filename
+        if (applicantName) {
+          filename = `${applicantName.replace(/\s+/g, '_')}.zip`;
+        } else {
+          // Use "document" when applicant name isn't available
+          filename = `Document_${documentId}.zip`;
+        }
+      }
+
+      // Create a temporary URL for the downloaded file
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+
+      // Create a hidden anchor element to trigger the download
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", filename);
+      document.body.appendChild(link);
+
+      // Trigger the download
+      link.click();
+
+      // Clean up the DOM and revoke the object URL
+      link.remove();
+      window.URL.revokeObjectURL(url);
+
+      // Show success notification
+      Swal.fire({
+        title: "Success",
+        text: "Documents, receipts, and certificates downloaded successfully!",
+        icon: "success",
+      });
+    } catch (error) {
+      console.error("Error downloading:", error);
+
+      // Show error notification with detailed message
+      let errorMessage = "Download failed. Please try again.";
+
+      if (error.code === "ECONNABORTED" || error.message.includes("timeout")) {
+        errorMessage = "Download timed out. The files might be too large or the server is busy. Please try again later.";
+      } else if (error.response) {
+        // Check if the response is a blob that contains error information
+        if (error.response.data instanceof Blob && error.response.data.type === 'application/json') {
+          try {
+            // Read the blob as text and parse it as JSON
+            const errorText = await new Response(error.response.data).text();
+            const errorData = JSON.parse(errorText);
+            errorMessage = errorData.message || errorMessage;
+          } catch (parseError) {
+            console.error('Error parsing error response:', parseError);
+          }
+        } else if (error.response.status === 404) {
+          errorMessage = "No documents, receipts, or certificates found for download.";
+        } else if (error.response.status === 500) {
+          errorMessage = "Server error. Please try again later.";
+        } else {
+          errorMessage = error.response.data?.message || errorMessage;
+        }
+      } else if (error.request) {
+        errorMessage = "Network error. Please check your connection.";
+      } else {
+        errorMessage = error.message || errorMessage;
+      }
+
+      // Show error notification
+      Swal.fire({
+        title: "Error",
+        text: errorMessage,
+        icon: "error",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
   return (
     <div className="max-w-8xl mx-auto p-6 bg-white shadow-lg rounded-lg mt-10">
 
@@ -239,9 +848,9 @@ const InvoicePage = () => {
                 <img src={logo1} alt="Logo" className="w-24 h-24 object-contain" />
 
                 {/* Title and Date/Application ID */}
-                <div className="text-center flex-1">
-                  <h2 className="text-3xl font-bold text-gray-700">Applicant Details</h2>
-                </div>
+                <h2 className="text-xl font-bold text-center text-gray-800">
+                  Manage Distributor List
+                </h2>
 
                 {/* Date and Application ID */}
                 <div className="text-right">
@@ -292,7 +901,7 @@ const InvoicePage = () => {
                     <tr key={idx} className="border-b border-gray-300">
                       {pair.map((field, index) => (
                         <React.Fragment key={index}>
-                          <td className="p-3 font-semibold border-r border-gray-300 w-1/6" style={{ backgroundColor: '#FFB4A2' }}>
+                          <td className="p-3 font-semibold border-r border-gray-300 w-1/6" style={{ backgroundColor: '#F58A3B14' }}>
                             {field.label}
                           </td>
                           <td className="p-3 border-r border-gray-300">{field.value}</td>
@@ -314,34 +923,47 @@ const InvoicePage = () => {
               {/* Document Fields Section */}
               {/* Document Fields Section */}
               <h3 className="text-2xl text-gray-700 font-semibold mb-4">Document Fields</h3>
-
               <table className="w-full table-fixed border border-gray-300">
                 <tbody>
-                  {Object.entries(documentData.document_fields || {})
-                    .reduce((rows, field, index, array) => {
-                      if (index % 2 === 0) {
-                        rows.push(array.slice(index, index + 2)); // Group 2 fields per row
-                      }
-                      return rows;
-                    }, [])
-                    .map((pair, idx) => (
-                      <tr key={idx} className="border-b border-gray-300">
-                        {pair.map(([key, value], index) => (
-                          <React.Fragment key={index}>
-                            <td className="w-1/5 p-3 font-semibold border-r border-gray-300 bg-white">
-                              {key}
-                            </td>
-                            <td className="w-1/3 p-3 border-r border-gray-300">{value}</td>
-                          </React.Fragment>
-                        ))}
-                        {pair.length < 2 && (
-                          <>
-                            <td className="w-1/5 p-3 bg-white border-r border-gray-300"></td>
-                            <td className="w-1/3 p-3 border-r border-gray-300"></td>
-                          </>
-                        )}
-                      </tr>
-                    ))}
+                  {(() => {
+                    // Handle both array format and object format
+                    let fieldsArray = [];
+
+                    if (Array.isArray(documentData.document_fields)) {
+                      // New format (array of objects with field_name and field_value)
+                      fieldsArray = documentData.document_fields.map(field => [
+                        field.field_name,
+                        field.field_value
+                      ]);
+                    } else if (typeof documentData.document_fields === 'object' && documentData.document_fields !== null) {
+                      // Old format (object with key-value pairs)
+                      fieldsArray = Object.entries(documentData.document_fields);
+                    } else {
+                      fieldsArray = [];
+                    }
+
+                    return fieldsArray
+                      .reduce((rows, field, index, array) => {
+                        if (index % 2 === 0) rows.push(array.slice(index, index + 2));
+                        return rows;
+                      }, [])
+                      .map((pair, idx) => (
+                        <tr key={idx} className="border-b border-gray-300">
+                          {pair.map(([key, value], index) => (
+                            <React.Fragment key={index}>
+                              <td className="w-1/5 p-3 font-semibold border-r border-gray-300 bg-white">{key}</td>
+                              <td className="w-1/3 p-3 border-r border-gray-300">{value || 'N/A'}</td>
+                            </React.Fragment>
+                          ))}
+                          {pair.length < 2 && (
+                            <>
+                              <td className="w-1/5 p-3 bg-white border-r border-gray-300"></td>
+                              <td className="w-1/3 p-3 border-r border-gray-300"></td>
+                            </>
+                          )}
+                        </tr>
+                      ));
+                  })()}
                 </tbody>
               </table>
 
@@ -351,101 +973,27 @@ const InvoicePage = () => {
         </div>    {/* Action Buttons */}
 
         {/* Right Side - Documents */}
-        {/* <div className="w-1/2"> */}
-        <div className="w-2/3 mx-auto p-6 bg-white shadow-md rounded-lg">
-          <div className="mt-0 flex space-x-4 items-center">
-            {/* Approve Button */}
-            {/* <button
-          onClick={() => handleUpdateStatus("Approved")}
-          className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 flex items-center"
-        >
-          <FaCheck className="mr-2" /> Approve
-        </button> */}
-
-            {/* Reject Button */}
-            <button
-              onClick={() =>
-                setOpenContainer((prev) => (prev === "rejection" ? null : "rejection"))
-              }
-              className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 flex items-center"
-            >
-              <FaTimes className="mr-2" /> Reject
-            </button>
-
-            {/* Assign Distributor */}
-
-
-            {/* Download Button */}
-            <button
-              onClick={handleDownloadAllDocuments}
-              className="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600 flex items-center"
-            >
-              <FaDownload className="mr-1" /> Download
-            </button>
-          </div>
-
-          {/* Rejection Input */}
-          {openContainer === "rejection" && (
-            <div className="mt-4 space-y-2">
-              <textarea
-                className="w-full p-2 border rounded"
-                placeholder="Enter reason for rejection"
-                value={rejectionReason}
-                onChange={(e) => setRejectionReason(e.target.value)}
-              />
-              <div className="flex justify-end space-x-4">
-                <button
-                  onClick={() => handleUpdateStatus("Rejected")}
-                  className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
-                >
-                  Send
-                </button>
-                <button
-                  onClick={() => {
-                    setOpenContainer(null);
-                    setRejectionReason("");
-                  }}
-                  className="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500"
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
-          )}
-
-
-
-
-
-
-
-
-
-          {/* Section Heading */}
-          <div className="w-2/2 mx-auto p-6 bg-white shadow-md rounded-lg">
-            {/* Application Details Section */}
+        <div className="w-2/5 mx-auto p-6 bg-white shadow-md rounded-lg">
+          {/* Application Details Section */}
+          <div className="mb-6">
             <h2 className="text-2xl font-bold text-gray-700 mb-2 flex items-center">
               📋 Application Details
             </h2>
-            {/* <p className="text-lg text-gray-600">
-        <strong>Name:</strong>{" "}
-        <span className="font-semibold">{documentData.name}</span>
-      </p> */}
-            <p className="text-gray-600 mb-4">
+            <p className="text-gray-600">
               <strong>Application ID:</strong> {documentData.application_id}
             </p>
+          </div>
 
-            {/* Required Documents Table */}
+          {/* Attached Documents Section */}
+          <div className="mb-6">
             <h3 className="text-xl font-semibold text-gray-700 mb-3">
               Attached Documents
             </h3>
-
             <table className="w-full border border-gray-300">
               <thead>
                 <tr className="bg-blue-100">
                   <th className="p-2 text-left border border-gray-300 w-1/12"></th>
                   <th className="p-2 text-left border border-gray-300">Name</th>
-                  {/* <th className="p-2 text-left border border-gray-300">Info</th> */}
                 </tr>
               </thead>
               <tbody>
@@ -465,67 +1013,217 @@ const InvoicePage = () => {
                       />
                     </td>
 
-                    {/* Document Name (Clickable Link) */}
+                    {/* Document Name */}
                     <td
                       className="p-2 border border-gray-300 text-blue-600 cursor-pointer hover:underline"
                       onClick={() => handleDocumentClick(doc.file_path, index)}
                     >
                       {documentNames[doc.document_type] || doc.document_type}
                     </td>
-
-                    {/* Info Column */}
-                    {/* <td className="p-2 border border-gray-300">
-                {doc.info || ""}
-              </td> */}
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
 
-          {/* Document Preview */}
-          {/* Document Preview */}
-          {/* Document Preview */}
+          {/* Action Buttons Section */}
+          <div className="flex space-x-4 mb-6">
+            {/* Reject Button */}
+            <button
+              onClick={() => setOpenContainer((prev) => (prev === "rejection" ? null : "rejection"))}
+              className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 flex items-center"
+              disabled={isUpdatingStatus} // Disable button while updating
+            >
+              <FaTimes className="mr-2" /> Reject
+            </button>
 
+            {/* Download Documents Button */}
+            <button
+              onClick={handleDownloadAllDocuments}
+              disabled={isLoading}
+              className="bg-green-500 text-white px-4 py-2 rounded hover:bg-purple-600 flex items-center"
+            >
+              <FaDownload className="mr-2" />
+              {isLoading ? "Downloading..." : "Download"}
+            </button>
+          </div>
 
-          {selectedDocument && (
-            <Draggable handle=".drag-handle" nodeRef={nodeRef}>
-              <div className="fixed inset-0 flex items-center justify-center z-50">
-                <div
-                  ref={nodeRef}
-                  className="relative w-3/4 md:w-2/3 lg:w-1/2 h-3/4 bg-gray-100 rounded-lg p-4 drag-handle cursor-move"
+          {/* Upload Sections */}
+          <div className="flex space-x-4 mb-6">
+            {/* Upload Receipt Section */}
+            <div className="flex-1">
+              <label className="text-sm font-medium text-gray-700">
+                Upload Receipt
+              </label>
+              <input
+                type="file"
+                accept=".pdf,.jpg,.png"
+                onChange={handleReceiptFileChange}
+                className="border p-2 rounded text-sm w-full"
+              />
+              {selectedReceiptFile && (
+                <button
+                  onClick={handleCancelReceiptFile}
+                  className="bg-red-500 text-white px-2 py-1 rounded mt-2"
                 >
-                  {/* Close Button */}
+                  Cancel Receipt
+                </button>
+              )}
+              <button
+                onClick={handleUploadReceipt}
+                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 flex items-center mt-2 w-full"
+              >
+                <FaFileAlt className="mr-2" /> Upload Receipt
+              </button>
+              {documentData?.receipt_url && (
+                <button
+                  onClick={handleDownloadReceipt}
+                  className="bg-[#F58A3B] text-white px-4 py-2 rounded hover:bg-green-600 flex items-center mt-2 w-full"
+                >
+                  <FaFileAlt className="mr-2" /> View Receipt
+                </button>
+              )}
+            </div>
+
+            {/* Upload Certificate Section */}
+            <div className="flex-1">
+              <label className="text-sm font-medium text-gray-700">
+                Upload Certificate
+              </label>
+              <input
+                type="file"
+                accept=".pdf,.jpg,.png"
+                onChange={handleFileChange}
+                className="border p-2 rounded text-sm w-full"
+              />
+              {selectedFile && (
+                <button
+                  onClick={handleCancelFile}
+                  className="bg-red-500 text-white px-2 py-1 rounded mt-2"
+                >
+                  Cancel Certificate
+                </button>
+              )}
+              <button
+                onClick={handleUploadCertificate}
+                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 flex items-center mt-2 w-full"
+              >
+                <FaFileAlt className="mr-2" /> Upload Certificate
+              </button>
+              {certificates &&
+                certificates.some(
+                  (cert) => String(cert.document_id) === String(documentId)
+                ) && (
                   <button
-                    className="absolute top-2 right-2 text-gray-600 hover:text-red-600 text-2xl font-bold"
-                    onClick={() => setSelectedDocument(null)}
+                    onClick={() => handleViewCertificate(documentId)}
+                    className="bg-[#F58A3B] text-white px-4 py-2 rounded flex items-center mt-2 w-full"
                   >
-                    &times;
+                    <FaFileAlt className="mr-2" /> View Certificate
                   </button>
+                )}
+            </div>
+          </div>
 
-                  {/* Document Title */}
-                  <h3 className="text-xl font-medium mb-4 text-center">
-                    Document Preview
-                  </h3>
+          {/* Download OC Button */}
+          <button
+            onClick={DownloadAllDocuments}
+            disabled={isLoading}
+            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 flex items-center mt-2 "
+          >
+            <FaDownload className="mr-2" />
+            {isLoading ? "Downloading..." : "Download OC"}
+          </button>
 
-                  {/* Iframe Preview */}
-                  <iframe
-                    src={selectedDocument}
-                    title="Document Preview"
-                    className="w-full h-full border rounded"
-                  />
-                </div>
+          {/* Preview Section */}
+          {showPreview && (
+            <div className="fixed inset-0 bg-black bg-opacity-80 flex justify-center items-center z-50">
+              <div className="relative w-3/4 h-3/4 bg-white shadow-lg rounded-lg flex flex-col">
+                <button
+                  onClick={() => setShowPreview(false)}
+                  className="absolute top-3 right-3 bg-red-500 text-white px-3 py-2 rounded"
+                >
+                  Close
+                </button>
+                <iframe
+                  src={previewReceiptFile || previewFile}
+                  className="w-full h-full border-none"
+                />
               </div>
-            </Draggable>
+            </div>
           )}
 
+          {/* Rejection Input Section */}
+          {
+            openContainer === "rejection" && (
+              <div className="mt-4 space-y-2">
+                {/* Textarea for entering rejection reason */}
+                <textarea
+                  className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Enter reason for rejection"
+                  value={rejectionReason}
+                  onChange={(e) => setRejectionReason(e.target.value)}
+                  rows={4} // Set a fixed number of rows for better UI
+                />
 
+                {/* Buttons for sending or canceling rejection */}
+                <div className="flex justify-end space-x-4">
+                  {/* Send Button */}
+                  <button
+                    onClick={() => handleUpdateStatus("Rejected")}
+                    className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 disabled:bg-red-400"
+                    disabled={!rejectionReason.trim()} // Disable button if rejection reason is empty
+                  >
+                    Send
+                  </button>
 
+                  {/* Cancel Button */}
+                  <button
+                    onClick={() => {
+                      setOpenContainer(null); // Close the rejection container (UI only)
+                      setRejectionReason(""); // Clear the rejection reason (UI only)
+                    }}
+                    className="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
         </div>
+
+
+        {/* Document Preview */}
+        {selectedDocument && (
+          <Draggable handle=".drag-handle" nodeRef={nodeRef}>
+            <div className="fixed inset-0 flex items-center justify-center z-50">
+              <div
+                ref={nodeRef}
+                className="relative w-3/4 md:w-2/3 lg:w-1/2 h-3/4 bg-gray-100 rounded-lg p-4 drag-handle cursor-move"
+              >
+                {/* Close Button */}
+                <button
+                  className="absolute top-2 right-2 text-gray-600 hover:text-red-600 text-2xl font-bold"
+                  onClick={() => setSelectedDocument(null)}
+                >
+                  &times;
+                </button>
+
+                {/* Document Title */}
+                <h3 className="text-xl font-medium mb-4 text-center">
+                  Document Preview
+                </h3>
+
+                {/* Iframe Preview */}
+                <iframe
+                  src={selectedDocument}
+                  title="Document Preview"
+                  className="w-full h-full border rounded"
+                />
+              </div>
+            </div>
+          </Draggable>
+        )}
       </div>
-
-      {/* Action Buttons */}
-
     </div>
   );
 };

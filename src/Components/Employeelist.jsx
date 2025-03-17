@@ -7,8 +7,8 @@ import { useNavigate } from "react-router-dom";
 // Set default timeout for all axios requests
 axios.defaults.timeout = 30000; // 30 seconds
 
-const DistributorList = () => {
-    const [distributors, setDistributors] = useState([]);
+const EmployeeList = () => {
+    const [employees, setEmployees] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingId, setEditingId] = useState(null);
     const [updatedPassword, setUpdatedPassword] = useState("");
@@ -18,30 +18,28 @@ const DistributorList = () => {
         password: "",
         phone: "",
         address: "",
-        shopAddress: "",
-        aadharCard: null,
-        panCard: null,
-        errors: { aadharCard: "", panCard: "" },
+        role: "employee", // Hardcode role as "employee"
     });
     const navigate = useNavigate();
 
-    const apiUrl = "https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/users/distributors";
+    // API endpoint for fetching employees
+    const apiUrl = "https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/users/employee";
 
     useEffect(() => {
-        fetchDistributors();
+        fetchEmployees();
     }, []);
 
-    const fetchDistributors = async () => {
+    const fetchEmployees = async () => {
         try {
             const response = await axios.get(apiUrl, { timeout: 30000 });
-            setDistributors(response.data);
+            setEmployees(response.data);
         } catch (error) {
-            console.error("Error fetching distributors:", error);
-            Swal.fire("Error", "Failed to fetch distributors. Server might be down.", "error");
+            console.error("Error fetching employees:", error);
+            Swal.fire("Error", "Failed to fetch employees. Server might be down.", "error");
         }
     };
 
-    const handleAddDistributor = () => {
+    const handleAddEmployee = () => {
         setIsModalOpen(true);
         setFormData({
             name: "",
@@ -49,56 +47,12 @@ const DistributorList = () => {
             password: "",
             phone: "",
             address: "",
-            shopAddress: "",
-            aadharCard: null,
-            panCard: null,
-            errors: { aadharCard: "", panCard: "" },
+            role: "employee",
         });
-    };
-
-    const handleFileChange = (e, field) => {
-        const file = e.target.files[0];
-        if (file) {
-            const allowedTypes = ["image/jpeg", "image/png", "application/pdf"];
-            const maxSize = 500 * 1024; // 500KB
-
-            if (!allowedTypes.includes(file.type)) {
-                setFormData((prev) => ({
-                    ...prev,
-                    errors: { ...prev.errors, [field]: "File type not supported. Please upload a PDF, JPG, or PNG file." },
-                }));
-                return;
-            }
-
-            if (file.size > maxSize) {
-                setFormData((prev) => ({
-                    ...prev,
-                    errors: { ...prev.errors, [field]: "File size exceeds 500KB. Please upload a smaller file." },
-                }));
-                return;
-            }
-
-            setFormData((prev) => ({
-                ...prev,
-                [field]: file,
-                errors: { ...prev.errors, [field]: "" },
-            }));
-        }
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
-        // Validate that both Aadhar Card and PAN Card are uploaded
-        if (!formData.aadharCard || !formData.panCard) {
-            Swal.fire({
-                title: "Error",
-                text: "Please upload both Aadhar Card and PAN Card.",
-                icon: "error",
-                confirmButtonColor: "#d33",
-            });
-            return;
-        }
 
         // Show "Processing, please wait" alert
         Swal.fire({
@@ -111,28 +65,17 @@ const DistributorList = () => {
             },
         });
 
-        // Create FormData object to send to the backend
-        const formDataToSend = new FormData();
-        formDataToSend.append("name", formData.name);
-        formDataToSend.append("email", formData.email);
-        formDataToSend.append("password", formData.password);
-        formDataToSend.append("phone", formData.phone);
-        formDataToSend.append("address", formData.address);
-        formDataToSend.append("shopAddress", formData.shopAddress || ""); // Optional field
-        formDataToSend.append("role", "Distributor"); // Hardcode role as "Distributor"
-        formDataToSend.append("user_login_status", "Active"); // Set login status as "Active"
-
-        // Append files and document types
-        formDataToSend.append("files", formData.aadharCard);
-        formDataToSend.append("files", formData.panCard);
-        formDataToSend.append("documentTypes", "Aadhar Card");
-        formDataToSend.append("documentTypes", "PAN Card");
+        // Prepare data to send to the backend
+        const dataToSend = {
+            ...formData,
+            user_login_status: "InActive", // Set login status as "InActive"
+        };
 
         try {
             // Send the registration request to the backend
-            const response = await axios.post("https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/users/register", formDataToSend, {
+            const response = await axios.post("https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/users/register", dataToSend, {
                 headers: {
-                    "Content-Type": "multipart/form-data",
+                    "Content-Type": "application/json",
                 },
                 timeout: 30000, // Increase timeout to 30 seconds
             });
@@ -142,32 +85,32 @@ const DistributorList = () => {
             // Close the "Processing" alert and show success message
             Swal.fire({
                 title: "Success",
-                text: "Distributor added successfully!",
+                text: "Employee added successfully!",
                 icon: "success",
                 confirmButtonText: "OK",
             }).then(() => {
-                fetchDistributors(); // Refresh the list
+                fetchEmployees(); // Refresh the list
                 setIsModalOpen(false); // Close the modal
             });
         } catch (error) {
-            console.error("Error adding distributor:", error);
+            console.error("Error adding employee:", error);
 
             // Close the "Processing" alert and show error message
             Swal.fire({
                 title: "Error",
-                text: "Failed to add distributor. Please try again.",
+                text: "Failed to add employee. Please try again.",
                 icon: "error",
                 confirmButtonColor: "#d33",
             });
         }
     };
 
-    const handleEditDistributor = (distributor) => {
-        setEditingId(distributor.user_id);
-        setUpdatedPassword(distributor.password);
+    const handleEditEmployee = (id, password) => {
+        setEditingId(id);
+        setUpdatedPassword(password);
     };
 
-    const handleUpdateDistributor = async (id) => {
+    const handleUpdateEmployee = async (id) => {
         try {
             if (updatedPassword) {
                 await axios.patch(`https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/users/password/${id}`,
@@ -176,11 +119,11 @@ const DistributorList = () => {
                 );
             }
 
-            setDistributors(
-                distributors.map((distributor) =>
-                    distributor.user_id === id
-                        ? { ...distributor, password: updatedPassword }
-                        : distributor
+            setEmployees(
+                employees.map((employee) =>
+                    employee.user_id === id
+                        ? { ...employee, password: updatedPassword }
+                        : employee
                 )
             );
 
@@ -189,18 +132,18 @@ const DistributorList = () => {
 
             Swal.fire({
                 title: "Updated",
-                text: "Distributor password updated successfully!",
+                text: "Employee password updated successfully!",
                 icon: "success",
                 timer: 1500,
                 showConfirmButton: false
             });
         } catch (error) {
-            console.error("Error updating distributor:", error);
-            Swal.fire("Error", "Failed to update distributor password", "error");
+            console.error("Error updating employee:", error);
+            Swal.fire("Error", "Failed to update employee password", "error");
         }
     };
 
-    const handleDeleteDistributor = async (id) => {
+    const handleDeleteEmployee = async (id) => {
         const confirmDelete = await Swal.fire({
             title: "Enter Deletion Code",
             text: "Please enter the code to confirm deletion.",
@@ -237,18 +180,18 @@ const DistributorList = () => {
 
                 Swal.fire({
                     title: "Deleted!",
-                    text: "Distributor has been deleted.",
+                    text: "Employee has been deleted.",
                     icon: "success",
                     timer: 1500,
                     showConfirmButton: false
                 });
 
-                setDistributors((prevDistributors) =>
-                    prevDistributors.filter((distributor) => distributor.user_id !== id)
+                setEmployees((prevEmployees) =>
+                    prevEmployees.filter((employee) => employee.user_id !== id)
                 );
             } catch (error) {
-                console.error("Error deleting distributor:", error);
-                Swal.fire("Error", "Failed to delete distributor", "error");
+                console.error("Error deleting employee:", error);
+                Swal.fire("Error", "Failed to delete employee", "error");
             }
         }
     };
@@ -256,9 +199,9 @@ const DistributorList = () => {
     const handleStatusChange = async (id, newStatus) => {
         try {
             // Update the UI immediately
-            setDistributors((prevDistributors) =>
-                prevDistributors.map((distributor) =>
-                    distributor.user_id === id ? { ...distributor, user_login_status: newStatus } : distributor
+            setEmployees((prevEmployees) =>
+                prevEmployees.map((employee) =>
+                    employee.user_id === id ? { ...employee, user_login_status: newStatus } : employee
                 )
             );
 
@@ -278,7 +221,7 @@ const DistributorList = () => {
             console.error("Error updating status:", error);
 
             // Revert UI change if API call fails
-            fetchDistributors();
+            fetchEmployees();
 
             Swal.fire("Error", "Failed to update status", "error");
         }
@@ -289,17 +232,17 @@ const DistributorList = () => {
             <div className="relative bg-white shadow-lg rounded-lg border border-gray-300 overflow-hidden">
                 {/* Header */}
                 <div className="border-t-4 border-orange-400 bg-[#F4F4F4] text-center p-4 rounded-t-lg relative">
-                    <h2 className="text-2xl font-bold text-gray-800">Distributor List</h2>
+                    <h2 className="text-2xl font-bold text-gray-800">Employee List</h2>
                     <div className="absolute bottom-[-2px] left-0 w-full h-1 bg-gray-300 shadow-md"></div>
                 </div>
 
                 {/* Add Button */}
                 <div className="p-4 flex justify-end">
                     <button
-                        onClick={handleAddDistributor}
+                        onClick={handleAddEmployee}
                         className="bg-orange-500 text-white px-4 py-2 rounded flex items-center gap-2 hover:bg-orange-600 transition duration-200"
                     >
-                        <FaPlus /> Add Distributor
+                        <FaPlus /> Add Employee
                     </button>
                 </div>
 
@@ -316,17 +259,17 @@ const DistributorList = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {distributors.length > 0 ? (
-                                distributors.map((distributor, index) => (
+                            {employees.length > 0 ? (
+                                employees.map((employee, index) => (
                                     <tr
-                                        key={distributor.user_id}
+                                        key={employee.user_id}
                                         className={`${index % 2 === 0 ? "bg-[#FFFFFF]" : "bg-[#F58A3B14]"} hover:bg-orange-100 transition duration-200`}
                                     >
-                                        <td className="px-4 py-3 border border-[#776D6DA8] text-center">{distributor.user_id}</td>
-                                        <td className="px-4 py-3 border border-[#776D6DA8] text-center">{distributor.name}</td>
-                                        <td className="px-4 py-3 border border-[#776D6DA8] text-center">{distributor.email}</td>
+                                        <td className="px-4 py-3 border border-[#776D6DA8] text-center">{employee.user_id}</td>
+                                        <td className="px-4 py-3 border border-[#776D6DA8] text-center">{employee.name}</td>
+                                        <td className="px-4 py-3 border border-[#776D6DA8] text-center">{employee.email}</td>
                                         <td className="px-4 py-3 border border-[#776D6DA8] text-center">
-                                            {editingId === distributor.user_id ? (
+                                            {editingId === employee.user_id ? (
                                                 <input
                                                     type="text"
                                                     value={updatedPassword}
@@ -334,50 +277,50 @@ const DistributorList = () => {
                                                     className="border border-gray-400 p-2 rounded w-full"
                                                 />
                                             ) : (
-                                                distributor.password
+                                                employee.password
                                             )}
                                         </td>
-                                        <td className="px-4 py-3 border border-[#776D6DA8] text-center">{distributor.user_login_status}</td>
+                                        <td className="px-4 py-3 border border-[#776D6DA8] text-center">{employee.user_login_status}</td>
                                         <td className="px-4 py-3 border border-[#776D6DA8] text-center">
                                             <button
-                                                onClick={() => handleStatusChange(distributor.user_id, "Active")}
-                                                className={`px-3 py-1 rounded text-white mr-2 ${distributor.user_login_status === "Active"
+                                                onClick={() => handleStatusChange(employee.user_id, "Active")}
+                                                className={`px-3 py-1 rounded text-white mr-2 ${employee.user_login_status === "Active"
                                                     ? "bg-green-500 cursor-default"
                                                     : "bg-gray-500 hover:bg-green-600"
                                                     }`}
-                                                disabled={distributor.user_login_status === "Active"}
+                                                disabled={employee.user_login_status === "Active"}
                                             >
                                                 Active
                                             </button>
                                             <button
-                                                onClick={() => handleStatusChange(distributor.user_id, "InActive")}
-                                                className={`px-3 py-1 rounded text-white ${distributor.user_login_status === "InActive"
+                                                onClick={() => handleStatusChange(employee.user_id, "InActive")}
+                                                className={`px-3 py-1 rounded text-white ${employee.user_login_status === "InActive"
                                                     ? "bg-red-500 cursor-default"
                                                     : "bg-gray-500 hover:bg-red-600"
                                                     }`}
-                                                disabled={distributor.user_login_status === "InActive"}
+                                                disabled={employee.user_login_status === "InActive"}
                                             >
                                                 Inactive
                                             </button>
                                         </td>
                                         <td className="px-4 py-3 border border-[#776D6DA8] text-center">
-                                            {editingId === distributor.user_id ? (
+                                            {editingId === employee.user_id ? (
                                                 <button
-                                                    onClick={() => handleUpdateDistributor(distributor.user_id)}
+                                                    onClick={() => handleUpdateEmployee(employee.user_id)}
                                                     className="bg-green-500 text-white px-3 py-1 rounded mr-2 hover:bg-green-600"
                                                 >
                                                     Save
                                                 </button>
                                             ) : (
                                                 <button
-                                                    onClick={() => handleEditDistributor(distributor)}
+                                                    onClick={() => handleEditEmployee(employee.user_id, employee.password)}
                                                     className="bg-blue-500 text-white px-3 py-1 rounded mr-2 hover:bg-blue-600"
                                                 >
                                                     <FaEdit />
                                                 </button>
                                             )}
                                             <button
-                                                onClick={() => handleDeleteDistributor(distributor.user_id)}
+                                                onClick={() => handleDeleteEmployee(employee.user_id)}
                                                 className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
                                             >
                                                 <FaTrash />
@@ -388,7 +331,7 @@ const DistributorList = () => {
                             ) : (
                                 <tr>
                                     <td colSpan="7" className="px-4 py-3 border border-[#776D6DA8] text-center">
-                                        No distributors found.
+                                        No employees found.
                                     </td>
                                 </tr>
                             )}
@@ -400,7 +343,7 @@ const DistributorList = () => {
             {isModalOpen && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
                     <div className="bg-white p-6 rounded-lg shadow-lg w-[400px]">
-                        <h2 className="text-xl font-bold text-gray-800 mb-4">Add Distributor</h2>
+                        <h2 className="text-xl font-bold text-gray-800 mb-4">Add Employee</h2>
 
                         <form onSubmit={handleSubmit} className="space-y-3">
                             <input
@@ -448,43 +391,6 @@ const DistributorList = () => {
                                 className="w-full p-2 border rounded text-xs"
                                 required
                             />
-                            <input
-                                type="text"
-                                name="shopAddress"
-                                placeholder="Shop Address (Optional)"
-                                value={formData.shopAddress}
-                                onChange={(e) => setFormData({ ...formData, shopAddress: e.target.value })}
-                                className="w-full p-2 border rounded text-xs"
-                            />
-
-                            {/* Aadhar Card Upload */}
-                            <div>
-                                <label className="block text-xs font-medium text-gray-700 mb-1">Aadhar Card (Max: 500KB)</label>
-                                <input
-                                    type="file"
-                                    onChange={(e) => handleFileChange(e, "aadharCard")}
-                                    className="w-full text-xs"
-                                    accept=".pdf,.jpg,.jpeg,.png"
-                                />
-                                {formData.errors.aadharCard && (
-                                    <p className="text-red-500 text-xs mt-1">{formData.errors.aadharCard}</p>
-                                )}
-                            </div>
-
-                            {/* PAN Card Upload */}
-                            <div>
-                                <label className="block text-xs font-medium text-gray-700 mb-1">PAN Card (Max: 500KB)</label>
-                                <input
-                                    type="file"
-                                    onChange={(e) => handleFileChange(e, "panCard")}
-                                    className="w-full text-xs"
-                                    accept=".pdf,.jpg,.jpeg,.png"
-                                />
-                                {formData.errors.panCard && (
-                                    <p className="text-red-500 text-xs mt-1">{formData.errors.panCard}</p>
-                                )}
-                            </div>
-
                             <div className="mt-4 flex justify-end space-x-3">
                                 <button
                                     type="button"
@@ -497,7 +403,7 @@ const DistributorList = () => {
                                     type="submit"
                                     className="bg-orange-500 text-white px-3 py-1 rounded text-xs hover:bg-orange-600"
                                 >
-                                    Add Distributor
+                                    Add Employee
                                 </button>
                             </div>
                         </form>
@@ -508,4 +414,4 @@ const DistributorList = () => {
     );
 };
 
-export default DistributorList;
+export default EmployeeList;

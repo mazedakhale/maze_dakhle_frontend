@@ -141,8 +141,44 @@ const ApplicationView = () => {
               // { label: "Name", value: documentData.name },
               // { label: "Email", value: documentData.email },
               // { label: "Phone", value: documentData.phone },
-              { label: "Status", value: documentData.status },
-                // { label: "Address", value: documentData.address },
+              {
+                label: "Status",
+                value: (
+                  <div className="flex flex-col ">
+                    {/* Status */}
+                    <span
+                      className={`px-8 py-1 rounded-full text-white text-xs ${documentData.status === "Approved"
+                        ? "bg-green-500"
+                        : documentData.status === "Rejected"
+                          ? "bg-red-500"
+                          : documentData.status === "Completed"
+                            ? "bg-yellow-500" // Color for Completed
+                            : "bg-blue-500" // Default color
+                        }`}
+                    >
+                      {documentData.status}
+                    </span>
+
+                    {/* Latest Status Date and Time */}
+                    {documentData.status_history
+                      ?.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at)) // Sort by latest date
+                      .slice(0, 1) // Take the first entry (latest status)
+                      .map((statusEntry, index) => (
+                        <div key={index} className="text-xs text-gray-600">
+                          {new Date(statusEntry.updated_at).toLocaleString("en-US", {
+                            year: "numeric",
+                            month: "2-digit",
+                            day: "2-digit",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            second: "2-digit", // Added seconds
+                            hour12: true, // Use AM/PM
+                          })}
+                        </div>
+                      ))}
+                  </div>
+                ),
+              }                // { label: "Address", value: documentData.address },
                 // { label: "Distributor", value: documentData.distributor_id || 'Not Assigned' }
               ].reduce((rows, field, index, array) => {
                 if (index % 2 === 0) rows.push(array.slice(index, index + 2));
@@ -172,27 +208,45 @@ const ApplicationView = () => {
           <h3 className="text-2xl text-gray-700 font-semibold mb-4">Document Fields</h3>
           <table className="w-full table-fixed border border-gray-300">
             <tbody>
-              {Object.entries(documentData.document_fields || {})
-                .reduce((rows, field, index, array) => {
-                  if (index % 2 === 0) rows.push(array.slice(index, index + 2));
-                  return rows;
-                }, [])
-                .map((pair, idx) => (
-                  <tr key={idx} className="border-b border-gray-300">
-                    {pair.map(([key, value], index) => (
-                      <React.Fragment key={index}>
-                        <td className="w-1/5 p-3 font-semibold border-r border-gray-300 bg-white">{key}</td>
-                        <td className="w-1/3 p-3 border-r border-gray-300">{value || 'N/A'}</td>
-                      </React.Fragment>
-                    ))}
-                    {pair.length < 2 && (
-                      <>
-                        <td className="w-1/5 p-3 bg-white border-r border-gray-300"></td>
-                        <td className="w-1/3 p-3 border-r border-gray-300"></td>
-                      </>
-                    )}
-                  </tr>
-                ))}
+              {(() => {
+                // Handle both array format and object format
+                let fieldsArray = [];
+
+                if (Array.isArray(documentData.document_fields)) {
+                  // New format (array of objects with field_name and field_value)
+                  fieldsArray = documentData.document_fields.map(field => [
+                    field.field_name,
+                    field.field_value
+                  ]);
+                } else if (typeof documentData.document_fields === 'object' && documentData.document_fields !== null) {
+                  // Old format (object with key-value pairs)
+                  fieldsArray = Object.entries(documentData.document_fields);
+                } else {
+                  fieldsArray = [];
+                }
+
+                return fieldsArray
+                  .reduce((rows, field, index, array) => {
+                    if (index % 2 === 0) rows.push(array.slice(index, index + 2));
+                    return rows;
+                  }, [])
+                  .map((pair, idx) => (
+                    <tr key={idx} className="border-b border-gray-300">
+                      {pair.map(([key, value], index) => (
+                        <React.Fragment key={index}>
+                          <td className="w-1/5 p-3 font-semibold border-r border-gray-300 bg-white">{key}</td>
+                          <td className="w-1/3 p-3 border-r border-gray-300">{value || 'N/A'}</td>
+                        </React.Fragment>
+                      ))}
+                      {pair.length < 2 && (
+                        <>
+                          <td className="w-1/5 p-3 bg-white border-r border-gray-300"></td>
+                          <td className="w-1/3 p-3 border-r border-gray-300"></td>
+                        </>
+                      )}
+                    </tr>
+                  ));
+              })()}
             </tbody>
           </table>
         </div>

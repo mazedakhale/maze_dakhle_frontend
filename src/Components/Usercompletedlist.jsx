@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { FaFileAlt } from "react-icons/fa";
 
 const CompletedApplicationsList = () => {
   const [userId, setUserId] = useState(null);
@@ -7,7 +8,6 @@ const CompletedApplicationsList = () => {
   const [certificates, setCertificates] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Decode user_id from token in localStorage
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -16,17 +16,14 @@ const CompletedApplicationsList = () => {
     }
   }, []);
 
-  // Fetch completed documents and certificates based on user_id
   useEffect(() => {
     if (!userId) return;
 
     const fetchCompletedDocuments = async () => {
       try {
         const response = await axios.get(
-          `https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/userdashboard/completed/${userId}`
+          ` https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/userdashboard/completed/${userId}`
         );
-        console.log("Fetched completed documents:", response.data);
-
         const sortedDocs = response.data.sort(
           (a, b) => new Date(b.uploaded_at) - new Date(a.uploaded_at)
         );
@@ -38,7 +35,9 @@ const CompletedApplicationsList = () => {
 
     const fetchCertificates = async () => {
       try {
-        const response = await axios.get("https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/certificates");
+        const response = await axios.get(
+          " https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/certificates"
+        );
         setCertificates(response.data);
       } catch (error) {
         console.error("Error fetching certificates:", error);
@@ -49,19 +48,16 @@ const CompletedApplicationsList = () => {
     fetchCertificates();
   }, [userId]);
 
-  // Handle search query change
   const handleSearch = (e) => {
     setSearchQuery(e.target.value);
   };
 
-  // Filter documents based on search query
   const filteredDocuments = completedDocuments.filter((document) => {
     return Object.values(document).some((value) =>
       String(value).toLowerCase().includes(searchQuery.toLowerCase())
     );
   });
 
-  // Get certificate by document ID
   const getCertificateByDocumentId = (documentId) => {
     const matchedCertificate = certificates.find(
       (cert) => String(cert.document_id) === String(documentId)
@@ -69,7 +65,6 @@ const CompletedApplicationsList = () => {
     return matchedCertificate ? matchedCertificate.certificate_id : null;
   };
 
-  // Handle View Certificate
   const handleViewCertificate = async (documentId) => {
     const certificateId = getCertificateByDocumentId(documentId);
     if (!certificateId) {
@@ -79,7 +74,7 @@ const CompletedApplicationsList = () => {
 
     try {
       const response = await axios.get(
-        `https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/certificates/${certificateId}`
+        ` https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/certificates/${certificateId}`
       );
 
       if (response.data && response.data.file_url) {
@@ -88,71 +83,99 @@ const CompletedApplicationsList = () => {
         alert("Certificate file not available.");
       }
     } catch (error) {
-      if (error.response && error.response.status === 404) {
-        alert("Certificate not found on the server.");
-      } else {
-        console.error("Error fetching certificate:", error);
-        alert("Failed to fetch certificate.");
-      }
+      alert("Failed to fetch certificate.");
     }
   };
 
   return (
-    <div className="ml-[300px] flex flex-col items-center min-h-screen p-10 bg-gray-100">
-      <div className="w-full max-w-[1400px] bg-white p-6 shadow-lg">
-        {/* Heading and Search Bar */}
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-bold">Completed Applications</h2>
+    <div className="w-[calc(90%-260px)] ml-[380px] mt-[80px] p-6">
+      {/* Header Section */}
+      <div className="relative bg-white shadow-lg rounded-lg border border-gray-300 overflow-hidden">
+        <div className="border-t-4 border-orange-400 bg-[#F4F4F4] text-center p-4 rounded-t-lg relative">
+          <h2 className="text-2xl font-bold text-gray-800">Completed Applications</h2>
+          <div className="absolute bottom-[-2px] left-0 w-full h-1 bg-gray-300 shadow-md"></div>
+        </div>
+
+        {/* Search Bar */}
+        <div className="p-4 flex justify-end">
           <input
             type="text"
-            placeholder="Search in table..."
+            placeholder="Search..."
             value={searchQuery}
             onChange={handleSearch}
-            className="px-4 py-2 border border-gray-300 rounded w-64"
+            className="border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-400 w-64"
           />
         </div>
 
-        {/* Table container with proper overflow handling */}
-        <div className="overflow-x-auto">
-          <table className="w-full bg-white rounded shadow">
-            <thead className="sticky top-0 bg-gray-200">
+        {/* Table */}
+        <div className="overflow-x-auto p-6">
+          <table className="w-full border border-[#776D6DA8] text-sm bg-white shadow-md rounded-md">
+            {/* Table Header */}
+            <thead className="bg-[#F58A3B14] border-b-2 border-[#776D6DA8]">
               <tr>
-                <th className="px-4 py-3 border">Document ID</th>
-                <th className="px-4 py-3 border">Category</th>
-                <th className="px-4 py-3 border">Subcategory</th>
-                <th className="px-4 py-3 border">Email</th>
-                <th className="px-4 py-3 border">Status</th>
-                <th className="px-4 py-3 border">Uploaded At</th>
-                <th className="px-4 py-3 border">Document Fields</th>
-                <th className="px-4 py-3 border">Action</th>
+                {["Document ID", "Category", "Subcategory", "Email", "Status", "Uploaded At", "Applicant name", "Certificate"].map((header, index) => (
+                  <th key={index} className="px-4 py-3 border border-[#776D6DA8] text-black font-semibold text-center">
+                    {header}
+                  </th>
+                ))}
               </tr>
             </thead>
+
+            {/* Table Body */}
             <tbody>
               {filteredDocuments.length > 0 ? (
-                filteredDocuments.map((document) => (
-                  <tr key={document.document_id}>
-                    <td className="px-4 py-3 border">{document.document_id}</td>
-                    <td className="px-4 py-3 border">{document.category_name}</td>
-                    <td className="px-4 py-3 border">{document.subcategory_name}</td>
-                    <td className="px-4 py-3 border">{document.email}</td>
-                    <td className="px-4 py-3 border">{document.status}</td>
-                    <td className="px-4 py-3 border">
+                filteredDocuments.map((document, index) => (
+                  <tr
+                    key={document.document_id}
+                    className={`${index % 2 === 0 ? "bg-[#FFFFFF]" : "bg-[#F58A3B14]"
+                      } hover:bg-orange-100 transition duration-200`}
+                  >
+                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">{document.document_id}</td>
+                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">{document.category_name}</td>
+                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">{document.subcategory_name}</td>
+                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">{document.email}</td>
+                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">
+                      <span
+                        className={`px-3 py-1 rounded-full text-white text-sm ${document.status === "Approved"
+                          ? "bg-green-500"
+                          : document.status === "Rejected"
+                            ? "bg-red-500"
+                            : "bg-yellow-500"
+                          }`}
+                      >
+                        {document.status}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">
                       {new Date(document.uploaded_at).toLocaleString()}
                     </td>
-                    <td className="px-4 py-3 border">
-                      {Object.entries(document.document_fields).map(([key, value]) => (
-                        <p key={key}>
-                          <strong>{key}:</strong> {value}
-                        </p>
-                      ))}
+                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">
+                      {document?.document_fields ? (
+                        Array.isArray(document.document_fields) ? (
+                          document.document_fields.find((field) => field.field_name === "APPLICANT NAME") ? (
+                            <p>{document.document_fields.find((field) => field.field_name === "APPLICANT NAME").field_value}</p>
+                          ) : (
+                            <p className="text-gray-500">No applicant name available</p>
+                          )
+                        ) : (
+                          document.document_fields["APPLICANT NAME"] ? (
+                            <p>{document.document_fields["APPLICANT NAME"]}</p>
+                          ) : (
+                            <p className="text-gray-500">No applicant name available</p>
+                          )
+                        )
+                      ) : (
+                        <p className="text-gray-500">No fields available</p>
+                      )}
                     </td>
-                    <td className="p-3 flex justify-center">
+
+                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">
                       {getCertificateByDocumentId(document.document_id) ? (
                         <button
                           onClick={() => handleViewCertificate(document.document_id)}
-                          className="bg-blue-500 text-white px-3 py-1 rounded"
+                          className="bg-blue-500 text-white px-3 py-2 rounded flex items-center justify-center hover:bg-blue-600 transition"
                         >
-                          View
+                          <FaFileAlt className="mr-1" /> View
                         </button>
                       ) : (
                         <span className="text-gray-500">Not Available</span>
@@ -162,7 +185,7 @@ const CompletedApplicationsList = () => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="8" className="px-4 py-3 border text-center">
+                  <td colSpan="8" className="px-4 py-3 border border-[#776D6DA8] text-center">
                     No completed applications found.
                   </td>
                 </tr>
@@ -172,8 +195,8 @@ const CompletedApplicationsList = () => {
         </div>
       </div>
     </div>
-
   );
 };
 
 export default CompletedApplicationsList;
+

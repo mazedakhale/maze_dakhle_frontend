@@ -138,55 +138,66 @@ const VerifyDocuments = () => {
   };
 
   return (
-    <div className="ml-[295px] flex flex-col items-center min-h-screen p-10 bg-gray-100">
-      <div className="w-full p-6 bg-white rounded-lg shadow-lg">
-        {/* Header and Filters */}
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-bold text-gray-800">Verify Documents</h2>
-          <div className="flex items-center space-x-4">
-            {/* Status Filter */}
-            <div>
-              <label htmlFor="statusFilter" className="mr-2">Filter by Status:</label>
-              <select
-                id="statusFilter"
-                value={statusFilter}
-                onChange={handleStatusFilterChange}
-                className="p-2 border rounded"
-              >
-                <option value="">All</option>
-                <option value="Approved">Approved</option>
-                <option vaalue="Rejected">Rejected</option>
-                <option value="Completed">Completed</option>
-              </select>
-            </div>
+    <div className="w-[calc(100%-350px)] ml-[310px] mt-[80px] p-6">
+      {/* Outer Container */}
+      <div className=" bg-white shadow-lg rounded-lg border border-gray-300 ">
 
-            {/* Search Bar */}
-            <input
-              type="text"
-              placeholder="Search documents..."
-              value={searchQuery}
-              onChange={handleSearchQueryChange}
-              className="p-2 border rounded w-[200px]"
-            />
+        {/* Header */}
+        <div className="border-t-4 border-orange-400 bg-[#F4F4F4] text-center p-4 rounded-t-lg relative">
+          <h2 className="text-xl font-bold text-center text-gray-800">
+            Pending Applications List
+
+          </h2>                    <div className="absolute bottom-[-2px] left-0 w-full h-1 bg-gray-300 shadow-md"></div>
+        </div>
+
+        {/* Filters */}
+        <div className="p-4 flex justify-between items-center bg-gray-100 border-b border-gray-300">
+          <div className="flex items-center space-x-4">
+            <label htmlFor="statusFilter" className="text-sm font-medium">Filter by Status:</label>
+            <select
+              id="statusFilter"
+              value={statusFilter}
+              onChange={handleStatusFilterChange}
+              className="border border-orange-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-400 text-sm"
+            >
+              <option value="">All</option>
+              <option value="Approved">Approved</option>
+              <option value="Rejected">Rejected</option>
+              <option value="Completed">Completed</option>
+              <option value="Pending">Pending</option>
+            </select>
           </div>
+
+          <input
+            type="text"
+            placeholder="Search documents..."
+            value={searchQuery}
+            onChange={handleSearchQueryChange}
+            className="border border-orange-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-400 w-64 text-sm"
+          />
         </div>
 
         {/* Table */}
-        <div className="table-container border border-gray-300 rounded-lg shadow-md">
+        <div className="table-container border border-gray-300 rounded-lg shadow-md p-6">
           <table className="table border-collapse border border-gray-300 min-w-full">
             <thead className="bg-gray-300">
               <tr>
                 <th className="border p-2 text-center font-bold">Sr No.</th>
                 <th className="border p-2 text-center font-bold">Application Id</th>
+                <th className="border p-2 text-center font-bold">Applicant Name</th>
+
+                <th className="border p-2 text-center font-bold">Date</th>
+
                 <th className="border p-2 font-bold">Category</th>
                 <th className="border p-2 font-bold">Subcategory</th>
-                <th className="border p-2 font-bold">Name</th>
-                <th className="border p-2 font-bold">Email</th>
-                <th className="border p-2 font-bold">Assign Distributor</th>
+                <th className="border p-2 font-bold">VLE Name</th>
+                <th className="border p-2 font-bold">VLE Email</th>
+                <th className="border p-2 font-bold">VLE Phone no</th>
+                <th className="border p-2 font-bold">Assigned Distributor</th>
                 <th className="border p-2 font-bold">Verification</th>
                 <th className="border p-2 font-bold">Action</th>
                 <th className="border p-2 font-bold">View</th>
-                <th className="border p-2 font-bold">Certificate</th>
+                {/* <th className="border p-2 font-bold">Certificate</th> */}
               </tr>
             </thead>
             <tbody>
@@ -197,23 +208,79 @@ const VerifyDocuments = () => {
                 >
                   <td className="border p-2 text-center">{index + 1}</td>
                   <td className="border p-2 text-center">{doc.application_id}</td>
+                  <td className="px-4 py-2 border text-sm">
+                    {doc?.document_fields ? (
+                      Array.isArray(doc.document_fields) ? (
+                        // New format (array of objects)
+                        doc.document_fields.find(field => field.field_name === "APPLICANT NAME") ? (
+                          <p>{doc.document_fields.find(field => field.field_name === "APPLICANT NAME").field_value}</p>
+                        ) : (
+                          <p className="text-gray-500">No applicant name available</p>
+                        )
+                      ) : (
+                        // Old format (object with key-value pairs)
+                        doc.document_fields["APPLICANT NAME"] ? (
+                          <p>{doc.document_fields["APPLICANT NAME"]}</p>
+                        ) : (
+                          <p className="text-gray-500">No applicant name available</p>
+                        )
+                      )
+                    ) : (
+                      <p className="text-gray-500">No fields available</p>
+                    )}
+                  </td>
+                  <td className="border p-2">
+                    {new Date(doc.uploaded_at).toLocaleString('en-US', {
+                      year: 'numeric',
+                      month: '2-digit',
+                      day: '2-digit',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                      second: '2-digit',  // Added seconds
+                      hour12: true, // Use AM/PM
+                    })}
+                  </td>
                   <td className="border p-2">{doc.category_name}</td>
                   <td className="border p-2">{doc.subcategory_name}</td>
                   <td className="border p-2">{doc.name}</td>
                   <td className="border p-2 break-words">{doc.email}</td>
+                  <td className="border p-2 break-words">{doc.phone}</td>
+
                   <td className="border p-2">{getDistributorName(doc.distributor_id)}</td>
                   <td className="border p-2">
-                    <span
-                      className={`px-3 py-1 rounded-full text-white text-sm ${doc.status === "Approved"
-                        ? "bg-green-500"
-                        : doc.status === "Rejected"
-                          ? "bg-red-500"
-                          : "bg-blue-500"
-                        }`}
-                    >
-                      {doc.status}
-                    </span>
+                    <div className="flex flex-col gap-1">
+                      {/* Status Badge */}
+                      <span
+                        className={`px-3 py-1 rounded-full text-white text-xs ${doc.status === "Approved"
+                          ? "bg-green-500"
+                          : doc.status === "Rejected"
+                            ? "bg-red-500"
+                            : doc.status === "Completed"
+                              ? "bg-yellow-500" // Color for Completed
+                              : "bg-blue-500" // Default color
+                          }`}
+                      >
+                        {doc.status}
+                      </span>
 
+                      {/* Latest Status Date and Time */}
+                      {doc.status_history
+                        ?.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at)) // Sort by latest date
+                        .slice(0, 1) // Take the first entry (latest status)
+                        .map((statusEntry, index) => (
+                          <div key={index} className="text-xs text-gray-600">
+                            {new Date(statusEntry.updated_at).toLocaleString("en-US", {
+                              year: "numeric",
+                              month: "2-digit",
+                              day: "2-digit",
+                              hour: "2-digit",
+                              minute: "2-digit",
+                              second: "2-digit", // Added seconds
+                              hour12: true, // Use AM/PM
+                            })}
+                          </div>
+                        ))}
+                    </div>
                   </td>
 
                   <td className="border p-2 text-center">
@@ -232,7 +299,7 @@ const VerifyDocuments = () => {
                       <FaFileInvoice className="mr-1" /> View
                     </button>
                   </td>
-                  <td className="border p-2">
+                  {/* <td className="border p-2">
                     {getCertificateByDocumentId(doc.document_id) ? (
                       <button
                         onClick={() => handleViewCertificate(doc.document_id)}
@@ -243,7 +310,7 @@ const VerifyDocuments = () => {
                     ) : (
                       <span>No Certificate</span>
                     )}
-                  </td>
+                  </td> */}
                 </tr>
               ))}
             </tbody>

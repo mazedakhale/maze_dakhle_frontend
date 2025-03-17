@@ -40,9 +40,12 @@ const VerifyDocuments = () => {
         `https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/documents/list/${distributorId}`
       );
 
-      const filteredDocuments = response.data.documents.filter(
-        (doc) => doc.status === "Uploaded" || doc.status === "Completed" || doc.status === "Distributor Rejected"
-      );
+      // Filter documents and sort by `uploaded_at` in descending order
+      const filteredDocuments = response.data.documents
+        .filter(
+          (doc) => doc.status === "Uploaded" || doc.status === "Completed" || doc.status === "Distributor Rejected"
+        )
+        .sort((a, b) => new Date(b.uploaded_at) - new Date(a.uploaded_at)); // Sort by most recent
 
       setDocuments(filteredDocuments);
     } catch (error) {
@@ -104,8 +107,27 @@ const VerifyDocuments = () => {
     navigate(`/Distributorview/${documentId}`, { state: { categoryId, subcategoryId } });
   };
 
+  const handleDownloadReceipt = (receiptUrl, documentName) => {
+    try {
+      // Extract the file extension from the URL (e.g., "pdf", "jpg", "png")
+      const fileExtension = receiptUrl.split('.').pop().toLowerCase();
 
+      // Generate the file name (e.g., "MyDocument_receipt.pdf")
+      const fileName = `${documentName}_receipt.${fileExtension}`;
 
+      // Create a temporary <a> element to trigger the download
+      const link = document.createElement("a");
+      link.href = receiptUrl;
+      link.download = fileName; // Set the file name for the download
+      link.style.display = "none"; // Hide the link element
+      document.body.appendChild(link); // Add the link to the DOM
+      link.click(); // Trigger the download
+      document.body.removeChild(link); // Clean up by removing the link
+    } catch (error) {
+      console.error("Error downloading receipt:", error);
+      Swal.fire("Error", "Failed to download receipt. Please try again.", "error");
+    }
+  };
 
   const handleDownloadCertificate = async (documentId, name) => {
     try {
@@ -130,30 +152,29 @@ const VerifyDocuments = () => {
     }
   };
 
-
-
-
   return (
-    <div className="ml-[250px] flex flex-col items-center min-h-screen p-6 bg-gray-100">
-      <div className="w-[90%] max-w-6xl bg-white shadow-md rounded-lg">
-        <div className="bg-[#f5f0eb] border-t-4 shadow-md rounded border-orange-400 p-4">
-          <h2 className="text-xl font-bold text-center text-gray-800">
-            Manage Distributor History
-          </h2>
+    <div className="ml-[300px] flex flex-col items-center min-h-screen p-6 bg-gray-100">
+      <div className="relative bg-white shadow-lg rounded-lg border border-gray-300 overflow-hidden">
+        <div className="border-t-4 border-orange-400 bg-[#f4f4f4] text-center p-4 rounded-t-lg relative">
+          <h2 className="text-2xl font-bold text-gray-800">Manage Distributor History</h2>
+          <div className="absolute bottom-[-2px] left-0 w-full h-1 bg-gray-300 shadow-md"></div>
         </div>
-        <div className="p-6 overflow-x-auto">
+        <div className=" overflow-x-auto">
           <table className="w-full border border-gray-300">
-            <thead className="bg-[#f5f0eb]">
+            <thead className="bg-[#F58A3B14]">
               <tr>
                 {[
                   "Application Id",
+                  "Application Name",
+                  "DateTime",
                   "Category",
                   "Subcategory",
                   "Verification",
                   "Actions",
                   "View",
+                  " Receipt",
                   "Certificate",
-                  "Download Certificate",
+
                 ].map((header, index) => (
                   <th
                     key={index}
@@ -168,26 +189,79 @@ const VerifyDocuments = () => {
               {documents.map((doc, index) => (
                 <tr
                   key={doc.document_id}
-                  className={`border border-gray-300 ${index % 2 === 0 ? "bg-[#fffaf4]" : "bg-white"
+                  className={`border border-gray-300 ${index % 2 === 0 ? "bg-white" : "bg-[#F58A3B14]"
                     }`}
                 >
                   <td className="border p-3 text-center">{doc.application_id}</td>
+                  <td className="px-4 py-2 border text-sm">
+                    {doc?.document_fields ? (
+                      Array.isArray(doc.document_fields) ? (
+                        // New format (array of objects)
+                        doc.document_fields.find(field => field.field_name === "APPLICANT NAME") ? (
+                          <p>{doc.document_fields.find(field => field.field_name === "APPLICANT NAME").field_value}</p>
+                        ) : (
+                          <p className="text-gray-500">No applicant name available</p>
+                        )
+                      ) : (
+                        // Old format (object with key-value pairs)
+                        doc.document_fields["APPLICANT NAME"] ? (
+                          <p>{doc.document_fields["APPLICANT NAME"]}</p>
+                        ) : (
+                          <p className="text-gray-500">No applicant name available</p>
+                        )
+                      )
+                    ) : (
+                      <p className="text-gray-500">No fields available</p>
+                    )}
+                  </td>
+                  <td className="border p-2">
+                    {new Date(doc.uploaded_at).toLocaleString('en-US', {
+                      year: 'numeric',
+                      month: '2-digit',
+                      day: '2-digit',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                      second: '2-digit',
+                      hour12: true,
+                    })}
+                  </td>
                   <td className="border p-3 text-center">{doc.category_name}</td>
                   <td className="border p-3 text-center">{doc.subcategory_name}</td>
 
-                  <td className="border p-3 text-center">
-                    <span
-                      className={`px-3 py-1 rounded-full text-white text-sm ${doc.status === "Processing"
-                        ? "bg-orange-500"
-                        : doc.status === "Rejected"
-                          ? "bg-red-500"
-                          : doc.status === "Uploaded"
-                            ? "bg-blue-500"
-                            : "bg-yellow-500"
-                        }`}
-                    >
-                      {doc.status}
-                    </span>
+                  <td className="border p-2">
+                    <div className="flex flex-col gap-1">
+                      {/* Status Badge */}
+                      <span
+                        className={`px-3 py-1 rounded-full text-white text-xs ${doc.status === "Approved"
+                          ? "bg-green-500"
+                          : doc.status === "Rejected"
+                            ? "bg-red-500"
+                            : doc.status === "Completed"
+                              ? "bg-yellow-500" // Color for Completed
+                              : "bg-blue-500" // Default color
+                          }`}
+                      >
+                        {doc.status}
+                      </span>
+
+                      {/* Latest Status Date and Time */}
+                      {doc.status_history
+                        ?.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at)) // Sort by latest date
+                        .slice(0, 1) // Take the first entry (latest status)
+                        .map((statusEntry, index) => (
+                          <div key={index} className="text-xs text-gray-600">
+                            {new Date(statusEntry.updated_at).toLocaleString("en-US", {
+                              year: "numeric",
+                              month: "2-digit",
+                              day: "2-digit",
+                              hour: "2-digit",
+                              minute: "2-digit",
+                              second: "2-digit", // Added seconds
+                              hour12: true, // Use AM/PM
+                            })}
+                          </div>
+                        ))}
+                    </div>
                   </td>
 
                   <td className="border p-3 text-center">
@@ -207,7 +281,18 @@ const VerifyDocuments = () => {
                       <FaFileInvoice className="mr-1" /> View
                     </button>
                   </td>
-
+                  <td className="border p-3 text-center">
+                    {doc.receipt_url ? (
+                      <button
+                        onClick={() => handleDownloadReceipt(doc.receipt_url, doc.name)}
+                        className="bg-blue-500 text-white px-3 py-1 rounded flex justify-center items-center hover:bg-blue-600 transition"
+                      >
+                        <FaDownload className="mr-1" /> Download Receipt
+                      </button>
+                    ) : (
+                      <span className="text-gray-500 text-center">Not Available</span>
+                    )}
+                  </td>
                   <td className="border px-4 py-2 text-center">
                     {["Uploaded", "Completed"].includes(doc.status) &&
                       getCertificateByDocumentId(doc.document_id) ? (
@@ -222,18 +307,7 @@ const VerifyDocuments = () => {
                     )}
                   </td>
 
-                  <td className="border p-3 text-center">
-                    {getCertificateByDocumentId(doc.document_id) ? (
-                      <button
-                        onClick={() => handleDownloadCertificate(doc.document_id, doc.name)}
-                        className="bg-green-500 text-white px-3 py-1 rounded flex justify-center items-center hover:bg-green-600 transition"
-                      >
-                        <FaDownload className="mr-1" /> Download
-                      </button>
-                    ) : (
-                      <span className="text-gray-500 text-center">Not Available</span>
-                    )}
-                  </td>
+
                 </tr>
               ))}
             </tbody>
@@ -242,6 +316,6 @@ const VerifyDocuments = () => {
       </div>
     </div>
   );
-}
+};
 
 export default VerifyDocuments;

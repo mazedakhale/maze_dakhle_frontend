@@ -135,110 +135,149 @@ const FieldNames = () => {
   };
 
   return (
-    <div className="ml-[330px] flex flex-col items-center min-h-screen p-10 bg-gray-100">
-      <div className="w-full p-6">
-        <div className="w-full max-w-8xl bg-white p-6 shadow-lg">
-          {/* Header and Button in the Same Row */}
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold text-gray-800">Field Names List</h2>
-            <button onClick={() => setModalOpen(true)} className="bg-[#00234E] text-white px-4 py-2 rounded flex items-center gap-2 hover:bg-blue-900 transition duration-200">
-              <FaPlus className="mr-2" /> Add Field Names
-            </button>
-          </div>
+    <div className="ml-[300px] mt-[80px] p-6 w-[calc(100%-260px)] overflow-x-hidden">
+      <div className="relative bg-white shadow-lg rounded-lg border border-gray-300 overflow-hidden">
+        {/* Header */}
+        <div className="border-t-4 border-orange-400 bg-[#F4F4F4] text-center p-4 rounded-t-lg relative">
+          <h2 className="text-2xl font-bold text-gray-800">Field Names List</h2>
+          <div className="absolute bottom-[-2px] left-0 w-full h-1 bg-gray-300 shadow-md"></div>
+        </div>
 
-          {/* Documents Table Container */}
-          <div className="overflow-x-auto border border-gray-300  shadow-md" style={{ maxHeight: "450px", overflowY: "auto" }}>
-            <table className="w-full border-collapse">
-              <thead className="bg-gray-300 sticky top-0">
-                <tr>
-                  {/* <th className="border p-2">ID</th> */}
-                  <th className="border p-2">Field Name</th>
-                  <th className="border p-2">Category</th>
-                  <th className="border p-2">Subcategory</th>
-                  <th className="border p-2">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {fields.map((field, index) => (
-                  <tr key={field.id} className={index % 2 === 0 ? "bg-white" : "bg-white"}>
-                    {/* <td className="border p-2 text-center">{field.id}</td> */}
-                    <td className="border p-2 text-center">
+        {/* Add Button */}
+        <div className="p-4 flex justify-end">
+          <button
+            onClick={() => setModalOpen(true)}
+            className="bg-orange-500 text-white px-4 py-2 rounded flex items-center gap-2 hover:bg-orange-600 transition duration-200"
+          >
+            <FaPlus /> Add Field Names
+          </button>
+        </div>
+
+        {/* Table */}
+        <div className="p-6 overflow-x-auto">
+          <table className="w-full border border-[#776D6DA8] text-sm bg-white shadow-md rounded-md">
+            <thead className="bg-[#F58A3B14] border-b-2 border-[#776D6DA8]">
+              <tr>
+                {["Field Name", "Category", "Subcategory", "Actions"].map((header, index) => (
+                  <th key={index} className="px-4 py-3 border border-[#776D6DA8] text-black font-semibold text-center">
+                    {header}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {fields.length > 0 ? (
+                fields.map((field, index) => (
+                  <tr
+                    key={field.id}
+                    className={`${index % 2 === 0 ? "bg-[#FFFFFF]" : "bg-[#F58A3B14]"} hover:bg-orange-100 transition duration-200`}
+                  >
+                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">
                       {editId === field.id ? (
                         <input
                           type="text"
                           value={editableField}
                           onChange={(e) => setEditableField(e.target.value)}
-                          className="border p-1 w-full"
+                          className="border border-gray-400 p-2 rounded w-full"
                         />
                       ) : (
                         field.document_fields
                       )}
                     </td>
-                    <td className="border p-2 text-center">{field.category.category_name}</td>
-                    <td className="border p-2 text-center">{field.subcategory.subcategory_name}</td>
-                    <td className="border p-2 text-center gap-2">
+                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">
+                      {field.category.category_name}
+                    </td>
+                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">
+                      {field.subcategory.subcategory_name}
+                    </td>
+                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">
                       {editId === field.id ? (
-                        <FaSave onClick={() => handleSave(field.id)} className="text-green-500 cursor-pointer" />
+                        <button
+                          onClick={() => handleSave(field.id)}
+                          className="bg-green-500 text-white px-3 py-1 rounded mr-2 hover:bg-green-600"
+                        >
+                          <FaSave />
+                        </button>
                       ) : (
-                        <FaEdit onClick={() => handleEdit(field)} className="text-yellow-500 cursor-pointer" />
+                        <button
+                          onClick={() => handleEdit(field)}
+                          className="bg-blue-500 text-white px-3 py-1 rounded mr-2 hover:bg-blue-600"
+                        >
+                          <FaEdit />
+                        </button>
                       )}
-                      <FaTrash onClick={() => handleDelete(field.id)} className="text-red-500 cursor-pointer" />
+                      <button
+                        onClick={() => handleDelete(field.id)}
+                        className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+                      >
+                        <FaTrash />
+                      </button>
                     </td>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="4" className="px-4 py-3 border border-[#776D6DA8] text-center">
+                    No field names found.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
       </div>
 
-      {/* Modal for Adding Fields */}
+      {/* Add / Edit Field Name Modal */}
       {modalOpen && (
-        <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center">
-          <div className="bg-white p-6 rounded-lg w-1/3">
-            <h2 className="text-xl font-bold mb-4">Add Field Name</h2>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+          <div className="p-6 bg-white rounded-lg shadow-lg w-[400px]">
+            <h3 className="text-xl font-semibold mb-4">Add Field Name</h3>
             <form onSubmit={handleSubmit}>
-              {/* Category Dropdown */}
               <select
-                className="w-full border p-2 mb-2"
+                className="border border-gray-300 p-2 rounded w-full mb-4"
                 value={formData.category_id}
                 onChange={handleCategoryChange}
               >
                 <option value="">Select Category</option>
-                {categories.map((cat) => (
-                  <option key={cat.category_id} value={cat.category_id}>
-                    {cat.category_name}
+                {categories.map((category) => (
+                  <option key={category.category_id} value={category.category_id}>
+                    {category.category_name}
                   </option>
                 ))}
               </select>
-
-              {/* Subcategory Dropdown */}
               <select
-                className="w-full border p-2 mb-2"
+                className="border border-gray-300 p-2 rounded w-full mb-4"
                 value={formData.subcategory_id}
                 onChange={(e) => setFormData({ ...formData, subcategory_id: e.target.value })}
                 disabled={!formData.category_id}
               >
                 <option value="">Select Subcategory</option>
-                {subcategories.map((sub) => (
-                  <option key={sub.subcategory_id} value={sub.subcategory_id}>
-                    {sub.subcategory_name}
+                {subcategories.map((subcategory) => (
+                  <option key={subcategory.subcategory_id} value={subcategory.subcategory_id}>
+                    {subcategory.subcategory_name}
                   </option>
                 ))}
               </select>
-
-              {/* Field Name Input */}
               <input
                 type="text"
-                className="w-full border p-2 mb-2"
+                className="border border-gray-300 p-2 rounded w-full mb-4"
+                placeholder="Field Name"
                 value={formData.document_fields}
                 onChange={(e) => setFormData({ ...formData, document_fields: e.target.value })}
-                placeholder="Field Name"
               />
-
-              <div className="flex justify-end">
-                <button type="submit" className="bg-[#00234E] text-white px-4 py-2 rounded">
-                  Add Field Name
+              <div className="flex justify-end space-x-3">
+                <button
+                  type="submit"
+                  className="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600"
+                >
+                  Save
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setModalOpen(false)}
+                  className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+                >
+                  Cancel
                 </button>
               </div>
             </form>
@@ -246,8 +285,8 @@ const FieldNames = () => {
         </div>
       )}
     </div>
-
   );
+
 };
 
 export default FieldNames;

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { FaFileAlt } from "react-icons/fa";
+import { FaFilePdf, FaFileAlt } from "react-icons/fa";
 
 const Categories = () => {
   const navigate = useNavigate();
@@ -9,8 +9,8 @@ const Categories = () => {
   const [subcategories, setSubcategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
 
-  const API_BASE_URL = "https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/categories";
-  const SUBCATEGORIES_API_URL = "https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/subcategories";
+  const API_BASE_URL = " https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/categories";
+  const SUBCATEGORIES_API_URL = " https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/subcategories";
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -43,6 +43,8 @@ const Categories = () => {
     });
   };
 
+  //import { FaFileAlt, FaFilePdf } from "react-icons/fa"; // Import PDF icon
+
   return (
     <div className="flex">
       {/* Sidebar Placeholder to Avoid Overlapping */}
@@ -50,10 +52,10 @@ const Categories = () => {
 
       {/* Main Content */}
       <div className="flex-1 bg-gray-100 text-[#1e293b] min-h-screen animate-fadeIn p-6 pt-12">
-        <section className="relative bg-orange-300 text-black py-16 px-6 text-center shadow-md">
+        <section className="relative bg-[#F58A3B] text-black py-16 px-6 text-center shadow-[0px_2px_4px_rgba(0,0,0,0.4)]">
           <div className="max-w-7xl mx-auto">
-            <h1 className="text-3xl font-bold -mt-9 mb-1">Government Document Services</h1>
-            <p className="text-lg -mb-10 text-gray-900">
+            <h1 className="text-3xl text-white font-bold -mt-9 mb-1">Government Document Services</h1>
+            <p className="text-lg -mb-10 text-white">
               Apply for various government documents quickly and hassle-free. Select a category below to proceed with your application.
             </p>
           </div>
@@ -66,42 +68,67 @@ const Categories = () => {
           </h2>
         </div>
 
-
-        {/* Categories & Subcategories Grid */}
         <div className="grid grid-cols-3 gap-4 w-full max-w-7xl mx-auto mt-4">
+          {/* ✅ Categories Section */}
           {!selectedCategory ? (
             categories.map((category) => (
               <div
                 key={category.category_id}
-                className="flex items-center w-full p-4 rounded-lg shadow-xl cursor-pointer transition-all duration-300 bg-gray-100 hover:bg-orange-200"
+                className="flex w-full rounded-lg shadow-[0px_2px_4px_rgba(0,0,0,0.4)] cursor-pointer transition-all duration-300 overflow-hidden"
                 onClick={() => fetchSubcategories(category.category_id, category.category_name)}
               >
-                <FaFileAlt className="text-2xl text-orange-500" />
-                <span className="ml-4 text-lg font-medium">{category.category_name}</span>
-              </div>
-
-            ))
-          ) : (
-            subcategories.length > 0 ? (
-              subcategories.map((sub) => (
-                <div
-                  key={sub.subcategory_id}
-                  className="flex items-center w-full p-4 rounded-lg shadow-xl cursor-pointer transition-all duration-300 bg-orange-200 hover:bg-white"
-                  onClick={() => handleSubcategorySelect(sub.subcategory_id, sub.subcategory_name, selectedCategory.categoryId, selectedCategory.categoryName)}
-                >
-                  <FaFileAlt className="text-2xl text-[#00234E]" />
-                  <span className="ml-4 text-lg font-medium">{sub.subcategory_name}</span>
+                {/* ✅ PDF/Icon Section with Separate BG */}
+                <div className="bg-[#FDEDD3] p-3 flex items-center justify-center">
+                  {category.isPdf ? (
+                    <FaFilePdf className="text-2xl text-orange-500" />
+                  ) : (
+                    <FaFileAlt className="text-2xl text-orange-500" />
+                  )}
                 </div>
 
-              ))
-            ) : (
-              <p className="text-lg text-gray-600 text-center w-full">No subcategories found.</p>
-            )
+                {/* ✅ Category Name Section */}
+                <div className="flex-1 bg-gray-100 hover:bg-orange-200 p-4">
+                  <span className="text-lg font-medium">{category.category_name}</span>
+                </div>
+              </div>
+            ))
+          ) : (
+            <>
+              {/* ✅ Subcategories Section */}
+              {subcategories.length > 0 ? (
+                subcategories.map((sub) => (
+                  <div
+                    key={sub.subcategory_id}
+                    className="flex w-full rounded-lg shadow-[0px_2px_4px_rgba(0,0,0,0.4)] cursor-pointer transition-all duration-300 overflow-hidden"
+                    onClick={() => handleSubcategorySelect(sub.subcategory_id, sub.subcategory_name, selectedCategory.categoryId, selectedCategory.categoryName)}
+                  >
+                    {/* ✅ PDF/Icon Section with Separate BG */}
+                    <div className="bg-[#FDEDD3] p-3 flex items-center justify-center">
+                      {sub.isPdf ? (
+                        <FaFilePdf className="text-2xl text-orange-500" />
+                      ) : (
+                        <FaFileAlt className="text-2xl text-orange-500" />
+                      )}
+                    </div>
+
+                    {/* ✅ Subcategory Name Section */}
+                    <div className="flex-1 bg-gray-100 hover:bg-orange-200 p-4">
+                      <span className="text-lg font-medium">{sub.subcategory_name}</span>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p className="text-lg text-gray-600 text-center w-full">No subcategories found.</p>
+              )}
+            </>
           )}
         </div>
+
       </div>
     </div>
   );
+
+
 };
 
 export default Categories;

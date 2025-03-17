@@ -151,7 +151,7 @@ const ApplicationView = () => {
                 <tr key={idx} className="border-b border-gray-300">
                   {pair.map((field, index) => (
                     <React.Fragment key={index}>
-                      <td className="p-3 font-semibold border-r border-gray-300 w-1/6" style={{ backgroundColor: '#FFB4A2' }}>
+                      <td className="p-3 font-semibold border-r border-gray-300 w-1/6" style={{ backgroundColor: '#F58A3B14' }}>
                         {field.label}
                       </td>
                       <td className="p-3 border-r border-gray-300">{field.value || 'N/A'}</td>
@@ -159,7 +159,7 @@ const ApplicationView = () => {
                   ))}
                   {pair.length < 2 && (
                     <>
-                      <td className="p-3 border-r border-gray-300" style={{ backgroundColor: '#FFCDB2' }}></td>
+                      <td className="p-3 border-r border-gray-300" style={{ backgroundColor: '#F58A3B14' }}></td>
                       <td className="p-3 border-r border-gray-300"></td>
                     </>
                   )}
@@ -172,27 +172,47 @@ const ApplicationView = () => {
           <h3 className="text-2xl text-gray-700 font-semibold mb-4">Document Fields</h3>
           <table className="w-full table-fixed border border-gray-300">
             <tbody>
-              {Object.entries(documentData.document_fields || {})
-                .reduce((rows, field, index, array) => {
-                  if (index % 2 === 0) rows.push(array.slice(index, index + 2));
-                  return rows;
-                }, [])
-                .map((pair, idx) => (
-                  <tr key={idx} className="border-b border-gray-300">
-                    {pair.map(([key, value], index) => (
-                      <React.Fragment key={index}>
-                        <td className="w-1/5 p-3 font-semibold border-r border-gray-300 bg-white">{key}</td>
-                        <td className="w-1/3 p-3 border-r border-gray-300">{value || 'N/A'}</td>
-                      </React.Fragment>
-                    ))}
-                    {pair.length < 2 && (
-                      <>
-                        <td className="w-1/5 p-3 bg-white border-r border-gray-300"></td>
-                        <td className="w-1/3 p-3 border-r border-gray-300"></td>
-                      </>
-                    )}
-                  </tr>
-                ))}
+              {(() => {
+                // Handle both array format and object format
+                let fieldsArray = [];
+
+                if (Array.isArray(documentData.document_fields)) {
+                  // New format (array of objects with field_name and field_value)
+                  fieldsArray = documentData.document_fields;
+                } else if (typeof documentData.document_fields === 'object' && documentData.document_fields !== null) {
+                  // Old format (object with key-value pairs)
+                  fieldsArray = Object.entries(documentData.document_fields).map(([key, value]) => ({
+                    field_name: key,
+                    field_value: value
+                  }));
+                }
+
+                return fieldsArray
+                  .reduce((rows, field, index, array) => {
+                    if (index % 2 === 0) rows.push(array.slice(index, index + 2));
+                    return rows;
+                  }, [])
+                  .map((pair, idx) => (
+                    <tr key={idx} className="border-b border-gray-300">
+                      {pair.map((field, index) => (
+                        <React.Fragment key={index}>
+                          <td className="w-1/5 p-3 font-semibold border-r border-gray-300 bg-white">
+                            {field.field_name}
+                          </td>
+                          <td className="w-1/3 p-3 border-r border-gray-300">
+                            {field.field_value || 'N/A'}
+                          </td>
+                        </React.Fragment>
+                      ))}
+                      {pair.length < 2 && (
+                        <>
+                          <td className="w-1/5 p-3 bg-white border-r border-gray-300"></td>
+                          <td className="w-1/3 p-3 border-r border-gray-300"></td>
+                        </>
+                      )}
+                    </tr>
+                  ));
+              })()}
             </tbody>
           </table>
         </div>

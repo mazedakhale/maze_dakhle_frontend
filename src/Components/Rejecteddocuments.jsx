@@ -3,7 +3,7 @@ import axios from "axios";
 import { FaRegFileAlt, FaDownload, FaFileInvoice, FaCheck, FaTimes } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
-const AssignedDistributorsList = () => {
+const Rejecteddocuments = () => {
     const [distributors, setDistributors] = useState([]);
     const [certificates, setCertificates] = useState([]);
     const [searchQuery, setSearchQuery] = useState("");
@@ -13,16 +13,16 @@ const AssignedDistributorsList = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        axios.get(`https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/documents/assigned-list`)
+        // Fetch assigned documents from the new API
+        axios
+            .get(`https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/documents/assigned-list`)
             .then((response) => {
-                console.log("API Response:", response.data);  // Log full response
                 const sortedDocuments = response.data.documents.sort(
                     (a, b) => new Date(b.uploaded_at) - new Date(a.uploaded_at)
                 );
                 setDocuments(sortedDocuments);
             })
             .catch((error) => console.error("Error fetching assigned documents:", error));
-
 
         // Fetch distributors
         axios
@@ -56,8 +56,6 @@ const AssignedDistributorsList = () => {
         try {
             await axios.put(`https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/documents/update-status/${documentId}`, {
                 status: newStatus,
-                status_updated_at: new Date().toISOString() // Add timestamp
-
             });
             setDocuments((prev) =>
                 prev.map((doc) =>
@@ -71,7 +69,7 @@ const AssignedDistributorsList = () => {
     };
 
     const filteredDocuments = documents
-        .filter((doc) => doc.status === "Rejected" || doc.status === "Pending" || doc.status === "Approved") // Include Pending and Approved
+        .filter((doc) => doc.status === "Rejected") // Only include documents with status "Uploaded"
         .filter((doc) =>
             statusFilter ? doc.status?.toLowerCase() === statusFilter.toLowerCase() : true
         )
@@ -171,21 +169,64 @@ const AssignedDistributorsList = () => {
             alert("Failed to download file.");
         }
     };
-    console.log("Document Fields:", document.document_fields);
+    const handleReupload = async (documentId, documentType) => {
+        const fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.accept = '.pdf,.doc,.docx,.png,.jpg,.jpeg';
 
+        fileInput.onchange = async (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                try {
+                    const formData = new FormData();
+                    formData.append('file', file);
+                    formData.append('documentType', documentType);
+
+                    const response = await axios.post(
+                        `https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/documents/reupload/${documentId}`,
+                        formData,
+                        {
+                            headers: {
+                                'Content-Type': 'multipart/form-data',
+                            },
+                        }
+                    );
+
+                    console.log('Reupload successful:', response.data);
+                    alert('Document reuploaded successfully.');
+
+                    const updatedDocuments = documents.map((doc) =>
+                        doc.document_id === documentId ? response.data.document : doc
+                    );
+                    setDocuments(updatedDocuments);
+                } catch (error) {
+                    console.error('Error reuploading document:', error);
+                    let errorMessage = 'Failed to reupload document. Please try again.';
+                    if (error.response) {
+                        errorMessage = error.response.data.message || errorMessage;
+                    } else if (error.request) {
+                        errorMessage = 'Network error. Please check your connection.';
+                    }
+                    alert(errorMessage);
+                }
+            }
+        };
+
+        fileInput.click();
+    };
     return (
-        <div className="w-[calc(90%-280px)] ml-[320px] mt-[80px] p-6">
+        <div className="w-[calc(90%-350px)] ml-[330px] mt-[80px] p-6">
             {/* Outer Container */}
             <div className=" bg-white shadow-lg rounded-lg border border-gray-300 ">
 
                 {/* Header */}
-                <div className="border-t-4 border-orange-400 bg-[#F4F4F4] text-center p-4 rounded-t-lg relative">
+                <div className="border-t-4 border-orange-400 bg-[#F4F4F4] text-center p-4 rounded-t-lg ">
                     <h2 className="text-xl font-bold text-center text-gray-800">
-                        Assigned Distributor  List
+                        Rejected Applications List
 
                     </h2>
-                    <div className="absolute bottom-[-2px] left-0 w-full h-1 bg-gray-300 shadow-md"></div>
                 </div>
+
 
                 {/* Filters */}
                 <div className="p-4 flex justify-between items-center bg-gray-100 border-b border-gray-300">
@@ -216,16 +257,31 @@ const AssignedDistributorsList = () => {
 
                 <div className="table-container border border-gray-300 rounded-lg shadow-md overflow-x-auto p-6">
                     <table className="table border-collapse border border-gray-300 min-w-full text-sm">
-                        <thead className="bg-[#F58A3B14] border-b-2 border-[#776D6DA8]">
+                        <thead className="bg-gray-300">
                             <tr>
-                                {["Sr No.", "Application ID", "Datetime", "Applicant", "Category", "Subcategory", "VLE Name", "VLE Email", "VLE Phone", "Distributor", "Verification", "Action", "View"].map((header, index) => (
-                                    <th key={index} className="px-4 py-3 border border-[#776D6DA8] text-black font-semibold text-center">
-                                        {header}
-                                    </th>
-                                ))}
+                                <th className="border p-2 text-center font-bold">Sr No.</th>
+                                <th className="border p-2 text-center font-bold">Application Id</th>
+                                <th className="border p-2 text-center font-bold">Datetime</th>
+
+                                <th className="border p-2 text-center font-bold">Applicants Name</th>
+
+                                <th className="border p-2 font-bold">Category</th>
+                                <th className="border p-2 font-bold">Subcategory</th>
+                                <th className="border p-2 font-bold">VLE Name</th>
+                                <th className="border p-2 font-bold">VLE Email</th>
+                                <th className="border p-2 font-bold">VLE Phone no</th>
+                                <th className="border p-2 font-bold">Assigned Distributor</th>
+                                <th className="border p-2 font-bold">Verification</th>
+                                {/* <th className="border p-2 font-bold">Completed</th> */}
+                                <th className="border p-2 font-bold">Action</th>
+                                <th className="border p-2 font-bold">View</th>
+                                <th className="border p-2 font-bold">Rejecetd Reason</th>
+                                <th className="border p-2 font-bold">Reupload</th>
+
+                                {/* <th className="border p-2 font-bold">Certificate</th>
+                                                <th className="border p-2 font-bold">Download Certificate</th> */}
                             </tr>
                         </thead>
-
                         <tbody>
                             {filteredDocuments.map((doc, index) => (
                                 <tr
@@ -246,26 +302,13 @@ const AssignedDistributorsList = () => {
                                         })}
                                     </td>
                                     <td className="px-4 py-2 border text-sm">
-                                        {doc?.document_fields ? (
-                                            Array.isArray(doc.document_fields) ? (
-                                                // New format (array of objects)
-                                                doc.document_fields.find(field => field.field_name === "APPLICANT NAME") ? (
-                                                    <p>{doc.document_fields.find(field => field.field_name === "APPLICANT NAME").field_value}</p>
-                                                ) : (
-                                                    <p className="text-gray-500">No applicant name available</p>
-                                                )
-                                            ) : (
-                                                // Old format (object with key-value pairs)
-                                                doc.document_fields["APPLICANT NAME"] ? (
-                                                    <p>{doc.document_fields["APPLICANT NAME"]}</p>
-                                                ) : (
-                                                    <p className="text-gray-500">No applicant name available</p>
-                                                )
-                                            )
-                                        ) : (
-                                            <p className="text-gray-500">No fields available</p>
-                                        )}
+                                        {doc?.document_fields && typeof doc.document_fields === "object"
+                                            ? (doc.document_fields["APPLICANT NAME"]
+                                                ? <p>{doc.document_fields["APPLICANT NAME"]}</p>
+                                                : <p className="text-gray-500">No applicant name available</p>)
+                                            : <p className="text-gray-500">No fields available</p>}
                                     </td>
+
 
                                     <td className="border p-2">{doc.category_name}</td>
                                     <td className="border p-2">{doc.subcategory_name}</td>
@@ -274,53 +317,63 @@ const AssignedDistributorsList = () => {
                                     <td className="border p-2 break-words">{doc.phone}</td>
 
                                     <td className="border p-2">{getDistributorName(doc.distributor_id)}</td>
-                                    <tr key={doc.document_id}>
-                                        <td className="border p-2">
-                                            <div className="flex flex-col gap-1">
-                                                {/* Status Badge */}
-                                                <span
-                                                    className={`px-3 py-1 rounded-full text-white text-xs ${doc.status === "Approved"
-                                                        ? "bg-green-500"
-                                                        : doc.status === "Rejected"
-                                                            ? "bg-red-500"
-                                                            : doc.status === "Pending"
-                                                                ? "bg-yellow-500" // Color for Pending
-                                                                : "bg-blue-500" // Default color
-                                                        }`}
-                                                >
-                                                    {doc.status}
-                                                </span>
+                                    <td className="border p-2">
+                                        <div className="flex flex-col gap-1">
+                                            {/* Status Badge */}
+                                            <span
+                                                className={`px-3 py-1 rounded-full text-white text-xs ${doc.status === "Approved"
+                                                    ? "bg-green-500"
+                                                    : doc.status === "Rejected"
+                                                        ? "bg-red-500"
+                                                        : doc.status === "Pending"
+                                                            ? "bg-yellow-500" // Color for Pending
+                                                            : "bg-blue-500" // Default color
+                                                    }`}
+                                            >
+                                                {doc.status}
+                                            </span>
 
-                                                {/* Latest Status Date and Time */}
-                                                {doc.status_history
-                                                    ?.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at)) // Sort by latest date
-                                                    .slice(0, 1) // Take the first entry (latest status)
-                                                    .map((statusEntry, index) => (
-                                                        <div key={index} className="text-xs text-gray-600">
-                                                            {new Date(statusEntry.updated_at).toLocaleString("en-US", {
-                                                                year: "numeric",
-                                                                month: "2-digit",
-                                                                day: "2-digit",
-                                                                hour: "2-digit",
-                                                                minute: "2-digit",
-                                                                second: "2-digit", // Added seconds
-                                                                hour12: true, // Use AM/PM
-                                                            })}
-                                                        </div>
-                                                    ))}
-                                            </div>
-                                        </td>
-                                    </tr>
-
+                                            {/* Latest Status Date and Time */}
+                                            {doc.status_history
+                                                ?.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at)) // Sort by latest date
+                                                .slice(0, 1) // Take the first entry (latest status)
+                                                .map((statusEntry, index) => (
+                                                    <div key={index} className="text-xs text-gray-600">
+                                                        {new Date(statusEntry.updated_at).toLocaleString("en-US", {
+                                                            year: "numeric",
+                                                            month: "2-digit",
+                                                            day: "2-digit",
+                                                            hour: "2-digit",
+                                                            minute: "2-digit",
+                                                            second: "2-digit", // Added seconds
+                                                            hour12: true, // Use AM/PM
+                                                        })}
+                                                    </div>
+                                                ))}
+                                        </div>
+                                    </td>
                                     {/* <td className="border p-2">
+                                                        <button
+                                                            onClick={() => handleUpdateStatus(doc.document_id, "Completed")}
+                                                            className="bg-blue-900 rounded flex justify-center items-center hover:bg-blue-600 px-3 py-1 text-white text-xs"
+                                                        >
+                                                            <FaCheck className="text-white" />
+                                                        </button>
+                                                    </td> */}
+                                    <td className="border p-2 text-center">
                                         <button
-                                            onClick={() => handleUpdateStatus(doc.document_id, "Completed")}
-                                            className="bg-blue-900 rounded flex justify-center items-center hover:bg-blue-600 px-3 py-1 text-white text-xs"
+                                            onClick={() => handleViewInvoice(doc.document_id)}
+                                            className="bg-red-500 text-white px-3 py-1 rounded flex justify-center items-center hover:bg-red-600 transition text-xs"
                                         >
-                                            <FaCheck className="text-white" />
+                                            <FaFileInvoice className="mr-1" /> Action
                                         </button>
-                                    </td> */}
-                                    {/* <td className="px-4 py-3 border border-[#776D6DA8] text-center">{doc.rejection_reason}</td>
+                                    </td>
+                                    <td className="border p-2 text-center">
+                                        <button onClick={() => handleView(doc.document_id, doc.category_id, doc.subcategory_id)} className="bg-indigo-500 text-white px-3 py-1 rounded hover:bg-indigo-600 transition text-xs">
+                                            <FaRegFileAlt className="mr-1" /> View
+                                        </button>
+                                    </td>
+                                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">{doc.rejection_reason}</td>
                                     <td className="px-4 py-3 border border-[#776D6DA8] text-center">
                                         {doc.status === "Rejected" && doc.selected_document_names ? (
                                             doc.selected_document_names.map((documentType, idx) => (
@@ -337,44 +390,31 @@ const AssignedDistributorsList = () => {
                                         ) : (
                                             "N/A"
                                         )}
-                                    </td> */}
-                                    <td className="border p-2 text-center">
-                                        <button
-                                            onClick={() => handleViewInvoice(doc.document_id)}
-                                            className="bg-red-500 text-white px-3 py-1 rounded flex justify-center items-center hover:bg-red-600 transition text-xs"
-                                        >
-                                            <FaFileInvoice className="mr-1" /> Action
-                                        </button>
-                                    </td>
-                                    <td className="border p-2 text-center">
-                                        <button onClick={() => handleView(doc.document_id, doc.category_id, doc.subcategory_id)} className="bg-indigo-500 text-white px-3 py-1 rounded hover:bg-indigo-600 transition text-xs">
-                                            <FaRegFileAlt className="mr-1" /> View
-                                        </button>
                                     </td>
                                     {/* <td className="border p-2 text-center">
-                                        {getCertificateByDocumentId(doc.document_id) ? (
-                                            <button
-                                                onClick={() => handleViewCertificate(doc.document_id)}
-                                                className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 transition text-xs"
-                                            >
-                                                <FaCheck className="mr-1" /> Certificate
-                                            </button>
-                                        ) : (
-                                            <span className="text-gray-500">Not Available</span>
-                                        )}
-                                    </td>
-                                    <td className="border p-2 text-center">
-                                        {getCertificateByDocumentId(doc.document_id) ? (
-                                            <button
-                                                onClick={() => handleDownloadCertificate(doc.document_id, doc.name)}
-                                                className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 transition text-xs"
-                                            >
-                                                <FaDownload className="mr-1" /> Download
-                                            </button>
-                                        ) : (
-                                            <span className="text-gray-500">Not Available</span>
-                                        )}
-                                    </td> */}
+                                                        {getCertificateByDocumentId(doc.document_id) ? (
+                                                            <button
+                                                                onClick={() => handleViewCertificate(doc.document_id)}
+                                                                className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 transition text-xs"
+                                                            >
+                                                                <FaCheck className="mr-1" /> Certificate
+                                                            </button>
+                                                        ) : (
+                                                            <span className="text-gray-500">Not Available</span>
+                                                        )}
+                                                    </td>
+                                                    <td className="border p-2 text-center">
+                                                        {getCertificateByDocumentId(doc.document_id) ? (
+                                                            <button
+                                                                onClick={() => handleDownloadCertificate(doc.document_id, doc.name)}
+                                                                className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 transition text-xs"
+                                                            >
+                                                                <FaDownload className="mr-1" /> Download
+                                                            </button>
+                                                        ) : (
+                                                            <span className="text-gray-500">Not Available</span>
+                                                        )}
+                                                    </td> */}
                                 </tr>
                             ))}
                         </tbody>
@@ -385,4 +425,4 @@ const AssignedDistributorsList = () => {
     );
 };
 
-export default AssignedDistributorsList;
+export default Rejecteddocuments;

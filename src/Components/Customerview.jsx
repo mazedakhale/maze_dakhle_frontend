@@ -135,14 +135,49 @@ const ApplicationView = () => {
           <table className="w-full border border-gray-300 mb-6">
             <tbody>
               {[{ label: "Application ID", value: documentData.application_id },
-              // { label: "User ID", value: documentData.user_id },
+              //  { label: "User ID", value: documentData.user_id },
               { label: "Category", value: documentData.category_name },
+
               { label: "Subcategory", value: documentData.subcategory_name },
-              { label: "Name", value: documentData.name },
-              { label: "Email", value: documentData.email },
-              { label: "Phone", value: documentData.phone },
-              { label: "Status", value: documentData.status },
-                // { label: "Address", value: documentData.address },
+              { label: "VLE Name", value: documentData.name },
+              { label: " VLE Email", value: documentData.email },
+              { label: "VLE Phone", value: documentData.phone },
+              {
+                label: "Status",
+                value: (
+                  <div className="flex flex-col gap-1">
+                    {/* Status */}
+                    <span
+                      className={`px-3 py-1 rounded-full text-white text-xs ${documentData.status === "Approved"
+                        ? "bg-green-500"
+                        : documentData.status === "Rejected"
+                          ? "bg-red-500"
+                          : "bg-yellow-500" // Default color for other statuses
+                        }`}
+                    >
+                      {documentData.status}
+                    </span>
+
+                    {/* Latest Status Date and Time */}
+                    {documentData.status_history
+                      ?.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at)) // Sort by latest date
+                      .slice(0, 1) // Take the first entry (latest status)
+                      .map((statusEntry, index) => (
+                        <div key={index} className="text-xs text-gray-600">
+                          {new Date(statusEntry.updated_at).toLocaleString("en-US", {
+                            year: "numeric",
+                            month: "2-digit",
+                            day: "2-digit",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            second: "2-digit", // Added seconds
+                            hour12: true, // Use AM/PM
+                          })}
+                        </div>
+                      ))}
+                  </div>
+                ),
+              }                // { label: "Address", value: documentData.address },
                 // { label: "Distributor", value: documentData.distributor_id || 'Not Assigned' }
               ].reduce((rows, field, index, array) => {
                 if (index % 2 === 0) rows.push(array.slice(index, index + 2));
@@ -151,7 +186,7 @@ const ApplicationView = () => {
                 <tr key={idx} className="border-b border-gray-300">
                   {pair.map((field, index) => (
                     <React.Fragment key={index}>
-                      <td className="p-3 font-semibold border-r border-gray-300 w-1/6" style={{ backgroundColor: '#FFB4A2' }}>
+                      <td className="p-3 font-semibold border-r border-gray-300 w-1/6" style={{ backgroundColor: '#F58A3B14' }}>
                         {field.label}
                       </td>
                       <td className="p-3 border-r border-gray-300">{field.value || 'N/A'}</td>
@@ -159,7 +194,7 @@ const ApplicationView = () => {
                   ))}
                   {pair.length < 2 && (
                     <>
-                      <td className="p-3 border-r border-gray-300" style={{ backgroundColor: '#FFCDB2' }}></td>
+                      <td className="p-3 border-r border-gray-300" style={{ backgroundColor: '#F58A3B14' }}></td>
                       <td className="p-3 border-r border-gray-300"></td>
                     </>
                   )}
@@ -172,17 +207,17 @@ const ApplicationView = () => {
           <h3 className="text-2xl text-gray-700 font-semibold mb-4">Document Fields</h3>
           <table className="w-full table-fixed border border-gray-300">
             <tbody>
-              {Object.entries(documentData.document_fields || {})
+              {(Array.isArray(documentData.document_fields) ? documentData.document_fields : [])
                 .reduce((rows, field, index, array) => {
                   if (index % 2 === 0) rows.push(array.slice(index, index + 2));
                   return rows;
                 }, [])
                 .map((pair, idx) => (
                   <tr key={idx} className="border-b border-gray-300">
-                    {pair.map(([key, value], index) => (
+                    {pair.map((field, index) => (
                       <React.Fragment key={index}>
-                        <td className="w-1/5 p-3 font-semibold border-r border-gray-300 bg-white">{key}</td>
-                        <td className="w-1/3 p-3 border-r border-gray-300">{value || 'N/A'}</td>
+                        <td className="w-1/5 p-3 font-semibold border-r border-gray-300 bg-white">{field.field_name}</td>
+                        <td className="w-1/3 p-3 border-r border-gray-300">{field.field_value || 'N/A'}</td>
                       </React.Fragment>
                     ))}
                     {pair.length < 2 && (
@@ -193,6 +228,7 @@ const ApplicationView = () => {
                     )}
                   </tr>
                 ))}
+
             </tbody>
           </table>
         </div>

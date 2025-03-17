@@ -1,17 +1,19 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { FaFileAlt, FaExclamationTriangle, FaRegFileAlt, FaFileInvoice } from "react-icons/fa";
-
+import { FaFileAlt, FaFileInvoice, FaDownload, FaCheck } from "react-icons/fa";
 import jwtDecode from "jwt-decode";
 import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 
 const CustomerApply = () => {
   const [documents, setDocuments] = useState([]);
   const [userId, setUserId] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
+  const [certificates, setCertificates] = useState([]); // State for certificates
   const navigate = useNavigate();
 
+  // Fetch user ID from token
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -24,6 +26,7 @@ const CustomerApply = () => {
     }
   }, []);
 
+  // Fetch documents for the logged-in user
   useEffect(() => {
     if (userId) {
       axios
@@ -31,114 +34,243 @@ const CustomerApply = () => {
         .then((response) => {
           const allDocuments = response.data.documents;
           const filteredDocs = allDocuments
-            .filter((doc) => doc.user_id === userId && doc.status !== "Completed") // Excluding "Completed" status
-            .reverse(); // Show newest first
+            .filter((doc) => doc.user_id === userId && (doc.status === "Received" || doc.status !== "Completed"))
+            .reverse();
           setDocuments(filteredDocs);
         })
         .catch((error) => console.error("Error fetching documents:", error));
+
+      // Fetch certificates
+      axios
+        .get("https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/certificates")
+        .then((response) => setCertificates(response.data))
+        .catch((error) => console.error("Error fetching certificates:", error));
     }
   }, [userId]);
 
-  // Search and Filter Logic
+  // Filter documents based on search query and status
   const filteredDocuments = documents.filter((doc) => {
-    const searchString = `${doc.user_id} ${doc.document_id} ${doc.category_name} ${doc.subcategory_name} ${doc.name} ${doc.email} ${doc.phone} ${doc.address}`
+    const searchString = `${doc.user_id} ${doc.document_id} ${doc.category_name} ${doc.subcategory_name} ${doc.name} ${doc.email} ${doc.phone} ${doc.address} ${doc.application_id}`
       .toLowerCase()
       .includes(searchQuery.toLowerCase());
 
-    const statusMatch = statusFilter
-      ? doc.status.toLowerCase() === statusFilter.toLowerCase()
-      : true;
-
+    const statusMatch = statusFilter ? doc.status.toLowerCase() === statusFilter.toLowerCase() : true;
     return searchString && statusMatch;
   });
 
-  const handleViewInvoice = (documentId, categoryId, subcategoryId) => {
-    navigate(`/Customerinvoice/${documentId}`, { state: { categoryId, subcategoryId } });
+  // Handle reupload for a specific document type
+  const handleReupload = async (documentId, documentType) => {
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = '.pdf,.doc,.docx,.png,.jpg,.jpeg';
+
+    fileInput.onchange = async (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        try {
+          const formData = new FormData();
+          formData.append('file', file);
+          formData.append('documentType', documentType);
+
+          const response = await axios.post(
+            `https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/documents/reupload/${documentId}`,
+            formData,
+            {
+              headers: {
+                'Content-Type': 'multipart/form-data',
+              },
+            }
+          );
+
+          console.log('Reupload successful:', response.data);
+          alert('Document reuploaded successfully.');
+
+          const updatedDocuments = documents.map((doc) =>
+            doc.document_id === documentId ? response.data.document : doc
+          );
+          setDocuments(updatedDocuments);
+        } catch (error) {
+          console.error('Error reuploading document:', error);
+          let errorMessage = 'Failed to reupload document. Please try again.';
+          if (error.response) {
+            errorMessage = error.response.data.message || errorMessage;
+          } else if (error.request) {
+            errorMessage = 'Network error. Please check your connection.';
+          }
+          alert(errorMessage);
+        }
+      }
+    };
+
+    fileInput.click();
   };
 
+  // Handle download receipt
+  const handleDownloadReceipt = (receiptUrl, documentName) => {
+    try {
+      const fileExtension = receiptUrl.split('.').pop().toLowerCase();
+      const fileName = `${documentName}_receipt.${fileExtension}`;
+
+      const link = document.createElement("a");
+      link.href = receiptUrl;
+      link.download = fileName;
+      link.style.display = "none";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      console.error("Error downloading receipt:", error);
+      Swal.fire("Error", "Failed to download receipt. Please try again.", "error");
+    }
+  };
+
+  // Handle view certificate
+  const handleViewCertificate = async (documentId) => {
+    const certificate = certificates.find((cert) => cert.document_id === documentId);
+    if (!certificate) {
+      Swal.fire("Error", "Certificate not found.", "error");
+      return;
+    }
+
+    const newTab = window.open("", "_blank");
+
+    try {
+      const response = await axios.get(`https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/certificates/${certificate.certificate_id}`);
+      if (response.data && response.data.file_url) {
+        newTab.location.href = response.data.file_url;
+      } else {
+        newTab.close();
+        Swal.fire("Error", "Certificate not found.", "error");
+      }
+    } catch (error) {
+      newTab.close();
+      console.error("Error fetching certificate:", error);
+      Swal.fire("Error", "Failed to fetch certificate.", "error");
+    }
+  };
+
+  // Get certificate by document ID
+  const getCertificateByDocumentId = (documentId) => {
+    return certificates.find((cert) => cert.document_id === documentId);
+  };
 
   const handleView = (documentId, categoryId, subcategoryId) => {
     navigate(`/Customerview/${documentId}`, { state: { categoryId, subcategoryId } });
   };
 
-
-
+  const handleViewInvoice = (documentId, categoryId, subcategoryId) => {
+    navigate(`/Customerinvoice/${documentId}`, { state: { categoryId, subcategoryId } });
+  };
 
   return (
-    <div className="flex h-screen">
-      {/* Sidebar */}
-      <div className="w-[310px] flex-shrink-0">{/* <Sidebar /> */}</div>
+    <div className="ml-[280px] flex flex-col items-center min-h-screen p-6 bg-gray-100">
+      <div className="w-[100%] max-w-7xl bg-white shadow-lg rounded-lg">
+        <div className="bg-[#F4F4F4] border-t-4 shadow-lg rounded border-orange-400 p-4">
+          <h2 className="text-xl font-bold text-center text-gray-800">
+            Customer Applications
+          </h2>
+        </div>
 
-      {/* Main Content */}
-      <div className="flex-1 bg-gray-100 p-6 mt-5 overflow-hidden">
-        <div className="w-full bg-white p-6">
-          {/* Header with Search and Filter */}
-          <div className="flex justify-between items-center mb-4">
-            <h1 className="text-2xl font-bold">Customer Applications</h1>
-            <div className="flex gap-4">
-              <input
-                type="text"
-                placeholder="Search..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="border border-gray-300 rounded px-3 py-1"
-              />
-              <select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-                className="border border-gray-300 rounded px-3 py-1"
-              >
-                <option value="">All Status</option>
-                <option value="Pending">Pending</option>
-                <option value="Approved">Approved</option>
-                <option value="Rejected">Rejected</option>
-                <option value="Uploaded">Uploaded</option>
-              </select>
-            </div>
-          </div>
+        {/* Search & Filter */}
+        <div className="p-4 flex justify-end items-center gap-4">
+          <input
+            type="text"
+            placeholder="Search..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-400 w-64 text-sm"
+          />
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-400 text-sm"
+          >
+            <option value="">All Status</option>
+            <option value="Pending">Pending</option>
+            <option value="Approved">Approved</option>
+            <option value="Rejected">Rejected</option>
+            <option value="Uploaded">Uploaded</option>
+            <option value="Received">Received</option>
+          </select>
+        </div>
 
-          {/* Table Container with Scroll */}
-          <div className="w-full max-h-[75vh] overflow-y-auto border border-gray-300">
-            <table className="w-full min-w-[1200px] border-collapse">
-              <thead className="bg-gray-300">
-                <tr>
-                  <th className="border p-3">S.No</th>
-                  <th className="border p-3">Application ID</th>
-                  {/* <th className="border p-3">Document ID</th> */}
-                  <th className="border p-3">Category</th>
-                  <th className="border p-3">Subcategory</th>
-                  <th className="border p-3">Name</th>
-                  <th className="border p-3">Email</th>
-                  {/* <th className="border p-3">Phone</th> */}
-                  {/* <th className="border p-3">Address</th> */}
-                  {/* <th className="border p-3">Document Fields</th> */}
-                  <th className="border p-2 font-bold">Action</th>
-                  <th className="border p-2 font-bold">View</th>
-                  <th className="border p-3">Documents</th>
-                  <th className="border p-3">Verification</th>
+        {/* Table Container with Scrollbar */}
+        <div className="table-container border border-gray-300 rounded-lg shadow-md overflow-x-auto p-4">
+          <table className="table border-collapse border border-gray-300 min-w-full text-sm">
+            <thead className="bg-[#F58A3B14] border-b-2 border-[#776D6DA8]">
+              <tr>
+                {[
+                  "Sr.No",
+                  "Application ID",
+                  "Applicant Name",
+                  "Datetime",
+                  "Category",
+                  "Subcategory",
+                  "VLE Name",
+                  "VLE Email",
+                  "VLE Phone no",
+                  "Action",
+                  "View",
+                  "Documents",
+                  "Verification",
+                  "Rejected Reason",
+                  "Reupload",
+                  "Download Receipt",
+                  "Certificate",
+                ].map((header, index) => (
+                  <th key={index} className="px-4 py-3 border border-[#776D6DA8] text-black font-semibold text-center">
+                    {header}
+                  </th>
+                ))}
+              </tr>
+            </thead>
 
-                </tr>
-              </thead>
-              <tbody>
-                {filteredDocuments.map((doc, index) => (
-                  <tr key={doc.document_id} className="border-t hover:bg-gray-100">
-                    <td className="border p-2 text-center">{index + 1}</td>
-                    <td className="border p-2 text-center">{doc.application_id}</td>
-                    {/* <td className="border p-2 text-center">{doc.document_id}</td> */}
-                    <td className="border p-2">{doc.category_name}</td>
-                    <td className="border p-2">{doc.subcategory_name}</td>
-                    <td className="border p-2">{doc.name}</td>
-                    <td className="border p-2">{doc.email}</td>
-                    {/* <td className="border p-2">{doc.phone}</td> */}
-                    {/* <td className="border p-2">{doc.address}</td> */}
-                    {/* <td className="border p-2">
-                      {Object.entries(doc.document_fields).map(([key, value]) => (
-                        <div key={key}>
-                          <strong>{key}:</strong> {String(value)}
-                        </div>
-                      ))}
-                    </td> */}
-
+            {/* Table Body */}
+            <tbody>
+              {filteredDocuments.length > 0 ? (
+                filteredDocuments.map((doc, index) => (
+                  <tr
+                    key={doc.document_id}
+                    className={`${index % 2 === 0 ? "bg-[#FFFFFF]" : "bg-[#F58A3B14]"
+                      } hover:bg-orange-100 transition duration-200`}
+                  >
+                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">{index + 1}</td>
+                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">{doc.application_id}</td>
+                    <td className="px-4 py-2 border">
+                      {doc?.document_fields ? (
+                        Array.isArray(doc.document_fields) ? (
+                          doc.document_fields.find((field) => field.field_name === "APPLICANT NAME") ? (
+                            <p>{doc.document_fields.find((field) => field.field_name === "APPLICANT NAME").field_value}</p>
+                          ) : (
+                            <p className="text-gray-500">No applicant name available</p>
+                          )
+                        ) : (
+                          doc.document_fields["APPLICANT NAME"] ? (
+                            <p>{doc.document_fields["APPLICANT NAME"]}</p>
+                          ) : (
+                            <p className="text-gray-500">No applicant name available</p>
+                          )
+                        )
+                      ) : (
+                        <p className="text-gray-500">No fields available</p>
+                      )}
+                    </td>
+                    <td className="border p-2">
+                      {new Date(doc.uploaded_at).toLocaleString('en-US', {
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit',
+                        hour12: true,
+                      })}
+                    </td>
+                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">{doc.category_name}</td>
+                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">{doc.subcategory_name}</td>
+                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">{doc.name}</td>
+                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">{doc.email}</td>
+                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">{doc.phone}</td>
                     <td className="border p-2 text-center">
                       <button
                         onClick={() => handleViewInvoice(doc.document_id)}
@@ -147,7 +279,6 @@ const CustomerApply = () => {
                         <FaFileInvoice className="mr-1" /> Action
                       </button>
                     </td>
-
                     <td className="border p-2 text-center">
                       <button
                         onClick={() => handleView(doc.document_id)}
@@ -156,48 +287,99 @@ const CustomerApply = () => {
                         <FaFileInvoice className="mr-1" /> View
                       </button>
                     </td>
-
-                    <td className="border p-2">
+                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">
                       <div className="flex justify-center">
                         {doc.documents &&
                           doc.documents.map((file, idx) => (
-                            <a
-                              key={idx}
-                              href={file.file_path}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                            >
+                            <a key={idx} href={file.file_path} target="_blank" rel="noopener noreferrer">
                               <FaFileAlt className="text-blue-500 text-xl" />
                             </a>
                           ))}
                       </div>
                     </td>
-
-                    <td className="border p-2">
-                      <span
-                        className={`px-3 py-1 rounded-full text-white text-sm flex justify-center ${doc.status === "Approved"
-                          ? "bg-green-500"
-                          : doc.status === "Rejected"
-                            ? "bg-red-500"
-                            : "bg-yellow-500"
-                          }`}
-                      >
-                        {doc.status}
-                      </span>
+                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">
+                      <div className="flex flex-col gap-1">
+                        <span
+                          className={`px-3 py-1 rounded-full text-white text-xs ${doc.status === "Approved"
+                            ? "bg-green-500"
+                            : doc.status === "Rejected"
+                              ? "bg-red-500"
+                              : "bg-yellow-500"
+                            }`}
+                        >
+                          {doc.status}
+                        </span>
+                        {doc.status_history
+                          ?.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at))
+                          .slice(0, 1)
+                          .map((statusEntry, index) => (
+                            <div key={index} className="text-xs text-gray-600">
+                              {new Date(statusEntry.updated_at).toLocaleString("en-US", {
+                                year: "numeric",
+                                month: "2-digit",
+                                day: "2-digit",
+                                hour: "2-digit",
+                                minute: "2-digit",
+                                second: "2-digit",
+                                hour12: true,
+                              })}
+                            </div>
+                          ))}
+                      </div>
                     </td>
-
-                  </tr>
-                ))}
-                {filteredDocuments.length === 0 && (
-                  <tr>
-                    <td colSpan="12" className="text-center py-4">
-                      No documents found.
+                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">{doc.rejection_reason}</td>
+                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">
+                      {doc.status === "Rejected" && doc.selected_document_names ? (
+                        doc.selected_document_names.map((documentType, idx) => (
+                          <div key={idx} className="flex items-center justify-between mb-2">
+                            <span className="text-xs">{documentType}</span>
+                            <button
+                              onClick={() => handleReupload(doc.document_id, documentType)}
+                              className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600 text-xs"
+                            >
+                              Reupload
+                            </button>
+                          </div>
+                        ))
+                      ) : (
+                        "N/A"
+                      )}
+                    </td>
+                    <td className="border p-3 text-center">
+                      {doc.receipt_url ? (
+                        <button
+                          onClick={() => handleDownloadReceipt(doc.receipt_url, doc.name)}
+                          className="bg-orange-500 text-white px-3 py-1 rounded flex justify-center items-center hover:bg-blue-600 transition"
+                        >
+                          <FaDownload className="mr-1" /> Receipt
+                        </button>
+                      ) : (
+                        <span className="text-gray-500 text-center">Not Available</span>
+                      )}
+                    </td>
+                    <td className="border p-2 text-center">
+                      {getCertificateByDocumentId(doc.document_id) ? (
+                        <button
+                          onClick={() => handleViewCertificate(doc.document_id)}
+                          className="bg-green-500 text-white px-3 py-1 rounded hover:bg-blue-600 transition text-xs"
+                        >
+                          <FaCheck className="mr-1" /> Certificate
+                        </button>
+                      ) : (
+                        <span className="text-gray-500">Not Available</span>
+                      )}
                     </td>
                   </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="17" className="px-4 py-3 border border-[#776D6DA8] text-center">
+                    No documents found.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>

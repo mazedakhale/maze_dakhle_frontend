@@ -136,161 +136,154 @@ const NotificationManager = () => {
   };
 
   return (
+    <div className="ml-[300px] mt-[80px] p-6 w-[calc(100%-260px)] overflow-x-hidden">
+      <div className="relative bg-white shadow-lg rounded-lg border border-gray-300 overflow-hidden">
+        {/* Header */}
+        <div className="border-t-4 border-orange-400 bg-[#F4F4F4] text-center p-4 rounded-t-lg relative">
+          <h2 className="text-2xl font-bold text-gray-800">Notification Manager</h2>
+          <div className="absolute bottom-[-2px] left-0 w-full h-1 bg-gray-300 shadow-md"></div>
+        </div>
 
-
-    <div className="p-6 ml-80"> {/* Sidebar offset */}
-
-      {/* Header Row */}
-      <div className="bg-white mt-4 rounded-lg shadow-lg p-4 overflow-x-auto">
-        <div className="flex justify-between items-center mb-4">
-
-          <h2 className="text-xl font-bold">Notification Manager</h2>
+        {/* Add Button */}
+        <div className="p-4 flex justify-end">
           <button
-            className="bg-[#00234E] text-white px-4 py-2 rounded"
+            className="bg-orange-500 text-white px-4 py-2 rounded flex items-center gap-2 hover:bg-orange-600 transition duration-200"
             onClick={() => setIsModalOpen(true)}
           >
             + Add Notification
           </button>
         </div>
 
-        {/* Outer Container for Table */}
-
-        <table className="w-full border-collapse border border-gray-300">
-          <thead>
-            <tr className="bg-gray-100">
-              <th className="border border-gray-300 p-2">ID</th>
-              <th className="border border-gray-300 p-2">Distributor Notification</th>
-              <th className="border border-gray-300 p-2">Customer Notification</th>
-              <th className="border border-gray-300 p-2">Date</th>
-              <th className="border border-gray-300 p-2">Status</th>
-              <th className="border border-gray-300 p-2">Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {notifications.length > 0 ? (
-              notifications.map((notification) => (
-                <tr key={notification.notification_id}>
-                  <td className="border border-gray-300 p-2 text-center">{notification.notification_id}</td>
-
-                  {/* Editable fields */}
-                  <td className="border border-gray-300 p-2">
-                    {editingId === notification.notification_id ? (
-                      <input
-                        type="text"
-                        name="distributor_notification"
-                        value={editData.distributor_notification}
-                        onChange={handleEditChange}
-                        className="border p-1 w-full"
-                      />
-                    ) : (
-                      notification.distributor_notification
-                    )}
-                  </td>
-
-                  <td className="border border-gray-300 p-2">
-                    {editingId === notification.notification_id ? (
-                      <input
-                        type="text"
-                        name="customer_notification"
-                        value={editData.customer_notification}
-                        onChange={handleEditChange}
-                        className="border p-1 w-full"
-                      />
-                    ) : (
-                      notification.customer_notification
-                    )}
-                  </td>
-
-                  <td className="border border-gray-300 p-2 text-center">
-                    {new Date(notification.notification_date).toLocaleDateString()}
-                  </td>
-
-                  <td className="border border-gray-300 p-2 text-center">
-                    <button
-                      className={`px-3 py-1 rounded ${notification.notification_status === 'Active'
-                        ? 'bg-green-500 text-white'
-                        : 'bg-red-500 text-white'
-                        }`}
-                      onClick={() =>
-                        handleToggleStatus(notification.notification_id, notification.notification_status)
-                      }
-                    >
-                      {notification.notification_status}
-                    </button>
-                  </td>
-
-                  <td className="border border-gray-300 p-2 text-center">
-                    {editingId === notification.notification_id ? (
+        {/* Table */}
+        <div className="p-6 overflow-x-auto">
+          <table className="w-full border border-[#776D6DA8] text-sm bg-white shadow-md rounded-md">
+            <thead className="bg-[#F58A3B14] border-b-2 border-[#776D6DA8]">
+              <tr>
+                {["ID", "Distributor Notification", "Customer Notification", "Date", "Status", "Actions"].map((header, index) => (
+                  <th key={index} className="px-4 py-3 border border-[#776D6DA8] text-black font-semibold text-center">
+                    {header}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {notifications.length > 0 ? (
+                notifications.map((notification, index) => (
+                  <tr
+                    key={notification.notification_id}
+                    className={`${index % 2 === 0 ? "bg-[#FFFFFF]" : "bg-[#F58A3B14]"} hover:bg-orange-100 transition duration-200`}
+                  >
+                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">{notification.notification_id}</td>
+                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">
+                      {editingId === notification.notification_id ? (
+                        <input
+                          type="text"
+                          name="distributor_notification"
+                          value={editData.distributor_notification}
+                          onChange={handleEditChange}
+                          className="border border-gray-400 p-2 rounded w-full"
+                        />
+                      ) : (
+                        notification.distributor_notification
+                      )}
+                    </td>
+                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">
+                      {editingId === notification.notification_id ? (
+                        <input
+                          type="text"
+                          name="customer_notification"
+                          value={editData.customer_notification}
+                          onChange={handleEditChange}
+                          className="border border-gray-400 p-2 rounded w-full"
+                        />
+                      ) : (
+                        notification.customer_notification
+                      )}
+                    </td>
+                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">
+                      {new Date(notification.notification_date).toLocaleDateString()}
+                    </td>
+                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">
                       <button
-                        className="bg-green-600 text-white px-2 py-1 rounded mr-2"
-                        onClick={() => handleSaveEdit(notification.notification_id)}
+                        className={`px-3 py-1 rounded text-white ${notification.notification_status === "Active"
+                          ? "bg-green-500 cursor-default"
+                          : "bg-gray-500 hover:bg-green-600"
+                          }`}
+                        disabled={notification.notification_status === "Active"}
+                        onClick={() =>
+                          handleToggleStatus(notification.notification_id, notification.notification_status)
+                        }
                       >
-                        Save
+                        {notification.notification_status}
                       </button>
-                    ) : (
+                    </td>
+                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">
+                      {editingId === notification.notification_id ? (
+                        <button
+                          className="bg-green-500 text-white px-3 py-1 rounded mr-2 hover:bg-green-600"
+                          onClick={() => handleSaveEdit(notification.notification_id)}
+                        >
+                          Save
+                        </button>
+                      ) : (
+                        <button
+                          className="bg-blue-500 text-white px-3 py-1 rounded mr-2 hover:bg-blue-600"
+                          onClick={() => handleEdit(notification.notification_id)}
+                        >
+                          Edit
+                        </button>
+                      )}
                       <button
-                        className="bg-yellow-500 text-white px-2 py-1 rounded mr-2"
-                        onClick={() => handleEdit(notification.notification_id)}
+                        className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+                        onClick={() => handleDelete(notification.notification_id)}
                       >
-                        Edit
+                        Delete
                       </button>
-                    )}
-
-                    <button
-                      className="bg-red-600 text-white px-2 py-1 rounded"
-                      onClick={() => handleDelete(notification.notification_id)}
-                    >
-                      Delete
-                    </button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="6" className="px-4 py-3 border border-[#776D6DA8] text-center">
+                    No notifications found.
                   </td>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="6" className="text-center p-4">
-                  No notifications found.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {/* Add Notification Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-          <div className="p-6 bg-white rounded-lg shadow-lg w-1/3">
+          <div className="p-6 bg-white rounded-lg shadow-lg w-[400px]">
             <h3 className="text-xl font-semibold mb-4">Add Notification</h3>
-
             <input
               type="text"
               name="distributor_notification"
               placeholder="Distributor Notification"
               value={newNotification.distributor_notification}
               onChange={handleNewInputChange}
-              className="border p-2 w-full mb-3"
+              className="border border-gray-300 p-2 w-full mb-3"
             />
-
             <input
               type="text"
               name="customer_notification"
               placeholder="Customer Notification"
               value={newNotification.customer_notification}
               onChange={handleNewInputChange}
-              className="border p-2 w-full mb-3"
+              className="border border-gray-300 p-2 w-full mb-3"
             />
-
-
-
             <div className="flex justify-end">
               <button
-                className="bg-blue-600 text-white px-4 py-2 rounded mr-2"
+                className="bg-orange-500 text-white px-4 py-2 rounded mr-2 hover:bg-orange-600"
                 onClick={handleAddNotification}
               >
                 Save
               </button>
               <button
-                className="bg-gray-500 text-white px-4 py-2 rounded"
+                className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
                 onClick={() => setIsModalOpen(false)}
               >
                 Cancel
@@ -301,6 +294,7 @@ const NotificationManager = () => {
       )}
     </div>
   );
+
 };
 
 export default NotificationManager;

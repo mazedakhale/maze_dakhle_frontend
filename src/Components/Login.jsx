@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
-// import "../index.css"; // Ensure Tailwind & CSS are imported
 import jwtDecode from "jwt-decode";
 
 const Login = () => {
@@ -11,6 +10,7 @@ const Login = () => {
   const [subcategories, setSubcategories] = useState({});
   const navigate = useNavigate();
 
+  // Fetch categories
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -54,10 +54,12 @@ const Login = () => {
     }
   }, [categories]);
 
+  // Handle form input changes
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -73,50 +75,33 @@ const Login = () => {
         throw new Error(data.message || "Login failed");
       }
 
-      // Store token & role
+      // Store token in localStorage
       localStorage.setItem("token", data.token);
-      localStorage.setItem("role", data.role);
 
-      // Decode JWT token to check user details
+      // Decode JWT token to extract user role
       const decodedToken = jwtDecode(data.token);
       console.log("Decoded Token:", decodedToken);
 
-      // Extract user_id and role
-      const userId = decodedToken.user_id; // Ensure this key matches your backend token structure
-      const userRole = data.role;
+      // Extract role from the decoded token
+      const userRole = decodedToken.role; // Ensure this key matches your backend token structure
 
-      // Check if phone, address, or user_documents array is empty
-      if (!decodedToken.phone || !decodedToken.address || !Array.isArray(decodedToken.user_documents) || decodedToken.user_documents.length === 0) {
-        Swal.fire({
-          title: "Complete Your Profile",
-          text: "Please add your phone, address, and upload documents.",
-          icon: "info",
-          confirmButtonColor: "#00234E",
-        }).then(() => {
-          navigate(`/Registerdocument/${userId}/${userRole}`); // Pass user_id & role to the next page
-        });
-        return;
-      }
-
-      // Role-based redirection
+      // Redirect based on the role
       Swal.fire({
         title: "Login Successful!",
-        text: "Redirecting...",
+        text: "Redirecting to your dashboard...",
         icon: "success",
         confirmButtonColor: "#00234E",
       }).then(() => {
-        switch (data.role) {
-          case "Admin":
-            navigate("/Adashinner");
-            break;
-          case "Customer":
-            navigate("/Cdashinner");
-            break;
-          case "Distributor":
-            navigate("/Ddashinner");
-            break;
-          default:
-            Swal.fire("Error", "Invalid role received", "error");
+        if (userRole === "Customer") {
+          navigate("/Cdashinner"); // Redirect to Customer Dashboard
+        } else if (userRole === "Admin") {
+          navigate("/Adashinner"); // Redirect to Admin Dashboard
+        } else if (userRole === "Distributor") {
+          navigate("/Ddashinner"); // Redirect to Distributor Dashboard
+        } else if (userRole === "Employee") {
+          navigate("/Edashinner"); // Redirect to Employee Dashboard
+        } else {
+          Swal.fire("Error", "Invalid role received", "error");
         }
       });
     } catch (error) {
@@ -128,6 +113,7 @@ const Login = () => {
       });
     }
   };
+
   return (
     <div className="relative flex justify-center items-center min-h-screen">
       {/* Background Image with Overlay */}
@@ -138,6 +124,7 @@ const Login = () => {
         }}
       />
 
+      {/* Login Form and Document List Container */}
       <div className="relative flex w-3/4 h-[75vh] bg-white bg-opacity-80 rounded-lg shadow-xl overflow-hidden gap-8 p-8">
         {/* Left Column - Login Form */}
         <div className="w-2/5 p-8 flex flex-col justify-center bg-white shadow-lg rounded-lg">
@@ -161,14 +148,14 @@ const Login = () => {
             />
             <button
               type="submit"
-              className="w-full bg-[#00234E] text-white p-3 rounded hover:bg-[#1e293b] transition"
+              className="w-full bg-[#F58A3B] text-white p-3 rounded hover:bg-[#F58A3B] transition"
             >
               Login
             </button>
           </form>
           <p className="mt-4 text-center">
             Don't have an account?{" "}
-            <Link to="/Registration" className="text-[#1e293b] hover:underline">
+            <Link to="/Registration" className="text-[#F58A3B] hover:underline">
               Register
             </Link>
           </p>
@@ -176,14 +163,14 @@ const Login = () => {
 
         {/* Right Column - Dynamic Category & Subcategory List */}
         <div className="w-3/5 p-8 bg-white shadow-lg border border-gray-200 overflow-y-auto max-h-[80vh] rounded-lg">
-          <h2 className="text-2xl text-[#00234E] font-bold mb-4 text-center">
-            Government Document
+          <h2 className="text-2xl text-[#F58A3B] font-bold mb-4 text-center">
+            Government Document Services
           </h2>
           <ul className="grid grid-cols-2 gap-6">
             {categories.map((category) => (
               <li key={category.category_id} className="text-gray-700 border-b pb-2">
                 <div className="flex items-center space-x-2">
-                  <span className="text-black text-sm">⚫</span>
+                  <span className="text-blue-400 text-sm">⚫</span>
                   <span className="font-medium">{category.category_name}</span>
                 </div>
                 {/* Subcategory List */}

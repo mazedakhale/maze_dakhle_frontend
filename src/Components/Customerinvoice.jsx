@@ -15,7 +15,8 @@ const InvoicePage = () => {
   const { documentId } = useParams();
   const location = useLocation();
   const { categoryId: stateCategoryId, subcategoryId: stateSubcategoryId } = location.state || {};
-
+  const [certificates, setCertificates] = useState([]);
+  const [documents, setDocuments] = useState([]);
   const [documentData, setDocumentData] = useState(null);
   const [documentNames, setDocumentNames] = useState({});
   const [selectedDocument, setSelectedDocument] = useState(null);
@@ -29,6 +30,8 @@ const InvoicePage = () => {
   const [openContainer, setOpenContainer] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedDistributor, setSelectedDistributor] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+
   const nodeRef = useRef(null);
 
   const filteredDistributors = distributors.filter((dist) =>
@@ -97,22 +100,144 @@ const InvoicePage = () => {
   // Add this function inside your InvoicePage component
   const handleDownloadAllDocuments = async () => {
     try {
-      const response = await axios.get(`https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/download/${documentId}`, {
-        responseType: 'blob', // Handle binary data
+      // Show loading indicator
+      setIsLoading(true);
+      const loadingToast = Swal.fire({
+        title: "Preparing download...",
+        text: "Please wait while we prepare your documents. This may take a moment.",
+        icon: "info",
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        didOpen: () => {
+          Swal.showLoading();
+        }
       });
 
+      // Make the API call to download the ZIP file with increased timeout
+      const response = await axios.get(`https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/download/${documentId}`, {
+        responseType: 'blob', // Handle binary data
+        timeout: 60000, // Increase timeout to 60 seconds
+        onDownloadProgress: (progressEvent) => {
+          if (progressEvent.total) {
+            const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+            Swal.update({
+              title: "Downloading...",
+              text: `${percentCompleted}% complete`,
+            });
+          }
+        }
+      });
+
+      // Close the loading toast
+      loadingToast.close();
+
+      // Extract the filename from Content-Disposition header
+      let filename = '';
+      const contentDisposition = response.headers['content-disposition'];
+
+      if (contentDisposition) {
+        // Extract filename from Content-Disposition header
+        const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+        const matches = filenameRegex.exec(contentDisposition);
+        if (matches != null && matches[1]) {
+          // Remove quotes if present
+          filename = matches[1].replace(/['"]/g, '');
+        }
+      }
+
+      if (!filename) {
+        // Try to get applicant name from document_fields if available
+        let applicantName = '';
+
+        // Safely check if document_fields exists and is an array
+        if (documentData &&
+          documentData.document_fields &&
+          Array.isArray(documentData.document_fields)) {
+
+          const applicantField = documentData.document_fields.find(
+            field => field.field_name === 'APPLICANT NAME'
+          );
+
+          if (applicantField && applicantField.field_value) {
+            applicantName = applicantField.field_value;
+          }
+        }
+
+        // If applicant name was found, use it for the filename
+        if (applicantName) {
+          filename = `${applicantName.replace(/\s+/g, '_')}.zip`;
+        } else {
+          // Use "Document_ID" when applicant name isn't available
+          filename = `Document_${documentId}.zip`;
+        }
+      }
+
+      // Create a temporary URL for the downloaded file
       const url = window.URL.createObjectURL(new Blob([response.data]));
+
+      // Create a hidden anchor element to trigger the download
       const link = document.createElement('a');
       link.href = url;
-      link.setAttribute('download', `${documentData.name || `documents_${documentId}`}.zip`);
+      link.setAttribute('download', filename);
       document.body.appendChild(link);
-      link.click();
-      link.remove();
 
-      // alert('Download started!');
+      // Trigger the download
+      link.click();
+
+      // Clean up the DOM and revoke the object URL
+      link.remove();
+      window.URL.revokeObjectURL(url);
+
+      // Show success notification
+      Swal.fire({
+        title: "Success",
+        text: "Documents downloaded successfully!",
+        icon: "success",
+      });
     } catch (error) {
       console.error('Error downloading documents:', error);
-      alert('Failed to download documents.');
+
+      // Show error notification with detailed message
+      let errorMessage = "Failed to download documents. Please try again.";
+
+      if (error.code === "ECONNABORTED" || error.message.includes("timeout")) {
+        errorMessage = "Download timed out. The file might be too large or the server is busy. Please try again later.";
+      } else if (error.response) {
+        // Check if the response is a blob that contains error information
+        if (error.response.data instanceof Blob && error.response.data.type === 'application/json') {
+          try {
+            // Read the blob as text and parse it as JSON
+            const errorText = await new Response(error.response.data).text();
+            const errorData = JSON.parse(errorText);
+            errorMessage = errorData.message || errorMessage;
+          } catch (parseError) {
+            console.error('Error parsing error response:', parseError);
+          }
+        } else if (error.response.status === 404) {
+          errorMessage = "No documents found for download.";
+        } else if (error.response.status === 500) {
+          errorMessage = "Server error. Please try again later.";
+        } else {
+          errorMessage = error.response.data?.message || errorMessage;
+        }
+      } else if (error.request) {
+        // Handle network errors
+        errorMessage = "Network error. Please check your connection.";
+      } else {
+        // Handle other unexpected errors
+        errorMessage = error.message || errorMessage;
+      }
+
+      // Show error notification
+      Swal.fire({
+        title: "Error",
+        text: errorMessage,
+        icon: "error",
+      });
+    } finally {
+      // Hide loading indicator
+      setIsLoading(false);
     }
   };
 
@@ -152,7 +277,17 @@ const InvoicePage = () => {
   };
 
 
-
+  const fetchCertificates = async () => {
+    try {
+      console.log("Fetching certificates...");
+      const response = await axios.get("https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/certificates", {
+        timeout: 30000
+      }); console.log("Certificates API Response:", response.data);
+      setCertificates(response.data);
+    } catch (error) {
+      console.error("Error fetching certificates:", error);
+    }
+  }
   const fetchDocumentData = useCallback(async () => {
     try {
       const response = await axios.get(`https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/singledocument/documentby/${documentId}`);
@@ -176,8 +311,81 @@ const InvoicePage = () => {
       fetchDocumentData();
     }
   }, [documentId, fetchDocumentData]);
+  const handleDownloadReceipt = () => {
+    if (!documentData?.receipt_url) {
+      Swal.fire("Error", "No receipt available for download.", "error");
+      return;
+    }
 
+    try {
+      const fileExtension = documentData.receipt_url.split('.').pop().toLowerCase();
+      const fileName = `${documentData.name || 'document'}_receipt.${fileExtension}`;
 
+      const link = document.createElement("a");
+      link.href = documentData.receipt_url;
+      link.download = fileName;
+      link.style.display = "none";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      console.error("Error downloading receipt:", error);
+      Swal.fire("Error", "Failed to download receipt. Please try again.", "error");
+    }
+  };
+  useEffect(() => {
+    // Your existing code for fetching document data
+
+    // Add this line to fetch certificates
+    fetchCertificates();
+  }, [documentId, fetchCertificates]);
+
+  const handleReupload = async (documentId, documentType) => {
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = '.pdf,.doc,.docx,.png,.jpg,.jpeg';
+
+    fileInput.onchange = async (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        try {
+          const formData = new FormData();
+          formData.append('file', file);
+          formData.append('documentType', documentType);
+
+          const response = await axios.post(
+            `https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/documents/reupload/${documentId}`,
+            formData,
+            {
+              headers: {
+                'Content-Type': 'multipart/form-data',
+              },
+            }
+          );
+
+          console.log('Reupload successful:', response.data);
+          alert('Document reuploaded successfully.');
+
+          const updatedDocuments = documents.map((doc) =>
+            documentData.document_id === documentId ? response.documentData.document : doc
+          );
+          setDocuments(updatedDocuments);
+        } catch (error) {
+          console.error('Error reuploading document:', error);
+          let errorMessage = 'Failed to reupload document. Please try again.';
+          if (error.response) {
+            errorMessage = error.response.data.message || errorMessage;
+          } else if (error.request) {
+            errorMessage = 'Network error. Please check your connection.';
+          }
+          alert(errorMessage);
+        }
+      }
+
+    };
+
+    fileInput.click();
+  };
 
   if (!documentData) return <div className="text-center text-lg mt-10">Loading Invoice...</div>;
 
@@ -272,21 +480,54 @@ const InvoicePage = () => {
               {/* Fields in Key-Value Format (Two per line, no border) */}
               <table className="w-full border border-gray-300 mb-6">
                 <tbody>
-                  {[
-                    { label: "Application ID", value: documentData.application_id },
-                    //   { label: "User ID", value: documentData.user_id },
-                    { label: "Category", value: documentData.category_name },
-                    { label: "Subcategory", value: documentData.subcategory_name },
-                    { label: "Name", value: documentData.name },
-                    { label: "Email", value: documentData.email },
-                    { label: "Phone", value: documentData.phone },
-                    { label: "Status", value: documentData.status },
-                    // { label: "Address", value: documentData.address },
-                    //   { label: "Distributor", value: documentData.distributor_id || 'Not Assigned' }
+                  {[{ label: "Application ID", value: documentData.application_id },
+                  // { label: "User ID", value: documentData.user_id },
+                  { label: "Category", value: documentData.category_name },
+                  { label: "Subcategory", value: documentData.subcategory_name },
+                  // { label: "Name", value: documentData.name },
+                  // { label: "Email", value: documentData.email },
+                  // { label: "Phone", value: documentData.phone },
+                  {
+                    label: "Status",
+                    value: (
+                      <div className="flex flex-col ">
+                        {/* Status */}
+                        <span
+                          className={`px-8 py-2 rounded-full text-white text-xs w-[150px] ${documentData.status === "Approved"
+                            ? "bg-green-500"
+                            : documentData.status === "Rejected"
+                              ? "bg-red-500"
+                              : documentData.status === "Completed"
+                                ? "bg-yellow-500" // Color for Completed
+                                : "bg-blue-500" // Default color
+                            }`}
+                        >
+                          {documentData.status}
+                        </span>
+
+                        {/* Latest Status Date and Time */}
+                        {documentData.status_history
+                          ?.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at)) // Sort by latest date
+                          .slice(0, 1) // Take the first entry (latest status)
+                          .map((statusEntry, index) => (
+                            <div key={index} className="text-xs text-gray-600">
+                              {new Date(statusEntry.updated_at).toLocaleString("en-US", {
+                                year: "numeric",
+                                month: "2-digit",
+                                day: "2-digit",
+                                hour: "2-digit",
+                                minute: "2-digit",
+                                second: "2-digit", // Added seconds
+                                hour12: true, // Use AM/PM
+                              })}
+                            </div>
+                          ))}
+                      </div>
+                    ),
+                  }                // { label: "Address", value: documentData.address },
+                    // { label: "Distributor", value: documentData.distributor_id || 'Not Assigned' }
                   ].reduce((rows, field, index, array) => {
-                    if (index % 2 === 0) {
-                      rows.push(array.slice(index, index + 2));
-                    }
+                    if (index % 2 === 0) rows.push(array.slice(index, index + 2));
                     return rows;
                   }, []).map((pair, idx) => (
                     <tr key={idx} className="border-b border-gray-300">
@@ -295,7 +536,7 @@ const InvoicePage = () => {
                           <td className="p-3 font-semibold border-r border-gray-300 w-1/6" style={{ backgroundColor: '#FFB4A2' }}>
                             {field.label}
                           </td>
-                          <td className="p-3 border-r border-gray-300">{field.value}</td>
+                          <td className="p-3 border-r border-gray-300">{field.value || 'N/A'}</td>
                         </React.Fragment>
                       ))}
                       {pair.length < 2 && (
@@ -308,43 +549,51 @@ const InvoicePage = () => {
                   ))}
                 </tbody>
               </table>
-
-
-
-              {/* Document Fields Section */}
-              {/* Document Fields Section */}
               <h3 className="text-2xl text-gray-700 font-semibold mb-4">Document Fields</h3>
-
               <table className="w-full table-fixed border border-gray-300">
                 <tbody>
-                  {Object.entries(documentData.document_fields || {})
-                    .reduce((rows, field, index, array) => {
-                      if (index % 2 === 0) {
-                        rows.push(array.slice(index, index + 2)); // Group 2 fields per row
-                      }
-                      return rows;
-                    }, [])
-                    .map((pair, idx) => (
-                      <tr key={idx} className="border-b border-gray-300">
-                        {pair.map(([key, value], index) => (
-                          <React.Fragment key={index}>
-                            <td className="w-1/5 p-3 font-semibold border-r border-gray-300 bg-white">
-                              {key}
-                            </td>
-                            <td className="w-1/3 p-3 border-r border-gray-300">{value}</td>
-                          </React.Fragment>
-                        ))}
-                        {pair.length < 2 && (
-                          <>
-                            <td className="w-1/5 p-3 bg-white border-r border-gray-300"></td>
-                            <td className="w-1/3 p-3 border-r border-gray-300"></td>
-                          </>
-                        )}
-                      </tr>
-                    ))}
+                  {(() => {
+                    // Handle both array format and object format
+                    let fieldsArray = [];
+
+                    if (Array.isArray(documentData.document_fields)) {
+                      // New format (array of objects with field_name and field_value)
+                      fieldsArray = documentData.document_fields.map(field => [
+                        field.field_name,
+                        field.field_value
+                      ]);
+                    } else if (typeof documentData.document_fields === 'object' && documentData.document_fields !== null) {
+                      // Old format (object with key-value pairs)
+                      fieldsArray = Object.entries(documentData.document_fields);
+                    } else {
+                      fieldsArray = [];
+                    }
+
+                    return fieldsArray
+                      .reduce((rows, field, index, array) => {
+                        if (index % 2 === 0) rows.push(array.slice(index, index + 2));
+                        return rows;
+                      }, [])
+                      .map((pair, idx) => (
+                        <tr key={idx} className="border-b border-gray-300">
+                          {pair.map(([key, value], index) => (
+                            <React.Fragment key={index}>
+                              <td className="w-1/5 p-3 font-semibold border-r border-gray-300 bg-white">{key}</td>
+                              <td className="w-1/3 p-3 border-r border-gray-300">{value || 'N/A'}</td>
+                            </React.Fragment>
+                          ))}
+                          {pair.length < 2 && (
+                            <>
+                              <td className="w-1/5 p-3 bg-white border-r border-gray-300"></td>
+                              <td className="w-1/3 p-3 border-r border-gray-300"></td>
+                            </>
+                          )}
+                        </tr>
+                      ));
+                  })()}
+
                 </tbody>
               </table>
-
             </div>
           </div>
 
@@ -352,20 +601,16 @@ const InvoicePage = () => {
 
         {/* Right Side - Documents */}
         {/* <div className="w-1/2"> */}
-        <div className="w-2/2 mx-auto p-6 bg-white shadow-md rounded-lg">
+        <div className="w-2/5 mx-auto p-6 bg-white shadow-md rounded-lg">
           <div className="mt-0 flex space-x-4 items-center">
             {/* Approve Button */}
 
 
-            {/* Download Button */}
-            <button
-              onClick={handleDownloadAllDocuments}
-              className="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600 flex items-center"
-            >
-              <FaDownload className="mr-1" /> Download
-            </button>
-          </div>
 
+
+
+
+          </div>
 
 
 
@@ -435,6 +680,38 @@ const InvoicePage = () => {
             </table>
           </div>
 
+          {/* Download Button */}
+          <div>
+            <button
+              onClick={handleDownloadAllDocuments}
+              disabled={isLoading}
+              className="bg-green-500 text-white px-4 py-2 rounded hover:bg-purple-600 flex items-center mt-[20px] ml-[20px]"
+            >
+              <FaDownload className="mr-2" />
+              {isLoading ? "Downloading..." : "Download"}
+            </button>
+
+
+            {documentData.status === "Rejected" && documentData.selected_document_names ?
+              (
+                documentData.selected_document_names.map((documentType, idx) => (
+                  <div key={idx} className="flex items-center justify-between mb-2">
+                    <span className="text-sm ml-[270px]">{documentType} </span>
+                    <button
+                      onClick={() => handleReupload(documentData.document_id, documentType)}
+                      className="bg-blue-500 text-white px-6 py-3 rounded hover:bg-blue-600 text-xs"
+                    >
+                      add Document
+                    </button>
+                  </div>
+                ))
+              ) : (
+                "N/A"
+              )}
+          </div>
+          <td className="px-4 mt-[20px] py-3 border border-[#776D6DA8] text-center">
+            Rejected Reason: {documentData.rejection_reason}
+          </td>
           {/* Document Preview */}
           {/* Document Preview */}
           {/* Document Preview */}
@@ -472,10 +749,8 @@ const InvoicePage = () => {
           )}
 
 
-
         </div>
       </div>
-
       {/* Action Buttons */}
 
     </div>
