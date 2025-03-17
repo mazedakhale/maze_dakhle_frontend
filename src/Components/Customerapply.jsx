@@ -213,8 +213,6 @@ const CustomerApply = () => {
                   "View",
                   "Documents",
                   "Verification",
-                  "Rejected Reason",
-                  "Reupload",
                   "Download Receipt",
                   "Certificate",
                 ].map((header, index) => (
@@ -327,24 +325,7 @@ const CustomerApply = () => {
                           ))}
                       </div>
                     </td>
-                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">{doc.rejection_reason}</td>
-                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">
-                      {doc.status === "Rejected" && doc.selected_document_names ? (
-                        doc.selected_document_names.map((documentType, idx) => (
-                          <div key={idx} className="flex items-center justify-between mb-2">
-                            <span className="text-xs">{documentType}</span>
-                            <button
-                              onClick={() => handleReupload(doc.document_id, documentType)}
-                              className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600 text-xs"
-                            >
-                              Reupload
-                            </button>
-                          </div>
-                        ))
-                      ) : (
-                        "N/A"
-                      )}
-                    </td>
+                   
                     <td className="border p-3 text-center">
                       {doc.receipt_url ? (
                         <button

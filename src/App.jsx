@@ -58,7 +58,7 @@ import "./App.css";
 import LazyCharts from "./Components/Lazycharts";
 import Edashinner from "./Components/Edashinner";
 import Employeedashboard from "./Components/Employeedashboard";
-import Employee from "./Components/employee";
+import Employee from "./Components/Employee";
 import Spage from "./Components/EmployeeDocumentList"
 import Received from "./Components/Received";
 import Dsentlist from "./Components/Dsentlist";

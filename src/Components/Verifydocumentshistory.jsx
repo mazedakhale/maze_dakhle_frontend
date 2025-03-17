@@ -193,16 +193,12 @@ const Verifydocumentshistory = () => {
   };
 
   return (
-    <div className="w-[calc(90%-330px)] ml-[330px] mt-[80px] p-6">
-      {/* Outer Container */}
-      <div className=" bg-white shadow-lg rounded-lg border border-gray-300 ">
-
-        {/* Header */}
-        <div className="border-t-4 border-orange-400 bg-[#F4F4F4] text-center p-4 rounded-t-lg ">
-          <h2 className="text-xl font-bold text-center text-gray-800">
-            Completed Application List
-
-          </h2>
+    <div className="ml-[250px] flex flex-col items-center min-h-screen p-6 bg-gray-100">
+      <div className="w-[90%] max-w-6xl bg-white shadow-lg rounded-lg">
+        <div className="border-t-4 border-orange-400 bg-[#F4F4F4] text-center p-4 rounded-t-lg relative">                    <h2 className="text-xl font-bold text-center text-gray-800">
+          Compelted List
+        </h2>
+          <div className="absolute bottom-[-2px] left-0 w-full h-1 bg-gray-300 shadow-md"></div>
         </div>
 
         {/* Filters */}

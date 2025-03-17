@@ -135,11 +135,11 @@ const CustomerHistory = () => {
 
 
   return (
-    <div className="w-[calc(90%-300px)] ml-[320px] mt-[80px] p-6">
-      {/* Header Section */}
-      <div className="relative bg-white shadow-lg rounded-lg border border-gray-300 overflow-hidden">
-        <div className="border-t-4 border-orange-400 bg-[#f4f4f4] text-center p-4 rounded-t-lg relative">
-          <h2 className="text-2xl font-bold text-gray-800">Completed Applications</h2>
+    <div className="ml-[250px] flex flex-col items-center min-h-screen p-6 bg-gray-100">
+      <div className="w-[100%] max-w-6xl bg-white shadow-lg rounded-lg">
+        <div className="border-t-4 border-orange-400 bg-[#F4F4F4] text-center p-4 rounded-t-lg relative">                    <h2 className="text-xl font-bold text-center text-gray-800">
+          Completed List
+        </h2>
           <div className="absolute bottom-[-2px] left-0 w-full h-1 bg-gray-300 shadow-md"></div>
         </div>
 
@@ -155,10 +155,9 @@ const CustomerHistory = () => {
         </div>
 
         {/* Table */}
-        <div className="overflow-x-auto p-6">
-          <table className="w-full border border-[#776D6DA8] text-sm bg-white shadow-md rounded-md">
-            {/* Table Header */}
-            <thead className="bg-[#F58A3B14] border-b-2 border-[#776D6DA8]">
+        <div className="table-container border border-gray-300 rounded-lg shadow-md overflow-x-auto p-6">
+          <table className="table border-collapse border border-gray-300 min-w-full text-sm">
+            <thead className="bg-gray-300">
               <tr>
                 {[
                   "S.No",
