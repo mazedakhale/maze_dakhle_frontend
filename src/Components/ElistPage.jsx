@@ -14,7 +14,7 @@ const ElistPage = () => {
 
     useEffect(() => {
         axios
-            .get("https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/documents/list")
+            .get("http://localhost:3000/documents/list")
             .then((response) => {
                 const sortedDocuments = response.data.documents.sort(
                     (a, b) => new Date(b.uploaded_at) - new Date(a.uploaded_at)
@@ -24,18 +24,18 @@ const ElistPage = () => {
             .catch((error) => console.error("Error fetching documents:", error));
 
         axios
-            .get("https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/users/distributors")
+            .get("http://localhost:3000/users/distributors")
             .then((response) => setDistributors(response.data))
 
             .catch((error) => console.error("Error fetching distributors:", error));
 
         axios
-            .get("https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/certificates")
+            .get("http://localhost:3000/certificates")
             .then((response) => setCertificates(response.data))
             .catch((error) => console.error("Error fetching certificates:", error));
 
         axios
-            .get("https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/users/register")
+            .get("http://localhost:3000/users/register")
             .then((response) => setUsers(response.data))
             .catch((error) => console.error("Error fetching users:", error));
     }, []);
@@ -115,7 +115,7 @@ const ElistPage = () => {
             return;
         }
         try {
-            const response = await axios.get(`https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/certificates/${certificateId}`);
+            const response = await axios.get(`http://localhost:3000/certificates/${certificateId}`);
             if (response.data && response.data.file_url) {
                 window.open(response.data.file_url, "_blank");
             } else {
@@ -130,7 +130,7 @@ const ElistPage = () => {
     const handleDownloadCertificate = async (documentId, name) => {
         try {
             const response = await axios.get(
-                `https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/download-certificate/${documentId}`,
+                `http://localhost:3000/download-certificate/${documentId}`,
                 {
                     responseType: "blob", // Important to handle file downloads
                 }

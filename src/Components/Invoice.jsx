@@ -68,14 +68,14 @@ const InvoicePage = () => {
 
   useEffect(() => {
     axios
-      .get('https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/users/distributors')
+      .get('http://localhost:3000/users/distributors')
       .then((response) => setDistributors(response.data))
       .catch((error) => console.error('Error fetching distributors:', error));
   }, []);
 
   const fetchDocumentData = useCallback(async () => {
     try {
-      const response = await axios.get(`https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/singledocument/documentby/${documentId}`);
+      const response = await axios.get(`http://localhost:3000/singledocument/documentby/${documentId}`);
       const data = response.data.document;
       setDocumentData(data);
 
@@ -83,7 +83,7 @@ const InvoicePage = () => {
       const subcategory = stateSubcategoryId || data.subcategory_id;
 
       if (category && subcategory) {
-        const fieldNamesResponse = await axios.get(`https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/field-names/${category}/${subcategory}`);
+        const fieldNamesResponse = await axios.get(`http://localhost:3000/field-names/${category}/${subcategory}`);
         setDocumentNames(fieldNamesResponse.data);
       }
     } catch (error) {
@@ -125,7 +125,7 @@ const InvoicePage = () => {
       console.log('Payload:', payload); // Debug: Log the payload
 
       const response = await axios.put(
-        `https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/documents/update-status/${documentId}`,
+        `http://localhost:3000/documents/update-status/${documentId}`,
         payload,
         {
           timeout: 30000, // Increase timeout to 30 seconds
@@ -133,8 +133,16 @@ const InvoicePage = () => {
       );
 
       console.log('Status updated successfully:', response.data);
+
+      // Update local state instead of redirecting
+      setDocumentData((prev) => ({
+        ...prev,
+        status: newStatus,
+        rejectionReason: newStatus === 'Rejected' ? rejectionReason : '',
+      }));
+
       alert('Status updated successfully.');
-      window.location.href = '/Verifydocument';
+
     } catch (error) {
       console.error('Error updating status:', error);
       alert('Failed to update status. Please check the console for details.');
@@ -142,6 +150,7 @@ const InvoicePage = () => {
       setIsProcessing(false); // Hide loading state
     }
   };
+
 
   const handleDownloadAllDocuments = async () => {
     try {
@@ -160,7 +169,7 @@ const InvoicePage = () => {
       });
 
       // Make the API call to download the ZIP file with increased timeout
-      const response = await axios.get(`https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/download/${documentId}`, {
+      const response = await axios.get(`http://localhost:3000/download/${documentId}`, {
         responseType: 'blob', // Handle binary data
         timeout: 60000, // Increase timeout to 60 seconds
         onDownloadProgress: (progressEvent) => {
@@ -305,7 +314,7 @@ const InvoicePage = () => {
 
       // Step 1: Assign the distributor
       const assignResponse = await axios.put(
-        `https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/documents/assign-distributor/${documentId}`,
+        `http://localhost:3000/documents/assign-distributor/${documentId}`,
         {
           distributor_id: distributorId,
           remark: distributorRemark,
@@ -314,9 +323,9 @@ const InvoicePage = () => {
 
       console.log('Assign Distributor Response:', assignResponse.data); // Log the response
 
-      // Step 2: Immediately update the status to "Approved" using the update-status API
+      // Step 2: Immediately update the status to "Approved"
       const statusResponse = await axios.put(
-        `https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/documents/update-status/${documentId}`,
+        `http://localhost:3000/documents/update-status/${documentId}`,
         {
           status: 'Approved', // Update status to "Approved"
         }
@@ -332,7 +341,13 @@ const InvoicePage = () => {
         remark: distributorRemark,
       }));
 
+      // Clear form fields
+      setSelectedDistributor(null);
+      setDistributorRemark('');
+
+      // Show a success message instead of redirecting
       alert('Distributor assigned successfully and status updated to Approved.');
+
     } catch (error) {
       console.error('Error assigning distributor or updating status:', error);
       console.error('Error details:', error.response?.data); // Log detailed error
@@ -340,12 +355,9 @@ const InvoicePage = () => {
     } finally {
       // Hide loading indicator
       setIsProcessing(false);
-      setSelectedDistributor(null);
-      setDistributorRemark('');
-      // Redirect to AssignedDistributorList page
-      window.location.href = '/Assigndistributorlist';
     }
   };
+
 
   const handleCheckboxChange = (userId) => {
     setSelectedDistributor(userId === selectedDistributor ? null : userId);

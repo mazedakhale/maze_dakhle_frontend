@@ -37,7 +37,7 @@ const VerifyDocuments = () => {
   const fetchDocuments = async (distributorId) => {
     try {
       const response = await axios.get(
-        `https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/documents/list/${distributorId}`
+        `http://localhost:3000/documents/list/${distributorId}`
       );
 
       // Filter documents and sort by `uploaded_at` in descending order
@@ -57,7 +57,7 @@ const VerifyDocuments = () => {
   const fetchCertificates = async () => {
     try {
       console.log("Fetching certificates...");
-      const response = await axios.get("https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/certificates"); // Adjust URL if needed
+      const response = await axios.get("http://localhost:3000/certificates"); // Adjust URL if needed
       console.log("Certificates API Response:", response.data);
       setCertificates(response.data);
     } catch (error) {
@@ -83,7 +83,7 @@ const VerifyDocuments = () => {
 
     try {
       console.log(`Fetching certificate for Certificate ID: ${certificate.certificate_id}`);
-      const response = await axios.get(`https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/certificates/${certificate.certificate_id}`);
+      const response = await axios.get(`http://localhost:3000/certificates/${certificate.certificate_id}`);
       console.log("View Certificate API Response:", response.data);
 
       if (response.data && response.data.file_url) {
@@ -132,7 +132,7 @@ const VerifyDocuments = () => {
   const handleDownloadCertificate = async (documentId, name) => {
     try {
       const response = await axios.get(
-        `https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/download-certificate/${documentId}`,
+        `http://localhost:3000/download-certificate/${documentId}`,
         {
           responseType: "blob", // Important to handle file downloads
         }

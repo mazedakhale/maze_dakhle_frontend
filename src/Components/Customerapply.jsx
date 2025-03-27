@@ -30,7 +30,7 @@ const CustomerApply = () => {
   useEffect(() => {
     if (userId) {
       axios
-        .get(`https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/documents/list`)
+        .get(`http://localhost:3000/documents/list`)
         .then((response) => {
           const allDocuments = response.data.documents;
           const filteredDocs = allDocuments
@@ -42,7 +42,7 @@ const CustomerApply = () => {
 
       // Fetch certificates
       axios
-        .get("https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/certificates")
+        .get("http://localhost:3000/certificates")
         .then((response) => setCertificates(response.data))
         .catch((error) => console.error("Error fetching certificates:", error));
     }
@@ -73,7 +73,7 @@ const CustomerApply = () => {
           formData.append('documentType', documentType);
 
           const response = await axios.post(
-            `https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/documents/reupload/${documentId}`,
+            `http://localhost:3000/documents/reupload/${documentId}`,
             formData,
             {
               headers: {
@@ -135,7 +135,7 @@ const CustomerApply = () => {
     const newTab = window.open("", "_blank");
 
     try {
-      const response = await axios.get(`https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/certificates/${certificate.certificate_id}`);
+      const response = await axios.get(`http://localhost:3000/certificates/${certificate.certificate_id}`);
       if (response.data && response.data.file_url) {
         newTab.location.href = response.data.file_url;
       } else {
@@ -325,7 +325,7 @@ const CustomerApply = () => {
                           ))}
                       </div>
                     </td>
-                   
+
                     <td className="border p-3 text-center">
                       {doc.receipt_url ? (
                         <button

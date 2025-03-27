@@ -77,11 +77,11 @@ const Edashinner = () => {
             try {
                 // Create an array of promises for all API calls
                 const promises = [
-                    fetch("https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/statistics/counts").then(res => res.json()),
-                    axios.get("https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/categories"),
-                    axios.get("https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/subcategories"),
-                    axios.get("https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/statistics/cscounts"),
-                    axios.get("https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/required-documents")
+                    fetch("http://localhost:3000/statistics/counts").then(res => res.json()),
+                    axios.get("http://localhost:3000/categories"),
+                    axios.get("http://localhost:3000/subcategories"),
+                    axios.get("http://localhost:3000/statistics/cscounts"),
+                    axios.get("http://localhost:3000/required-documents")
                 ];
 
                 // Wait for all promises to resolve

@@ -22,7 +22,7 @@ const ApplicationView = () => {
   // Fetch Document Data
   const fetchDocumentData = useCallback(async () => {
     try {
-      const response = await axios.get(`https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/singledocument/documentby/${documentId}`);
+      const response = await axios.get(`http://localhost:3000/singledocument/documentby/${documentId}`);
       const data = response.data.document;
       setDocumentData(data);
 
@@ -30,7 +30,7 @@ const ApplicationView = () => {
       const subcategory = stateSubcategoryId || data.subcategory_id;
 
       if (category && subcategory) {
-        const fieldNamesResponse = await axios.get(`https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/field-names/${category}/${subcategory}`);
+        const fieldNamesResponse = await axios.get(`http://localhost:3000/field-names/${category}/${subcategory}`);
         setDocumentNames(fieldNamesResponse.data);
       }
     } catch (error) {

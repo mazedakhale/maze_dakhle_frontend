@@ -26,7 +26,7 @@ const FeedbackList = () => {
 
     const fetchFeedback = async () => {
         try {
-            const response = await axios.get("https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/feedback");
+            const response = await axios.get("http://localhost:3000/feedback");
             setFeedbackList(response.data);
         } catch (error) {
             console.error("Error fetching feedback:", error);
@@ -64,7 +64,7 @@ const FeedbackList = () => {
 
             // 2. API call runs in background, not blocking UI
             axios
-                .delete(`https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/feedback/${id}`)
+                .delete(`http://localhost:3000/feedback/${id}`)
                 .then(() => {
                     fetchFeedback(); // Refresh list after deletion
                 })

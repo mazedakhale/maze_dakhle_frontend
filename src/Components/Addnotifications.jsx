@@ -16,7 +16,7 @@ const NotificationManager = () => {
   // Fetch all notifications
   const fetchNotifications = async () => {
     try {
-      const response = await axios.get('https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/notifications'); // Adjust API URL as needed
+      const response = await axios.get('http://localhost:3000/notifications'); // Adjust API URL as needed
       setNotifications(Array.isArray(response.data) ? response.data : []);
     } catch (err) {
       console.error('Error fetching notifications:', err);
@@ -40,7 +40,7 @@ const NotificationManager = () => {
         ...newNotification,
         notification_date: newNotification.notification_date || new Date().toISOString(),
       };
-      await axios.post('https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/notifications', payload);
+      await axios.post('http://localhost:3000/notifications', payload);
       fetchNotifications();
       setIsModalOpen(false);
       setNewNotification({ distributor_notification: '', customer_notification: '', notification_date: '' });
@@ -81,7 +81,7 @@ const NotificationManager = () => {
 
       // 2. **API call runs in background, not blocking UI**
       axios
-        .delete(`https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/notifications/${id}`)
+        .delete(`http://localhost:3000/notifications/${id}`)
         .then(() => {
           fetchNotifications(); // Refresh list after deletion
         })
@@ -116,7 +116,7 @@ const NotificationManager = () => {
   // Save edited notification
   const handleSaveEdit = async (id) => {
     try {
-      await axios.put(`https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/notifications/${id}`, editData);
+      await axios.put(`http://localhost:3000/notifications/${id}`, editData);
       setEditingId(null);
       fetchNotifications();
     } catch (err) {
@@ -128,7 +128,7 @@ const NotificationManager = () => {
   const handleToggleStatus = async (id, currentStatus) => {
     try {
       const newStatus = currentStatus === 'Active' ? 'Inactive' : 'Active';
-      await axios.patch(`https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/notifications/status/${id}`, { notification_status: newStatus });
+      await axios.patch(`http://localhost:3000/notifications/status/${id}`, { notification_status: newStatus });
       fetchNotifications();
     } catch (err) {
       console.error('Error updating status:', err);

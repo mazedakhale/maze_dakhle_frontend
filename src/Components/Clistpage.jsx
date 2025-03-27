@@ -35,7 +35,7 @@ const ClistPage = () => {
   // Fetch documents based on categoryId, subcategoryId, and userId
   useEffect(() => {
     if (categoryId && subcategoryId && userId) {
-      const DOCUMENTS_API_URL = `https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/documents/doc/${categoryId}/${subcategoryId}/${userId}`;
+      const DOCUMENTS_API_URL = `http://localhost:3000/documents/doc/${categoryId}/${subcategoryId}/${userId}`;
       console.log("API URL:", DOCUMENTS_API_URL); // Debugging
 
       const fetchDocuments = async () => {

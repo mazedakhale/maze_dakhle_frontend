@@ -38,7 +38,7 @@ const VerifyDocuments = () => {
   const fetchDocuments = async (distributorId) => {
     try {
       const response = await axios.get(
-        `https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/documents/list/${distributorId}`
+        `http://localhost:3000/documents/list/${distributorId}`
       );
 
       const filteredDocuments = response.data.documents.filter(
@@ -125,19 +125,19 @@ const VerifyDocuments = () => {
 
     try {
       await axios.post(
-        "https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/certificates/upload",
+        "http://localhost:3000/certificates/upload",
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },
         }
       );
       axios
-        .get('https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/certificates')
+        .get('http://localhost:3000/certificates')
         .then((response) => setCertificates(response.data))
         .catch((error) => console.error("Error fetching certificates:", error));
 
       await axios.put(
-        `https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/documents/update-status/${documentId}`,
+        `http://localhost:3000/documents/update-status/${documentId}`,
         { status: "Uploaded" }
       );
 
@@ -175,7 +175,7 @@ const VerifyDocuments = () => {
       return;
     }
     try {
-      const response = await axios.get(`https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/certificates/${certificateId}`);
+      const response = await axios.get(`http://localhost:3000/certificates/${certificateId}`);
       if (response.data && response.data.file_url) {
         window.open(response.data.file_url, "_blank");
       } else {

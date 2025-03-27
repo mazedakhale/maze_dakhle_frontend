@@ -9,8 +9,8 @@ const Categories = () => {
   const [subcategories, setSubcategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
 
-  const API_BASE_URL = " https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/categories";
-  const SUBCATEGORIES_API_URL = " https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/subcategories";
+  const API_BASE_URL = " http://localhost:3000/categories";
+  const SUBCATEGORIES_API_URL = " http://localhost:3000/subcategories";
 
   useEffect(() => {
     const fetchCategories = async () => {

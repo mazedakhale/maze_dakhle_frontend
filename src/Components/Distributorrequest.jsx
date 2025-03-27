@@ -36,7 +36,7 @@ const ErrorRequests = () => {
     try {
       console.log(`Fetching error requests for distributor ID: ${distributorId}`);
       const response = await axios.get(
-        ` https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/request-errors/distributor/${distributorId}`
+        ` http://localhost:3000/request-errors/distributor/${distributorId}`
       );
       console.log("Error Requests API Response:", response.data);
 
@@ -55,7 +55,7 @@ const ErrorRequests = () => {
   const fetchCertificates = async () => {
     try {
       console.log("Fetching certificates...");
-      const response = await axios.get(" https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/certificates");
+      const response = await axios.get(" http://localhost:3000/certificates");
       console.log("Certificates API Response:", response.data);
       setCertificates(response.data);
     } catch (error) {
@@ -81,7 +81,7 @@ const ErrorRequests = () => {
     }
     try {
       console.log(`Fetching certificate for Certificate ID: ${certificateId}`);
-      const response = await axios.get(` https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/certificates/${certificateId}`);
+      const response = await axios.get(` http://localhost:3000/certificates/${certificateId}`);
       console.log("View Certificate API Response:", response.data);
 
       if (response.data && response.data.file_url) {
@@ -99,7 +99,7 @@ const ErrorRequests = () => {
   // const handleRejectStatus = async (requestId) => {
   //   try {
   //     console.log(`Rejecting request with Request ID: ${requestId}`);
-  //     await axios.patch(` https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/request-errors/update-status/${requestId}`, {
+  //     await axios.patch(` http://localhost:3000/request-errors/update-status/${requestId}`, {
   //       request_status: "Distributor Rejected",
   //     });
   //     fetchErrorRequests(distributorId);
@@ -136,7 +136,7 @@ const ErrorRequests = () => {
     try {
       console.log(`🔹 Rejecting request ID: ${requestId} with reason: ${rejectionReason}`);
 
-      const response = await axios.patch(` https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/request-errors/update-status/${requestId}`, {
+      const response = await axios.patch(` http://localhost:3000/request-errors/update-status/${requestId}`, {
         request_status: "Distributor Rejected",
         rejectionReason: rejectionReason.trim(), // Ensure it's not undefined
       });
@@ -200,7 +200,7 @@ const ErrorRequests = () => {
 
     try {
       const uploadResponse = await axios.patch(
-        `https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/certificates/update/${documentId}`,
+        `http://localhost:3000/certificates/update/${documentId}`,
         formData,
         {
           headers: {
@@ -212,7 +212,7 @@ const ErrorRequests = () => {
 
       // Update request status to "Uploaded"
       const updateStatusResponse = await axios.patch(
-        `https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/request-errors/update-status/${requestId}`,
+        `http://localhost:3000/request-errors/update-status/${requestId}`,
         { request_status: "Uploaded" }
       );
       console.log("Update Request Status Response:", updateStatusResponse.data);

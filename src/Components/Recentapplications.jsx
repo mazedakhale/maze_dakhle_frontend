@@ -14,7 +14,7 @@ const RecentApplications = () => {
   useEffect(() => {
     const fetchApplications = async () => {
       try {
-        const response = await fetch('https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/documents/recent');
+        const response = await fetch('http://localhost:3000/documents/recent');
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
@@ -51,7 +51,7 @@ const RecentApplications = () => {
   // Handle View Certificate Action
   const handleViewCertificate = async (documentId) => {
     try {
-      const response = await axios.get(`https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/certificates/${documentId}`);
+      const response = await axios.get(`http://localhost:3000/certificates/${documentId}`);
       if (response.data && response.data.file_url) {
         window.open(response.data.file_url, "_blank");
       } else {
@@ -67,7 +67,7 @@ const RecentApplications = () => {
   const handleDownloadCertificate = async (documentId, name) => {
     try {
       const response = await axios.get(
-        `https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/download-certificate/${documentId}`,
+        `http://localhost:3000/download-certificate/${documentId}`,
         {
           responseType: "blob",
         }

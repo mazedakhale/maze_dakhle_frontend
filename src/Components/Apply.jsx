@@ -66,7 +66,7 @@ const Apply = () => {
   useEffect(() => {
     if (formData.category_id && formData.subcategory_id) {
       axios
-        .get(`https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/required-documents/${formData.category_id}/${formData.subcategory_id}`)
+        .get(`http://localhost:3000/required-documents/${formData.category_id}/${formData.subcategory_id}`)
         .then((response) => {
           if (response.data.length > 0 && response.data[0].document_names) {
             const documentsArray = response.data[0].document_names.split(",").map((doc) => doc.trim());
@@ -85,7 +85,7 @@ const Apply = () => {
   useEffect(() => {
     if (formData.category_id && formData.subcategory_id) {
       axios
-        .get(`https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/field-names/${formData.category_id}/${formData.subcategory_id}`)
+        .get(`http://localhost:3000/field-names/${formData.category_id}/${formData.subcategory_id}`)
         .then((response) => {
           if (response.data.length > 0 && response.data[0].document_fields) {
             const fieldsArray = response.data[0].document_fields.split(",").map((field) => field.trim());
@@ -147,7 +147,8 @@ const Apply = () => {
     });
 
     documentNames.forEach((doc) => {
-      if (!selectedFiles[doc]) {
+      // Skip validation if the document name is "other" or "others"
+      if (doc.toLowerCase() !== "other" && doc.toLowerCase() !== "others" && !selectedFiles[doc]) {
         newErrors[doc] = `${doc} file is required.`;
       }
     });
@@ -155,7 +156,6 @@ const Apply = () => {
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -204,7 +204,7 @@ const Apply = () => {
 
     try {
       const response = await axios.post(
-        "https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/documents/upload",
+        "http://localhost:3000/documents/upload",
         formDataToSend,
         {
           headers: { "Content-Type": "multipart/form-data" },
@@ -226,6 +226,7 @@ const Apply = () => {
       });
     }
   };
+
   return (
     <div className="ml-[320px] flex flex-col items-center min-h-screen p-10 bg-gray-100">
       <div className="flex-1 flex justify-center pt-9 bg-white items-center py-9 px-9">
@@ -301,7 +302,7 @@ const Apply = () => {
           </div>
 
           <div className="mb-6">
-            <label className="block text-gray-700 font-bold text-lg text-center">
+            <label className="block text-orange-700 font-bold text-lg text-center">
               APPLICANT  INFORMATION <span className="text-red-500">*</span>
             </label>
             <div className="grid grid-cols-3 gap-6">
@@ -324,12 +325,16 @@ const Apply = () => {
           </div>
 
           <div className="mb-6">
-            <label className="block text-gray-700 font-bold text-lg text-center">UPLOAD DOCUMENTS <span className="text-red-500">*</span></label>
+            <label className="block text-orange-700 font-bold text-lg text-center">UPLOAD DOCUMENTS <span className="text-red-500">*</span></label>
             <div className="grid grid-cols-3 gap-6">
               {documentNames.map((docName, index) => (
                 <div key={index} className="mb-2">
                   <label className="block text-gray-700 font-semibold">
-                    {docName} <span className="text-red-500">*</span>
+                    {docName}
+                    {/* Conditionally render the red asterisk */}
+                    {docName.toLowerCase() !== "other" && docName.toLowerCase() !== "others" && (
+                      <span className="text-red-500"> *</span>
+                    )}
                   </label>
                   <input
                     type="file"

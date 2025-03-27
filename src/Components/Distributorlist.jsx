@@ -25,7 +25,7 @@ const DistributorList = () => {
     });
     const navigate = useNavigate();
 
-    const apiUrl = "https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/users/distributors";
+    const apiUrl = "http://localhost:3000/users/distributors";
 
     useEffect(() => {
         fetchDistributors();
@@ -130,7 +130,7 @@ const DistributorList = () => {
 
         try {
             // Send the registration request to the backend
-            const response = await axios.post("https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/users/register", formDataToSend, {
+            const response = await axios.post("http://localhost:3000/users/register", formDataToSend, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                 },
@@ -170,7 +170,7 @@ const DistributorList = () => {
     const handleUpdateDistributor = async (id) => {
         try {
             if (updatedPassword) {
-                await axios.patch(`https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/users/password/${id}`,
+                await axios.patch(`http://localhost:3000/users/password/${id}`,
                     { newPassword: updatedPassword },
                     { timeout: 30000 }
                 );
@@ -233,7 +233,7 @@ const DistributorList = () => {
             });
 
             try {
-                await axios.delete(`https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/users/delete/${id}`, { timeout: 30000 });
+                await axios.delete(`http://localhost:3000/users/delete/${id}`, { timeout: 30000 });
 
                 Swal.fire({
                     title: "Deleted!",
@@ -262,7 +262,7 @@ const DistributorList = () => {
                 )
             );
 
-            await axios.patch(`https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/users/status/${id}`,
+            await axios.patch(`http://localhost:3000/users/status/${id}`,
                 { status: newStatus },
                 { timeout: 30000 }
             );

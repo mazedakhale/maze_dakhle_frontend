@@ -22,7 +22,7 @@ const CompletedApplicationsList = () => {
     const fetchCompletedDocuments = async () => {
       try {
         const response = await axios.get(
-          ` https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/userdashboard/completed/${userId}`
+          ` http://localhost:3000/userdashboard/completed/${userId}`
         );
         const sortedDocs = response.data.sort(
           (a, b) => new Date(b.uploaded_at) - new Date(a.uploaded_at)
@@ -36,7 +36,7 @@ const CompletedApplicationsList = () => {
     const fetchCertificates = async () => {
       try {
         const response = await axios.get(
-          " https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/certificates"
+          " http://localhost:3000/certificates"
         );
         setCertificates(response.data);
       } catch (error) {
@@ -74,7 +74,7 @@ const CompletedApplicationsList = () => {
 
     try {
       const response = await axios.get(
-        ` https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/certificates/${certificateId}`
+        ` http://localhost:3000/certificates/${certificateId}`
       );
 
       if (response.data && response.data.file_url) {

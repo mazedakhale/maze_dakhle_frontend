@@ -16,7 +16,7 @@ const ErrorRequests = () => {
   // Fetch error requests
   const fetchErrorRequests = async () => {
     try {
-      const response = await axios.get("https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/request-errors");
+      const response = await axios.get("http://localhost:3000/request-errors");
       setErrorRequests(response.data);
     } catch (error) {
       console.error("Error fetching error requests:", error);
@@ -26,7 +26,7 @@ const ErrorRequests = () => {
   // Fetch certificates
   const fetchCertificates = async () => {
     try {
-      const response = await axios.get("https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/certificates");
+      const response = await axios.get("http://localhost:3000/certificates");
       setCertificates(response.data);
     } catch (error) {
       console.error("Error fetching certificates:", error);
@@ -49,7 +49,7 @@ const ErrorRequests = () => {
       return;
     }
     try {
-      const response = await axios.get(`https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/certificates/${certificateId}`);
+      const response = await axios.get(`http://localhost:3000/certificates/${certificateId}`);
       if (response.data && response.data.file_url) {
         window.open(response.data.file_url, "_blank");
       } else {
@@ -66,7 +66,7 @@ const ErrorRequests = () => {
   const handleDownloadCertificate = async (documentId, requestName) => {
     try {
       const response = await axios.get(
-        `https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/download-certificate/${documentId}`,
+        `http://localhost:3000/download-certificate/${documentId}`,
         {
           responseType: "blob", // Important to handle file downloads
         }

@@ -42,6 +42,10 @@ const Sidebar = ({ onNavigate }) => {
             { icon: <FaTachometerAlt />, label: "Dashboard", path: "/Adashinner" },
             { icon: <FaPlus />, label: "Add Category", path: "/Addcategory" },
             { icon: <FaList />, label: "Subcategory", path: "/Addsubcategory" },
+            { icon: <FaList />, label: "Add Services", path: "/DocumentTable " },
+            { icon: <FaList />, label: "Add Privacy", path: "/PrivacyPolicyTable " },
+            { icon: <FaList />, label: "Add Contact Form", path: "/ContactTable " },
+
             { icon: <FaExclamationTriangle />, label: "Error Request", path: "/Adminrequest" },
             { icon: <FaHistory />, label: "Error Request History", path: "/Adminerrorhistory" },
             { icon: <FaUserShield />, label: "Distributor Credentials", path: "/Distributorlist" },

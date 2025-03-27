@@ -6,43 +6,52 @@ import Swal from "sweetalert2";
 const DocumentTable = () => {
   const [documents, setDocuments] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [formData, setFormData] = useState({ doc_type_name: "" });
+  const [formData, setFormData] = useState({ doc_type_name: "", description: "" }); // Added description field
   const [editingDoc, setEditingDoc] = useState(null);
 
+  // Fetch documents from the API
   useEffect(() => {
     fetchDocuments();
   }, []);
 
   const fetchDocuments = async () => {
     try {
-      const response = await axios.get("https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/document-types");
+      const response = await axios.get("http://localhost:3000/document-types");
       setDocuments(response.data);
     } catch (error) {
       console.error("Error fetching documents:", error);
     }
   };
 
+  // Handle input changes in the form
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  // Handle form submission (add or edit document)
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       if (editingDoc) {
-        await axios.put(`https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/document-types/${editingDoc.doc_type_id}`, formData);
+        // Update existing document
+        await axios.put(
+          `http://localhost:3000/document-types/${editingDoc.doc_type_id}`,
+          formData
+        );
       } else {
-        await axios.post("https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/document-types/", formData);
+        // Add new document
+        await axios.post("http://localhost:3000/document-types/", formData);
       }
       setIsModalOpen(false);
-      fetchDocuments();
-      setFormData({ doc_type_name: "" });
+      fetchDocuments(); // Refresh the document list
+      setFormData({ doc_type_name: "", description: "" }); // Reset form data
       setEditingDoc(null);
     } catch (error) {
       console.error("Error submitting document:", error);
     }
   };
 
+  // Handle document deletion
   const handleDelete = async (id) => {
     const confirmDelete = await Swal.fire({
       title: "Are you sure?",
@@ -56,8 +65,8 @@ const DocumentTable = () => {
 
     if (confirmDelete.isConfirmed) {
       try {
-        await axios.delete(`https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/document-types/${id}`);
-        fetchDocuments();
+        await axios.delete(`http://localhost:3000/document-types/${id}`);
+        fetchDocuments(); // Refresh the document list
         Swal.fire("Deleted!", "Document has been deleted.", "success");
       } catch (error) {
         console.error("Error deleting document:", error);
@@ -66,8 +75,9 @@ const DocumentTable = () => {
     }
   };
 
+  // Handle editing a document
   const handleEdit = (doc) => {
-    setFormData({ doc_type_name: doc.doc_type_name });
+    setFormData({ doc_type_name: doc.doc_type_name, description: doc.description }); // Set form data with description
     setEditingDoc(doc);
     setIsModalOpen(true);
   };
@@ -95,6 +105,7 @@ const DocumentTable = () => {
                 <tr>
                   <th className="p-3 text-left border-r border-gray-400">ID</th>
                   <th className="p-3 text-left border-r border-gray-400">Document Name</th>
+                  <th className="p-3 text-left border-r border-gray-400">Description</th>
                   <th className="p-3 text-left border-r border-gray-400">Actions</th>
                 </tr>
               </thead>
@@ -103,11 +114,12 @@ const DocumentTable = () => {
                   documents.map((doc, index) => (
                     <tr
                       key={doc.doc_type_id}
-                      className={`${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'
+                      className={`${index % 2 === 0 ? "bg-white" : "bg-gray-50"
                         } hover:bg-gray-100 transition-colors`}
                     >
                       <td className="p-3 text-left border border-gray-300">{doc.doc_type_id}</td>
                       <td className="p-3 text-left border border-gray-300">{doc.doc_type_name}</td>
+                      <td className="p-3 text-left border border-gray-300">{doc.description}</td>
                       <td className="p-3 text-left border border-gray-300 gap-2">
                         <button
                           onClick={() => handleEdit(doc)}
@@ -128,7 +140,7 @@ const DocumentTable = () => {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="3" className="text-center p-4 text-gray-500 border border-gray-300">
+                    <td colSpan="4" className="text-center p-4 text-gray-500 border border-gray-300">
                       No documents found.
                     </td>
                   </tr>
@@ -143,8 +155,9 @@ const DocumentTable = () => {
       {isModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
           <div className="bg-white p-6 rounded-lg w-96 shadow-lg">
-            <h2 className="text-xl font-semibold mb-4">{editingDoc ? 'Edit Document' : 'Add Document'}</h2>
+            <h2 className="text-xl font-semibold mb-4">{editingDoc ? "Edit Document" : "Add Document"}</h2>
             <form onSubmit={handleSubmit}>
+              {/* Document Name Field */}
               <label className="block mb-2">Document Name:</label>
               <input
                 type="text"
@@ -154,6 +167,18 @@ const DocumentTable = () => {
                 required
                 className="w-full px-3 py-2 border rounded-lg mb-4"
               />
+
+              {/* Description Field */}
+              <label className="block mb-2">Description:</label>
+              <textarea
+                name="description"
+                value={formData.description}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border rounded-lg mb-4"
+                rows={3}
+              />
+
+              {/* Buttons */}
               <div className="flex justify-end">
                 <button
                   type="button"
@@ -161,13 +186,13 @@ const DocumentTable = () => {
                   onClick={() => {
                     setIsModalOpen(false);
                     setEditingDoc(null);
-                    setFormData({ doc_type_name: '' });
+                    setFormData({ doc_type_name: "", description: "" }); // Reset form data
                   }}
                 >
                   Cancel
                 </button>
                 <button type="submit" className="px-4 py-2 bg-[#00234E] text-white rounded">
-                  {editingDoc ? 'Update' : 'Add'} Document
+                  {editingDoc ? "Update" : "Add"} Document
                 </button>
               </div>
             </form>
@@ -177,4 +202,5 @@ const DocumentTable = () => {
     </div>
   );
 };
+
 export default DocumentTable;

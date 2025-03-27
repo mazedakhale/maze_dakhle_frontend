@@ -40,6 +40,8 @@ const Sidebar = ({ onNavigate }) => {
                 <ul>
                     {[
                         { icon: <FaTachometerAlt />, label: "Dashboard", path: "/Edashinner" },
+                        { icon: <FaTachometerAlt />, label: "Assigned List", path: "/Emplist" },
+
                         // { icon: <FaPlus />, label: "Add Category", path: "/Spage" },
 
                         // { icon: <FaList />, label: "Subcategory", path: "/Addsubcategory" },

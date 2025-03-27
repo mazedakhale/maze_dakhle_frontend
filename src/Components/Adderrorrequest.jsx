@@ -70,7 +70,7 @@ const AddErrorRequestPage = () => {
 
     try {
       const response = await axios.post(
-        "https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/request-errors/create",
+        "http://localhost:3000/request-errors/create",
         formData,
         {
           headers: {

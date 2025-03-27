@@ -45,7 +45,7 @@ const SearchApplication = () => {
 
     try {
       const response = await axios.get(
-        ` https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/userdashboard/fetch/${userId}/${applicationId}`
+        ` http://localhost:3000/userdashboard/fetch/${userId}/${applicationId}`
       );
       setDocument(response.data);
     } catch (err) {

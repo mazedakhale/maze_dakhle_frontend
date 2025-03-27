@@ -14,7 +14,7 @@ const DistributorEdit = () => {
     });
 
     useEffect(() => {
-        axios.get(`https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/users/edit/${user_id}`)
+        axios.get(`http://localhost:3000/users/edit/${user_id}`)
             .then(response => {
                 setFormData(response.data);
             })
@@ -29,7 +29,7 @@ const DistributorEdit = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        axios.put(`https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/users/edit/${user_id}`, formData)
+        axios.put(`http://localhost:3000/users/edit/${user_id}`, formData)
             .then(() => {
                 alert("Distributor updated successfully!");
                 navigate("/distributor-list"); // Redirect after update

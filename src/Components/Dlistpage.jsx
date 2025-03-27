@@ -44,7 +44,7 @@ const DlistPage = () => {
   // Fetch documents based on category, subcategory, and distributor ID
   useEffect(() => {
     if (categoryId && subcategoryId && distributorId) {
-      const DOCUMENTS_API_URL = `https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/documents/${categoryId}/${subcategoryId}?distributorId=${distributorId}`;
+      const DOCUMENTS_API_URL = `http://localhost:3000/documents/${categoryId}/${subcategoryId}?distributorId=${distributorId}`;
       console.log("API URL:", DOCUMENTS_API_URL); // Debugging
 
       const fetchDocuments = async () => {
@@ -70,7 +70,7 @@ const DlistPage = () => {
   // Fetch certificates
   const fetchCertificates = async () => {
     try {
-      const response = await axios.get("https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/certificates");
+      const response = await axios.get("http://localhost:3000/certificates");
       setCertificates(response.data);
     } catch (error) {
       console.error("Error fetching certificates:", error);
@@ -164,7 +164,7 @@ const DlistPage = () => {
 
     try {
       await axios.post(
-        "https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/certificates/upload",
+        "http://localhost:3000/certificates/upload",
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },
@@ -172,7 +172,7 @@ const DlistPage = () => {
       );
 
       await axios.put(
-        `https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/documents/update-status/${documentId}`,
+        `http://localhost:3000/documents/update-status/${documentId}`,
         { status: "Uploaded" }
       );
 
@@ -225,7 +225,7 @@ const DlistPage = () => {
     }
 
     try {
-      const response = await axios.get(`https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/certificates/${certificate.certificate_id}`);
+      const response = await axios.get(`http://localhost:3000/certificates/${certificate.certificate_id}`);
 
       if (response.data && response.data.file_url) {
         const link = document.createElement("a");

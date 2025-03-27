@@ -63,14 +63,23 @@ import Spage from "./Components/EmployeeDocumentList"
 import Received from "./Components/Received";
 import Dsentlist from "./Components/Dsentlist";
 import Distributorrejected from "./Components/Distributorrejected";
-
+import Emplist from "./Components/Emplist";
+import MainPage from "./Components/Mainpage";
+import PrivacyPolicy from "./Components/Privacypolicy";
+import PrivacyPolicyTable from "./Components/PrivacyPolicyTable";
+import ContactTable from "./Components/ContactTable";
+import ContactForm from "./Components/ContactForm";
 function App() {
   return (
     <Router>
       <Routes>
         {/* Authentication */}
-        <Route path="/" element={<Login />} />
+        <Route path="/" element={<MainPage />} />
+
+        <Route path="/Login" element={<Login />} />
         <Route path="/Registration" element={<Registration />} />
+        <Route path="/Privacypolicy" element={<PrivacyPolicy />} />
+        <Route path="/ContactForm" element={<ContactForm />} />
 
         {/* Admin Routes */}
         <Route path="/Admindashboard" element={<Admindashboard />} />
@@ -80,6 +89,8 @@ function App() {
         <Route path="/Addcategory" element={<Admindashboard><Addcategory /></Admindashboard>} />
         <Route path="/Addsubcategory" element={<Admindashboard><Addsubcategory /></Admindashboard>} />
         <Route path="/Requireddocuments" element={<Admindashboard><RequiredDocuments /></Admindashboard>} />
+        <Route path="/ContactTable" element={<Admindashboard><ContactTable /></Admindashboard>} />
+
         <Route path="/Documenttable" element={<Admindashboard><DocumentTable /></Admindashboard>} />
         <Route path="/Addfieldname" element={<Admindashboard><Addfieldname /></Admindashboard>} />
         <Route path="/Verifydocuments" element={<Admindashboard><Verifydocuments /></Admindashboard>} />
@@ -87,6 +98,7 @@ function App() {
         <Route path="/Employeelist" element={<Admindashboard><Employeelist /></Admindashboard>} />
         <Route path="/Employee" element={<Admindashboard><Employee /></Admindashboard>} />
 
+        <Route path="/PrivacyPolicyTable" element={<Admindashboard><PrivacyPolicyTable /></Admindashboard>} />
 
         <Route path="/Distributorregister" element={<Admindashboard><Distributorregister /></Admindashboard>} />
         <Route path="/Recentapplications" element={<Admindashboard><Recentapplications /></Admindashboard>} />
@@ -139,6 +151,8 @@ function App() {
 
         <Route path="/Employeedashboard" element={<Employeedashboard />} />
         <Route path="/Edashinner" element={<Employeedashboard><Edashinner /></Employeedashboard>} />
+        <Route path="/Emplist" element={<Employeedashboard><Emplist /></Employeedashboard>} />
+
         <Route path="/Employee" element={<Employeedashboard><Employee /></Employeedashboard>} />
         <Route path="/Spage" element={<Employeedashboard><Spage /></Employeedashboard>} />
 
