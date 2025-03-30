@@ -4,13 +4,16 @@ import react from '@vitejs/plugin-react';
 export default defineConfig({
   plugins: [react()],
   server: {
-    host: '0.0.0.0',  // Allows access from external networks (e.g., AWS Lightsail)
-    port: 5173,       // Ensures Vite runs on port 5173
-    strictPort: true, // Prevents Vite from changing the port if 5173 is busy
-    open: true,       // Opens the browser automatically when Vite starts
+    host: true,        // Allows external access (0.0.0.0 automatically handled)
+    port: 5173,        // Ensures Vite runs on port 5173
+    strictPort: true,  // Prevents Vite from changing the port if 5173 is busy
+    open: false,       // Disable auto-opening (prevents `xdg-open ENOENT` error)
+    watch: {
+      usePolling: true, // Required for AWS Lightsail to detect file changes
+    },
     proxy: {
       '/api': {
-        target: 'http://localhost:5000', // Proxy API requests to your NestJS backend
+        target: 'http://localhost:5000', // Proxy API requests to NestJS backend
         changeOrigin: true,
         secure: false,
       },
