@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import Logo from "../assets/Logo.png";
+import Logo from "../assets/logo.png";
 import MainBanner from "../assets/Mainpage.jpg";
 import {
     FaCertificate, FaUsers, FaGraduationCap, FaUserShield, FaTractor, FaPeopleCarry,
