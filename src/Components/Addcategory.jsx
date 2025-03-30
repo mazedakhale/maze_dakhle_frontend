@@ -10,7 +10,7 @@ const AddCategory = () => {
   const [updatedName, setUpdatedName] = useState("");
   const [isAdding, setIsAdding] = useState(false);
 
-  const apiUrl = "http://localhost:3000/categories";
+  const apiUrl = "http://13.201.37.154:3000/categories";
 
   useEffect(() => {
     fetchCategories();

@@ -68,14 +68,14 @@ const InvoicePage = () => {
 
   useEffect(() => {
     axios
-      .get('http://localhost:3000/users/distributors')
+      .get('http://13.201.37.154:3000/users/distributors')
       .then((response) => setDistributors(response.data))
       .catch((error) => console.error('Error fetching distributors:', error));
   }, []);
 
   const fetchDocumentData = useCallback(async () => {
     try {
-      const response = await axios.get(`http://localhost:3000/singledocument/documentby/${documentId}`);
+      const response = await axios.get(`http://13.201.37.154:3000/singledocument/documentby/${documentId}`);
       const data = response.data.document;
       setDocumentData(data);
 
@@ -83,7 +83,7 @@ const InvoicePage = () => {
       const subcategory = stateSubcategoryId || data.subcategory_id;
 
       if (category && subcategory) {
-        const fieldNamesResponse = await axios.get(`http://localhost:3000/field-names/${category}/${subcategory}`);
+        const fieldNamesResponse = await axios.get(`http://13.201.37.154:3000/field-names/${category}/${subcategory}`);
         setDocumentNames(fieldNamesResponse.data);
       }
     } catch (error) {
@@ -125,7 +125,7 @@ const InvoicePage = () => {
       console.log('Payload:', payload); // Debug: Log the payload
 
       const response = await axios.put(
-        `http://localhost:3000/documents/update-status/${documentId}`,
+        `http://13.201.37.154:3000/documents/update-status/${documentId}`,
         payload,
         {
           timeout: 30000, // Increase timeout to 30 seconds
@@ -169,7 +169,7 @@ const InvoicePage = () => {
       });
 
       // Make the API call to download the ZIP file with increased timeout
-      const response = await axios.get(`http://localhost:3000/download/${documentId}`, {
+      const response = await axios.get(`http://13.201.37.154:3000/download/${documentId}`, {
         responseType: 'blob', // Handle binary data
         timeout: 60000, // Increase timeout to 60 seconds
         onDownloadProgress: (progressEvent) => {
@@ -314,7 +314,7 @@ const InvoicePage = () => {
 
       // Step 1: Assign the distributor
       const assignResponse = await axios.put(
-        `http://localhost:3000/documents/assign-distributor/${documentId}`,
+        `http://13.201.37.154:3000/documents/assign-distributor/${documentId}`,
         {
           distributor_id: distributorId,
           remark: distributorRemark,
@@ -325,7 +325,7 @@ const InvoicePage = () => {
 
       // Step 2: Immediately update the status to "Approved"
       const statusResponse = await axios.put(
-        `http://localhost:3000/documents/update-status/${documentId}`,
+        `http://13.201.37.154:3000/documents/update-status/${documentId}`,
         {
           status: 'Approved', // Update status to "Approved"
         }

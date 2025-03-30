@@ -10,7 +10,7 @@ const PrivacyPolicyTable = () => {
     const [isEditing, setIsEditing] = useState(false);
     const [editingId, setEditingId] = useState(null);
 
-    const apiUrl = "http://localhost:3000/privacy-policy";
+    const apiUrl = "http://13.201.37.154:3000/privacy-policy";
 
     // Fetch all privacy policies from the API
     useEffect(() => {

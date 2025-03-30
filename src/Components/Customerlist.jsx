@@ -9,7 +9,7 @@ const CustomerList = () => {
     const [editingId, setEditingId] = useState(null);
     const [updatedPassword, setUpdatedPassword] = useState(""); // State for password editing
 
-    const apiUrl = "http://localhost:3000/users/customers";
+    const apiUrl = "http://13.201.37.154:3000/users/customers";
 
     useEffect(() => {
         fetchCustomers();
@@ -32,7 +32,7 @@ const CustomerList = () => {
     const handleUpdateCustomer = async (id) => {
         try {
             if (updatedPassword) {
-                await axios.patch(`http://localhost:3000/users/password/${id}`, { newPassword: updatedPassword });
+                await axios.patch(`http://13.201.37.154:3000/users/password/${id}`, { newPassword: updatedPassword });
             }
 
             setCustomers(
@@ -91,7 +91,7 @@ const CustomerList = () => {
             });
 
             try {
-                await axios.delete(`http://localhost:3000/users/delete/${id}`);
+                await axios.delete(`http://13.201.37.154:3000/users/delete/${id}`);
                 setCustomers((prevCustomers) =>
                     prevCustomers.filter((customer) => customer.user_id !== id)
                 );
@@ -111,7 +111,7 @@ const CustomerList = () => {
                 )
             );
 
-            await axios.patch(`http://localhost:3000/users/status/${id}`, { status: newStatus });
+            await axios.patch(`http://13.201.37.154:3000/users/status/${id}`, { status: newStatus });
 
             Swal.fire({
                 title: "Updated!",

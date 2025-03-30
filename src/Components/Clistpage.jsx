@@ -35,7 +35,7 @@ const ClistPage = () => {
   // Fetch documents based on categoryId, subcategoryId, and userId
   useEffect(() => {
     if (categoryId && subcategoryId && userId) {
-      const DOCUMENTS_API_URL = `http://localhost:3000/documents/doc/${categoryId}/${subcategoryId}/${userId}`;
+      const DOCUMENTS_API_URL = `http://13.201.37.154:3000/documents/doc/${categoryId}/${subcategoryId}/${userId}`;
       console.log("API URL:", DOCUMENTS_API_URL); // Debugging
 
       const fetchDocuments = async () => {

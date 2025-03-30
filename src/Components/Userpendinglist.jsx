@@ -22,7 +22,7 @@ const PendingApplicationsList = () => {
         const fetchPendingDocuments = async () => {
             try {
                 const response = await axios.get(
-                    ` http://localhost:3000/userdashboard/pending/${userId}`
+                    ` http://13.201.37.154:3000/userdashboard/pending/${userId}`
                 );
                 setPendingDocuments(response.data);
             } catch (error) {
