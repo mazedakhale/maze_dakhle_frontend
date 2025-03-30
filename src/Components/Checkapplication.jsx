@@ -45,7 +45,7 @@ const SearchApplication = () => {
 
     try {
       const response = await axios.get(
-        ` http://13.201.37.154:3000/userdashboard/fetch/${userId}/${applicationId}`
+        ` http://65.2.172.92:3000/userdashboard/fetch/${userId}/${applicationId}`
       );
       setDocument(response.data);
     } catch (err) {

@@ -25,7 +25,7 @@ const RequiredDocuments = () => {
 
   const fetchDocuments = async () => {
     try {
-      const response = await axios.get("http://13.201.37.154:3000/required-documents");
+      const response = await axios.get("http://65.2.172.92:3000/required-documents");
       // Add default values for category and subcategory if they are null
       const documentsWithDefaults = response.data.map((doc) => ({
         ...doc,
@@ -40,7 +40,7 @@ const RequiredDocuments = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await axios.get("http://13.201.37.154:3000/categories");
+      const response = await axios.get("http://65.2.172.92:3000/categories");
       setCategories(response.data);
     } catch (error) {
       console.error("Error fetching categories:", error);
@@ -50,7 +50,7 @@ const RequiredDocuments = () => {
   const fetchSubcategories = async (categoryId) => {
     if (!categoryId) return;
     try {
-      const response = await axios.get(`http://13.201.37.154:3000/subcategories/category/${categoryId}`);
+      const response = await axios.get(`http://65.2.172.92:3000/subcategories/category/${categoryId}`);
       setSubcategories(response.data);
     } catch (error) {
       console.error("Error fetching subcategories:", error);
@@ -88,7 +88,7 @@ const RequiredDocuments = () => {
 
     if (confirmDelete.isConfirmed) {
       try {
-        await axios.delete(`http://13.201.37.154:3000/required-documents/${id}`);
+        await axios.delete(`http://65.2.172.92:3000/required-documents/${id}`);
         setDocuments((prevDocuments) =>
           prevDocuments.filter((document) => document.id !== id)
         );
@@ -140,8 +140,8 @@ const RequiredDocuments = () => {
       }
 
       const url = editId
-        ? `http://13.201.37.154:3000/required-documents/${editId}`
-        : "http://13.201.37.154:3000/required-documents";
+        ? `http://65.2.172.92:3000/required-documents/${editId}`
+        : "http://65.2.172.92:3000/required-documents";
 
       const method = editId ? "patch" : "post";
 

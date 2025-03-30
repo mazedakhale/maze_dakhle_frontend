@@ -107,7 +107,7 @@ const InvoicePage = () => {
     try {
       // Step 1: Upload the receipt
       const response = await axios.post(
-        `http://13.201.37.154:3000/documents/upload-receipt/${documentId}`,
+        `http://65.2.172.92:3000/documents/upload-receipt/${documentId}`,
         formData,
         {
           headers: {
@@ -120,7 +120,7 @@ const InvoicePage = () => {
 
       // Step 2: Update the status to "Uploaded"
       await axios.put(
-        `http://13.201.37.154:3000/documents/update-status/${documentId}`,
+        `http://65.2.172.92:3000/documents/update-status/${documentId}`,
         { status: "Sent" },
         { timeout: 30000 }  // Increase timeout to 30 seconds
       );
@@ -197,7 +197,7 @@ const InvoicePage = () => {
     try {
       // Increased timeout
       const response = await axios.post(
-        'http://13.201.37.154:3000/certificates/upload',
+        'http://65.2.172.92:3000/certificates/upload',
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },
@@ -228,7 +228,7 @@ const InvoicePage = () => {
 
   useEffect(() => {
     axios
-      .get("http://13.201.37.154:3000/users/distributors")
+      .get("http://65.2.172.92:3000/users/distributors")
       .then((response) => setDistributors(response.data))
       .catch((error) => console.error("Error fetching distributors:", error));
   }, []);
@@ -276,7 +276,7 @@ const InvoicePage = () => {
       });
 
       const response = await axios.put(
-        `http://13.201.37.154:3000/documents/update-status/${documentId}`,
+        `http://65.2.172.92:3000/documents/update-status/${documentId}`,
         payload,
         { timeout: 30000 }
       );
@@ -310,7 +310,7 @@ const InvoicePage = () => {
   const fetchCertificates = async () => {
     try {
       console.log("Fetching certificates...");
-      const response = await axios.get("http://13.201.37.154:3000/certificates", {
+      const response = await axios.get("http://65.2.172.92:3000/certificates", {
         timeout: 30000
       }); console.log("Certificates API Response:", response.data);
       setCertificates(response.data);
@@ -321,7 +321,7 @@ const InvoicePage = () => {
   //   };const fetchCertificates = async () => {
   //   try {
   //     setLoading(true);
-  //     const response = await axios.get("http://13.201.37.154:3000/certificates", {
+  //     const response = await axios.get("http://65.2.172.92:3000/certificates", {
   //       timeout: 30000
   //     });
   //     setCertificates(response.data);
@@ -356,7 +356,7 @@ const InvoicePage = () => {
 
     try {
       console.log(`Fetching certificate for Certificate ID: ${certificate.certificate_id}`);
-      const response = await axios.get(`http://13.201.37.154:3000/certificates/${certificate.certificate_id}`);
+      const response = await axios.get(`http://65.2.172.92:3000/certificates/${certificate.certificate_id}`);
       console.log("View Certificate API Response:", response.data);
 
       if (response.data && response.data.file_url) {
@@ -390,7 +390,7 @@ const InvoicePage = () => {
       });
 
       // Make the API call to download the ZIP file with increased timeout
-      const response = await axios.get(`http://13.201.37.154:3000/download/${documentId}`, {
+      const response = await axios.get(`http://65.2.172.92:3000/download/${documentId}`, {
         responseType: 'blob', // Handle binary data
         timeout: 60000, // Increase timeout to 60 seconds
         onDownloadProgress: (progressEvent) => {
@@ -519,7 +519,7 @@ const InvoicePage = () => {
   const handleAssignDistributor = async (distributorId) => {
     if (!distributorId) return;
     try {
-      await axios.put(`http://13.201.37.154:3000/documents/assign-distributor/${documentId}`, {
+      await axios.put(`http://65.2.172.92:3000/documents/assign-distributor/${documentId}`, {
         distributor_id: distributorId,
       });
       setDocumentData((prev) => ({ ...prev, distributor_id: distributorId }));
@@ -559,7 +559,7 @@ const InvoicePage = () => {
   const handleDownloadCertificate = async () => {
     try {
       const response = await axios.get(
-        `http://13.201.37.154:3000/download-certificate/${documentId}`,
+        `http://65.2.172.92:3000/download-certificate/${documentId}`,
         {
           responseType: "blob",
         }
@@ -612,7 +612,7 @@ const InvoicePage = () => {
 
   const fetchDocumentData = useCallback(async () => {
     try {
-      const response = await axios.get(`http://13.201.37.154:3000/singledocument/documentby/${documentId}`);
+      const response = await axios.get(`http://65.2.172.92:3000/singledocument/documentby/${documentId}`);
       const data = response.data.document;
       setDocumentData(data);
 
@@ -620,7 +620,7 @@ const InvoicePage = () => {
       const subcategory = stateSubcategoryId || data.subcategory_id;
 
       if (category && subcategory) {
-        const fieldNamesResponse = await axios.get(`http://13.201.37.154:3000/field-names/${category}/${subcategory}`);
+        const fieldNamesResponse = await axios.get(`http://65.2.172.92:3000/field-names/${category}/${subcategory}`);
         setDocumentNames(fieldNamesResponse.data);
       }
     } catch (error) {
@@ -665,7 +665,7 @@ const InvoicePage = () => {
 
       // Make the API call to download the ZIP file
       const response = await axios.get(
-        `http://13.201.37.154:3000/download/all/${documentId}`,
+        `http://65.2.172.92:3000/download/all/${documentId}`,
         {
           responseType: "blob",
           timeout: 120000, // 2 minutes timeout

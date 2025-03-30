@@ -35,7 +35,7 @@ const ErrorRequests = () => {
     try {
       console.log(`Fetching error requests for distributor ID: ${distributorId}`);
       const response = await axios.get(
-        `http://13.201.37.154:3000request-errors/distributor/${distributorId}`
+        `http://65.2.172.92:3000request-errors/distributor/${distributorId}`
       );
       console.log("Error Requests API Response:", response.data);
 
@@ -54,7 +54,7 @@ const ErrorRequests = () => {
   const fetchCertificates = async () => {
     try {
       console.log("Fetching certificates...");
-      const response = await axios.get("http://13.201.37.154:3000certificates");
+      const response = await axios.get("http://65.2.172.92:3000certificates");
       console.log("Certificates API Response:", response.data);
       setCertificates(response.data);
     } catch (error) {
@@ -80,7 +80,7 @@ const ErrorRequests = () => {
     }
     try {
       console.log(`Fetching certificate for Certificate ID: ${certificateId}`);
-      const response = await axios.get(`http://13.201.37.154:3000certificates/${certificateId}`);
+      const response = await axios.get(`http://65.2.172.92:3000certificates/${certificateId}`);
       console.log("View Certificate API Response:", response.data);
 
       if (response.data && response.data.file_url) {
@@ -108,7 +108,7 @@ const ErrorRequests = () => {
   const handleDownloadCertificate = async (documentId, requestName) => {
     try {
       const response = await axios.get(
-        `http://13.201.37.154:3000download-certificate/${documentId}`,
+        `http://65.2.172.92:3000download-certificate/${documentId}`,
         {
           responseType: "blob", // Important to handle file downloads
         }

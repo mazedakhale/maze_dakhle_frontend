@@ -14,7 +14,7 @@ const DistributorEdit = () => {
     });
 
     useEffect(() => {
-        axios.get(`http://13.201.37.154:3000/users/edit/${user_id}`)
+        axios.get(`http://65.2.172.92:3000/users/edit/${user_id}`)
             .then(response => {
                 setFormData(response.data);
             })
@@ -29,7 +29,7 @@ const DistributorEdit = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        axios.put(`http://13.201.37.154:3000/users/edit/${user_id}`, formData)
+        axios.put(`http://65.2.172.92:3000/users/edit/${user_id}`, formData)
             .then(() => {
                 alert("Distributor updated successfully!");
                 navigate("/distributor-list"); // Redirect after update

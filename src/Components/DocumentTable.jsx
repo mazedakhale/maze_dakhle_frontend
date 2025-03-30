@@ -16,7 +16,7 @@ const DocumentTable = () => {
 
   const fetchDocuments = async () => {
     try {
-      const response = await axios.get("http://13.201.37.154:3000/document-types");
+      const response = await axios.get("http://65.2.172.92:3000/document-types");
       setDocuments(response.data);
     } catch (error) {
       console.error("Error fetching documents:", error);
@@ -35,12 +35,12 @@ const DocumentTable = () => {
       if (editingDoc) {
         // Update existing document
         await axios.put(
-          `http://13.201.37.154:3000/document-types/${editingDoc.doc_type_id}`,
+          `http://65.2.172.92:3000/document-types/${editingDoc.doc_type_id}`,
           formData
         );
       } else {
         // Add new document
-        await axios.post("http://13.201.37.154:3000/document-types/", formData);
+        await axios.post("http://65.2.172.92:3000/document-types/", formData);
       }
       setIsModalOpen(false);
       fetchDocuments(); // Refresh the document list
@@ -65,7 +65,7 @@ const DocumentTable = () => {
 
     if (confirmDelete.isConfirmed) {
       try {
-        await axios.delete(`http://13.201.37.154:3000/document-types/${id}`);
+        await axios.delete(`http://65.2.172.92:3000/document-types/${id}`);
         fetchDocuments(); // Refresh the document list
         Swal.fire("Deleted!", "Document has been deleted.", "success");
       } catch (error) {

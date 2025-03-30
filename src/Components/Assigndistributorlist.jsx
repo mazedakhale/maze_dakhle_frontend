@@ -13,7 +13,7 @@ const AssignedDistributorsList = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        axios.get(`http://13.201.37.154:3000/documents/assigned-list`)
+        axios.get(`http://65.2.172.92:3000/documents/assigned-list`)
             .then((response) => {
                 console.log("API Response:", response.data);  // Log full response
                 const sortedDocuments = response.data.documents.sort(
@@ -26,19 +26,19 @@ const AssignedDistributorsList = () => {
 
         // Fetch distributors
         axios
-            .get(`http://13.201.37.154:3000/users/distributors`)
+            .get(`http://65.2.172.92:3000/users/distributors`)
             .then((response) => setDistributors(response.data))
             .catch((error) => console.error("Error fetching distributors:", error));
 
         // Fetch certificates
         axios
-            .get('http://13.201.37.154:3000/certificates')
+            .get('http://65.2.172.92:3000/certificates')
             .then((response) => setCertificates(response.data))
             .catch((error) => console.error("Error fetching certificates:", error));
 
         // Fetch users
         axios
-            .get('http://13.201.37.154:3000/users/register')
+            .get('http://65.2.172.92:3000/users/register')
             .then((response) => setUsers(response.data))
             .catch((error) => console.error("Error fetching users:", error));
     }, []);
@@ -54,7 +54,7 @@ const AssignedDistributorsList = () => {
     // Update document status
     const handleUpdateStatus = async (documentId, newStatus) => {
         try {
-            await axios.put(`http://13.201.37.154:3000/documents/update-status/${documentId}`, {
+            await axios.put(`http://65.2.172.92:3000/documents/update-status/${documentId}`, {
                 status: newStatus,
                 status_updated_at: new Date().toISOString() // Add timestamp
 
@@ -116,7 +116,7 @@ const AssignedDistributorsList = () => {
             return;
         }
         try {
-            const response = await axios.get(`http://13.201.37.154:3000/certificates/${certificateId}`);
+            const response = await axios.get(`http://65.2.172.92:3000/certificates/${certificateId}`);
             if (response.data && response.data.file_url) {
                 window.open(response.data.file_url, "_blank");
             } else {
@@ -134,7 +134,7 @@ const AssignedDistributorsList = () => {
 
             // Make the API call to download the file
             const response = await axios.get(
-                `http://13.201.37.154:3000/download-certificate/${documentId}`,
+                `http://65.2.172.92:3000/download-certificate/${documentId}`,
                 {
                     responseType: "blob", // Important to handle file downloads
                 }

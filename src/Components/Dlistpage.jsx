@@ -44,7 +44,7 @@ const DlistPage = () => {
   // Fetch documents based on category, subcategory, and distributor ID
   useEffect(() => {
     if (categoryId && subcategoryId && distributorId) {
-      const DOCUMENTS_API_URL = `http://13.201.37.154:3000/documents/${categoryId}/${subcategoryId}?distributorId=${distributorId}`;
+      const DOCUMENTS_API_URL = `http://65.2.172.92:3000/documents/${categoryId}/${subcategoryId}?distributorId=${distributorId}`;
       console.log("API URL:", DOCUMENTS_API_URL); // Debugging
 
       const fetchDocuments = async () => {
@@ -70,7 +70,7 @@ const DlistPage = () => {
   // Fetch certificates
   const fetchCertificates = async () => {
     try {
-      const response = await axios.get("http://13.201.37.154:3000/certificates");
+      const response = await axios.get("http://65.2.172.92:3000/certificates");
       setCertificates(response.data);
     } catch (error) {
       console.error("Error fetching certificates:", error);
@@ -164,7 +164,7 @@ const DlistPage = () => {
 
     try {
       await axios.post(
-        "http://13.201.37.154:3000/certificates/upload",
+        "http://65.2.172.92:3000/certificates/upload",
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },
@@ -172,7 +172,7 @@ const DlistPage = () => {
       );
 
       await axios.put(
-        `http://13.201.37.154:3000/documents/update-status/${documentId}`,
+        `http://65.2.172.92:3000/documents/update-status/${documentId}`,
         { status: "Uploaded" }
       );
 
@@ -225,7 +225,7 @@ const DlistPage = () => {
     }
 
     try {
-      const response = await axios.get(`http://13.201.37.154:3000/certificates/${certificate.certificate_id}`);
+      const response = await axios.get(`http://65.2.172.92:3000/certificates/${certificate.certificate_id}`);
 
       if (response.data && response.data.file_url) {
         const link = document.createElement("a");
