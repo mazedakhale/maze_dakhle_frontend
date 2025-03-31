@@ -163,7 +163,7 @@ const Register = () => {
           icon: "success",
           confirmButtonColor: "#00234E",
           confirmButtonText: "OK",
-        }).then(() => navigate("/"));
+        }).then(() => navigate("/Login"));
       } else {
         // Show error message if registration fails
         Swal.fire({
