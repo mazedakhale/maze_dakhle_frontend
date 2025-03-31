@@ -101,7 +101,7 @@ const Employeedashboard = ({ children }) => {
 
     const handleLogout = () => {
         localStorage.removeItem("token");
-        window.location.href = "/";
+        window.location.href = "/Login";
     };
 
     return (
