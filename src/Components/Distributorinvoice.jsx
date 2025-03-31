@@ -547,7 +547,7 @@ const InvoicePage = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("token");
-    window.location.href = "/";
+    window.location.href = "/Login";
   };
   // Add these state variables
   const [certificates, setCertificates] = useState([]);
@@ -816,7 +816,7 @@ const InvoicePage = () => {
                 )}
               </div>
               <button
-                onClick={handleLogout}
+                onClick={handle}
                 className="w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
               >
                 Logout
