@@ -23,7 +23,7 @@ const EmployeeList = () => {
     const navigate = useNavigate();
 
     // API endpoint for fetching employees
-    const apiUrl = "https://65.2.172.92:3000/users/employee";
+    const apiUrl = "https://https://mazedakhale.in/users/employee";
 
     useEffect(() => {
         fetchEmployees();
@@ -73,7 +73,7 @@ const EmployeeList = () => {
 
         try {
             // Send the registration request to the backend
-            const response = await axios.post("https://65.2.172.92:3000/users/register", dataToSend, {
+            const response = await axios.post("https://https://mazedakhale.in/users/register", dataToSend, {
                 headers: {
                     "Content-Type": "application/json",
                 },
@@ -113,7 +113,7 @@ const EmployeeList = () => {
     const handleUpdateEmployee = async (id) => {
         try {
             if (updatedPassword) {
-                await axios.patch(`https://65.2.172.92:3000/users/password/${id}`,
+                await axios.patch(`https://https://mazedakhale.in/users/password/${id}`,
                     { newPassword: updatedPassword },
                     { timeout: 30000 }
                 );
@@ -176,7 +176,7 @@ const EmployeeList = () => {
             });
 
             try {
-                await axios.delete(`https://65.2.172.92:3000/users/delete/${id}`, { timeout: 30000 });
+                await axios.delete(`https://https://mazedakhale.in/users/delete/${id}`, { timeout: 30000 });
 
                 Swal.fire({
                     title: "Deleted!",
@@ -205,7 +205,7 @@ const EmployeeList = () => {
                 )
             );
 
-            await axios.patch(`https://65.2.172.92:3000/users/status/${id}`,
+            await axios.patch(`https://https://mazedakhale.in/users/status/${id}`,
                 { status: newStatus },
                 { timeout: 30000 }
             );

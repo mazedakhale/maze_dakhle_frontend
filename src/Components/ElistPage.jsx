@@ -14,7 +14,7 @@ const ElistPage = () => {
 
     useEffect(() => {
         axios
-            .get("https://65.2.172.92:3000/documents/list")
+            .get("https://https://mazedakhale.in/documents/list")
             .then((response) => {
                 const sortedDocuments = response.data.documents.sort(
                     (a, b) => new Date(b.uploaded_at) - new Date(a.uploaded_at)
@@ -24,18 +24,18 @@ const ElistPage = () => {
             .catch((error) => console.error("Error fetching documents:", error));
 
         axios
-            .get("https://65.2.172.92:3000/users/distributors")
+            .get("https://https://mazedakhale.in/users/distributors")
             .then((response) => setDistributors(response.data))
 
             .catch((error) => console.error("Error fetching distributors:", error));
 
         axios
-            .get("https://65.2.172.92:3000/certificates")
+            .get("https://https://mazedakhale.in/certificates")
             .then((response) => setCertificates(response.data))
             .catch((error) => console.error("Error fetching certificates:", error));
 
         axios
-            .get("https://65.2.172.92:3000/users/register")
+            .get("https://https://mazedakhale.in/users/register")
             .then((response) => setUsers(response.data))
             .catch((error) => console.error("Error fetching users:", error));
     }, []);
@@ -115,7 +115,7 @@ const ElistPage = () => {
             return;
         }
         try {
-            const response = await axios.get(`https://65.2.172.92:3000/certificates/${certificateId}`);
+            const response = await axios.get(`https://https://mazedakhale.in/certificates/${certificateId}`);
             if (response.data && response.data.file_url) {
                 window.open(response.data.file_url, "_blank");
             } else {
@@ -130,7 +130,7 @@ const ElistPage = () => {
     const handleDownloadCertificate = async (documentId, name) => {
         try {
             const response = await axios.get(
-                `https://65.2.172.92:3000/download-certificate/${documentId}`,
+                `https://https://mazedakhale.in/download-certificate/${documentId}`,
                 {
                     responseType: "blob", // Important to handle file downloads
                 }

@@ -16,7 +16,7 @@ const Received = () => {
     useEffect(() => {
         // Fetch assigned documents from the new API
         axios
-            .get(`https://65.2.172.92:3000/documents/assigned-list`)
+            .get(`https://https://mazedakhale.in/documents/assigned-list`)
             .then((response) => {
                 const sortedDocuments = response.data.documents.sort(
                     (a, b) => new Date(b.uploaded_at) - new Date(a.uploaded_at)
@@ -30,19 +30,19 @@ const Received = () => {
 
         // Fetch distributors
         axios
-            .get(`https://65.2.172.92:3000/users/distributors`)
+            .get(`https://https://mazedakhale.in/users/distributors`)
             .then((response) => setDistributors(response.data))
             .catch((error) => console.error("Error fetching distributors:", error));
 
         // Fetch certificates
         axios
-            .get('https://65.2.172.92:3000/certificates')
+            .get('https://https://mazedakhale.in/certificates')
             .then((response) => setCertificates(response.data))
             .catch((error) => console.error("Error fetching certificates:", error));
 
         // Fetch users
         axios
-            .get('https://65.2.172.92:3000/users/register')
+            .get('https://https://mazedakhale.in/users/register')
             .then((response) => setUsers(response.data))
             .catch((error) => console.error("Error fetching users:", error));
     }, []);
@@ -91,7 +91,7 @@ const Received = () => {
 
             // Make the API call to update the status with a longer timeout
             const response = await axios.put(
-                `https://65.2.172.92:3000/documents/update-status/${documentId}`,
+                `https://https://mazedakhale.in/documents/update-status/${documentId}`,
                 { status: newStatus },
                 { timeout: 30000 } // Set timeout to 30 seconds
             );
@@ -191,7 +191,7 @@ const Received = () => {
             return;
         }
         try {
-            const response = await axios.get(`https://65.2.172.92:3000/certificates/${certificateId}`);
+            const response = await axios.get(`https://https://mazedakhale.in/certificates/${certificateId}`);
             if (response.data && response.data.file_url) {
                 window.open(response.data.file_url, "_blank");
             } else {
@@ -209,7 +209,7 @@ const Received = () => {
 
             // Make the API call to download the file
             const response = await axios.get(
-                `https://65.2.172.92:3000/download-certificate/${documentId}`,
+                `https://https://mazedakhale.in/download-certificate/${documentId}`,
                 {
                     responseType: "blob", // Important to handle file downloads
                 }
@@ -264,7 +264,7 @@ const Received = () => {
         if (rejectionReason) {
             try {
                 // Call the API to update the status to "Rejected" with the rejection reason
-                await axios.put(`https://65.2.172.92:3000/documents/update-status/${documentId}`, {
+                await axios.put(`https://https://mazedakhale.in/documents/update-status/${documentId}`, {
                     status: "Rejected",
                     rejectionReason,
                 });

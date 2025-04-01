@@ -9,8 +9,8 @@ const Categories = () => {
   const [subcategories, setSubcategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
 
-  const API_BASE_URL = " https://65.2.172.92:3000/categories";
-  const SUBCATEGORIES_API_URL = " https://65.2.172.92:3000/subcategories";
+  const API_BASE_URL = " https://https://mazedakhale.in/categories";
+  const SUBCATEGORIES_API_URL = " https://https://mazedakhale.in/subcategories";
 
   useEffect(() => {
     const fetchCategories = async () => {
