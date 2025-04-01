@@ -7,13 +7,14 @@ export default defineConfig({
     host: true,        // Allows external access (0.0.0.0 automatically handled)
     port: 5173,        // Ensures Vite runs on port 5173
     strictPort: true,  // Prevents Vite from changing the port if 5173 is busy
-    open: false,       // Disable auto-opening (prevents xdg-open ENOENT error)
+    open: false,       // Disable auto-opening (prevents `xdg-open ENOENT` error)
     watch: {
       usePolling: true, // Required for AWS Lightsail to detect file changes
     },
+    allowedHosts: ['mazedakhale.in'],  // Allow requests from this domain
     proxy: {
       '/api': {
-        target: 'http://localhost:5000', // Proxy API requests to NestJS backend
+        target: 'http://localhost:5000', // Proxy API requests to backend
         changeOrigin: true,
         secure: false,
       },
