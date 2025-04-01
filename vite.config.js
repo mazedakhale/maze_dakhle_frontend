@@ -13,7 +13,7 @@ export default defineConfig({
     },
     proxy: {
       '/api': {
-        target: 'http://localhost:3000', // Proxy API requests to NestJS backend
+        target: 'http://localhost:5000', // Proxy API requests to NestJS backend
         changeOrigin: true,
         secure: false,
       },
