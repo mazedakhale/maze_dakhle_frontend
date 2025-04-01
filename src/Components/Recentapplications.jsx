@@ -14,7 +14,7 @@ const RecentApplications = () => {
   useEffect(() => {
     const fetchApplications = async () => {
       try {
-        const response = await fetch('https://https://mazedakhale.in/documents/recent');
+        const response = await fetch('https://mazedakhale.in/documents/recent');
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
@@ -51,7 +51,7 @@ const RecentApplications = () => {
   // Handle View Certificate Action
   const handleViewCertificate = async (documentId) => {
     try {
-      const response = await axios.get(`https://https://mazedakhale.in/certificates/${documentId}`);
+      const response = await axios.get(`https://mazedakhale.in/certificates/${documentId}`);
       if (response.data && response.data.file_url) {
         window.open(response.data.file_url, "_blank");
       } else {
@@ -67,7 +67,7 @@ const RecentApplications = () => {
   const handleDownloadCertificate = async (documentId, name) => {
     try {
       const response = await axios.get(
-        `https://https://mazedakhale.in/download-certificate/${documentId}`,
+        `https://mazedakhale.in/download-certificate/${documentId}`,
         {
           responseType: "blob",
         }

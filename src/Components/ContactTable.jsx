@@ -10,7 +10,7 @@ const ContactTable = () => {
     const [updatedKey, setUpdatedKey] = useState("");
     const [isAdding, setIsAdding] = useState(false);
 
-    const apiUrl = "https://https://mazedakhale.in/field";
+    const apiUrl = "https://mazedakhale.in/field";
 
     // Fetch all fields
     useEffect(() => {

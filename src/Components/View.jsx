@@ -22,7 +22,7 @@ const ApplicationView = () => {
   // Fetch Document Data
   const fetchDocumentData = useCallback(async () => {
     try {
-      const response = await axios.get(`https://https://mazedakhale.in/singledocument/documentby/${documentId}`);
+      const response = await axios.get(`https://mazedakhale.in/singledocument/documentby/${documentId}`);
       const data = response.data.document;
       setDocumentData(data);
 
@@ -30,7 +30,7 @@ const ApplicationView = () => {
       const subcategory = stateSubcategoryId || data.subcategory_id;
 
       if (category && subcategory) {
-        const fieldNamesResponse = await axios.get(`https://https://mazedakhale.in/field-names/${category}/${subcategory}`);
+        const fieldNamesResponse = await axios.get(`https://mazedakhale.in/field-names/${category}/${subcategory}`);
         setDocumentNames(fieldNamesResponse.data);
       }
     } catch (error) {

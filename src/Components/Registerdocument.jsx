@@ -61,7 +61,7 @@ const RegisterDocument = () => {
     });
 
     try {
-      const response = await fetch(`https://https://mazedakhale.in/users/update/${id}`, {
+      const response = await fetch(`https://mazedakhale.in/users/update/${id}`, {
         method: "PUT",
         body: formDataObj,
       });

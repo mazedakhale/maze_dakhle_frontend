@@ -9,7 +9,7 @@ const CustomerList = () => {
     const [editingId, setEditingId] = useState(null);
     const [updatedPassword, setUpdatedPassword] = useState(""); // State for password editing
 
-    const apiUrl = "https://https://mazedakhale.in/users/customers";
+    const apiUrl = "https://mazedakhale.in/users/customers";
 
     useEffect(() => {
         fetchCustomers();
@@ -32,7 +32,7 @@ const CustomerList = () => {
     const handleUpdateCustomer = async (id) => {
         try {
             if (updatedPassword) {
-                await axios.patch(`https://https://mazedakhale.in/users/password/${id}`, { newPassword: updatedPassword });
+                await axios.patch(`https://mazedakhale.in/users/password/${id}`, { newPassword: updatedPassword });
             }
 
             setCustomers(
@@ -91,7 +91,7 @@ const CustomerList = () => {
             });
 
             try {
-                await axios.delete(`https://https://mazedakhale.in/users/delete/${id}`);
+                await axios.delete(`https://mazedakhale.in/users/delete/${id}`);
                 setCustomers((prevCustomers) =>
                     prevCustomers.filter((customer) => customer.user_id !== id)
                 );
@@ -111,7 +111,7 @@ const CustomerList = () => {
                 )
             );
 
-            await axios.patch(`https://https://mazedakhale.in/users/status/${id}`, { status: newStatus });
+            await axios.patch(`https://mazedakhale.in/users/status/${id}`, { status: newStatus });
 
             Swal.fire({
                 title: "Updated!",
