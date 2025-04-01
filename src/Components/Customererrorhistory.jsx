@@ -16,7 +16,7 @@ const ErrorRequests = () => {
   // Fetch error requests (only completed ones)
   const fetchErrorRequests = async () => {
     try {
-      const response = await axios.get(" http://65.2.172.92:3000/request-errors");
+      const response = await axios.get(" https://65.2.172.92:3000/request-errors");
 
       // ✅ Filter requests to include only those with status "Completed"
       const completedRequests = response.data.filter(
@@ -32,7 +32,7 @@ const ErrorRequests = () => {
   // Fetch certificates
   const fetchCertificates = async () => {
     try {
-      const response = await axios.get(" http://65.2.172.92:3000/certificates");
+      const response = await axios.get(" https://65.2.172.92:3000/certificates");
       setCertificates(response.data);
     } catch (error) {
       console.error("Error fetching certificates:", error);
@@ -56,7 +56,7 @@ const ErrorRequests = () => {
     }
     try {
       const response = await axios.get(
-        ` http://65.2.172.92:3000/certificates/${certificateId}`
+        ` https://65.2.172.92:3000/certificates/${certificateId}`
       );
       if (response.data && response.data.file_url) {
         window.open(response.data.file_url, "_blank");
@@ -73,7 +73,7 @@ const ErrorRequests = () => {
   const handleDownloadCertificate = async (documentId, requestName) => {
     try {
       const response = await axios.get(
-        ` http://65.2.172.92:3000/download-certificate/${documentId}`,
+        ` https://65.2.172.92:3000/download-certificate/${documentId}`,
         {
           responseType: "blob", // Important to handle file downloads
         }
