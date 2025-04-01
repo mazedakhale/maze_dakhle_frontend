@@ -41,7 +41,7 @@ const Feedback = () => {
         }
 
         try {
-            await axios.post("https://65.2.172.92:3000/feedback", {
+            await axios.post("https://mazedakhale.in/feedback", {
                 comment,
                 rating,
                 user_id: storedUser.user_id,  // ✅ Extract user_id correctly

@@ -14,7 +14,7 @@ const Login = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await fetch("https://65.2.172.92:3000/categories");
+        const response = await fetch("https://mazedakhale.in/categories");
         if (!response.ok) {
           throw new Error("Failed to fetch categories");
         }
@@ -34,7 +34,7 @@ const Login = () => {
         const subcategoryData = {};
         for (const category of categories) {
           const response = await fetch(
-            `https://65.2.172.92:3000/subcategories/category/${category.category_id}`
+            `https://mazedakhale.in/subcategories/category/${category.category_id}`
           );
           if (response.ok) {
             const data = await response.json();
@@ -63,7 +63,7 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch("https://65.2.172.92:3000/users/login", {
+      const response = await fetch("https://mazedakhale.in/users/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),

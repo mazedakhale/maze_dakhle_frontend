@@ -78,7 +78,7 @@ const Register = () => {
         };
 
         try {
-            const response = await fetch("https://65.2.172.92:3000/users/register", {
+            const response = await fetch("https://mazedakhale.in/users/register", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(userData),

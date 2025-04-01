@@ -78,7 +78,7 @@ const AddDistributorModal = ({ isOpen, onClose, fetchDistributors }) => {
         formDataToSend.append("documentTypes", "PAN Card");
 
         try {
-            const response = await axios.post("https://65.2.172.92:3000/users/register", formDataToSend, {
+            const response = await axios.post("https://mazedakhale.in/users/register", formDataToSend, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                 },

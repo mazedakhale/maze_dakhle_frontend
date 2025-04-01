@@ -66,7 +66,7 @@ const Apply = () => {
   useEffect(() => {
     if (formData.category_id && formData.subcategory_id) {
       axios
-        .get(`https://65.2.172.92:3000/required-documents/${formData.category_id}/${formData.subcategory_id}`)
+        .get(`https://mazedakhale.in/required-documents/${formData.category_id}/${formData.subcategory_id}`)
         .then((response) => {
           if (response.data.length > 0 && response.data[0].document_names) {
             const documentsArray = response.data[0].document_names.split(",").map((doc) => doc.trim());
@@ -85,7 +85,7 @@ const Apply = () => {
   useEffect(() => {
     if (formData.category_id && formData.subcategory_id) {
       axios
-        .get(`https://65.2.172.92:3000/field-names/${formData.category_id}/${formData.subcategory_id}`)
+        .get(`https://mazedakhale.in/field-names/${formData.category_id}/${formData.subcategory_id}`)
         .then((response) => {
           if (response.data.length > 0 && response.data[0].document_fields) {
             const fieldsArray = response.data[0].document_fields.split(",").map((field) => field.trim());
@@ -204,7 +204,7 @@ const Apply = () => {
 
     try {
       const response = await axios.post(
-        "https://65.2.172.92:3000/documents/upload",
+        "https://mazedakhale.in/documents/upload",
         formDataToSend,
         {
           headers: { "Content-Type": "multipart/form-data" },

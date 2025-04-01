@@ -70,7 +70,7 @@ const AddErrorRequestPage = () => {
 
     try {
       const response = await axios.post(
-        "https://65.2.172.92:3000/request-errors/create",
+        "https://mazedakhale.in/request-errors/create",
         formData,
         {
           headers: {
