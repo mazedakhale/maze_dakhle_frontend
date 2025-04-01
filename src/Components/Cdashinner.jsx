@@ -29,8 +29,8 @@ const CustomerDashboard = () => {
   const [selectedFiles, setSelectedFiles] = useState({});
   const [isUploading, setIsUploading] = useState(false);
 
-  const API_BASE_URL = "https://mazedakhale.in/categories";
-  const SUBCATEGORIES_API_URL = "https://mazedakhale.in/subcategories";
+  const API_BASE_URL = "https://mazedakhale.in/api/categories";
+  const SUBCATEGORIES_API_URL = "https://mazedakhale.in/api/subcategories";
 
   // Decode token and set user ID
   useEffect(() => {
@@ -46,17 +46,17 @@ const CustomerDashboard = () => {
     if (!userId) return;
 
     // Fetch applied applications count
-    axios.get(`https://mazedakhale.in/userdashboard/total-applied/${userId}`)
+    axios.get(`https://mazedakhale.in/api/userdashboard/total-applied/${userId}`)
       .then((res) => setAppliedCount(res.data.totalCount))
       .catch((err) => console.error("Error fetching total applied:", err));
 
     // Fetch completed applications count
-    axios.get(`https://mazedakhale.in/userdashboard/total-completed/${userId}`)
+    axios.get(`https://mazedakhale.in/api/userdashboard/total-completed/${userId}`)
       .then((res) => setCompletedCount(res.data.totalCompleted))
       .catch((err) => console.error("Error fetching total completed:", err));
 
     // Fetch category counts
-    axios.get(`https://mazedakhale.in/userdashboard/category-counts/${userId}`)
+    axios.get(`https://mazedakhale.in/api/userdashboard/category-counts/${userId}`)
       .then((res) => {
         const categoryDataWithColors = res.data.categories.map((item, index) => ({
           name: item.category,
@@ -71,7 +71,7 @@ const CustomerDashboard = () => {
       .catch((err) => console.error("Error fetching category data:", err));
 
     // Fetch application status counts
-    axios.get(`https://mazedakhale.in/userdashboard/status-count/${userId}`)
+    axios.get(`https://mazedakhale.in/api/userdashboard/status-count/${userId}`)
       .then((res) => {
         const formattedData = res.data.map((item) => ({
           status: item.status,
@@ -82,7 +82,7 @@ const CustomerDashboard = () => {
       .catch((err) => console.error("Error fetching status counts:", err));
 
     // Fetch active notifications
-    axios.get("https://mazedakhale.in/notifications/active")
+    axios.get("https://mazedakhale.in/api/notifications/active")
       .then((res) => setNotifications(res.data))
       .catch((err) => console.error("Error fetching notifications:", err));
 
@@ -115,7 +115,7 @@ const CustomerDashboard = () => {
   const fetchRequiredDocuments = async (categoryId, subcategoryId) => {
     try {
       const response = await axios.get(
-        `https://mazedakhale.in/required-documents/${categoryId}/${subcategoryId}`
+        `https://mazedakhale.in/api/required-documents/${categoryId}/${subcategoryId}`
       );
       setRequiredDocuments(response.data);
       setIsModalOpen(true);
