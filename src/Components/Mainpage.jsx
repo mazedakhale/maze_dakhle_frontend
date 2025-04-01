@@ -77,6 +77,7 @@ const Mainpage = () => {
         const fetchDocumentTypes = async () => {
             try {
                 const response = await fetch('http://65.2.172.92:3000/document-types');
+
                 if (!response.ok) {
                     throw new Error(`HTTP error! Status: ${response.status}`);
                 }
@@ -97,8 +98,12 @@ const Mainpage = () => {
                     setDocumentTypes([]);
                 }
             } catch (error) {
+                if (error instanceof TypeError) {
+                    setError("Network error: Unable to fetch data. Check your connection.");
+                } else {
+                    setError(error.message);
+                }
                 console.error('Error fetching documentTypes:', error);
-                setError(error.message);
                 setDocumentTypes([]);
             } finally {
                 setLoading(false);
@@ -108,6 +113,7 @@ const Mainpage = () => {
         fetchDocumentTypes();
     }, []);
 
+
     if (loading) {
         return (
             <div className="bg-gray-100">
@@ -116,7 +122,6 @@ const Mainpage = () => {
                     <img src={MainBanner} alt="Maze Dakhale" className="w-full" />
                 </div>
                 <div className="container mx-auto py-10 text-center">
-                    Loading document types...
                 </div>
                 <Footer />
             </div>
@@ -131,9 +136,8 @@ const Mainpage = () => {
                     <img src={MainBanner} alt="Maze Dakhale" className="w-full" />
                 </div>
                 <div className="container mx-auto py-10 text-center">
-                    <h2 className="text-red-600 text-2xl font-semibold">Error</h2>
+                    <h2 className="text-red-600 text-2xl font-semibold"></h2>
                     <p className="text-gray-700">{error}</p>
-                    <p className="text-gray-500">Please try again later.</p>
                 </div>
                 <Footer />
             </div>
