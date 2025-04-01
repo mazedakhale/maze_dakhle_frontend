@@ -9,7 +9,7 @@ const CustomerList = () => {
     const [editingId, setEditingId] = useState(null);
     const [updatedPassword, setUpdatedPassword] = useState(""); // State for password editing
 
-    const apiUrl = "https://mazedakhale.in/api/users/customers";
+    const apiUrl = "https://65.2.172.92:3000/users/customers";
 
     useEffect(() => {
         fetchCustomers();
@@ -32,7 +32,7 @@ const CustomerList = () => {
     const handleUpdateCustomer = async (id) => {
         try {
             if (updatedPassword) {
-                await axios.patch(`https://mazedakhale.in/api/users/password/${id}`, { newPassword: updatedPassword });
+                await axios.patch(`https://65.2.172.92:3000/users/password/${id}`, { newPassword: updatedPassword });
             }
 
             setCustomers(
@@ -91,7 +91,7 @@ const CustomerList = () => {
             });
 
             try {
-                await axios.delete(`https://mazedakhale.in/api/users/delete/${id}`);
+                await axios.delete(`https://65.2.172.92:3000/users/delete/${id}`);
                 setCustomers((prevCustomers) =>
                     prevCustomers.filter((customer) => customer.user_id !== id)
                 );
@@ -111,7 +111,7 @@ const CustomerList = () => {
                 )
             );
 
-            await axios.patch(`https://mazedakhale.in/api/users/status/${id}`, { status: newStatus });
+            await axios.patch(`https://65.2.172.92:3000/users/status/${id}`, { status: newStatus });
 
             Swal.fire({
                 title: "Updated!",

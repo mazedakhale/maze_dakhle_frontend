@@ -76,7 +76,7 @@ const Mainpage = () => {
     useEffect(() => {
         const fetchDocumentTypes = async () => {
             try {
-                const response = await fetch('https://mazedakhale.in/api/document-types');
+                const response = await fetch('https://65.2.172.92:3000/document-types');
 
                 if (!response.ok) {
                     throw new Error(`HTTP error! Status: ${response.status}`);

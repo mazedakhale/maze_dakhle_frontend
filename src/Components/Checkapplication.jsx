@@ -45,7 +45,7 @@ const SearchApplication = () => {
 
     try {
       const response = await axios.get(
-        ` https://mazedakhale.in/api/userdashboard/fetch/${userId}/${applicationId}`
+        ` https://65.2.172.92:3000/userdashboard/fetch/${userId}/${applicationId}`
       );
       setDocument(response.data);
     } catch (err) {

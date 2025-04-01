@@ -11,7 +11,7 @@ const Addsubcategory = () => {
   const [updatedName, setUpdatedName] = useState("");
   const [isAdding, setIsAdding] = useState(false);
 
-  const API_BASE_URL = "https://mazedakhale.in/api";
+  const API_BASE_URL = "https://65.2.172.92:3000";
 
   useEffect(() => {
     fetchSubcategories();
