@@ -12,7 +12,7 @@ import VerifiedUserIcon from '@mui/icons-material/VerifiedUser';
 ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 
 // Base URL for API calls
-const BASE_URL = 'http://65.2.172.92:3000';
+const BASE_URL = 'https://65.2.172.92:3000';
 
 // Configure axios for faster responses
 axios.defaults.timeout = 5000; // 5 second timeout

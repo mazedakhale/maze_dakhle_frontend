@@ -14,7 +14,7 @@ const ErrorRequests = () => {
 
   const fetchErrorRequests = async () => {
     try {
-      const response = await axios.get("http://65.2.172.92:3000/request-errors");
+      const response = await axios.get("https://65.2.172.92:3000/request-errors");
       setErrorRequests(response.data);
     } catch (error) {
       console.error("Error fetching error requests:", error);
@@ -23,7 +23,7 @@ const ErrorRequests = () => {
 
   const fetchCertificates = async () => {
     try {
-      const response = await axios.get("http://65.2.172.92:3000/certificates");
+      const response = await axios.get("https://65.2.172.92:3000/certificates");
       setCertificates(response.data);
     } catch (error) {
       console.error("Error fetching certificates:", error);
@@ -44,7 +44,7 @@ const ErrorRequests = () => {
       return;
     }
     try {
-      const response = await axios.get(`http://65.2.172.92:3000/certificates/${certificateId}`);
+      const response = await axios.get(`https://65.2.172.92:3000/certificates/${certificateId}`);
       if (response.data && response.data.file_url) {
         window.open(response.data.file_url, "_blank");
       } else {
@@ -97,7 +97,7 @@ const ErrorRequests = () => {
     });
 
     try {
-      await axios.patch(`http://65.2.172.92:3000/request-errors/update-status/${requestId}`, {
+      await axios.patch(`https://65.2.172.92:3000/request-errors/update-status/${requestId}`, {
         request_status: newStatus,
         rejectionReason,
       });

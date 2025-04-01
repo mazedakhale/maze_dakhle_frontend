@@ -38,7 +38,7 @@ const VerifyDocuments = () => {
   const fetchDocuments = async (distributorId) => {
     try {
       const response = await axios.get(
-        `http://65.2.172.92:3000/documents/list/${distributorId}`
+        `https://65.2.172.92:3000/documents/list/${distributorId}`
       );
 
       const filteredDocuments = response.data.documents.filter(
@@ -125,19 +125,19 @@ const VerifyDocuments = () => {
 
     try {
       await axios.post(
-        "http://65.2.172.92:3000/certificates/upload",
+        "https://65.2.172.92:3000/certificates/upload",
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },
         }
       );
       axios
-        .get('http://65.2.172.92:3000/certificates')
+        .get('https://65.2.172.92:3000/certificates')
         .then((response) => setCertificates(response.data))
         .catch((error) => console.error("Error fetching certificates:", error));
 
       await axios.put(
-        `http://65.2.172.92:3000/documents/update-status/${documentId}`,
+        `https://65.2.172.92:3000/documents/update-status/${documentId}`,
         { status: "Uploaded" }
       );
 
@@ -175,7 +175,7 @@ const VerifyDocuments = () => {
       return;
     }
     try {
-      const response = await axios.get(`http://65.2.172.92:3000/certificates/${certificateId}`);
+      const response = await axios.get(`https://65.2.172.92:3000/certificates/${certificateId}`);
       if (response.data && response.data.file_url) {
         window.open(response.data.file_url, "_blank");
       } else {
