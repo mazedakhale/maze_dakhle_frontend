@@ -16,7 +16,7 @@ const Verifydocumentshistory = () => {
   // Fetch assigned documents from the new API
   useEffect(() => {
     axios
-      .get("https://mazedakhale.in/api/documents/list")
+      .get("http://65.2.172.92:3000/documents/list")
       .then((response) => {
         const sortedDocuments = response.data.documents.sort(
           (a, b) => new Date(b.uploaded_at) - new Date(a.uploaded_at)
@@ -28,19 +28,19 @@ const Verifydocumentshistory = () => {
 
     // Fetch distributors
     axios
-      .get(`https://mazedakhale.in/api/users/distributors`)
+      .get(`http://65.2.172.92:3000/users/distributors`)
       .then((response) => setDistributors(response.data))
       .catch((error) => console.error("Error fetching distributors:", error));
 
     // Fetch certificates
     axios
-      .get('https://mazedakhale.in/api/certificates')
+      .get('http://65.2.172.92:3000/certificates')
       .then((response) => setCertificates(response.data))
       .catch((error) => console.error("Error fetching certificates:", error));
 
     // Fetch users
     axios
-      .get('https://mazedakhale.in/api/users/register')
+      .get('http://65.2.172.92:3000/users/register')
       .then((response) => setUsers(response.data))
       .catch((error) => console.error("Error fetching users:", error));
   }, []);
@@ -76,7 +76,7 @@ const Verifydocumentshistory = () => {
   // Update document status
   const handleUpdateStatus = async (documentId, newStatus) => {
     try {
-      await axios.put(`https://mazedakhale.in/api/documents/update-status/${documentId}`, {
+      await axios.put(`http://65.2.172.92:3000/documents/update-status/${documentId}`, {
         status: newStatus,
       });
       setDocuments((prev) =>
@@ -136,7 +136,7 @@ const Verifydocumentshistory = () => {
       return;
     }
     try {
-      const response = await axios.get(`https://mazedakhale.in/api/certificates/${certificateId}`);
+      const response = await axios.get(`http://65.2.172.92:3000/certificates/${certificateId}`);
       if (response.data && response.data.file_url) {
         window.open(response.data.file_url, "_blank");
       } else {
@@ -154,7 +154,7 @@ const Verifydocumentshistory = () => {
 
       // Make the API call to download the file
       const response = await axios.get(
-        `https://mazedakhale.in/api/download-certificate/${documentId}`,
+        `http://65.2.172.92:3000/download-certificate/${documentId}`,
         {
           responseType: "blob", // Important to handle file downloads
         }
