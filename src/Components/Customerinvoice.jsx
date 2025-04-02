@@ -52,7 +52,7 @@ const InvoicePage = () => {
 
   useEffect(() => {
     axios
-      .get("https://65.2.172.92:3000/users/distributors")
+      .get("https://mazedakhale.in:3000/users/distributors")
       .then((response) => setDistributors(response.data))
       .catch((error) => console.error("Error fetching distributors:", error));
   }, []);
@@ -77,7 +77,7 @@ const InvoicePage = () => {
     }
 
     try {
-      await axios.put(`https://65.2.172.92:3000/documents/update-status/${documentId}`, {
+      await axios.put(`https://mazedakhale.in:3000/documents/update-status/${documentId}`, {
         status: newStatus,
         rejectionReason: newStatus === "Rejected" ? rejectionReason : undefined,
       });
@@ -115,7 +115,7 @@ const InvoicePage = () => {
       });
 
       // Make the API call to download the ZIP file with increased timeout
-      const response = await axios.get(`https://65.2.172.92:3000/download/${documentId}`, {
+      const response = await axios.get(`https://mazedakhale.in:3000/download/${documentId}`, {
         responseType: 'blob', // Handle binary data
         timeout: 60000, // Increase timeout to 60 seconds
         onDownloadProgress: (progressEvent) => {
@@ -245,7 +245,7 @@ const InvoicePage = () => {
   const handleAssignDistributor = async (distributorId) => {
     if (!distributorId) return;
     try {
-      await axios.put(`https://65.2.172.92:3000/documents/assign-distributor/${documentId}`, {
+      await axios.put(`https://mazedakhale.in:3000/documents/assign-distributor/${documentId}`, {
         distributor_id: distributorId,
       });
       setDocumentData((prev) => ({ ...prev, distributor_id: distributorId }));
@@ -280,7 +280,7 @@ const InvoicePage = () => {
   const fetchCertificates = async () => {
     try {
       console.log("Fetching certificates...");
-      const response = await axios.get("https://65.2.172.92:3000/certificates", {
+      const response = await axios.get("https://mazedakhale.in:3000/certificates", {
         timeout: 30000
       }); console.log("Certificates API Response:", response.data);
       setCertificates(response.data);
@@ -290,7 +290,7 @@ const InvoicePage = () => {
   }
   const fetchDocumentData = useCallback(async () => {
     try {
-      const response = await axios.get(`https://65.2.172.92:3000/singledocument/documentby/${documentId}`);
+      const response = await axios.get(`https://mazedakhale.in:3000/singledocument/documentby/${documentId}`);
       const data = response.data.document;
       setDocumentData(data);
 
@@ -298,7 +298,7 @@ const InvoicePage = () => {
       const subcategory = stateSubcategoryId || data.subcategory_id;
 
       if (category && subcategory) {
-        const fieldNamesResponse = await axios.get(`https://65.2.172.92:3000/field-names/${category}/${subcategory}`);
+        const fieldNamesResponse = await axios.get(`https://mazedakhale.in:3000/field-names/${category}/${subcategory}`);
         setDocumentNames(fieldNamesResponse.data);
       }
     } catch (error) {
@@ -354,7 +354,7 @@ const InvoicePage = () => {
           formData.append('documentType', documentType);
 
           const response = await axios.post(
-            `https://65.2.172.92:3000/documents/reupload/${documentId}`,
+            `https://mazedakhale.in:3000/documents/reupload/${documentId}`,
             formData,
             {
               headers: {

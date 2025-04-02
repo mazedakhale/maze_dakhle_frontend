@@ -10,7 +10,7 @@ const AddCategory = () => {
   const [updatedName, setUpdatedName] = useState("");
   const [isAdding, setIsAdding] = useState(false);
 
-  const apiUrl = "https://65.2.172.92:3000/categories";
+  const apiUrl = "https://mazedakhale.in:3000/categories";
 
   useEffect(() => {
     fetchCategories();

@@ -26,7 +26,7 @@ const CustomerHistory = () => {
   useEffect(() => {
     if (userId) {
       axios
-        .get(`https://65.2.172.92:3000/documents/list`)
+        .get(`https://mazedakhale.in:3000/documents/list`)
         .then((response) => {
           const allDocuments = response.data.documents;
           // Filter documents where status is "Completed"
@@ -38,7 +38,7 @@ const CustomerHistory = () => {
         .catch((error) => console.error("Error fetching documents:", error));
 
       axios
-        .get("https://65.2.172.92:3000/certificates")
+        .get("https://mazedakhale.in:3000/certificates")
         .then((response) => setCertificates(response.data))
         .catch((error) => console.error("Error fetching certificates:", error));
     }
@@ -80,7 +80,7 @@ const CustomerHistory = () => {
 
     try {
       const response = await axios.get(
-        `https://65.2.172.92:3000/certificates/${certificateId}`
+        `https://mazedakhale.in:3000/certificates/${certificateId}`
       );
 
       if (response.data && response.data.file_url) {
@@ -98,7 +98,7 @@ const CustomerHistory = () => {
   const handleDownloadCertificate = async (documentId, name) => {
     try {
       const response = await axios.get(
-        `https://65.2.172.92:3000/download-certificate/${documentId}`,
+        `https://mazedakhale.in:3000/download-certificate/${documentId}`,
         {
           responseType: "blob", // Important to handle file downloads
         }

@@ -25,7 +25,7 @@ const DistributorList = () => {
     });
     const navigate = useNavigate();
 
-    const apiUrl = "https://65.2.172.92:3000/users/distributors";
+    const apiUrl = "https://mazedakhale.in:3000/users/distributors";
 
     useEffect(() => {
         fetchDistributors();
@@ -130,7 +130,7 @@ const DistributorList = () => {
 
         try {
             // Send the registration request to the backend
-            const response = await axios.post("https://65.2.172.92:3000/users/register", formDataToSend, {
+            const response = await axios.post("https://mazedakhale.in:3000/users/register", formDataToSend, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                 },
@@ -170,7 +170,7 @@ const DistributorList = () => {
     const handleUpdateDistributor = async (id) => {
         try {
             if (updatedPassword) {
-                await axios.patch(`https://65.2.172.92:3000/users/password/${id}`,
+                await axios.patch(`https://mazedakhale.in:3000/users/password/${id}`,
                     { newPassword: updatedPassword },
                     { timeout: 30000 }
                 );
@@ -233,7 +233,7 @@ const DistributorList = () => {
             });
 
             try {
-                await axios.delete(`https://65.2.172.92:3000/users/delete/${id}`, { timeout: 30000 });
+                await axios.delete(`https://mazedakhale.in:3000/users/delete/${id}`, { timeout: 30000 });
 
                 Swal.fire({
                     title: "Deleted!",
@@ -262,7 +262,7 @@ const DistributorList = () => {
                 )
             );
 
-            await axios.patch(`https://65.2.172.92:3000/users/status/${id}`,
+            await axios.patch(`https://mazedakhale.in:3000/users/status/${id}`,
                 { status: newStatus },
                 { timeout: 30000 }
             );

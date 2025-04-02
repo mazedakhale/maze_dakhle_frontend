@@ -22,7 +22,7 @@ const CompletedApplicationsList = () => {
     const fetchCompletedDocuments = async () => {
       try {
         const response = await axios.get(
-          ` https://65.2.172.92:3000/userdashboard/completed/${userId}`
+          ` https://mazedakhale.in:3000/userdashboard/completed/${userId}`
         );
         const sortedDocs = response.data.sort(
           (a, b) => new Date(b.uploaded_at) - new Date(a.uploaded_at)
@@ -36,7 +36,7 @@ const CompletedApplicationsList = () => {
     const fetchCertificates = async () => {
       try {
         const response = await axios.get(
-          " https://65.2.172.92:3000/certificates"
+          " https://mazedakhale.in:3000/certificates"
         );
         setCertificates(response.data);
       } catch (error) {
@@ -74,7 +74,7 @@ const CompletedApplicationsList = () => {
 
     try {
       const response = await axios.get(
-        ` https://65.2.172.92:3000/certificates/${certificateId}`
+        ` https://mazedakhale.in:3000/certificates/${certificateId}`
       );
 
       if (response.data && response.data.file_url) {
