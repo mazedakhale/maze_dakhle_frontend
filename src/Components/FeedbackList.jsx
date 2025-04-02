@@ -26,7 +26,7 @@ const FeedbackList = () => {
 
     const fetchFeedback = async () => {
         try {
-            const response = await axios.get("https://mazedakhale.in:3000/feedback");
+            const response = await axios.get(" https://mazedakhale.in/api/feedback");
             setFeedbackList(response.data);
         } catch (error) {
             console.error("Error fetching feedback:", error);
@@ -64,7 +64,7 @@ const FeedbackList = () => {
 
             // 2. API call runs in background, not blocking UI
             axios
-                .delete(`https://mazedakhale.in:3000/feedback/${id}`)
+                .delete(` https://mazedakhale.in/api/feedback/${id}`)
                 .then(() => {
                     fetchFeedback(); // Refresh list after deletion
                 })

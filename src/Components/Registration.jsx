@@ -26,7 +26,7 @@ const Register = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await fetch("https://mazedakhale.in:3000/categories");
+        const response = await fetch(" https://mazedakhale.in/api/categories");
         if (!response.ok) {
           throw new Error("Failed to fetch categories");
         }
@@ -45,7 +45,7 @@ const Register = () => {
         const subcategoryData = {};
         for (const category of categories) {
           const response = await fetch(
-            `https://mazedakhale.in:3000/subcategories/category/${category.category_id}`
+            ` https://mazedakhale.in/api/subcategories/category/${category.category_id}`
           );
           if (response.ok) {
             const data = await response.json();
@@ -145,7 +145,7 @@ const Register = () => {
 
     try {
       // Send the registration request to the backend
-      const response = await fetch("https://mazedakhale.in:3000/users/register", {
+      const response = await fetch(" https://mazedakhale.in/api/users/register", {
         method: "POST",
         body: formDataToSend,
       });
