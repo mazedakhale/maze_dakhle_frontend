@@ -22,7 +22,7 @@ const PendingApplicationsList = () => {
         const fetchPendingDocuments = async () => {
             try {
                 const response = await axios.get(
-                    ` https://mazedakhale.in:3000/userdashboard/pending/${userId}`
+                    ` http://mazedakhale.in:3000/userdashboard/pending/${userId}`
                 );
                 setPendingDocuments(response.data);
             } catch (error) {

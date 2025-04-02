@@ -14,7 +14,7 @@ const ElistPage = () => {
 
     useEffect(() => {
         axios
-            .get("https://mazedakhale.in:3000/documents/list")
+            .get("http://mazedakhale.in:3000/documents/list")
             .then((response) => {
                 const sortedDocuments = response.data.documents.sort(
                     (a, b) => new Date(b.uploaded_at) - new Date(a.uploaded_at)
@@ -24,18 +24,18 @@ const ElistPage = () => {
             .catch((error) => console.error("Error fetching documents:", error));
 
         axios
-            .get("https://mazedakhale.in:3000/users/distributors")
+            .get("http://mazedakhale.in:3000/users/distributors")
             .then((response) => setDistributors(response.data))
 
             .catch((error) => console.error("Error fetching distributors:", error));
 
         axios
-            .get("https://mazedakhale.in:3000/certificates")
+            .get("http://mazedakhale.in:3000/certificates")
             .then((response) => setCertificates(response.data))
             .catch((error) => console.error("Error fetching certificates:", error));
 
         axios
-            .get("https://mazedakhale.in:3000/users/register")
+            .get("http://mazedakhale.in:3000/users/register")
             .then((response) => setUsers(response.data))
             .catch((error) => console.error("Error fetching users:", error));
     }, []);
@@ -115,7 +115,7 @@ const ElistPage = () => {
             return;
         }
         try {
-            const response = await axios.get(`https://mazedakhale.in:3000/certificates/${certificateId}`);
+            const response = await axios.get(`http://mazedakhale.in:3000/certificates/${certificateId}`);
             if (response.data && response.data.file_url) {
                 window.open(response.data.file_url, "_blank");
             } else {
@@ -130,7 +130,7 @@ const ElistPage = () => {
     const handleDownloadCertificate = async (documentId, name) => {
         try {
             const response = await axios.get(
-                `https://mazedakhale.in:3000/download-certificate/${documentId}`,
+                `http://mazedakhale.in:3000/download-certificate/${documentId}`,
                 {
                     responseType: "blob", // Important to handle file downloads
                 }

@@ -10,7 +10,7 @@ const PrivacyPolicyTable = () => {
     const [isEditing, setIsEditing] = useState(false);
     const [editingId, setEditingId] = useState(null);
 
-    const apiUrl = "https://mazedakhale.in:3000/privacy-policy";
+    const apiUrl = "http://mazedakhale.in:3000/privacy-policy";
 
     // Fetch all privacy policies from the API
     useEffect(() => {

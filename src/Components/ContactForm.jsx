@@ -7,8 +7,8 @@ const ContactForm = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [isSubmitted, setIsSubmitted] = useState(false); // State to track form submission
 
-    const fieldApiUrl = "https://mazedakhale.in:3000/field"; // API to fetch keys
-    const contactApiUrl = "https://mazedakhale.in:3000/contact"; // API to save key-value pairs
+    const fieldApiUrl = "http://mazedakhale.in:3000/field"; // API to fetch keys
+    const contactApiUrl = "http://mazedakhale.in:3000/contact"; // API to save key-value pairs
 
     // Fetch keys from the Field API
     useEffect(() => {

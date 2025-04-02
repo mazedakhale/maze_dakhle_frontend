@@ -38,7 +38,7 @@ const VerifyDocuments = () => {
   const fetchDocuments = async (distributorId) => {
     try {
       const response = await axios.get(
-        `https://mazedakhale.in:3000/documents/list/${distributorId}`
+        `http://mazedakhale.in:3000/documents/list/${distributorId}`
       );
 
       const filteredDocuments = response.data.documents.filter(
@@ -125,19 +125,19 @@ const VerifyDocuments = () => {
 
     try {
       await axios.post(
-        "https://mazedakhale.in:3000/certificates/upload",
+        "http://mazedakhale.in:3000/certificates/upload",
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },
         }
       );
       axios
-        .get('https://mazedakhale.in:3000/certificates')
+        .get('http://mazedakhale.in:3000/certificates')
         .then((response) => setCertificates(response.data))
         .catch((error) => console.error("Error fetching certificates:", error));
 
       await axios.put(
-        `https://mazedakhale.in:3000/documents/update-status/${documentId}`,
+        `http://mazedakhale.in:3000/documents/update-status/${documentId}`,
         { status: "Uploaded" }
       );
 
@@ -175,7 +175,7 @@ const VerifyDocuments = () => {
       return;
     }
     try {
-      const response = await axios.get(`https://mazedakhale.in:3000/certificates/${certificateId}`);
+      const response = await axios.get(`http://mazedakhale.in:3000/certificates/${certificateId}`);
       if (response.data && response.data.file_url) {
         window.open(response.data.file_url, "_blank");
       } else {

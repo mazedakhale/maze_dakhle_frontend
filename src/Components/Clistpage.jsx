@@ -35,7 +35,7 @@ const ClistPage = () => {
   // Fetch documents based on categoryId, subcategoryId, and userId
   useEffect(() => {
     if (categoryId && subcategoryId && userId) {
-      const DOCUMENTS_API_URL = `https://mazedakhale.in:3000/documents/doc/${categoryId}/${subcategoryId}/${userId}`;
+      const DOCUMENTS_API_URL = `http://mazedakhale.in:3000/documents/doc/${categoryId}/${subcategoryId}/${userId}`;
       console.log("API URL:", DOCUMENTS_API_URL); // Debugging
 
       const fetchDocuments = async () => {

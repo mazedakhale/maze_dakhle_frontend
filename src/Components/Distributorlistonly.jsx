@@ -11,7 +11,7 @@ const UserTable = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await axios.get("https://mazedakhale.in:3000/users/register");
+        const response = await axios.get("http://mazedakhale.in:3000/users/register");
         const distributors = response.data.filter((user) => user.role === "Distributor");
         setUsers(distributors);
         setFilteredUsers(distributors);

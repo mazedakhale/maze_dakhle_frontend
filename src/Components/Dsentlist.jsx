@@ -37,7 +37,7 @@ const Dsentlist = () => {
     const fetchDocuments = async (distributorId) => {
         try {
             const response = await axios.get(
-                `https://mazedakhale.in:3000/documents/list/${distributorId}`
+                `http://mazedakhale.in:3000/documents/list/${distributorId}`
             );
 
             // Filter documents with status "Sent" and sort by `uploaded_at` in descending order
@@ -55,7 +55,7 @@ const Dsentlist = () => {
     const fetchCertificates = async () => {
         try {
             console.log("Fetching certificates...");
-            const response = await axios.get("https://mazedakhale.in:3000/certificates"); // Adjust URL if needed
+            const response = await axios.get("http://mazedakhale.in:3000/certificates"); // Adjust URL if needed
             console.log("Certificates API Response:", response.data);
             setCertificates(response.data);
         } catch (error) {
@@ -81,7 +81,7 @@ const Dsentlist = () => {
 
         try {
             console.log(`Fetching certificate for Certificate ID: ${certificate.certificate_id}`);
-            const response = await axios.get(`https://mazedakhale.in:3000/certificates/${certificate.certificate_id}`);
+            const response = await axios.get(`http://mazedakhale.in:3000/certificates/${certificate.certificate_id}`);
             console.log("View Certificate API Response:", response.data);
 
             if (response.data && response.data.file_url) {
@@ -130,7 +130,7 @@ const Dsentlist = () => {
     const handleDownloadCertificate = async (documentId, name) => {
         try {
             const response = await axios.get(
-                `https://mazedakhale.in:3000/download-certificate/${documentId}`,
+                `http://mazedakhale.in:3000/download-certificate/${documentId}`,
                 {
                     responseType: "blob", // Important to handle file downloads
                 }
