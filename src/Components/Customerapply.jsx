@@ -30,7 +30,7 @@ const CustomerApply = () => {
   useEffect(() => {
     if (userId) {
       axios
-        .get(`http://mazedakhale.in:3000/documents/list`)
+        .get(`https://mazedakhale.in:3000/documents/list`)
         .then((response) => {
           const allDocuments = response.data.documents;
           const filteredDocs = allDocuments
@@ -42,7 +42,7 @@ const CustomerApply = () => {
 
       // Fetch certificates
       axios
-        .get("http://mazedakhale.in:3000/certificates")
+        .get("https://mazedakhale.in:3000/certificates")
         .then((response) => setCertificates(response.data))
         .catch((error) => console.error("Error fetching certificates:", error));
     }
@@ -73,7 +73,7 @@ const CustomerApply = () => {
           formData.append('documentType', documentType);
 
           const response = await axios.post(
-            `http://mazedakhale.in:3000/documents/reupload/${documentId}`,
+            `https://mazedakhale.in:3000/documents/reupload/${documentId}`,
             formData,
             {
               headers: {
@@ -135,7 +135,7 @@ const CustomerApply = () => {
     const newTab = window.open("", "_blank");
 
     try {
-      const response = await axios.get(`http://mazedakhale.in:3000/certificates/${certificate.certificate_id}`);
+      const response = await axios.get(`https://mazedakhale.in:3000/certificates/${certificate.certificate_id}`);
       if (response.data && response.data.file_url) {
         newTab.location.href = response.data.file_url;
       } else {

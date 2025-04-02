@@ -45,7 +45,7 @@ const SearchApplication = () => {
 
     try {
       const response = await axios.get(
-        ` http://mazedakhale.in:3000/userdashboard/fetch/${userId}/${applicationId}`
+        ` https://mazedakhale.in:3000/userdashboard/fetch/${userId}/${applicationId}`
       );
       setDocument(response.data);
     } catch (err) {
