@@ -66,6 +66,8 @@ const Sidebar = ({ onNavigate }) => {
 // Customer Dashboard Component
 const Customerdashboard = ({ children }) => {
   const [userEmail, setUserEmail] = useState("");
+  const [showEmail, setShowEmail] = useState(false); // State to toggle email visibility
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -97,13 +99,22 @@ const Customerdashboard = ({ children }) => {
           <span className="text-lg font-bold">Customer Dashboard</span>
 
           {/* Profile & Logout */}
-          <div className="flex items-center gap-4">
-            {/* Profile Image */}
+          <div className="flex items-center gap-4 relative">
+            {/* Profile Image - Click to Show/Hide Email */}
             <img
               src="https://t4.ftcdn.net/jpg/04/83/90/95/360_F_483909569_OI4LKNeFgHwvvVju60fejLd9gj43dIcd.jpg"
               alt="Profile"
-              className="h-10 w-10 rounded-full"
+              className="h-10 w-10 rounded-full cursor-pointer"
+              onClick={() => setShowEmail(!showEmail)}
             />
+
+            {/* Email Display Box */}
+            {showEmail && (
+              <div className="absolute right-14 top-12 bg-white p-2 rounded-lg shadow-lg border border-gray-300">
+                <p className="text-sm text-gray-700">{userEmail}</p>
+              </div>
+            )}
+
             {/* Logout Button */}
             <button
               onClick={handleLogout}

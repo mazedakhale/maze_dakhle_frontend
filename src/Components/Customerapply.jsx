@@ -252,6 +252,7 @@ const CustomerApply = () => {
                       ) : (
                         <p className="text-gray-500">No fields available</p>
                       )}
+
                     </td>
                     <td className="border p-2">
                       {new Date(doc.uploaded_at).toLocaleString('en-US', {

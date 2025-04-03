@@ -10,7 +10,7 @@ const Login = () => {
   const [subcategories, setSubcategories] = useState({});
   const navigate = useNavigate();
 
-  // Fetch categories
+ // Fetch categories
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -26,7 +26,6 @@ const Login = () => {
     };
     fetchCategories();
   }, []);
-
   // Fetch subcategories when categories are available
   useEffect(() => {
     const fetchSubcategories = async () => {
@@ -48,7 +47,6 @@ const Login = () => {
         console.error("Error fetching subcategories:", error);
       }
     };
-
     if (categories.length > 0) {
       fetchSubcategories();
     }
@@ -68,24 +66,17 @@ const Login = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
-
       const data = await response.json();
-
       if (!response.ok) {
         throw new Error(data.message || "Login failed");
       }
-
       // Store token in localStorage
       localStorage.setItem("token", data.token);
-
       // Decode JWT token to extract user role
       const decodedToken = jwtDecode(data.token);
       console.log("Decoded Token:", decodedToken);
-
       // Extract role from the decoded token
       const userRole = decodedToken.role; // Ensure this key matches your backend token structure
-
-      // Redirect based on the role
       Swal.fire({
         title: "Login Successful!",
         text: "Redirecting to your dashboard...",
@@ -113,7 +104,6 @@ const Login = () => {
       });
     }
   };
-
   return (
     <div className="relative flex justify-center items-center min-h-screen">
       {/* Background Image with Overlay */}
@@ -160,7 +150,6 @@ const Login = () => {
             </Link>
           </p>
         </div>
-
         {/* Right Column - Dynamic Category & Subcategory List */}
         <div className="w-3/5 p-8 bg-white shadow-lg border border-gray-200 overflow-y-auto max-h-[80vh] rounded-lg">
           <h2 className="text-2xl text-[#F58A3B] font-bold mb-4 text-center">

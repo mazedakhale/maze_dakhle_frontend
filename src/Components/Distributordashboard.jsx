@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaChartLine, FaUserShield, FaClockRotateLeft, FaUserCheck, FaFileSignature } from "react-icons/fa6";
-import { FaSignOutAlt } from "react-icons/fa";  // Add this line
+import { FaSignOutAlt } from "react-icons/fa";
 import jwtDecode from "jwt-decode";
 import logo from "../assets/logo.png";
 
@@ -12,8 +12,8 @@ const Sidebar = ({ onNavigate }) => {
   const [activePath, setActivePath] = useState("/");
 
   const handleNavigation = (path) => {
-    setActivePath(path); // Update state for active item
-    onNavigate(path); // Call parent navigation function
+    setActivePath(path);
+    onNavigate(path);
   };
 
   return (
@@ -33,16 +33,13 @@ const Sidebar = ({ onNavigate }) => {
             { icon: <FaClockRotateLeft />, label: "Verify History", path: "/Distributorverifyhistory" },
             { icon: <FaClockRotateLeft />, label: "Sent History", path: "/Dsentlist" },
             { icon: <FaClockRotateLeft />, label: "Rejected History", path: "/Distributorrejected" },
-
             { icon: <FaUserCheck />, label: "Distributor Request", path: "/Distributorrequest" },
             { icon: <FaFileSignature />, label: "Request History", path: "/Distributorhistory" },
           ].map((item, index) => (
             <li
               key={index}
               className={`flex items-center p-4 rounded-lg cursor-pointer transition duration-300 ease-in-out mb-4 
-                  shadow-lg border border-[#111] ${activePath === item.path
-                  ? "bg-orange-500 text-white"
-                  : "bg-[#494E53] hover:bg-orange-400"
+                shadow-lg border border-[#111] ${activePath === item.path ? "bg-orange-500 text-white" : "bg-[#494E53] hover:bg-orange-400"
                 }`}
               onClick={() => handleNavigation(item.path)}
             >
@@ -54,12 +51,12 @@ const Sidebar = ({ onNavigate }) => {
       </nav>
     </div>
   );
-
 };
 
 // Distributor Dashboard Component
 const Distributordashboard = ({ children }) => {
   const [userEmail, setUserEmail] = useState("");
+  const [showEmail, setShowEmail] = useState(false); // State to toggle email visibility
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -91,13 +88,23 @@ const Distributordashboard = ({ children }) => {
 
           {/* Dashboard Title */}
           <span className="text-lg font-bold">Distributor Dashboard</span>
-          <div className="flex items-center gap-4">
-            {/* Profile Image */}
+
+          <div className="flex items-center gap-4 relative">
+            {/* Profile Image - Click to Show/Hide Email */}
             <img
               src="https://t4.ftcdn.net/jpg/04/83/90/95/360_F_483909569_OI4LKNeFgHwvvVju60fejLd9gj43dIcd.jpg"
               alt="Profile"
-              className="h-10 w-10 rounded-full"
+              className="h-10 w-10 rounded-full cursor-pointer"
+              onClick={() => setShowEmail(!showEmail)}
             />
+
+            {/* Email Display Box */}
+            {showEmail && (
+              <div className="absolute right-14 top-12 bg-white p-2 rounded-lg shadow-lg border border-gray-300">
+                <p className="text-sm text-gray-700">{userEmail}</p>
+              </div>
+            )}
+
             {/* Logout Button */}
             <button
               onClick={handleLogout}
@@ -105,7 +112,6 @@ const Distributordashboard = ({ children }) => {
             >
               <FaSignOutAlt className="h-6 w-6 text-white" />
             </button>
-
           </div>
         </div>
 

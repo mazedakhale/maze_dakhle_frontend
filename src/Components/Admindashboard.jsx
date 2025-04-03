@@ -89,19 +89,19 @@ const Sidebar = ({ onNavigate }) => {
 const Admindashboard = ({ children }) => {
   const [userEmail, setUserEmail] = useState("");
   const navigate = useNavigate();
+  const [showEmail, setShowEmail] = useState(false); // Toggle email visibility
 
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
       try {
         const decodedToken = jwtDecode(token);
-        setUserEmail(decodedToken.email);
+        setUserEmail(decodedToken.email || "No email found");
       } catch (error) {
         console.error("Invalid token:", error);
       }
     }
   }, []);
-
   const handleLogout = () => {
     localStorage.removeItem("token");
     window.location.href = "/Login";
@@ -117,14 +117,28 @@ const Admindashboard = ({ children }) => {
         {/* Top Navbar */}
         <div className="flex items-center justify-between bg-white text-gray px-4 py-2 shadow-[0_3px_2px_rgba(0,0,0,0.15)] fixed top-0 left-[20%] w-[80%] z-10 h-[73px]">          <span className="text-lg font-bold">Admin Dashboard</span>
 
+          {/* Profile & Logout Section */}
+
           {/* Profile & Logout */}
-          <div className="flex items-center gap-4">
-            {/* Profile Image */}
-            <img
-              src="https://t4.ftcdn.net/jpg/04/83/90/95/360_F_483909569_OI4LKNeFgHwvvVju60fejLd9gj43dIcd.jpg"
-              alt="Profile"
-              className="h-10 w-10 rounded-full"
-            />
+          <div className="flex items-center gap-4 relative">
+            {/* Profile Image with Email Toggle */}
+            <div
+              className="relative cursor-pointer"
+              onClick={() => setShowEmail(!showEmail)}
+            >
+              <img
+                src="https://t4.ftcdn.net/jpg/04/83/90/95/360_F_483909569_OI4LKNeFgHwvvVju60fejLd9gj43dIcd.jpg"
+                alt="Profile"
+                className="h-10 w-10 rounded-full"
+              />
+              {/* Email Display Dropdown */}
+              {showEmail && (
+                <div className="absolute top-12 left-1/2 transform -translate-x-1/2 bg-white shadow-md text-black p-2 rounded-md w-48 text-center">
+                  {userEmail || "No Email Found"}
+                </div>
+              )}
+            </div>
+
             {/* Logout Button */}
             <button
               onClick={handleLogout}
