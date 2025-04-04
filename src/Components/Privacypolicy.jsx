@@ -10,7 +10,7 @@ const PrivacyPolicy = () => {
     useEffect(() => {
         const fetchPrivacyPolicy = async () => {
             try {
-                const response = await axios.get(" https://mazedakhale.in/api/privacy-policy");
+                const response = await axios.get("https://mazedakhale.in/api/privacy-policy");
                 console.log("API Response:", response.data); // Log the response
 
                 // Check if the response is an array and has at least one element

@@ -38,7 +38,7 @@ const VerifyDocuments = () => {
   const fetchDocuments = async (distributorId) => {
     try {
       const response = await axios.get(
-        ` https://mazedakhale.in/api/documents/list/${distributorId}`
+        `https://mazedakhale.in/api/documents/list/${distributorId}`
       );
 
       const filteredDocuments = response.data.documents.filter(
@@ -125,19 +125,19 @@ const VerifyDocuments = () => {
 
     try {
       await axios.post(
-        " https://mazedakhale.in/api/certificates/upload",
+        "https://mazedakhale.in/api/certificates/upload",
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },
         }
       );
       axios
-        .get(' https://mazedakhale.in/api/certificates')
+        .get('https://mazedakhale.in/api/certificates')
         .then((response) => setCertificates(response.data))
         .catch((error) => console.error("Error fetching certificates:", error));
 
       await axios.put(
-        ` https://mazedakhale.in/api/documents/update-status/${documentId}`,
+        `https://mazedakhale.in/api/documents/update-status/${documentId}`,
         { status: "Uploaded" }
       );
 
@@ -175,7 +175,7 @@ const VerifyDocuments = () => {
       return;
     }
     try {
-      const response = await axios.get(` https://mazedakhale.in/api/certificates/${certificateId}`);
+      const response = await axios.get(`https://mazedakhale.in/api/certificates/${certificateId}`);
       if (response.data && response.data.file_url) {
         window.open(response.data.file_url, "_blank");
       } else {

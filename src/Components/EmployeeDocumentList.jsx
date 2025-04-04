@@ -70,7 +70,7 @@ const EmployeeDocumentList = () => {
             if (userRole === "Admin" || userRole === "Employee") {
                 // Use the API endpoint
                 const response = await axios.get(
-                    ` https://mazedakhale.in/api/documents/category-docs/${categoryId}/${subcategoryId}/${userId}`
+                    `https://mazedakhale.in/api/documents/category-docs/${categoryId}/${subcategoryId}/${userId}`
                 );
 
                 if (response.data.error) {
@@ -191,7 +191,7 @@ const EmployeeDocumentList = () => {
     // Handle view certificate
     const handleViewCertificate = async (documentId) => {
         try {
-            const response = await axios.get(` https://mazedakhale.in/api/certificates/by-document/${documentId}`);
+            const response = await axios.get(`https://mazedakhale.in/api/certificates/by-document/${documentId}`);
             if (response.data && response.data.file_url) {
                 window.open(response.data.file_url, "_blank");
             } else {

@@ -7,6 +7,7 @@ import { FaUserCircle, FaDownload } from 'react-icons/fa';
 import Draggable from 'react-draggable';
 import { useRef } from 'react';
 import Swal from "sweetalert2";
+import { useNavigate } from 'react-router-dom';
 
 const DocumentViewer = ({ filePath, onClose }) => {
   return (
@@ -68,14 +69,14 @@ const InvoicePage = () => {
 
   useEffect(() => {
     axios
-      .get(' https://mazedakhale.in/api/users/distributors')
+      .get('https://mazedakhale.in/api/users/distributors')
       .then((response) => setDistributors(response.data))
       .catch((error) => console.error('Error fetching distributors:', error));
   }, []);
 
   const fetchDocumentData = useCallback(async () => {
     try {
-      const response = await axios.get(` https://mazedakhale.in/api/singledocument/documentby/${documentId}`);
+      const response = await axios.get(`https://mazedakhale.in/api/singledocument/documentby/${documentId}`);
       const data = response.data.document;
       setDocumentData(data);
 
@@ -83,7 +84,7 @@ const InvoicePage = () => {
       const subcategory = stateSubcategoryId || data.subcategory_id;
 
       if (category && subcategory) {
-        const fieldNamesResponse = await axios.get(` https://mazedakhale.in/api/field-names/${category}/${subcategory}`);
+        const fieldNamesResponse = await axios.get(`https://mazedakhale.in/api/field-names/${category}/${subcategory}`);
         setDocumentNames(fieldNamesResponse.data);
       }
     } catch (error) {
@@ -125,7 +126,7 @@ const InvoicePage = () => {
       console.log('Payload:', payload); // Debug: Log the payload
 
       const response = await axios.put(
-        ` https://mazedakhale.in/api/documents/update-status/${documentId}`,
+        `https://mazedakhale.in/api/documents/update-status/${documentId}`,
         payload,
         {
           timeout: 30000, // Increase timeout to 30 seconds
@@ -169,7 +170,7 @@ const InvoicePage = () => {
       });
 
       // Make the API call to download the ZIP file with increased timeout
-      const response = await axios.get(` https://mazedakhale.in/api/download/${documentId}`, {
+      const response = await axios.get(`https://mazedakhale.in/api/download/${documentId}`, {
         responseType: 'blob', // Handle binary data
         timeout: 60000, // Increase timeout to 60 seconds
         onDownloadProgress: (progressEvent) => {
@@ -295,13 +296,14 @@ const InvoicePage = () => {
       setIsLoading(false);
     }
   };
+  const navigate = useNavigate(); // ← Add this inside your component
+
   const handleAssignDistributor = async (distributorId) => {
     if (!distributorId) {
       alert('Please select a distributor.');
       return;
     }
 
-    // Check if all documents are selected
     const allDocumentsSelected = documentData.documents.every((_, index) => checkedDocs[index]);
     if (!allDocumentsSelected) {
       alert('Please view and select all attached documents before assigning a distributor.');
@@ -309,51 +311,45 @@ const InvoicePage = () => {
     }
 
     try {
-      // Show loading indicator
       setIsProcessing(true);
 
-      // Step 1: Assign the distributor
       const assignResponse = await axios.put(
-        ` https://mazedakhale.in/api/documents/assign-distributor/${documentId}`,
+        `https://mazedakhale.in/api/documents/assign-distributor/${documentId}`,
         {
           distributor_id: distributorId,
           remark: distributorRemark,
         }
       );
+      console.log('Assign Distributor Response:', assignResponse.data);
 
-      console.log('Assign Distributor Response:', assignResponse.data); // Log the response
-
-      // Step 2: Immediately update the status to "Approved"
       const statusResponse = await axios.put(
-        ` https://mazedakhale.in/api/documents/update-status/${documentId}`,
+        `https://mazedakhale.in/api/documents/update-status/${documentId}`,
         {
-          status: 'Approved', // Update status to "Approved"
+          status: 'Approved',
         }
       );
+      console.log('Update Status Response:', statusResponse.data);
 
-      console.log('Update Status Response:', statusResponse.data); // Log the response
-
-      // Update local state
       setDocumentData((prev) => ({
         ...prev,
         distributor_id: distributorId,
-        status: 'Approved', // Update status to "Approved"
+        status: 'Approved',
         remark: distributorRemark,
       }));
 
-      // Clear form fields
       setSelectedDistributor(null);
       setDistributorRemark('');
 
-      // Show a success message instead of redirecting
       alert('Distributor assigned successfully and status updated to Approved.');
+
+      // ✅ Redirect to VerifyDocuments page
+      navigate('/Verifydocuments'); // Change path if different
 
     } catch (error) {
       console.error('Error assigning distributor or updating status:', error);
-      console.error('Error details:', error.response?.data); // Log detailed error
+      console.error('Error details:', error.response?.data);
       alert('Failed to assign distributor or update status. Please check the console for details.');
     } finally {
-      // Hide loading indicator
       setIsProcessing(false);
     }
   };

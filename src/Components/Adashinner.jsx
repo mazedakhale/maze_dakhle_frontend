@@ -73,10 +73,10 @@ const Adashinner = () => {
       try {
         // Create an array of promises for all API calls
         const promises = [
-          fetch(" https://mazedakhale.in/api/statistics/counts").then(res => res.json()),
-          axios.get(" https://mazedakhale.in/api/categories"),
-          axios.get(" https://mazedakhale.in/api/subcategories"),
-          axios.get(" https://mazedakhale.in/api/statistics/cscounts")
+          fetch("https://mazedakhale.in/api/statistics/counts").then(res => res.json()),
+          axios.get("https://mazedakhale.in/api/categories"),
+          axios.get("https://mazedakhale.in/api/subcategories"),
+          axios.get("https://mazedakhale.in/api/statistics/cscounts")
 
         ];
 

@@ -10,11 +10,11 @@ const Login = () => {
   const [subcategories, setSubcategories] = useState({});
   const navigate = useNavigate();
 
- // Fetch categories
+  // Fetch categories
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await fetch(" https://mazedakhale.in/api/categories");
+        const response = await fetch("https://mazedakhale.in/api/categories");
         if (!response.ok) {
           throw new Error("Failed to fetch categories");
         }
@@ -33,7 +33,7 @@ const Login = () => {
         const subcategoryData = {};
         for (const category of categories) {
           const response = await fetch(
-            ` https://mazedakhale.in/api/subcategories/category/${category.category_id}`
+            `https://mazedakhale.in/api/subcategories/category/${category.category_id}`
           );
           if (response.ok) {
             const data = await response.json();
@@ -61,7 +61,7 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch(" https://mazedakhale.in/api/users/login", {
+      const response = await fetch("https://mazedakhale.in/api/users/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
