@@ -10,6 +10,7 @@ const Dsentlist = () => {
     const [certificates, setCertificates] = useState([]);
     const [distributorId, setDistributorId] = useState(null);
     const navigate = useNavigate();
+    const [isLoading, setIsLoading] = useState(false);
 
     // Decode token and extract user ID
     useEffect(() => {
@@ -149,6 +150,30 @@ const Dsentlist = () => {
             alert("Failed to download certificate.");
         }
     };
+    const renderCertificateCell = (doc) => {
+        const certificate = getCertificateByDocumentId(doc.document_id);
+
+        if (certificate) {
+            return (
+                <button
+                    onClick={() => handleViewCertificate(doc.document_id)}
+                    className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 transition"
+                >
+                    View Certificate
+                </button>
+            );
+        } else {
+            return <span className="text-gray-500">No Certificate</span>;
+        }
+    };
+
+    if (isLoading) {
+        return (
+            <div className="ml-[300px] flex items-center justify-center min-h-screen">
+                <div className="text-xl font-semibold">Loading documents...</div>
+            </div>
+        );
+    }
 
     return (
         <div className="ml-[300px] flex flex-col items-center min-h-screen p-6 bg-gray-100">
@@ -292,17 +317,7 @@ const Dsentlist = () => {
                                         )}
                                     </td>
                                     <td className="border px-4 py-2 text-center">
-                                        {["Uploaded", "Completed"].includes(doc.status) &&
-                                            getCertificateByDocumentId(doc.document_id) ? (
-                                            <button
-                                                onClick={() => handleViewCertificate(doc.document_id)}
-                                                className="bg-[#F58A3B] text-white px-3 py-1 rounded hover:bg-green-600 transition"
-                                            >
-                                                View Certificate
-                                            </button>
-                                        ) : (
-                                            <span className="text-gray-500">No Certificate</span>
-                                        )}
+                                        {renderCertificateCell(doc)}
                                     </td>
 
 
