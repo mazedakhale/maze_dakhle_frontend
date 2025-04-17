@@ -3,6 +3,20 @@ import axios from "axios";
 import { FaSearch, FaFileAlt } from "react-icons/fa";
 import { useLocation } from "react-router-dom";
 
+// Function to format date to dd-mm-yyyy hh:mm:ss AM/PM
+const formatDate = (dateStr) => {
+  const date = new Date(dateStr);
+  const formattedDate = `${String(date.getDate()).padStart(2, '0')}-${String(date.getMonth() + 1).padStart(2, '0')}-${date.getFullYear()}`;
+  const formattedTime = date.toLocaleTimeString('en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: true,
+  });
+
+  return `${formattedDate} ${formattedTime}`;
+};
+
 const SearchApplication = () => {
   const [userId, setUserId] = useState(null);
   const [applicationId, setApplicationId] = useState("");
@@ -96,6 +110,7 @@ const SearchApplication = () => {
             <div className="p-2 border-b"><strong>Email:</strong> {document.email}</div>
             <div className="p-2 border-b"><strong>Phone:</strong> {document.phone}</div>
             <div className="p-2 border-b"><strong>Address:</strong> {document.address}</div>
+
             <div className="p-2 border-b"><strong>Category:</strong> {document.category_name}</div>
             <div className="p-2 border-b"><strong>Subcategory:</strong> {document.subcategory_name}</div>
             <div className="p-2 border-b">
@@ -106,18 +121,11 @@ const SearchApplication = () => {
                 .slice(0, 1) // Take the first entry (latest status)
                 .map((statusEntry, index) => (
                   <div key={index} className="text-xs text-gray-600">
-                    {new Date(statusEntry.updated_at).toLocaleString("en-US", {
-                      year: "numeric",
-                      month: "2-digit",
-                      day: "2-digit",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                      second: "2-digit", // Added seconds
-                      hour12: true, // Use AM/PM
-                    })}
+                    {formatDate(statusEntry.updated_at)}
                   </div>
                 ))}
-            </div>            <div className="p-2 border-b"><strong>Uploaded At:</strong> {new Date(document.uploaded_at).toLocaleString()}</div>
+            </div>
+            <div className="p-2 border-b"><strong>Uploaded At:</strong> {formatDate(document.uploaded_at)}</div>
           </div>
 
           {/* Document Fields */}
@@ -129,7 +137,6 @@ const SearchApplication = () => {
               </p>
             ))}
           </div>
-
 
           {/* Uploaded Documents */}
           <h3 className="mt-4 text-lg font-bold">Uploaded Documents</h3>
@@ -147,9 +154,6 @@ const SearchApplication = () => {
       )}
     </div>
   );
-
 }
 
 export default SearchApplication;
-
-

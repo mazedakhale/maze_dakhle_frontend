@@ -66,7 +66,7 @@ const Apply = () => {
   useEffect(() => {
     if (formData.category_id && formData.subcategory_id) {
       axios
-        .get(`https://mazedakhale.in/api/required-documents/${formData.category_id}/${formData.subcategory_id}`)
+        .get(` https://mazedakhale.in/api/required-documents/${formData.category_id}/${formData.subcategory_id}`)
         .then((response) => {
           if (response.data.length > 0 && response.data[0].document_names) {
             const documentsArray = response.data[0].document_names.split(",").map((doc) => doc.trim());
@@ -85,7 +85,7 @@ const Apply = () => {
   useEffect(() => {
     if (formData.category_id && formData.subcategory_id) {
       axios
-        .get(`https://mazedakhale.in/api/field-names/${formData.category_id}/${formData.subcategory_id}`)
+        .get(` https://mazedakhale.in/api/field-names/${formData.category_id}/${formData.subcategory_id}`)
         .then((response) => {
           if (response.data.length > 0 && response.data[0].document_fields) {
             const fieldsArray = response.data[0].document_fields.split(",").map((field) => field.trim());
@@ -204,7 +204,7 @@ const Apply = () => {
 
     try {
       const response = await axios.post(
-        "https://mazedakhale.in/api/documents/upload",
+        " https://mazedakhale.in/api/documents/upload",
         formDataToSend,
         {
           headers: { "Content-Type": "multipart/form-data" },
@@ -235,26 +235,37 @@ const Apply = () => {
           onSubmit={handleSubmit}
         >
           <h2 className="text-3xl font-bold text-center text-orange-600 mb-3 shadow-md pb-2 rounded-lg">
-            Apply for Government Document
+            Apply for {formData.subcategory_name}
           </h2>
 
-          <div className="grid grid-cols-3 gap-5 mb-6">
+
+          <div className="grid grid-cols-3 gap-4 mb-4">
             <div>
-              <label className="block text-gray-700 font-semibold text-lg">
+              <label className="block text-gray-700 font-semibold text-base">
                 Category <span className="text-red-500">*</span>
               </label>
-              <input type="text" value={formData.category_name} readOnly className="w-full mt-2 p-3 border border-gray-300 rounded-lg bg-gray-100 shadow-md" />
+              <input
+                type="text"
+                value={formData.category_name}
+                readOnly
+                className="w-full mt-1 p-2 border border-gray-300 rounded-md bg-gray-100 shadow-sm text-sm"
+              />
             </div>
 
             <div>
-              <label className="block text-gray-700 font-semibold text-lg">
+              <label className="block text-gray-700 font-semibold text-base">
                 Subcategory <span className="text-red-500">*</span>
               </label>
-              <input type="text" value={formData.subcategory_name} readOnly className="w-full mt-2 p-3 border border-gray-300 rounded-lg bg-gray-100 shadow-md" />
+              <input
+                type="text"
+                value={formData.subcategory_name}
+                readOnly
+                className="w-full mt-1 p-2 border border-gray-300 rounded-md bg-gray-100 shadow-sm text-sm"
+              />
             </div>
 
             <div>
-              <label className="block text-gray-700 font-medium text-lg">
+              <label className="block text-gray-700 font-medium text-base">
                 VLE Name <span className="text-red-500">*</span>
               </label>
               <input
@@ -262,44 +273,48 @@ const Apply = () => {
                 name="name"
                 onChange={handleChange}
                 value={formData.name || ""}
-                className={`w-full mt-2 p-3 border ${errors.name ? 'border-red-500' : 'border-gray-300'} rounded-lg bg-white shadow-md`}
+                readOnly
+                className={`w-full mt-1 p-2 border ${errors.name ? 'border-red-500' : 'border-gray-300'} rounded-md bg-gray-100 shadow-sm cursor-not-allowed text-sm`}
                 placeholder="Enter Full Name"
               />
-              {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
+              {errors.name && <p className="text-red-500 text-xs">{errors.name}</p>}
             </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-6 mb-6">
+          <div className="grid grid-cols-3 gap-4 mb-4">
             <div>
-              <label className="block text-gray-700 font-medium text-lg">
-                VLE Email  <span className="text-red-500">*</span>
+              <label className="block text-gray-700 font-medium text-base">
+                VLE Email <span className="text-red-500">*</span>
               </label>
               <input
                 type="email"
                 name="email"
                 onChange={handleChange}
                 value={formData.email || ""}
-                className={`w-full mt-2 p-3 border ${errors.email ? 'border-red-500' : 'border-gray-300'} rounded-lg bg-white shadow-md`}
+                readOnly
+                className={`w-full mt-1 p-2 border ${errors.email ? 'border-red-500' : 'border-gray-300'} rounded-md bg-gray-100 shadow-sm cursor-not-allowed text-sm`}
                 placeholder="Enter Email"
               />
-              {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
+              {errors.email && <p className="text-red-500 text-xs">{errors.email}</p>}
             </div>
 
             <div>
-              <label className="block text-gray-700 font-medium text-lg">
-                VLE Phone  <span className="text-red-500">*</span>
+              <label className="block text-gray-700 font-medium text-base">
+                VLE Phone <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
                 name="phone"
                 onChange={handleChange}
                 value={formData.phone || ""}
-                className={`w-full mt-2 p-3 border ${errors.phone ? 'border-red-500' : 'border-gray-300'} rounded-lg bg-white shadow-md`}
+                readOnly
+                className={`w-full mt-1 p-2 border ${errors.phone ? 'border-red-500' : 'border-gray-300'} rounded-md bg-gray-100 shadow-sm cursor-not-allowed text-sm`}
                 placeholder="Enter Phone Number"
               />
-              {errors.phone && <p className="text-red-500 text-sm">{errors.phone}</p>}
+              {errors.phone && <p className="text-red-500 text-xs">{errors.phone}</p>}
             </div>
           </div>
+
 
           <div className="mb-6">
             <label className="block text-orange-700 font-bold text-lg text-center">

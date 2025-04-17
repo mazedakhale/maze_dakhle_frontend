@@ -30,11 +30,11 @@ const CustomerApply = () => {
   useEffect(() => {
     if (userId) {
       axios
-        .get(`https://mazedakhale.in/api/documents/list`)
+        .get(` https://mazedakhale.in/api/documents/list`)
         .then((response) => {
           const allDocuments = response.data.documents;
           const filteredDocs = allDocuments
-            .filter((doc) => doc.user_id === userId && (doc.status === "Received" || doc.status !== "Completed"))
+            .filter((doc) => doc.user_id === userId && (doc.status === "Received" || doc.status !== "Pending" || doc.status !== "Approved" || doc.status !== "Rejected"))
             .reverse();
           setDocuments(filteredDocs);
         })
@@ -42,7 +42,7 @@ const CustomerApply = () => {
 
       // Fetch certificates
       axios
-        .get("https://mazedakhale.in/api/certificates")
+        .get(" https://mazedakhale.in/api/certificates")
         .then((response) => setCertificates(response.data))
         .catch((error) => console.error("Error fetching certificates:", error));
     }
@@ -73,7 +73,7 @@ const CustomerApply = () => {
           formData.append('documentType', documentType);
 
           const response = await axios.post(
-            `https://mazedakhale.in/api/documents/reupload/${documentId}`,
+            ` https://mazedakhale.in/api/documents/reupload/${documentId}`,
             formData,
             {
               headers: {
@@ -135,7 +135,7 @@ const CustomerApply = () => {
     const newTab = window.open("", "_blank");
 
     try {
-      const response = await axios.get(`https://mazedakhale.in/api/certificates/${certificate.certificate_id}`);
+      const response = await axios.get(` https://mazedakhale.in/api/certificates/${certificate.certificate_id}`);
       if (response.data && response.data.file_url) {
         newTab.location.href = response.data.file_url;
       } else {
@@ -160,6 +160,20 @@ const CustomerApply = () => {
 
   const handleViewInvoice = (documentId, categoryId, subcategoryId) => {
     navigate(`/Customerinvoice/${documentId}`, { state: { categoryId, subcategoryId } });
+  };
+
+  const formatDateTime = (dateString) => {
+    const date = new Date(dateString);
+
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+    const year = date.getFullYear();
+
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+
+    return `${day}-${month}-${year} ${hours}:${minutes}:${seconds}`;
   };
 
   return (
@@ -254,16 +268,23 @@ const CustomerApply = () => {
                       )}
 
                     </td>
-                    <td className="border p-2">
-                      {new Date(doc.uploaded_at).toLocaleString('en-US', {
-                        year: 'numeric',
-                        month: '2-digit',
-                        day: '2-digit',
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        second: '2-digit',
-                        hour12: true,
-                      })}
+                    <td className="border p-2 text-center">
+                      {(() => {
+                        const date = new Date(doc.uploaded_at);
+                        const formattedDate = `${String(date.getDate()).padStart(2, '0')}-${String(date.getMonth() + 1).padStart(2, '0')}-${date.getFullYear()}`;
+                        const formattedTime = date.toLocaleTimeString('en-US', {
+                          hour: '2-digit',
+                          minute: '2-digit',
+                          second: '2-digit',
+                          hour12: true,
+                        });
+                        return (
+                          <>
+                            <div>{formattedDate}</div>
+                            <div className="text-sm text-gray-600">{formattedTime}</div>
+                          </>
+                        );
+                      })()}
                     </td>
                     <td className="px-4 py-3 border border-[#776D6DA8] text-center">{doc.category_name}</td>
                     <td className="px-4 py-3 border border-[#776D6DA8] text-center">{doc.subcategory_name}</td>
@@ -308,24 +329,30 @@ const CustomerApply = () => {
                         >
                           {doc.status}
                         </span>
+
                         {doc.status_history
                           ?.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at))
                           .slice(0, 1)
-                          .map((statusEntry, index) => (
-                            <div key={index} className="text-xs text-gray-600">
-                              {new Date(statusEntry.updated_at).toLocaleString("en-US", {
-                                year: "numeric",
-                                month: "2-digit",
-                                day: "2-digit",
-                                hour: "2-digit",
-                                minute: "2-digit",
-                                second: "2-digit",
-                                hour12: true,
-                              })}
-                            </div>
-                          ))}
+                          .map((statusEntry, index) => {
+                            const date = new Date(statusEntry.updated_at);
+                            const formattedDate = `${String(date.getDate()).padStart(2, '0')}-${String(date.getMonth() + 1).padStart(2, '0')}-${date.getFullYear()}`;
+                            const formattedTime = date.toLocaleTimeString('en-US', {
+                              hour: '2-digit',
+                              minute: '2-digit',
+                              second: '2-digit',
+                              hour12: true,
+                            });
+
+                            return (
+                              <div key={index} className="text-xs text-gray-600">
+                                <div>{formattedDate}</div>
+                                <div className="text-sm text-gray-600">{formattedTime}</div>
+                              </div>
+                            );
+                          })}
                       </div>
                     </td>
+
 
                     <td className="border p-3 text-center">
                       {doc.receipt_url ? (

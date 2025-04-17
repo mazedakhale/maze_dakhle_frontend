@@ -26,19 +26,19 @@ const CustomerHistory = () => {
   useEffect(() => {
     if (userId) {
       axios
-        .get(`https://mazedakhale.in/api/documents/list`)
+        .get(` https://mazedakhale.in/api/documents/list`)
         .then((response) => {
           const allDocuments = response.data.documents;
           // Filter documents where status is "Completed"
           const filteredDocs = allDocuments
-            .filter((doc) => doc.user_id === userId && doc.status === "Completed" || "Received")
+            .filter((doc) => doc.user_id === userId && doc.status === "Completed")
             .reverse(); // Show newest first
           setDocuments(filteredDocs);
         })
         .catch((error) => console.error("Error fetching documents:", error));
 
       axios
-        .get("https://mazedakhale.in/api/certificates")
+        .get(" https://mazedakhale.in/api/certificates")
         .then((response) => setCertificates(response.data))
         .catch((error) => console.error("Error fetching certificates:", error));
     }
@@ -80,7 +80,7 @@ const CustomerHistory = () => {
 
     try {
       const response = await axios.get(
-        `https://mazedakhale.in/api/certificates/${certificateId}`
+        ` https://mazedakhale.in/api/certificates/${certificateId}`
       );
 
       if (response.data && response.data.file_url) {
@@ -98,7 +98,7 @@ const CustomerHistory = () => {
   const handleDownloadCertificate = async (documentId, name) => {
     try {
       const response = await axios.get(
-        `https://mazedakhale.in/api/download-certificate/${documentId}`,
+        ` https://mazedakhale.in/api/download-certificate/${documentId}`,
         {
           responseType: "blob", // Important to handle file downloads
         }
@@ -200,16 +200,25 @@ const CustomerHistory = () => {
                       {doc.application_id}
                     </td>
                     <td className="px-4 py-4 border border-[#776D6DA8] text-center">
-                      {new Date(doc.uploaded_at).toLocaleString("en-US", {
-                        year: "numeric",
-                        month: "2-digit",
-                        day: "2-digit",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                        second: "2-digit", // Added seconds
-                        hour12: true, // Use AM/PM
-                      })}
+                      {(() => {
+                        const date = new Date(doc.uploaded_at);
+                        const formattedDate = `${String(date.getDate()).padStart(2, '0')}-${String(date.getMonth() + 1).padStart(2, '0')}-${date.getFullYear()}`;
+                        const formattedTime = date.toLocaleTimeString('en-US', {
+                          hour: '2-digit',
+                          minute: '2-digit',
+                          second: '2-digit',
+                          hour12: true,
+                        });
+
+                        return (
+                          <>
+                            <div>{formattedDate}</div>
+                            <div className="text-sm text-gray-600">{formattedTime}</div>
+                          </>
+                        );
+                      })()}
                     </td>
+
                     <td className="px-4 py-4 border border-[#776D6DA8] text-center">
                       {doc.category_name}
                     </td>
@@ -262,8 +271,8 @@ const CustomerHistory = () => {
                             : doc.status === "Rejected"
                               ? "bg-red-500"
                               : doc.status === "Pending"
-                                ? "bg-yellow-500" // Color for Pending
-                                : "bg-blue-500" // Default color
+                                ? "bg-yellow-500"
+                                : "bg-blue-500"
                             }`}
                         >
                           {doc.status}
@@ -273,21 +282,26 @@ const CustomerHistory = () => {
                         {doc.status_history
                           ?.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at)) // Sort by latest date
                           .slice(0, 1) // Take the first entry (latest status)
-                          .map((statusEntry, index) => (
-                            <div key={index} className="text-xs text-gray-600">
-                              {new Date(statusEntry.updated_at).toLocaleString("en-US", {
-                                year: "numeric",
-                                month: "2-digit",
-                                day: "2-digit",
-                                hour: "2-digit",
-                                minute: "2-digit",
-                                second: "2-digit", // Added seconds
-                                hour12: true, // Use AM/PM
-                              })}
-                            </div>
-                          ))}
+                          .map((statusEntry, index) => {
+                            const date = new Date(statusEntry.updated_at);
+                            const formattedDate = `${String(date.getDate()).padStart(2, '0')}-${String(date.getMonth() + 1).padStart(2, '0')}-${date.getFullYear()}`;
+                            const formattedTime = date.toLocaleTimeString('en-US', {
+                              hour: '2-digit',
+                              minute: '2-digit',
+                              second: '2-digit',
+                              hour12: true,
+                            });
+
+                            return (
+                              <div key={index} className="text-xs text-gray-600">
+                                <div>{formattedDate}</div>
+                                <div className="text-sm text-gray-600">{formattedTime}</div>
+                              </div>
+                            );
+                          })}
                       </div>
                     </td>
+
 
                     {/* Download Receipt */}
                     <td className="px-4 py-4 border border-[#776D6DA8] text-center">

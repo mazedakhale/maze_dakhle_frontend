@@ -9,7 +9,7 @@ const CustomerList = () => {
     const [editingId, setEditingId] = useState(null);
     const [updatedPassword, setUpdatedPassword] = useState(""); // State for password editing
 
-    const apiUrl = "https://mazedakhale.in/api/users/customers";
+    const apiUrl = " https://mazedakhale.in/api/users/customers";
 
     useEffect(() => {
         fetchCustomers();
@@ -32,7 +32,7 @@ const CustomerList = () => {
     const handleUpdateCustomer = async (id) => {
         try {
             if (updatedPassword) {
-                await axios.patch(`https://mazedakhale.in/api/users/password/${id}`, { newPassword: updatedPassword });
+                await axios.patch(` https://mazedakhale.in/api/users/password/${id}`, { newPassword: updatedPassword });
             }
 
             setCustomers(
@@ -91,7 +91,7 @@ const CustomerList = () => {
             });
 
             try {
-                await axios.delete(`https://mazedakhale.in/api/users/delete/${id}`);
+                await axios.delete(` https://mazedakhale.in/api/users/delete/${id}`);
                 setCustomers((prevCustomers) =>
                     prevCustomers.filter((customer) => customer.user_id !== id)
                 );
@@ -111,7 +111,7 @@ const CustomerList = () => {
                 )
             );
 
-            await axios.patch(`https://mazedakhale.in/api/users/status/${id}`, { status: newStatus });
+            await axios.patch(` https://mazedakhale.in/api/users/status/${id}`, { status: newStatus });
 
             Swal.fire({
                 title: "Updated!",
@@ -140,7 +140,7 @@ const CustomerList = () => {
                     <table className="w-full border border-[#776D6DA8] text-sm bg-white shadow-md rounded-md">
                         <thead className="bg-[#F58A3B14] border-b-2 border-[#776D6DA8]">
                             <tr>
-                                {["ID", "Name", "Email", "Password", "Status", "Update", "Actions"].map((header, index) => (
+                                {["ID", "Name", "Email", "Password", "District", "Taluka", "Documents", "Status", "Update", "Actions"].map((header, index) => (
                                     <th key={index} className="px-4 py-3 border border-[#776D6DA8] text-black font-semibold text-center">
                                         {header}
                                     </th>
@@ -169,6 +169,28 @@ const CustomerList = () => {
                                                 customer.password
                                             )}
                                         </td>
+                                        <td className="px-4 py-3 border border-[#776D6DA8] text-center">{customer.district}</td>
+
+                                        <td className="px-4 py-3 border border-[#776D6DA8] text-center">{customer.taluka}</td>
+                                        {Array.isArray(customer.user_documents) && customer.user_documents.length > 0 ? (
+                                            customer.user_documents.map((doc, index) => (
+                                                <div key={index}>
+                                                    <a
+                                                        href={doc.file_path}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="text-blue-500 hover:underline"
+                                                    >
+                                                        {doc.document_type}
+                                                    </a>
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <span className="text-gray-400 italic">No documents</span>
+                                        )}
+
+
+
                                         <td className="px-4 py-3 border border-[#776D6DA8] text-center">{customer.user_login_status}</td>
                                         <td className="px-4 py-3 border border-[#776D6DA8] text-center">
                                             <button
