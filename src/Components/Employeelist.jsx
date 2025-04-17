@@ -18,7 +18,7 @@ const EmployeeList = () => {
         password: "",
         phone: "",
         address: "",
-        role: "employee", // Hardcode role as "employee"
+        role: "Employee", // Hardcode role as "employee"
     });
     const navigate = useNavigate();
 

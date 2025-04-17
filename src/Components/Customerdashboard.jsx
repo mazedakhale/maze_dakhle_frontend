@@ -38,7 +38,7 @@ const Sidebar = ({ onNavigate }) => {
             { icon: <FaTachometerAlt />, label: "Dashboard", path: "/Cdashinner" },
             { icon: <FaClipboardList />, label: "Check Application", path: "/Checkapplication" },
             { icon: <FaFileAlt />, label: "Fill Form", path: "/Category" },
-            { icon: <FaClipboardList />, label: "History", path: "/Customerhistory" },
+            { icon: <FaClipboardList />, label: " Applications History", path: "/Customerhistory" },
             { icon: <FaClipboardList />, label: "Request History", path: "/Customererrorhistory" },
             { icon: <FaClipboardList />, label: "Applications", path: "/Customerapply" },
             { icon: <FaCommentDots />, label: "Feedback", path: "/Feedback" },
