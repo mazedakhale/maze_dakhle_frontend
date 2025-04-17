@@ -25,7 +25,7 @@ const DistributorList = () => {
     });
     const navigate = useNavigate();
 
-    const apiUrl = "https://mazedakhale.in/api/users/distributors";
+    const apiUrl = " http://localhost:3000/users/distributors";
 
     useEffect(() => {
         fetchDistributors();
@@ -118,7 +118,7 @@ const DistributorList = () => {
         formDataToSend.append("password", formData.password);
         formDataToSend.append("phone", formData.phone);
         formDataToSend.append("address", formData.address);
-        formDataToSend.append("shopAddress", formData.shopAddress || ""); // Optional field
+        formDataToSend.append("shop_address", formData.shopAddress || ""); // Optional field
         formDataToSend.append("role", "Distributor"); // Hardcode role as "Distributor"
         formDataToSend.append("user_login_status", "Active"); // Set login status as "Active"
 
@@ -130,7 +130,7 @@ const DistributorList = () => {
 
         try {
             // Send the registration request to the backend
-            const response = await axios.post("https://mazedakhale.in/api/users/register", formDataToSend, {
+            const response = await axios.post(" http://localhost:3000/users/register", formDataToSend, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                 },
@@ -170,7 +170,7 @@ const DistributorList = () => {
     const handleUpdateDistributor = async (id) => {
         try {
             if (updatedPassword) {
-                await axios.patch(`https://mazedakhale.in/api/users/password/${id}`,
+                await axios.patch(` http://localhost:3000/users/password/${id}`,
                     { newPassword: updatedPassword },
                     { timeout: 30000 }
                 );
@@ -233,7 +233,7 @@ const DistributorList = () => {
             });
 
             try {
-                await axios.delete(`https://mazedakhale.in/api/users/delete/${id}`, { timeout: 30000 });
+                await axios.delete(` http://localhost:3000/users/delete/${id}`, { timeout: 30000 });
 
                 Swal.fire({
                     title: "Deleted!",
@@ -262,7 +262,7 @@ const DistributorList = () => {
                 )
             );
 
-            await axios.patch(`https://mazedakhale.in/api/users/status/${id}`,
+            await axios.patch(` http://localhost:3000/users/status/${id}`,
                 { status: newStatus },
                 { timeout: 30000 }
             );
@@ -308,7 +308,7 @@ const DistributorList = () => {
                     <table className="w-full border border-[#776D6DA8] text-sm bg-white shadow-md rounded-md">
                         <thead className="bg-[#F58A3B14] border-b-2 border-[#776D6DA8]">
                             <tr>
-                                {["ID", "Name", "Email", "Password", "Status", "Update", "Actions"].map((header, index) => (
+                                {["ID", "Name", "Email", "Password", "Address", "ShopAddress", "Documents", "Status", "Update", "Actions"].map((header, index) => (
                                     <th key={index} className="px-4 py-3 border border-[#776D6DA8] text-black font-semibold text-center">
                                         {header}
                                     </th>
@@ -335,6 +335,29 @@ const DistributorList = () => {
                                                 />
                                             ) : (
                                                 distributor.password
+                                            )}
+                                        </td>
+                                        <td className="px-4 py-3 border border-[#776D6DA8] text-center">{distributor.address}</td>
+
+                                        <td className="px-4 py-3 border border-[#776D6DA8] text-center">{distributor.shop_address}</td>
+
+
+                                        <td className="px-4 py-3 border border-[#776D6DA8] text-center">
+                                            {Array.isArray(distributor.user_documents) ? (
+                                                distributor.user_documents.map((doc, index) => (
+                                                    <div key={index}>
+                                                        <a
+                                                            href={doc.file_path}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="text-blue-500 hover:underline"
+                                                        >
+                                                            {doc.document_type}
+                                                        </a>
+                                                    </div>
+                                                ))
+                                            ) : (
+                                                <span className="text-gray-400 italic">No documents</span>
                                             )}
                                         </td>
                                         <td className="px-4 py-3 border border-[#776D6DA8] text-center">{distributor.user_login_status}</td>
