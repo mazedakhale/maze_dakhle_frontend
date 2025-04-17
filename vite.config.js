@@ -4,17 +4,17 @@ import react from '@vitejs/plugin-react';
 export default defineConfig({
   plugins: [react()],
   server: {
-    host: true,        // Allows external access (0.0.0.0 automatically handled)
-    port: 5173,        // Ensures Vite runs on port 5173
-    strictPort: true,  // Prevents Vite from changing the port if 5173 is busy
-    open: false,       // Disable auto-opening (prevents `xdg-open ENOENT` error)
+    host: true,
+    port: 5173,
+    strictPort: true,
+    open: false,
     watch: {
-      usePolling: true, // Required for AWS Lightsail to detect file changes
+      usePolling: true,
     },
-    allowedHosts: ['mazedakhale.in'],  // Allow requests from this domain
+    allowedHosts: ['mazedakhale.in'],
     proxy: {
       '/api': {
-        target: 'http//localhost:3000', // Proxy API requests to backend
+        target: 'http://localhost:3000', // ✅ fixed
         changeOrigin: true,
         secure: false,
       },
