@@ -14,10 +14,13 @@ export default defineConfig({
     allowedHosts: ['mazedakhale.in'],
     proxy: {
       '/api': {
-        target: 'http://localhost:3000', // ✅ fixed
+        target: 'http://localhost:3000',
         changeOrigin: true,
         secure: false,
       },
+    },
+    hmr: {
+      overlay: false, // ✅ This disables the error overlay
     },
   },
 });
