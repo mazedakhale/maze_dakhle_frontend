@@ -11,7 +11,7 @@ const VerifyDocuments = () => {
   const [filePreviews, setFilePreviews] = useState({});
   const [distributorId, setDistributorId] = useState(null);
   const [certificates, setCertificates] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+  // const [isLoading, setIsLoading] = useState(true);
   const [showPreview, setShowPreview] = useState(false);
   const [previewFile, setPreviewFile] = useState(null);
 
@@ -19,63 +19,66 @@ const VerifyDocuments = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      setIsLoading(true);
       const token = localStorage.getItem("token");
-      if (token) {
-        try {
-          const decodedToken = jwtDecode(token);
-          const userId = decodedToken.user_id || decodedToken.id || decodedToken.user;
-          if (userId) {
-            setDistributorId(userId);
-            // Parallel fetching
-            await Promise.all([
-              fetchDocuments(userId),
-              fetchCertificates()
-            ]);
-          }
-        } catch (error) {
-          console.error("Error:", error);
-          Swal.fire("Error", "Failed to load data", "error");
-        } finally {
+      if (!token) {
+        setIsLoading(false);
+        Swal.fire("Error", "Authentication token missing", "error");
+        return;
+      }
+
+      try {
+        const decodedToken = jwtDecode(token);
+        const userId = decodedToken.user_id || decodedToken.id || decodedToken.user;
+
+        if (!userId) {
           setIsLoading(false);
+          Swal.fire("Error", "User ID not found in token", "error");
+          return;
         }
+
+        setDistributorId(userId);
+
+        // Show loading indicator
+        // Swal.fire({
+        //   title: "Loading...",
+        //   allowOutsideClick: false,
+        //   didOpen: () => Swal.showLoading(),
+        // });
+
+        // Fetch data in parallel
+        const [docsResponse, certsResponse] = await Promise.all([
+          axios.get(`https://mazedakhale.in/api/documents/list/${userId}`, {
+            timeout: 10000
+          }),
+          axios.get("https://mazedakhale.in/api/certificates", {
+            timeout: 10000
+          })
+        ]);
+
+        // Process documents
+        const filteredDocuments = docsResponse.data.documents
+          .filter(doc => doc.status !== "Uploaded" && doc.status !== "Completed")
+          .sort((a, b) => new Date(b.uploaded_at) - new Date(a.uploaded_at));
+
+        setDocuments(filteredDocuments);
+        setCertificates(certsResponse.data || []);
+
+        Swal.close();
+      } catch (error) {
+        console.error("Error:", error);
+        let errorMessage = "Failed to load data";
+        if (error.response) {
+          errorMessage = error.response.data.message || errorMessage;
+        } else if (error.request) {
+          errorMessage = "No response from server";
+        }
+        Swal.fire("Error", errorMessage, "error");
+      } finally {
       }
     };
 
     fetchData();
   }, []);
-
-
-  const fetchDocuments = async (distributorId) => {
-    try {
-      const response = await axios.get(
-        `https://mazedakhale.in/api/documents/list/${distributorId}`
-      );
-
-      const filteredDocuments = response.data.documents.filter(
-        (doc) => doc.status !== "Uploaded" && doc.status !== "Completed"
-      );
-
-      const sortedDocuments = filteredDocuments.sort((a, b) => {
-        return new Date(b.uploaded_at) - new Date(a.uploaded_at);
-      });
-
-      setDocuments(sortedDocuments);
-    } catch (error) {
-      console.error("Error fetching documents:", error);
-      throw error;
-    }
-  };
-
-  const fetchCertificates = async () => {
-    try {
-      const response = await axios.get("https://mazedakhale.in/api/certificates");
-      setCertificates(response.data || []);
-    } catch (error) {
-      console.error("Error fetching certificates:", error);
-      setCertificates([]);
-    }
-  };
 
   const handleViewInvoice = (documentId) => {
     navigate(`/Distributorinvoice/${documentId}`);
@@ -139,11 +142,7 @@ const VerifyDocuments = () => {
     const finalUserId = user_id || distributorId;
 
     if (!finalUserId || !distributorId || !application_id || !name) {
-      Swal.fire(
-        "Error",
-        "Required document information is missing",
-        "error"
-      );
+      Swal.fire("Error", "Required document information is missing", "error");
       return;
     }
 
@@ -182,8 +181,17 @@ const VerifyDocuments = () => {
       );
 
       // Refresh data
-      await fetchCertificates();
-      await fetchDocuments(distributorId);
+      const [docsResponse, certsResponse] = await Promise.all([
+        axios.get(`https://mazedakhale.in/api/documents/list/${distributorId}`),
+        axios.get("https://mazedakhale.in/api/certificates")
+      ]);
+
+      const filteredDocuments = docsResponse.data.documents
+        .filter(doc => doc.status !== "Uploaded" && doc.status !== "Completed")
+        .sort((a, b) => new Date(b.uploaded_at) - new Date(a.uploaded_at));
+
+      setDocuments(filteredDocuments);
+      setCertificates(certsResponse.data || []);
 
       Swal.fire("Success", "Certificate uploaded successfully!", "success");
       handleCancelFile(documentId);
@@ -198,7 +206,6 @@ const VerifyDocuments = () => {
       Swal.fire("Error", errorMessage, "error");
     } finally {
       setIsLoading(false);
-      Swal.close();
     }
   };
 
@@ -253,13 +260,13 @@ const VerifyDocuments = () => {
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="ml-[280px] flex items-center justify-center min-h-screen">
-        <div className="text-xl font-semibold">Loading documents...</div>
-      </div>
-    );
-  }
+  // if (isLoading) {
+  //   return (
+  //     <div className="ml-[280px] flex items-center justify-center min-h-screen">
+  //       <div className="text-xl font-semibold">Loading documents...</div>
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="ml-[280px] flex flex-col items-center min-h-screen p-6 bg-gray-100">
@@ -273,6 +280,12 @@ const VerifyDocuments = () => {
           {documents.length === 0 ? (
             <div className="text-center py-10">
               <p className="text-lg text-gray-600">No documents found</p>
+              <button
+                onClick={() => window.location.reload()}
+                className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+              >
+                Refresh
+              </button>
             </div>
           ) : (
             <table className="w-full border border-gray-300">
@@ -384,12 +397,42 @@ const VerifyDocuments = () => {
                           <FaCheck className="mr-1" /> View
                         </button>
                       ) : doc.status === "Approved" ? (
-                        <span className="text-gray-500">Certificate Not Available</span>
+                        <div className="flex flex-col items-center">
+                          <span className="text-gray-500 mb-1">Upload Certificate</span>
+                          <input
+                            type="file"
+                            id={`certificate-upload-${doc.document_id}`}
+                            onChange={(e) => handleFileChange(e, doc.document_id)}
+                            className="hidden"
+                            accept=".jpg,.jpeg,.png,.pdf"
+                          />
+                          <label
+                            htmlFor={`certificate-upload-${doc.document_id}`}
+                            className="bg-orange-500 text-white px-2 py-1 rounded text-xs cursor-pointer hover:bg-orange-600"
+                          >
+                            Select File
+                          </label>
+                          {filePreviews[doc.document_id] && (
+                            <div className="mt-1 flex items-center">
+                              <button
+                                onClick={() => handleUploadCertificate(doc.document_id)}
+                                className="bg-green-500 text-white px-2 py-1 rounded text-xs mr-1"
+                              >
+                                Upload
+                              </button>
+                              <button
+                                onClick={() => handleCancelFile(doc.document_id)}
+                                className="bg-red-500 text-white px-2 py-1 rounded text-xs"
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          )}
+                        </div>
                       ) : (
                         <span className="text-gray-500">Not Available</span>
                       )}
                     </td>
-
                   </tr>
                 ))}
               </tbody>

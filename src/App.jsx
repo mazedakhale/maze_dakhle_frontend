@@ -50,6 +50,9 @@ import Verifydocumentshistory from "./Components/Verifydocumentshistory";
 import Registerdocument from "./Components/Registerdocument";
 import Customerlist from "./Components/Customerlist";
 import Feedback from "./Components/Feedback";
+import FeedbackD from "./Components/FeedbackD";
+
+
 import FeedbackList from "./Components/FeedbackList";
 import Uploadeddocuments from "./Components/Uploadeddocuments";
 import Rejecteddocuments from "./Components/Rejecteddocuments";
@@ -137,7 +140,7 @@ function App() {
         <Route path="/Distributordashboard" element={<Distributordashboard />} />
         <Route path="/Ddashinner" element={<Distributordashboard><Ddashinner /></Distributordashboard>} />
         <Route path="/Distributorrequest" element={<Distributordashboard><Distributorrequest /></Distributordashboard>} />
-        <Route path="/Feedback" element={<Distributordashboard><Feedback /></Distributordashboard>} />
+        <Route path="/FeedbackD" element={<Distributordashboard><FeedbackD /></Distributordashboard>} />
         <Route path="/Distributorverify" element={<Distributordashboard><Distributorverify /></Distributordashboard>} />
         <Route path="/Distributorverifyhistory" element={<Distributordashboard><Distributorverifyhistory /></Distributordashboard>} />
         <Route path="/Dlistpage" element={<Distributordashboard><Dlistpage /></Distributordashboard>} />
