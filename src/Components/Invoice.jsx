@@ -10,24 +10,42 @@ import Swal from "sweetalert2";
 import { useNavigate } from 'react-router-dom';
 
 const DocumentViewer = ({ filePath, onClose }) => {
+  const nodeRef = useRef(null);
+
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
-      <div className="bg-white rounded-lg shadow-lg p-6 w-3/4 h-3/4 overflow-auto">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold">Document Viewer</h2>
-          <button
-            onClick={onClose}
-            className="text-gray-500 hover:text-gray-700 text-sm"
-          >
-            &times;
-          </button>
+      <Draggable
+        nodeRef={nodeRef}
+        handle=".handle"
+        bounds="parent"
+        defaultPosition={{ x: window.innerWidth / 5, y: 50 }} // Changed from /3 to /5 for more left position
+      >
+        <div
+          ref={nodeRef}
+          className="bg-white rounded-lg shadow-lg p-4 w-1/2 h-1/2 overflow-auto"
+          style={{
+            minWidth: '200px',
+            minHeight: '600px',
+            left: '20%' // Additional left positioning
+          }}
+        >
+          <div className="flex justify-between items-center mb-3 handle cursor-move">
+            <h2 className="text-lg font-bold">Document Preview</h2>
+            <button
+              onClick={onClose}
+              className="text-gray-500 hover:text-gray-700 text-sm"
+            >
+              &times;
+            </button>
+          </div>
+          <iframe
+            src={filePath}
+            title="Document Viewer"
+            className="w-full h-full border"
+            style={{ minHeight: 'calc(100% - 40px)' }}
+          />
         </div>
-        <iframe
-          src={filePath}
-          title="Document Viewer"
-          className="w-full h-full border"
-        />
-      </div>
+      </Draggable>
     </div>
   );
 };
