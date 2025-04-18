@@ -600,7 +600,7 @@ const InvoicePage = () => {
           </button>
 
           {/* Preview Modal */}
-          {showPreview && (
+          {/* {showPreview && (
             <div className="fixed inset-0 bg-black bg-opacity-80 flex justify-center items-center z-50">
               <div className="relative w-3/4 h-3/4 bg-white shadow-lg rounded-lg">
                 <button
@@ -616,7 +616,7 @@ const InvoicePage = () => {
                 />
               </div>
             </div>
-          )}
+          )} */}
 
           {/* Rejection Reason */}
           {openContainer === 'rejection' && (
@@ -648,7 +648,6 @@ const InvoicePage = () => {
         </div>
       </div>
 
-      {/* Draggable Document Preview */}
       {previewFile && (
         <Draggable handle=".drag-handle" nodeRef={nodeRef}>
           <div className="fixed inset-0 flex items-center justify-center z-50">
