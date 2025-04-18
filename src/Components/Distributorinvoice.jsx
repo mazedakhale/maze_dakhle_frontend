@@ -128,7 +128,6 @@ const InvoicePage = () => {
       allowOutsideClick: false,
       didOpen: () => Swal.showLoading()
     });
-
     const form = new FormData();
     form.append('file', selectedFile);
     form.append('document_id', documentId);
@@ -138,14 +137,24 @@ const InvoicePage = () => {
     form.append('name', documentData.name);
 
     try {
+      // 1️⃣ Upload the cert file
       await axios.post(
         'https://mazedakhale.in/api/certificates/upload',
         form,
         { headers: { 'Content-Type': 'multipart/form-data' }, timeout: 30000 }
       );
+
+      // 2️⃣ THEN update the document status
+      await axios.put(
+        `https://mazedakhale.in/api/documents/update-status/${documentId}`,
+        { status: 'Uploaded' },
+        { timeout: 30000 }
+      );
+
       Swal.close();
-      Swal.fire('Success', 'Certificate uploaded!', 'success')
+      Swal.fire('Success', 'Certificate uploaded & status set to “Uploaded”!', 'success')
         .then(() => navigate('/Distributorverify'));
+
       handleCancelFile();
     } catch (err) {
       Swal.close();
@@ -579,7 +588,7 @@ const InvoicePage = () => {
                 <button
                   onClick={() => {
                     const cert = certificates.find(c => String(c.document_id) === String(documentId));
-                    window.open(`https://mazedakhale.in/api/certificates/${cert.certificate_id}`, '_blank');
+                    window.open(cert.file_url, '_blank');
                   }}
                   className="bg-[#F58A3B] text-white px-4 py-2 rounded flex items-center mt-2 w-full"
                 >

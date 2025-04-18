@@ -16,7 +16,7 @@ const Uploadeddocuments = () => {
     useEffect(() => {
         // Fetch assigned documents from the new API
         axios
-            .get(`https://mazedakhale.in/api/documents/assigned-list`)
+            .get(`https://mazedakhale.in/api/documents/list`)
             .then((response) => {
                 const sortedDocuments = response.data.documents.sort(
                     (a, b) => new Date(b.uploaded_at) - new Date(a.uploaded_at)

@@ -26,26 +26,32 @@ const CustomerApply = () => {
     }
   }, []);
 
-  // Fetch documents for the logged-in user
   useEffect(() => {
-    if (userId) {
-      axios
-        .get(` https://mazedakhale.in/api/documents/list`)
-        .then((response) => {
-          const allDocuments = response.data.documents;
-          const filteredDocs = allDocuments
-            .filter((doc) => doc.user_id === userId && (doc.status === "Received" || doc.status !== "Pending" || doc.status !== "Approved" || doc.status !== "Rejected"))
-            .reverse();
-          setDocuments(filteredDocs);
-        })
-        .catch((error) => console.error("Error fetching documents:", error));
+    if (!userId) return;
 
-      // Fetch certificates
-      axios
-        .get(" https://mazedakhale.in/api/certificates")
-        .then((response) => setCertificates(response.data))
-        .catch((error) => console.error("Error fetching certificates:", error));
-    }
+    // Allowed statuses
+    const allowedStatuses = ["Received", "Pending", "Approved", "Rejected", "Uploaded"];
+
+    axios
+      .get("https://mazedakhale.in/api/documents/list")
+      .then((response) => {
+        const allDocuments = response.data.documents;
+        const filteredDocs = allDocuments
+          .filter(
+            (doc) =>
+              doc.user_id === userId &&
+              allowedStatuses.includes(doc.status)
+          )
+          .reverse();
+        setDocuments(filteredDocs);
+      })
+      .catch((error) => console.error("Error fetching documents:", error));
+
+    // Fetch certificates
+    axios
+      .get("https://mazedakhale.in/api/certificates")
+      .then((response) => setCertificates(response.data))
+      .catch((error) => console.error("Error fetching certificates:", error));
   }, [userId]);
 
   // Filter documents based on search query and status
@@ -353,9 +359,11 @@ const CustomerApply = () => {
                       </div>
                     </td>
 
-
                     <td className="border p-3 text-center">
-                      {doc.receipt_url ? (
+                      {(
+                        (doc.status === "Received" || doc.status === "Uploaded")
+                        && doc.receipt_url
+                      ) ? (
                         <button
                           onClick={() => handleDownloadReceipt(doc.receipt_url, doc.name)}
                           className="bg-orange-500 text-white px-3 py-1 rounded flex justify-center items-center hover:bg-blue-600 transition"
@@ -363,11 +371,13 @@ const CustomerApply = () => {
                           <FaDownload className="mr-1" /> Receipt
                         </button>
                       ) : (
-                        <span className="text-gray-500 text-center">Not Available</span>
+                        <span className="text-gray-500">Not Available</span>
                       )}
                     </td>
+
+
                     <td className="border p-2 text-center">
-                      {getCertificateByDocumentId(doc.document_id) ? (
+                      {doc.status === "Completed" && getCertificateByDocumentId(doc.document_id) ? (
                         <button
                           onClick={() => handleViewCertificate(doc.document_id)}
                           className="bg-green-500 text-white px-3 py-1 rounded hover:bg-blue-600 transition text-xs"
@@ -378,6 +388,7 @@ const CustomerApply = () => {
                         <span className="text-gray-500">Not Available</span>
                       )}
                     </td>
+
                   </tr>
                 ))
               ) : (
