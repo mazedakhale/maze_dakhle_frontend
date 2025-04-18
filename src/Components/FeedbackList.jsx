@@ -13,24 +13,71 @@ const FeedbackList = () => {
         const token = localStorage.getItem("token");
         if (token) {
             try {
-                const decoded = jwtDecode(token);
-                setUser(decoded);
-            } catch (error) {
-                console.error("Invalid token:", error);
+                setUser(jwtDecode(token));
+            } catch (err) {
+                console.error("Invalid token:", err);
                 localStorage.removeItem("token");
             }
         }
-
         fetchFeedback();
     }, []);
 
     const fetchFeedback = async () => {
         try {
-            const response = await axios.get("https://mazedakhale.in/api/feedback");
-            setFeedbackList(response.data);
-        } catch (error) {
-            console.error("Error fetching feedback:", error);
+            const { data } = await axios.get("https://mazedakhale.in/api/feedback");
+            setFeedbackList(data);
+        } catch (err) {
+            console.error("Error fetching feedback:", err);
         }
+    };
+
+    const handleStatusToggle = async (id, newStatus) => {
+        // Optimistic UI update
+        setFeedbackList((prev) =>
+            prev.map((f) =>
+                f.feedback_feedback_id === id ? { ...f, status: newStatus } : f
+            )
+        );
+        try {
+            await axios.patch(
+                `https://mazedakhale.in/api/feedback/status/${id}`,
+                { status: newStatus }
+            );
+            Swal.fire({
+                toast: true,
+                position: "top-end",
+                icon: "success",
+                title: `Feedback will ${newStatus ? "be shown" : "no longer be shown"}`,
+                showConfirmButton: false,
+                timer: 1200,
+            });
+        } catch (err) {
+            console.error("Status update failed:", err);
+            // Revert on error
+            setFeedbackList((prev) =>
+                prev.map((f) =>
+                    f.feedback_feedback_id === id ? { ...f, status: !newStatus } : f
+                )
+            );
+            Swal.fire("Error", "Could not update display status", "error");
+        }
+    };
+
+    const handleStatusClick = (feedback) => {
+        const newStatus = !feedback.status;
+        Swal.fire({
+            title: newStatus
+                ? "Are you sure you want to display this feedback on the main page?"
+                : "Are you sure you want to hide this feedback from the main page?",
+            icon: "question",
+            showCancelButton: true,
+            confirmButtonText: newStatus ? "Show" : "Hide",
+            cancelButtonText: "Cancel",
+        }).then((result) => {
+            if (result.isConfirmed) {
+                handleStatusToggle(feedback.feedback_feedback_id, newStatus);
+            }
+        });
     };
 
     const handleDelete = async (id) => {
@@ -45,36 +92,25 @@ const FeedbackList = () => {
             cancelButtonColor: "#3085d6",
             confirmButtonText: "Delete",
             showLoaderOnConfirm: true,
-            preConfirm: (inputValue) => {
-                if (inputValue !== "0000") {
+            preConfirm: (val) => {
+                if (val !== "0000") {
                     Swal.showValidationMessage("Incorrect code! Deletion not allowed.");
-                    return false;
                 }
-                return true;
             },
-            allowOutsideClick: () => !Swal.isLoading()
+            allowOutsideClick: () => !Swal.isLoading(),
         });
 
         if (confirmDelete.isConfirmed) {
-            // Optimized Approach:
-            // 1. Remove from UI first (Makes it feel instant)
-            setFeedbackList((prevFeedback) =>
-                prevFeedback.filter((feedback) => feedback.feedback_feedback_id !== id)
+            setFeedbackList((prev) =>
+                prev.filter((f) => f.feedback_feedback_id !== id)
             );
-
-            // 2. API call runs in background, not blocking UI
-            axios
-                .delete(`https://mazedakhale.in/api/feedback/${id}`)
-                .then(() => {
-                    fetchFeedback(); // Refresh list after deletion
-                })
-                .catch((error) => {
-                    console.error("Error deleting feedback:", error);
-                    Swal.fire("Error", "Failed to delete feedback", "error");
-                });
-
-            // 3. Show success message immediately
-            Swal.fire("Deleted!", "Feedback has been deleted.", "success");
+            try {
+                await axios.delete(`https://mazedakhale.in/api/feedback/${id}`);
+                Swal.fire("Deleted!", "Feedback has been deleted.", "success");
+            } catch (err) {
+                console.error("Error deleting feedback:", err);
+                Swal.fire("Error", "Failed to delete feedback", "error");
+            }
         }
     };
 
@@ -84,7 +120,7 @@ const FeedbackList = () => {
                 {/* Header */}
                 <div className="border-t-4 border-orange-400 bg-[#F4F4F4] text-center p-4 rounded-t-lg relative">
                     <h2 className="text-2xl font-bold text-gray-800">Feedback List</h2>
-                    <div className="absolute bottom-[-2px] left-0 w-full h-1 bg-gray-300 shadow-md"></div>
+                    <div className="absolute bottom-[-2px] left-0 w-full h-1 bg-gray-300 shadow-md" />
                 </div>
 
                 {/* Table */}
@@ -92,33 +128,59 @@ const FeedbackList = () => {
                     <table className="w-full border border-[#776D6DA8] text-sm bg-white shadow-md rounded-md">
                         <thead className="bg-[#F58A3B14] border-b-2 border-[#776D6DA8]">
                             <tr>
-                                {["User ID", "Name", "Role", "Comment", "Rating", "Actions"].map((header, index) => (
-                                    <th key={index} className="px-4 py-3 border border-[#776D6DA8] text-black font-semibold text-center">
-                                        {header}
-                                    </th>
-                                ))}
+                                {["Name", "Role", "Comment", "Rating", "Update", "Action"].map(
+                                    (header, idx) => (
+                                        <th
+                                            key={idx}
+                                            className="px-4 py-3 border border-[#776D6DA8] text-center font-semibold"
+                                        >
+                                            {header}
+                                        </th>
+                                    )
+                                )}
                             </tr>
                         </thead>
                         <tbody>
                             {feedbackList.length > 0 ? (
-                                feedbackList.map((feedback, index) => (
+                                feedbackList.map((fb, idx) => (
                                     <tr
-                                        key={feedback.feedback_feedback_id}
-                                        className={`${index % 2 === 0 ? "bg-[#FFFFFF]" : "bg-[#F58A3B14]"} hover:bg-orange-100 transition duration-200`}
+                                        key={fb.feedback_feedback_id}
+                                        className={`${idx % 2 === 0 ? "bg-white" : "bg-[#F58A3B14]"
+                                            } hover:bg-orange-100 transition duration-200`}
                                     >
-                                        <td className="px-4 py-3 border border-[#776D6DA8] text-center">{feedback.feedback_user_id}</td>
-                                        <td className="px-4 py-3 border border-[#776D6DA8] text-center">{feedback.users_name || "N/A"}</td>
-                                        <td className="px-4 py-3 border border-[#776D6DA8] text-center">{feedback.users_role || "N/A"}</td>
-                                        <td className="px-4 py-3 border border-[#776D6DA8] text-center">{feedback.feedback_comment}</td>
-                                        <td className="px-4 py-3 border border-[#776D6DA8] text-center">
-                                            {[...Array(feedback.feedback_rating)].map((_, i) => (
+                                        {/* Show/Not Show toggle */}
+
+
+                                        <td className="px-4 py-3 border text-center">
+                                            {fb.users_name || "N/A"}
+                                        </td>
+                                        <td className="px-4 py-3 border text-center">
+                                            {fb.users_role || "N/A"}
+                                        </td>
+                                        <td className="px-4 py-3 border text-center">
+                                            {fb.feedback_comment}
+                                        </td>
+                                        <td className="px-4 py-3 border text-center">
+                                            {[...Array(fb.feedback_rating)].map((_, i) => (
                                                 <StarIcon key={i} color="warning" />
                                             ))}
                                         </td>
-                                        <td className="px-4 py-3 border border-[#776D6DA8] text-center">
+                                        <td className="px-4 py-3 border text-center">
+                                            <button
+                                                className={`px-2 py-1 rounded ${fb.status ? "bg-green-500 text-white" : "bg-gray-200"
+                                                    }`}
+                                                onClick={() => handleStatusClick(fb)}
+                                            >
+                                                {fb.status ? "Hide" : "Show"}
+                                            </button>
+                                        </td>
+
+                                        <td className="px-4 py-3 border text-center">
                                             <button
                                                 className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-                                                onClick={() => handleDelete(feedback.feedback_feedback_id)}
+                                                onClick={() =>
+                                                    handleDelete(fb.feedback_feedback_id)
+                                                }
                                             >
                                                 Delete
                                             </button>
@@ -127,7 +189,10 @@ const FeedbackList = () => {
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan="6" className="px-4 py-3 border border-[#776D6DA8] text-center">
+                                    <td
+                                        colSpan="7"
+                                        className="px-4 py-3 border border-[#776D6DA8] text-center"
+                                    >
                                         No feedback found.
                                     </td>
                                 </tr>
