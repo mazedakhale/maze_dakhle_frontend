@@ -47,7 +47,7 @@ const EmployeeList = () => {
             password: "",
             phone: "",
             address: "",
-            role: "employee",
+            role: "Employee",
         });
     };
 
