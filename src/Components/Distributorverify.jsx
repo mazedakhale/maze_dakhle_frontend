@@ -7,212 +7,160 @@ import { useNavigate } from "react-router-dom";
 
 const VerifyDocuments = () => {
   const [documents, setDocuments] = useState([]);
+  const [certificates, setCertificates] = useState([]);
   const [selectedFiles, setSelectedFiles] = useState({});
   const [filePreviews, setFilePreviews] = useState({});
+  const [showPreview, setShowPreview] = useState(false);
+  const [previewFile, setPreviewFile] = useState(null);
   const [distributorId, setDistributorId] = useState(null);
-  const [certificates, setCertificates] = useState([]);
-
   const navigate = useNavigate();
 
+  // Fetch user ID, documents, and certificates on mount
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
       try {
-        const decodedToken = jwtDecode(token);
-        const userId =
-          decodedToken.user_id || decodedToken.id || decodedToken.user;
+        const decoded = jwtDecode(token);
+        const userId = decoded.user_id || decoded.id || decoded.user;
         if (userId) {
           setDistributorId(userId);
           fetchDocuments(userId);
+          fetchCertificates();
         } else {
           console.error("User ID is missing in the decoded token.");
         }
-      } catch (error) {
-        console.error("Error decoding token:", error);
+      } catch (err) {
+        console.error("Error decoding token:", err);
       }
     } else {
       console.error("Token is missing.");
     }
   }, []);
 
+  // Get list of certificates
+  const fetchCertificates = async () => {
+    try {
+      const response = await axios.get(
+        "https://mazedakhale.in/api/certificates"
+      );
+      // assume response.data is an array of certificate objects
+      setCertificates(response.data);
+    } catch (err) {
+      console.error("Error fetching certificates:", err);
+    }
+  };
+
+  // Get list of documents, excluding only those still 'Sent'
   const fetchDocuments = async (distributorId) => {
     try {
       const response = await axios.get(
         `https://mazedakhale.in/api/documents/list/${distributorId}`
       );
-
-      const filteredDocuments = response.data.documents.filter(
-        (doc) => doc.status !== "Uploaded" && doc.status !== "Completed"
+      const filtered = response.data.documents.filter(
+        (doc) => doc.status !== "Sent"
       );
-
-      // Sort documents by uploaded_at date in descending order (latest first)
-      const sortedDocuments = filteredDocuments.sort((a, b) => {
-        return new Date(b.uploaded_at) - new Date(a.uploaded_at);
-      });
-
-      setDocuments(sortedDocuments);
-    } catch (error) {
-      console.error("Error fetching documents:", error);
+      const sorted = filtered.sort(
+        (a, b) => new Date(b.uploaded_at) - new Date(a.uploaded_at)
+      );
+      setDocuments(sorted);
+    } catch (err) {
+      console.error("Error fetching documents:", err);
     }
   };
 
-  const handleViewInvoice = (documentId) => {
-    navigate(`/Distributorinvoice/${documentId}`);
+  const handleViewInvoice = (id) => navigate(`/Distributorinvoice/${id}`);
+  const handleView = (id) => navigate(`/Distributorview/${id}`);
+
+  const handleFileChange = (e, id) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    setSelectedFiles((p) => ({ ...p, [id]: file }));
+    setFilePreviews((p) => ({ ...p, [id]: url }));
+    setPreviewFile(url);
+    setShowPreview(true);
   };
 
-  const handleView = (documentId) => {
-    navigate(`/Distributorview/${documentId}`);
-  };
-
-  const [showPreview, setShowPreview] = useState(false);
-  const [previewFile, setPreviewFile] = useState(null);
-
-  const handleFileChange = (event, documentId) => {
-    const file = event.target.files[0];
-    if (file) {
-      const fileURL = URL.createObjectURL(file);
-      setSelectedFiles((prev) => ({ ...prev, [documentId]: file }));
-      setFilePreviews((prev) => ({ ...prev, [documentId]: fileURL }));
-      setPreviewFile(fileURL);
-      setShowPreview(true);
-    }
-  };
-
-  const handleCancelFile = (documentId) => {
-    if (filePreviews[documentId]) {
-      URL.revokeObjectURL(filePreviews[documentId]);
-    }
-    setSelectedFiles((prev) => ({ ...prev, [documentId]: null }));
-    setFilePreviews((prev) => ({ ...prev, [documentId]: null }));
+  const handleCancelFile = (id) => {
+    if (filePreviews[id]) URL.revokeObjectURL(filePreviews[id]);
+    setSelectedFiles((p) => ({ ...p, [id]: null }));
+    setFilePreviews((p) => ({ ...p, [id]: null }));
     setShowPreview(false);
+  };
+
+  const getCertificateByDocumentId = (documentId) => {
+    const cert = certificates.find(
+      (c) => String(c.document_id) === String(documentId)
+    );
+    return cert ? cert.certificate_id : null;
   };
 
   const handleUploadCertificate = async (documentId) => {
     const file = selectedFiles[documentId];
-
     if (!file) {
-      Swal.fire("Warning", "Please select a file first", "warning");
-      return;
+      return Swal.fire("Warning", "Please select a file first", "warning");
     }
-
-    const selectedDocument = documents.find(
-      (doc) => doc.document_id === documentId
-    );
-    if (!selectedDocument) {
-      Swal.fire("Error", "Document not found", "error");
-      return;
-    }
-
-    const { user_id, application_id, name } = selectedDocument;
-    const finalUserId = user_id || distributorId;
-
-    if (!finalUserId || !distributorId || !application_id || !name) {
-      Swal.fire(
-        "Error",
-        "User ID, Distributor ID, Application ID, or Name is missing",
-        "error"
-      );
-      return;
-    }
+    const doc = documents.find((d) => d.document_id === documentId);
+    if (!doc) return Swal.fire("Error", "Document not found", "error");
 
     const formData = new FormData();
     formData.append("file", file);
-    formData.append("document_id", documentId.toString());
-    formData.append("user_id", finalUserId.toString());
-    formData.append("distributor_id", distributorId.toString());
-    formData.append("application_id", application_id.toString());
-    formData.append("name", name.toString());
+    formData.append("document_id", documentId);
+    formData.append("user_id", doc.user_id || distributorId);
+    formData.append("distributor_id", distributorId);
+    formData.append("application_id", doc.application_id);
+    formData.append("name", doc.name);
 
     try {
       await axios.post(
         "https://mazedakhale.in/api/certificates/upload",
         formData,
-        {
-          headers: { "Content-Type": "multipart/form-data" },
-        }
+        { headers: { "Content-Type": "multipart/form-data" } }
       );
-      axios
-        .get('https://mazedakhale.in/api/certificates')
-        .then((response) => setCertificates(response.data))
-        .catch((error) => console.error("Error fetching certificates:", error));
-
+      // re-fetch certificates and update document status
+      await fetchCertificates();
       await axios.put(
         `https://mazedakhale.in/api/documents/update-status/${documentId}`,
         { status: "Uploaded" }
       );
-
-      setDocuments((prev) =>
-        prev.map((doc) =>
-          doc.document_id === documentId
-            ? { ...doc, status: "Uploaded" }
-            : doc
+      setDocuments((p) =>
+        p.map((d) =>
+          d.document_id === documentId ? { ...d, status: "Uploaded" } : d
         )
       );
-
       Swal.fire("Success", "Certificate uploaded successfully!", "success");
-
-      setSelectedFiles((prev) => ({ ...prev, [documentId]: null }));
-      setFilePreviews((prev) => ({ ...prev, [documentId]: null }));
-    } catch (error) {
-      console.error("Error uploading certificate:", error);
+      handleCancelFile(documentId);
+    } catch (err) {
+      console.error("Upload error:", err);
       Swal.fire(
         "Error",
-        error.response?.data?.message || "Internal server error",
+        err.response?.data?.message || "Internal server error",
         "error"
       );
     }
   };
 
-  const getCertificateByDocumentId = (documentId) => {
-    const matchedCertificate = certificates.find((cert) => cert.document_id === documentId);
-    return matchedCertificate ? matchedCertificate.certificate_id : null;
-  };
-
   const handleViewCertificate = async (documentId) => {
     const certificateId = getCertificateByDocumentId(documentId);
-    if (!certificateId) {
-      alert("Certificate not found.");
-      return;
-    }
+    if (!certificateId) return Swal.fire("Error", "Certificate not found", "error");
     try {
-      const response = await axios.get(`https://mazedakhale.in/api/certificates/${certificateId}`);
-      if (response.data && response.data.file_url) {
-        window.open(response.data.file_url, "_blank");
-      } else {
-        alert("Certificate not found.");
-      }
-    } catch (error) {
-      console.error("Error fetching certificate:", error);
-      alert("Failed to fetch certificate.");
-    }
-  };
-
-  const handleDownloadReceipt = (receiptUrl, documentName) => {
-    try {
-      const fileExtension = receiptUrl.split('.').pop().toLowerCase();
-      const fileName = `${documentName}_receipt.${fileExtension}`;
-      const link = document.createElement("a");
-      link.href = receiptUrl;
-      link.download = fileName;
-      link.style.display = "none";
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    } catch (error) {
-      console.error("Error downloading receipt:", error);
-      Swal.fire("Error", "Failed to download receipt. Please try again.", "error");
+      const res = await axios.get(
+        `https://mazedakhale.in/api/certificates/${certificateId}`
+      );
+      if (res.data.file_url) window.open(res.data.file_url, "_blank");
+      else Swal.fire("Error", "Certificate file not found", "error");
+    } catch (err) {
+      console.error("Error fetching certificate:", err);
+      Swal.fire("Error", "Failed to fetch certificate.", "error");
     }
   };
 
   return (
     <div className="ml-[280px] flex flex-col items-center min-h-screen p-6 bg-gray-100">
-      <div className="relative bg-white shadow-lg rounded-lg border border-gray-300 overflow-hidden">
-        <div className="border-t-4 border-orange-400 bg-[#f4f4f4] text-center p-4 rounded-t-lg relative">
+      <div className="relative bg-white shadow-lg rounded-lg border overflow-hidden">
+        <div className="border-t-4 border-orange-400 bg-[#f4f4f4] p-4 text-center rounded-t-lg">
           <h2 className="text-2xl font-bold text-gray-800">Manage Distributor List</h2>
-          <div className="absolute bottom-[-2px] left-0 w-full h-1 bg-gray-300 shadow-md"></div>
         </div>
-
-
         <div className="p-6 overflow-x-auto">
           <table className="w-full border border-gray-300">
             <thead className="bg-[#F58A3B14]">
@@ -227,96 +175,56 @@ const VerifyDocuments = () => {
                   "View",
                   "Receipt",
                   "Certificate"
-                ].map((header, index) => (
-                  <th
-                    key={index}
-                    className="border border-gray-300 p-3 text-center font-semibold text-black"
-                  >
-                    {header}
+                ].map((h, i) => (
+                  <th key={i} className="border p-3 text-center font-semibold">
+                    {h}
                   </th>
                 ))}
               </tr>
             </thead>
             <tbody>
-              {documents.map((doc, index) => (
+              {documents.map((doc, idx) => (
                 <tr
                   key={doc.document_id}
-                  className={`border border-gray-300 ${index % 2 === 0 ? "bg-[#ffffff]" : "#F58A3B14"}`}
+                  className={idx % 2 === 0 ? "bg-white" : "bg-[#F58A3B14]"}
                 >
                   <td className="border p-3 text-center">{doc.application_id}</td>
-                  <td className="px-4 py-2 border text-sm">
-                    {doc?.document_fields ? (
-                      Array.isArray(doc.document_fields) ? (
-                        // New format (array of objects)
-                        doc.document_fields.find(field => field.field_name === "APPLICANT NAME") ? (
-                          <p>{doc.document_fields.find(field => field.field_name === "APPLICANT NAME").field_value}</p>
-                        ) : (
-                          <p className="text-gray-500">No applicant name available</p>
-                        )
-                      ) : (
-                        // Old format (object with key-value pairs)
-                        doc.document_fields["APPLICANT NAME"] ? (
-                          <p>{doc.document_fields["APPLICANT NAME"]}</p>
-                        ) : (
-                          <p className="text-gray-500">No applicant name available</p>
-                        )
-                      )
-                    ) : (
-                      <p className="text-gray-500">No fields available</p>
-                    )}
+                  <td className="border px-4 py-2 text-sm">
+                    {Array.isArray(doc.document_fields)
+                      ? doc.document_fields.find(f => f.field_name === "APPLICANT NAME")?.field_value || "-"
+                      : doc.document_fields["APPLICANT NAME"] || "-"}
                   </td>
-                  <td className="border p-2">
+                  <td className="border p-2 text-center">
                     {new Date(doc.uploaded_at).toLocaleString('en-US', {
-                      year: 'numeric',
-                      month: '2-digit',
-                      day: '2-digit',
-                      hour: '2-digit',
-                      minute: '2-digit',
-                      second: '2-digit',  // Added seconds
-                      hour12: true, // Use AM/PM
+                      year: 'numeric', month: '2-digit', day: '2-digit',
+                      hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true
                     })}
                   </td>
                   <td className="border p-3 text-center">{doc.category_name}</td>
                   <td className="border p-3 text-center">{doc.subcategory_name}</td>
                   <td className="border p-3 text-center">
-                    <button
-                      onClick={() => handleViewInvoice(doc.document_id)}
-                      className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition"
-                    >
+                    <button onClick={() => handleViewInvoice(doc.document_id)} className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition">
                       Action
                     </button>
                   </td>
                   <td className="border p-3 text-center">
-                    <button
-                      onClick={() => handleView(doc.document_id)}
-                      className="bg-indigo-500 text-white px-3 py-1 rounded hover:bg-indigo-600 transition"
-                    >
+                    <button onClick={() => handleView(doc.document_id)} className="bg-indigo-500 text-white px-3 py-1 rounded hover:bg-indigo-600 transition">
                       View
                     </button>
                   </td>
                   <td className="border p-3 text-center">
                     {doc.receipt_url ? (
-                      <button
-                        onClick={() => handleDownloadReceipt(doc.receipt_url, doc.name)}
-                        className="bg-blue-500 text-white px-3 py-1 rounded flex justify-center items-center hover:bg-blue-600 transition"
-                      >
+                      <button onClick={() => handleDownloadReceipt(doc.receipt_url, doc.name)} className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 transition flex items-center justify-center">
                         <FaDownload className="mr-1" /> Receipt
                       </button>
-                    ) : (
-                      <span className="text-gray-500 text-center">Not Available</span>
-                    )}
+                    ) : <span className="text-gray-500">Not Available</span>}
                   </td>
-                  <td className="border p-2 text-center">
+                  <td className="border p-3 text-center">
                     {getCertificateByDocumentId(doc.document_id) ? (
-                      <button
-                        onClick={() => handleViewCertificate(doc.document_id)}
-                        className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 transition text-xs"
-                      >
+                      <button onClick={() => handleViewCertificate(doc.document_id)} className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 transition flex items-center justify-center">
                         <FaCheck className="mr-1" /> Certificate
                       </button>
-                    ) : (
-                      <span className="text-gray-500">Not Available</span>
-                    )}
+                    ) : <span className="text-gray-500">Not Available</span>}
                   </td>
                 </tr>
               ))}
@@ -327,14 +235,11 @@ const VerifyDocuments = () => {
 
       {showPreview && (
         <div className="fixed inset-0 bg-black bg-opacity-80 flex justify-center items-center">
-          <div className="relative w-3/4 h-3/4 bg-white shadow-lg rounded-lg flex flex-col">
-            <button
-              onClick={() => setShowPreview(false)}
-              className="absolute top-3 right-3 bg-red-500 text-white px-3 py-2 rounded"
-            >
+          <div className="relative w-3/4 h-3/4 bg-white shadow-lg rounded-lg">
+            <button onClick={() => setShowPreview(false)} className="absolute top-3 right-3 bg-red-500 text-white px-3 py-2 rounded">
               Close
             </button>
-            <iframe src={previewFile} className="w-full h-full border-none"></iframe>
+            <iframe src={previewFile} className="w-full h-full border-none" />
           </div>
         </div>
       )}

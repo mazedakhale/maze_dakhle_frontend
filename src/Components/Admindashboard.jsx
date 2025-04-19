@@ -59,7 +59,7 @@ const Sidebar = ({ onNavigate }) => {
             { icon: <FaCheckCircle />, label: "Customer Request", path: "/Verifydocuments" },
             { icon: <FaCheckCircle />, label: " Rejected  List", path: "/Rejecteddocuments" },
 
-            { icon: <FaCheckCircle />, label: "Verify Documents History", path: "/Verifydocumentshistory" },
+            { icon: <FaCheckCircle />, label: "Applications History", path: "/Verifydocumentshistory" },
             { icon: <FaCheckCircle />, label: "Assigned Distributor List", path: "/Assigndistributorlist" },
             { icon: <FaCheckCircle />, label: " Uploaded  List", path: "/Uploadeddocuments" },
             { icon: <FaCheckCircle />, label: " Received  List", path: "/Received" },

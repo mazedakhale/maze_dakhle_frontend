@@ -93,11 +93,14 @@ const VerifyDocuments = () => {
 
 
 
-  // Get distributor name by ID
   const getDistributorName = (distributorId) => {
-    const distributor = users.find((user) => Number(user.user_id) === Number(distributorId));
+    const distributor = users.find(
+      (user) => Number(user.user_id) === Number(distributorId)
+    );
+    console.log("Distributor fetched for ID", distributorId, distributor);
     return distributor ? distributor.name : "";
   };
+
 
   // Navigate to invoice view
   const handleViewInvoice = (documentId, categoryId, subcategoryId) => {
@@ -229,16 +232,23 @@ const VerifyDocuments = () => {
                       <p className="text-gray-500">No fields available</p>
                     )}
                   </td>
-                  <td className="border p-2">
-                    {new Date(doc.uploaded_at).toLocaleString('en-US', {
-                      year: 'numeric',
-                      month: '2-digit',
-                      day: '2-digit',
-                      hour: '2-digit',
-                      minute: '2-digit',
-                      second: '2-digit',  // Added seconds
-                      hour12: true, // Use AM/PM
-                    })}
+                  <td className="border p-2 text-center">
+                    {(() => {
+                      const date = new Date(doc.uploaded_at);
+                      const formattedDate = `${String(date.getDate()).padStart(2, '0')}-${String(date.getMonth() + 1).padStart(2, '0')}-${date.getFullYear()}`;
+                      const formattedTime = date.toLocaleTimeString('en-US', {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit',
+                        hour12: true,
+                      });
+                      return (
+                        <>
+                          <div>{formattedDate}</div>
+                          <div className="text-sm text-gray-600">{formattedTime}</div>
+                        </>
+                      );
+                    })()}
                   </td>
                   <td className="border p-2">{doc.category_name}</td>
                   <td className="border p-2">{doc.subcategory_name}</td>

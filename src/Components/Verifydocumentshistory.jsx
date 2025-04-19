@@ -261,16 +261,23 @@ const Verifydocumentshistory = () => {
                 >
                   <td className="border p-2 text-center">{index + 1}</td>
                   <td className="border p-2 text-center">{doc.application_id}</td>
-                  <td className="border p-2">
-                    {new Date(doc.uploaded_at).toLocaleString('en-US', {
-                      year: 'numeric',
-                      month: '2-digit',
-                      day: '2-digit',
-                      hour: '2-digit',
-                      minute: '2-digit',
-                      second: '2-digit',  // Added seconds
-                      hour12: true, // Use AM/PM
-                    })}
+                  <td className="border p-2 text-center">
+                    {(() => {
+                      const date = new Date(doc.uploaded_at);
+                      const formattedDate = `${String(date.getDate()).padStart(2, '0')}-${String(date.getMonth() + 1).padStart(2, '0')}-${date.getFullYear()}`;
+                      const formattedTime = date.toLocaleTimeString('en-US', {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit',
+                        hour12: true,
+                      });
+                      return (
+                        <>
+                          <div>{formattedDate}</div>
+                          <div className="text-sm text-gray-600">{formattedTime}</div>
+                        </>
+                      );
+                    })()}
                   </td>
                   <td className="px-4 py-2 border text-sm">
                     {doc?.document_fields && typeof doc.document_fields === "object"
@@ -295,9 +302,9 @@ const Verifydocumentshistory = () => {
                           ? "bg-green-500"
                           : doc.status === "Rejected"
                             ? "bg-red-500"
-                            : doc.status === "Completed"
-                              ? "bg-yellow-500" // Color for Completed
-                              : "bg-blue-500" // Default color
+                            : doc.status === "Pending"
+                              ? "bg-yellow-500"
+                              : "bg-blue-500"
                           }`}
                       >
                         {doc.status}
@@ -305,24 +312,28 @@ const Verifydocumentshistory = () => {
 
                       {/* Latest Status Date and Time */}
                       {doc.status_history
-                        ?.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at)) // Sort by latest date
-                        .slice(0, 1) // Take the first entry (latest status)
-                        .map((statusEntry, index) => (
-                          <div key={index} className="text-xs text-gray-600">
-                            {new Date(statusEntry.updated_at).toLocaleString("en-US", {
-                              year: "numeric",
-                              month: "2-digit",
-                              day: "2-digit",
-                              hour: "2-digit",
-                              minute: "2-digit",
-                              second: "2-digit", // Added seconds
-                              hour12: true, // Use AM/PM
-                            })}
-                          </div>
-                        ))}
+                        ?.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at))
+                        .slice(0, 1)
+                        .map((statusEntry, index) => {
+                          const dateObj = new Date(statusEntry.updated_at);
+                          const day = String(dateObj.getDate()).padStart(2, "0");
+                          const month = String(dateObj.getMonth() + 1).padStart(2, "0");
+                          const year = dateObj.getFullYear();
+                          const time = dateObj.toLocaleTimeString("en-US", {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            second: "2-digit",
+                            hour12: true,
+                          });
+
+                          return (
+                            <div key={index} className="text-xs text-gray-600">
+                              {`${day}-${month}-${year} ${time}`}
+                            </div>
+                          );
+                        })}
                     </div>
                   </td>
-
 
                   {/* <td className="border p-2 text-center">
                                         <button
