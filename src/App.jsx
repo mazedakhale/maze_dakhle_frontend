@@ -72,6 +72,8 @@ import PrivacyPolicy from "./Components/Privacypolicy";
 import PrivacyPolicyTable from "./Components/PrivacyPolicyTable";
 import ContactTable from "./Components/ContactTable";
 import ContactForm from "./Components/ContactForm";
+import ProfilePage from "./Components/ProfilePage";
+
 function App() {
   return (
     <Router>
@@ -119,8 +121,19 @@ function App() {
         <Route path="/Received" element={<Admindashboard><Received /></Admindashboard>} />
 
 
+
         {/* Customer Routes */}
         <Route path="/Customerdashboard" element={<Customerdashboard />} />
+        {/* Profile page */}
+        <Route
+          path="/ProfilePage"
+          element={
+            <Customerdashboard>
+              <ProfilePage />
+            </Customerdashboard>
+          }
+        />
+
         <Route path="/Cdashinner" element={<Customerdashboard><Cdashinner /></Customerdashboard>} />
         <Route path="/Userpendinglist" element={<Customerdashboard><Userpendinglist /></Customerdashboard>} />
         <Route path="/Usercompletedlist" element={<Customerdashboard><Usercompletedlist /></Customerdashboard>} />

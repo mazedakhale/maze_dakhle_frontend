@@ -98,32 +98,27 @@ const Customerdashboard = ({ children }) => {
         <div className="flex items-center justify-between bg-white text-gray px-4 py-2 shadow-[0_3px_2px_rgba(0,0,0,0.15)] fixed top-0 left-[20%] w-[80%] z-10 h-[73px]">
           <span className="text-lg font-bold">Customer Dashboard</span>
 
-          {/* Profile & Logout */}
-          <div className="flex items-center gap-4 relative">
-            {/* Profile Image - Click to Show/Hide Email */}
+          {/* Right‑side controls */}
+          <div className="flex items-center space-x-4">
+            {/* Profile icon */}
             <img
               src="https://t4.ftcdn.net/jpg/04/83/90/95/360_F_483909569_OI4LKNeFgHwvvVju60fejLd9gj43dIcd.jpg"
               alt="Profile"
               className="h-10 w-10 rounded-full cursor-pointer"
-              onClick={() => setShowEmail(!showEmail)}
+              onClick={() => navigate("/ProfilePage")}
             />
-
-            {/* Email Display Box */}
-            {showEmail && (
-              <div className="absolute right-14 top-12 bg-white p-2 rounded-lg shadow-lg border border-gray-300">
-                <p className="text-sm text-gray-700">{userEmail}</p>
-              </div>
-            )}
 
             {/* Logout Button */}
             <button
               onClick={handleLogout}
-              className="bg-orange-500 hover:bg-orange-600 text-white p-2 rounded-md transition flex items-center justify-center"
+              className="bg-orange-500 hover:bg-orange-600 text-white
+                 p-2 rounded-md transition flex items-center justify-center"
             >
               <FaSignOutAlt className="h-6 w-6 text-white" />
             </button>
           </div>
         </div>
+
 
         {/* Main Content Area */}
         <div className="mt-6">{children}</div>
