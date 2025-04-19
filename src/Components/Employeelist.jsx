@@ -4,12 +4,7 @@ import React, { useState, useEffect } from "react";
 import { FaEdit, FaTrash, FaPlus } from "react-icons/fa";
 import Swal from "sweetalert2";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
-// import { validateRegistration } from ".utils/formValidators";
-// import { validateRegistration } from "../utils/formValidators";
 import { validateRegistration } from "../utils/formValidators.js";
-
-// our shared helper:
 
 axios.defaults.timeout = 30000; // 30 seconds
 
@@ -26,9 +21,8 @@ const EmployeeList = () => {
         address: "",
         role: "Employee",
     });
-    const navigate = useNavigate();
 
-    const apiUrl = "https://mazedakhale.in/api/users/employee";
+    const apiUrl = "https://mazedakhale.in/api/users/register";
 
     // fetch list on mount
     useEffect(() => {
@@ -46,21 +40,33 @@ const EmployeeList = () => {
     };
 
     const handleAddEmployee = () => {
-        setFormData({ name: "", email: "", password: "", phone: "", address: "", role: "Employee" });
+        setFormData({
+            name: "",
+            email: "",
+            password: "",
+            phone: "",
+            address: "",
+            role: "Employee",
+        });
         setIsModalOpen(true);
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // 1️⃣ client‑side validation
+        // 1) client‑side duplicate‑email check
+        if (employees.some((emp) => emp.email === formData.email)) {
+            return Swal.fire("Oops", "That email is already registered", "warning");
+        }
+
+        // 2) client‑side validation
         const { ok, errors } = validateRegistration(formData);
         if (!ok) {
             const firstErr = Object.values(errors)[0];
             return Swal.fire("Validation Error", firstErr, "warning");
         }
 
-        // 2️⃣ show spinner
+        // 3) show spinner
         Swal.fire({
             title: "Processing",
             text: "Please wait…",
@@ -72,20 +78,21 @@ const EmployeeList = () => {
         const payload = { ...formData, user_login_status: "InActive" };
 
         try {
-            await axios.post("https://mazedakhale.in/api/users/register", payload);
+            // use JSON‑only endpoint
+            await axios.post(apiUrl, payload);
+
             Swal.fire("Success", "Employee added successfully!", "success");
             fetchEmployees();
             setIsModalOpen(false);
         } catch (error) {
             Swal.close();
 
-            // duplicate‑email?
             if (error.response?.status === 409) {
-                const msg = error.response.data?.message || "That email is already registered.";
+                const msg =
+                    error.response.data?.message || "That email is already registered.";
                 return Swal.fire("Oops", msg, "warning");
             }
 
-            // fallback
             Swal.fire("Error", "Failed to add employee. Please try again.", "error");
         }
     };
@@ -98,11 +105,14 @@ const EmployeeList = () => {
     const handleUpdateEmployee = async (id) => {
         if (!updatedPassword) return;
         try {
-            await axios.patch(`https://mazedakhale.in/api/users/password/${id}`, {
-                newPassword: updatedPassword,
-            });
+            await axios.patch(
+                `https://mazedakhale.in/api/users/password/${id}`,
+                { newPassword: updatedPassword }
+            );
             setEmployees((prev) =>
-                prev.map((e) => (e.user_id === id ? { ...e, password: updatedPassword } : e))
+                prev.map((e) =>
+                    e.user_id === id ? { ...e, password: updatedPassword } : e
+                )
             );
             setEditingId(null);
             setUpdatedPassword("");
@@ -113,7 +123,7 @@ const EmployeeList = () => {
     };
 
     const handleDeleteEmployee = async (id) => {
-        const { isConfirmed, value } = await Swal.fire({
+        const { isConfirmed } = await Swal.fire({
             title: "Enter Deletion Code",
             input: "text",
             inputPlaceholder: "Enter code here…",
@@ -138,9 +148,15 @@ const EmployeeList = () => {
     const handleStatusChange = async (id, newStatus) => {
         try {
             setEmployees((prev) =>
-                prev.map((e) => (e.user_id === id ? { ...e, user_login_status: newStatus } : e))
+                prev.map((e) =>
+                    e.user_id === id
+                        ? { ...e, user_login_status: newStatus }
+                        : e
+                )
             );
-            await axios.patch(`https://mazedakhale.in/api/users/status/${id}`, { status: newStatus });
+            await axios.patch(`https://mazedakhale.in/api/users/status/${id}`, {
+                status: newStatus,
+            });
             Swal.fire("Updated", `Status changed to ${newStatus}`, "success");
         } catch {
             fetchEmployees(); // rollback
@@ -165,14 +181,29 @@ const EmployeeList = () => {
                     <table className="w-full text-sm border border-gray-300 bg-white">
                         <thead className="bg-orange-100">
                             <tr>
-                                {["ID", "Name", "Email", "Password", "Phone", "Address", "Status", "Update", "Actions"].map((h) => (
-                                    <th key={h} className="px-4 py-2 border">{h}</th>
+                                {[
+                                    "ID",
+                                    "Name",
+                                    "Email",
+                                    "Password",
+                                    "Phone",
+                                    "Address",
+                                    "Status",
+                                    "Update",
+                                    "Actions",
+                                ].map((h) => (
+                                    <th key={h} className="px-4 py-2 border">
+                                        {h}
+                                    </th>
                                 ))}
                             </tr>
                         </thead>
                         <tbody>
                             {employees.map((emp, i) => (
-                                <tr key={emp.user_id} className={i % 2 === 0 ? "bg-white" : "bg-gray-50"}>
+                                <tr
+                                    key={emp.user_id}
+                                    className={i % 2 === 0 ? "bg-white" : "bg-gray-50"}
+                                >
                                     <td className="border px-4 py-2">{emp.user_id}</td>
                                     <td className="border px-4 py-2">{emp.name}</td>
                                     <td className="border px-4 py-2">{emp.email}</td>
@@ -180,7 +211,7 @@ const EmployeeList = () => {
                                         {editingId === emp.user_id ? (
                                             <input
                                                 value={updatedPassword}
-                                                onChange={e => setUpdatedPassword(e.target.value)}
+                                                onChange={(e) => setUpdatedPassword(e.target.value)}
                                                 className="border p-1 w-full"
                                             />
                                         ) : (
@@ -189,19 +220,29 @@ const EmployeeList = () => {
                                     </td>
                                     <td className="border px-4 py-2">{emp.phone}</td>
                                     <td className="border px-4 py-2">{emp.address}</td>
-                                    <td className="border px-4 py-2">{emp.user_login_status}</td>
+                                    <td className="border px-4 py-2">
+                                        {emp.user_login_status}
+                                    </td>
                                     <td className="border px-4 py-2">
                                         <button
-                                            onClick={() => handleStatusChange(emp.user_id, "Active")}
-                                            className={`px-2 py-1 mr-2 rounded text-white ${emp.user_login_status === "Active" ? "bg-green-500" : "bg-gray-400"
+                                            onClick={() =>
+                                                handleStatusChange(emp.user_id, "Active")
+                                            }
+                                            className={`px-2 py-1 mr-2 rounded text-white ${emp.user_login_status === "Active"
+                                                ? "bg-green-500"
+                                                : "bg-gray-400"
                                                 }`}
                                             disabled={emp.user_login_status === "Active"}
                                         >
                                             Active
                                         </button>
                                         <button
-                                            onClick={() => handleStatusChange(emp.user_id, "InActive")}
-                                            className={`px-2 py-1 rounded text-white ${emp.user_login_status === "InActive" ? "bg-red-500" : "bg-gray-400"
+                                            onClick={() =>
+                                                handleStatusChange(emp.user_id, "InActive")
+                                            }
+                                            className={`px-2 py-1 rounded text-white ${emp.user_login_status === "InActive"
+                                                ? "bg-red-500"
+                                                : "bg-gray-400"
                                                 }`}
                                             disabled={emp.user_login_status === "InActive"}
                                         >
@@ -218,7 +259,9 @@ const EmployeeList = () => {
                                             </button>
                                         ) : (
                                             <button
-                                                onClick={() => handleEditEmployee(emp.user_id, emp.password)}
+                                                onClick={() =>
+                                                    handleEditEmployee(emp.user_id, emp.password)
+                                                }
                                                 className="text-blue-500"
                                             >
                                                 <FaEdit />
@@ -237,7 +280,6 @@ const EmployeeList = () => {
                     </table>
                 </div>
 
-                {/* add‑employee modal */}
                 {isModalOpen && (
                     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
                         <div className="bg-white p-6 rounded shadow w-[400px]">
@@ -246,10 +288,18 @@ const EmployeeList = () => {
                                 {["name", "email", "password", "phone", "address"].map((f) => (
                                     <input
                                         key={f}
-                                        type={f === "password" ? "password" : f === "email" ? "email" : "text"}
+                                        type={
+                                            f === "password"
+                                                ? "password"
+                                                : f === "email"
+                                                    ? "email"
+                                                    : "text"
+                                        }
                                         placeholder={f.charAt(0).toUpperCase() + f.slice(1)}
                                         value={formData[f]}
-                                        onChange={e => setFormData({ ...formData, [f]: e.target.value })}
+                                        onChange={(e) =>
+                                            setFormData({ ...formData, [f]: e.target.value })
+                                        }
                                         className="w-full p-2 border rounded"
                                         required
                                     />
