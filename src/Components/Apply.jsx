@@ -208,7 +208,7 @@ const Apply = () => {
         formDataToSend,
         {
           headers: { "Content-Type": "multipart/form-data" },
-          timeout: 30000, // Set timeout to 30 seconds
+          timeout: 60000, // Set timeout to 30 seconds
         }
       );
 

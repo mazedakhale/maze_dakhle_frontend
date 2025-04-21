@@ -324,7 +324,7 @@ const CustomerHistory = () => {
                           onClick={() => handleViewCertificate(doc.document_id)}
                           className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 transition"
                         >
-                          View
+                          Certificate
                         </button>
                       ) : (
                         <span className="text-gray-500 text-center">Not Available</span>

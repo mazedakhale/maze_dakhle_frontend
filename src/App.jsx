@@ -75,6 +75,8 @@ import ContactForm from "./Components/ContactForm";
 import ProfilePage from "./Components/ProfilePage";
 import Youtube from "./Components/Youtube";
 import Guide from "./Components/Guide"
+import Contact from "./Components/Contact"
+
 
 function App() {
   return (
@@ -97,6 +99,7 @@ function App() {
         <Route path="/Addsubcategory" element={<Admindashboard><Addsubcategory /></Admindashboard>} />
         <Route path="/Requireddocuments" element={<Admindashboard><RequiredDocuments /></Admindashboard>} />
         <Route path="/ContactTable" element={<Admindashboard><ContactTable /></Admindashboard>} />
+        <Route path="/Contact" element={<Admindashboard><Contact /></Admindashboard>} />
 
         <Route path="/Documenttable" element={<Admindashboard><DocumentTable /></Admindashboard>} />
         <Route path="/Addfieldname" element={<Admindashboard><Addfieldname /></Admindashboard>} />

@@ -257,7 +257,7 @@ const Footer = () => (
 
             <div className="w-full md:w-1/4 mb-6 md:mb-0">
                 <ul className="space-y-3">
-                    {["Home", "Login", "Register", "Contact us", "Privacy Policy"].map(
+                    {["Home", "Login", "Register", "ContactForm", "Privacy Policy"].map(
                         (label) => (
                             <li key={label} className="flex items-center space-x-2">
                                 <BsStopCircle className="text-gray-700 text-xl" />
