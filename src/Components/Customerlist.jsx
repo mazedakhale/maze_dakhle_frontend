@@ -7,9 +7,9 @@ import { useNavigate } from "react-router-dom";
 const CustomerList = () => {
     const [customers, setCustomers] = useState([]);
     const [editingId, setEditingId] = useState(null);
-    const [updatedPassword, setUpdatedPassword] = useState(""); // State for password editing
+    const [updatedPassword, setUpdatedPassword] = useState("");
 
-    const apiUrl = " https://mazedakhale.in/api/users/customers";
+    const apiUrl = "https://mazedakhale.in/api/users/customers";
 
     useEffect(() => {
         fetchCustomers();
@@ -18,7 +18,7 @@ const CustomerList = () => {
     const fetchCustomers = async () => {
         try {
             const response = await axios.get(apiUrl);
-            setCustomers(response.data.reverse()); // Reverse the order
+            setCustomers(response.data.reverse());
         } catch (error) {
             console.error("Error fetching customers:", error);
         }
@@ -26,233 +26,170 @@ const CustomerList = () => {
 
     const handleEditCustomer = (id, password) => {
         setEditingId(id);
-        setUpdatedPassword(password); // Set the password for editing
+        setUpdatedPassword(password);
     };
 
     const handleUpdateCustomer = async (id) => {
         try {
             if (updatedPassword) {
-                await axios.patch(` https://mazedakhale.in/api/users/password/${id}`, { newPassword: updatedPassword });
+                await axios.patch(`https://mazedakhale.in/api/users/password/${id}`, {
+                    newPassword: updatedPassword,
+                });
             }
-
-            setCustomers(
-                customers.map((customer) =>
-                    customer.user_id === id
-                        ? { ...customer, password: updatedPassword }
-                        : customer
+            setCustomers((prev) =>
+                prev.map((cust) =>
+                    cust.user_id === id ? { ...cust, password: updatedPassword } : cust
                 )
             );
-
             setEditingId(null);
             setUpdatedPassword("");
-
-            Swal.fire({
-                title: "Updated",
-                text: "Customer password updated successfully!",
-                icon: "success",
-                timer: 1000,
-                showConfirmButton: false
-            });
+            Swal.fire("Updated!", "Customer password updated!", "success");
         } catch (error) {
             console.error("Error updating customer:", error);
-            Swal.fire("Error", "Failed to update customer password", "error");
+            Swal.fire("Error", "Failed to update password", "error");
         }
     };
 
     const handleDeleteCustomer = async (id) => {
-        const confirmDelete = await Swal.fire({
+        const confirm = await Swal.fire({
             title: "Enter Deletion Code",
-            text: "Please enter the code to confirm deletion.",
             input: "text",
-            inputPlaceholder: "Enter code here...",
-            inputAttributes: { autocapitalize: "off" },
+            inputPlaceholder: "0000",
             showCancelButton: true,
-            confirmButtonColor: "#d33",
-            cancelButtonColor: "#3085d6",
-            confirmButtonText: "Delete",
-            showLoaderOnConfirm: true,
-            preConfirm: (inputValue) => {
-                if (inputValue !== "0000") {
-                    Swal.showValidationMessage("Incorrect code! Deletion not allowed.");
-                    return false;
-                }
-                return true;
-            },
-            allowOutsideClick: () => !Swal.isLoading()
+            preConfirm: (val) => val === "0000" || Swal.showValidationMessage("Wrong code"),
         });
 
-        if (confirmDelete.isConfirmed) {
-            Swal.fire({
-                title: "Deleted!",
-                text: "Customer has been deleted.",
-                icon: "success",
-                timer: 1500,
-                showConfirmButton: false
-            });
-
+        if (confirm.isConfirmed) {
             try {
-                await axios.delete(` https://mazedakhale.in/api/users/delete/${id}`);
-                setCustomers((prevCustomers) =>
-                    prevCustomers.filter((customer) => customer.user_id !== id)
-                );
+                await axios.delete(`https://mazedakhale.in/api/users/delete/${id}`);
+                setCustomers((prev) => prev.filter((c) => c.user_id !== id));
+                Swal.fire("Deleted!", "Customer removed.", "success");
             } catch (error) {
-                console.error("Error deleting customer:", error);
-                Swal.fire("Error", "Failed to delete customer", "error");
+                console.error("Delete failed", error);
+                Swal.fire("Error", "Failed to delete", "error");
             }
         }
     };
 
     const handleStatusChange = async (id, newStatus) => {
         try {
-            // Update the UI immediately
-            setCustomers((prevCustomers) =>
-                prevCustomers.map((customer) =>
-                    customer.user_id === id ? { ...customer, user_login_status: newStatus } : customer
+            await axios.patch(`https://mazedakhale.in/api/users/status/${id}`, { status: newStatus });
+            setCustomers((prev) =>
+                prev.map((c) =>
+                    c.user_id === id ? { ...c, user_login_status: newStatus } : c
                 )
             );
-
-            await axios.patch(` https://mazedakhale.in/api/users/status/${id}`, { status: newStatus });
-
-            Swal.fire({
-                title: "Updated!",
-                text: `Status changed to ${newStatus}`,
-                icon: "success",
-                timer: 1000, // Faster SweetAlert2 update
-                showConfirmButton: false
-            });
+            Swal.fire("Success", `Status set to ${newStatus}`, "success");
         } catch (error) {
-            console.error("Error updating status:", error);
-            Swal.fire("Error", "Failed to update status", "error");
+            console.error("Status update error", error);
+            Swal.fire("Error", "Could not change status", "error");
+        }
+    };
+
+    const updateEditRequestStatus = async (id, newStatus) => {
+        try {
+            await axios.patch(`https://mazedakhale.in/api/users/request-edit/${id}`, {
+                status: newStatus,
+            });
+            setCustomers((prev) =>
+                prev.map((c) =>
+                    c.user_id === id ? { ...c, edit_request_status: newStatus } : c
+                )
+            );
+            Swal.fire("Success", `Edit request ${newStatus.toLowerCase()}!`, "success");
+        } catch (error) {
+            console.error("Edit request error", error);
+            Swal.fire("Error", "Failed to update edit request", "error");
         }
     };
 
     return (
-        <div className="ml-[300px] mt-[80px] p-6 w-[calc(100%-260px)] overflow-x-hidden">
-            <div className="relative bg-white shadow-lg rounded-lg border border-gray-300 overflow-hidden">
-                {/* Header */}
-                <div className="border-t-4 border-orange-400 bg-[#F4F4F4] text-center p-4 rounded-t-lg relative">
+        <div className="ml-[300px] mt-[80px] p-6 w-[calc(100%-260px)] overflow-x-auto">
+            <div className="bg-white border shadow-lg rounded-lg overflow-hidden">
+                <div className="bg-[#F4F4F4] border-t-4 border-orange-400 p-4 text-center">
                     <h2 className="text-2xl font-bold text-gray-800">Customer List</h2>
-                    <div className="absolute bottom-[-2px] left-0 w-full h-1 bg-gray-300 shadow-md"></div>
                 </div>
 
-                {/* Table */}
-                <div className="p-6 overflow-x-auto">
-                    <table className="w-full border border-[#776D6DA8] text-sm bg-white shadow-md rounded-md">
-                        <thead className="bg-[#F58A3B14] border-b-2 border-[#776D6DA8]">
-                            <tr>
-                                {["ID", "Name", "Email", "Password", "District", "Taluka", "Documents", "Status", "Update", "Actions"].map((header, index) => (
-                                    <th key={index} className="px-4 py-3 border border-[#776D6DA8] text-black font-semibold text-center">
-                                        {header}
-                                    </th>
-                                ))}
+                <table className="w-full text-sm border">
+                    <thead className="bg-[#F58A3B14]">
+                        <tr>
+                            {["ID", "Name", "Email", "Password", "District", "Taluka", "Documents", "Status", "Edit Request", "Update", "Actions"].map((h, i) => (
+                                <th key={i} className="px-3 py-2 border text-black">{h}</th>
+                            ))}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {customers.map((customer) => (
+                            <tr key={customer.user_id} className="border hover:bg-orange-100">
+                                <td className="text-center border px-2 py-2">{customer.user_id}</td>
+                                <td className="text-center border">{customer.name}</td>
+                                <td className="text-center border">{customer.email}</td>
+                                <td className="text-center border">
+                                    {editingId === customer.user_id ? (
+                                        <input
+                                            value={updatedPassword}
+                                            onChange={(e) => setUpdatedPassword(e.target.value)}
+                                            className="border p-1 rounded w-full"
+                                        />
+                                    ) : customer.password}
+                                </td>
+                                <td className="text-center border">{customer.district}</td>
+                                <td className="text-center border">{customer.taluka}</td>
+                                <td className="text-center border">
+                                    {customer.user_documents?.length > 0 ? (
+                                        customer.user_documents.map((doc, i) => (
+                                            <div key={i}>
+                                                <a href={doc.file_path} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline">
+                                                    {doc.document_type}
+                                                </a>
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <span className="italic text-gray-400">No docs</span>
+                                    )}
+                                </td>
+                                <td className="text-center border">
+                                    <button onClick={() => handleStatusChange(customer.user_id, "Active")} className={`px-2 py-1 rounded text-white mr-2 ${customer.user_login_status === "Active" ? "bg-green-500" : "bg-gray-500 hover:bg-green-600"}`}>
+                                        Active
+                                    </button>
+                                    <button onClick={() => handleStatusChange(customer.user_id, "Inactive")} className={`px-2 py-1 rounded text-white ${customer.user_login_status === "Inactive" ? "bg-red-500" : "bg-gray-500 hover:bg-red-600"}`}>
+                                        Inactive
+                                    </button>
+                                </td>
+                                <td className="text-center border">
+                                    <div className="text-sm font-semibold">{customer.edit_request_status}</div>
+                                    <div className="flex gap-1 justify-center mt-1">
+                                        <button onClick={() => updateEditRequestStatus(customer.user_id, "Approved")} className="bg-green-500 text-white px-2 py-1 rounded text-xs hover:bg-green-600">
+                                            Approve
+                                        </button>
+                                        <button onClick={() => updateEditRequestStatus(customer.user_id, "Rejected")} className="bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600">
+                                            Reject
+                                        </button>
+                                    </div>
+                                </td>
+                                <td className="text-center border">
+                                    {editingId === customer.user_id ? (
+                                        <button onClick={() => handleUpdateCustomer(customer.user_id)} className="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600">
+                                            Save
+                                        </button>
+                                    ) : (
+                                        <button onClick={() => handleEditCustomer(customer.user_id, customer.password)} className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600">
+                                            <FaEdit />
+                                        </button>
+                                    )}
+                                </td>
+                                <td className="text-center border">
+                                    <button onClick={() => handleDeleteCustomer(customer.user_id)} className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600">
+                                        <FaTrash />
+                                    </button>
+                                </td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            {customers.length > 0 ? (
-                                customers.map((customer, index) => (
-                                    <tr
-                                        key={customer.user_id}
-                                        className={`${index % 2 === 0 ? "bg-[#FFFFFF]" : "bg-[#F58A3B14]"} hover:bg-orange-100 transition duration-200`}
-                                    >
-                                        <td className="px-4 py-3 border border-[#776D6DA8] text-center">{customer.user_id}</td>
-                                        <td className="px-4 py-3 border border-[#776D6DA8] text-center">{customer.name}</td>
-                                        <td className="px-4 py-3 border border-[#776D6DA8] text-center">{customer.email}</td>
-                                        <td className="px-4 py-3 border border-[#776D6DA8] text-center">
-                                            {editingId === customer.user_id ? (
-                                                <input
-                                                    type="text"
-                                                    value={updatedPassword}
-                                                    onChange={(e) => setUpdatedPassword(e.target.value)}
-                                                    className="border border-gray-400 p-2 rounded w-full"
-                                                />
-                                            ) : (
-                                                customer.password
-                                            )}
-                                        </td>
-                                        <td className="px-4 py-3 border border-[#776D6DA8] text-center">{customer.district}</td>
-
-                                        <td className="px-4 py-3 border border-[#776D6DA8] text-center">{customer.taluka}</td>
-                                        {Array.isArray(customer.user_documents) && customer.user_documents.length > 0 ? (
-                                            customer.user_documents.map((doc, index) => (
-                                                <div key={index}>
-                                                    <a
-                                                        href={doc.file_path}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        className="text-blue-500 hover:underline"
-                                                    >
-                                                        {doc.document_type}
-                                                    </a>
-                                                </div>
-                                            ))
-                                        ) : (
-                                            <span className="text-gray-400 italic">No documents</span>
-                                        )}
-
-
-
-                                        <td className="px-4 py-3 border border-[#776D6DA8] text-center">{customer.user_login_status}</td>
-                                        <td className="px-4 py-3 border border-[#776D6DA8] text-center">
-                                            <button
-                                                onClick={() => handleStatusChange(customer.user_id, "Active")}
-                                                className={`px-3 py-1 rounded text-white mr-2 ${customer.user_login_status === "Active"
-                                                    ? "bg-green-500 cursor-default"
-                                                    : "bg-gray-500 hover:bg-green-600"
-                                                    }`}
-                                                disabled={customer.user_login_status === "Active"}
-                                            >
-                                                Active
-                                            </button>
-                                            <button
-                                                onClick={() => handleStatusChange(customer.user_id, "Inactive")}
-                                                className={`px-3 py-1 rounded text-white ${customer.user_login_status === "Inactive"
-                                                    ? "bg-red-500 cursor-default"
-                                                    : "bg-gray-500 hover:bg-red-600"
-                                                    }`}
-                                                disabled={customer.user_login_status === "Inactive"}
-                                            >
-                                                Inactive
-                                            </button>
-                                        </td>
-                                        <td className="px-4 py-3 border border-[#776D6DA8] text-center">
-                                            {editingId === customer.user_id ? (
-                                                <button
-                                                    onClick={() => handleUpdateCustomer(customer.user_id)}
-                                                    className="bg-green-500 text-white px-3 py-1 rounded mr-2 hover:bg-green-600"
-                                                >
-                                                    Save
-                                                </button>
-                                            ) : (
-                                                <button
-                                                    onClick={() => handleEditCustomer(customer.user_id, customer.password)}
-                                                    className="bg-blue-500 text-white px-3 py-1 rounded mr-2 hover:bg-blue-600"
-                                                >
-                                                    <FaEdit />
-                                                </button>
-                                            )}
-                                            <button
-                                                onClick={() => handleDeleteCustomer(customer.user_id)}
-                                                className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-                                            >
-                                                <FaTrash />
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))
-                            ) : (
-                                <tr>
-                                    <td colSpan="7" className="px-4 py-3 border border-[#776D6DA8] text-center">
-                                        No customers found.
-                                    </td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
-                </div>
+                        ))}
+                    </tbody>
+                </table>
             </div>
         </div>
     );
-
 };
 
 export default CustomerList;

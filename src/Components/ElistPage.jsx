@@ -46,7 +46,7 @@ const ElistPage = () => {
     const handleSearch = (e) => {
         setSearchQuery(e.target.value);
     };
-  
+
 
     const filteredDocuments = documents
         .filter((doc) =>
