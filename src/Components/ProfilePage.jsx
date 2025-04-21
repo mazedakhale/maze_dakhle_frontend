@@ -30,8 +30,9 @@ export default function ProfilePage() {
         const token = localStorage.getItem('token');
         if (!token) return navigate('/Login');
         let decoded;
-        try { decoded = jwtDecode(token); }
-        catch {
+        try {
+            decoded = jwtDecode(token);
+        } catch {
             localStorage.removeItem('token');
             return navigate('/Login');
         }
@@ -52,8 +53,7 @@ export default function ProfilePage() {
                     }))
                 });
             })
-            .catch(err => {
-                console.error(err);
+            .catch(() => {
                 Swal.fire('Error', 'Could not load profile', 'error');
             });
     }, [navigate]);
@@ -104,7 +104,6 @@ export default function ProfilePage() {
             Swal.fire('Requested!', 'Your edit request has been sent to admin.', 'success');
             setUser(u => ({ ...u, edit_request_status: 'Pending' }));
         } catch (err) {
-            console.error(err);
             Swal.fire('Error', 'Failed to send request', 'error');
         }
     };
@@ -151,7 +150,15 @@ export default function ProfilePage() {
                 {/* Edit Request Status */}
                 {user.edit_request_status && (
                     <p className="text-sm mb-3 text-center">
-                        Edit Request Status: <strong className={user.edit_request_status === 'Approved' ? 'text-green-600' : user.edit_request_status === 'Rejected' ? 'text-red-500' : 'text-yellow-500'}>{user.edit_request_status}</strong>
+                        Edit Request Status: <strong className={
+                            user.edit_request_status === 'Approved'
+                                ? 'text-green-600'
+                                : user.edit_request_status === 'Rejected'
+                                    ? 'text-red-500'
+                                    : 'text-yellow-500'
+                        }>
+                            {user.edit_request_status}
+                        </strong>
                     </p>
                 )}
 
@@ -163,7 +170,10 @@ export default function ProfilePage() {
                         </div>
                     ) : (
                         <div className="text-center mb-4">
-                            <button onClick={requestProfileEdit} disabled={user.edit_request_status === 'Pending'} className={`px-4 py-2 rounded text-white ${user.edit_request_status === 'Pending' ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}`}>
+                            <button
+                                onClick={requestProfileEdit}
+                                disabled={user.edit_request_status === 'Pending'}
+                                className={`px-4 py-2 rounded text-white ${user.edit_request_status === 'Pending' ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}`}>
                                 Request Profile Edit
                             </button>
                         </div>
