@@ -44,6 +44,8 @@ const Sidebar = ({ onNavigate }) => {
             { icon: <FaList />, label: "Subcategory", path: "/Addsubcategory" },
             { icon: <FaList />, label: "Add Services", path: "/DocumentTable " },
             { icon: <FaList />, label: "Add Privacy", path: "/PrivacyPolicyTable " },
+            { icon: <FaList />, label: "Add Youtube Link", path: "/Youtube " },
+
             { icon: <FaList />, label: "Add Contact Form", path: "/ContactTable " },
 
             { icon: <FaExclamationTriangle />, label: "Error Request", path: "/Adminrequest" },

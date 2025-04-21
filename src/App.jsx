@@ -73,6 +73,8 @@ import PrivacyPolicyTable from "./Components/PrivacyPolicyTable";
 import ContactTable from "./Components/ContactTable";
 import ContactForm from "./Components/ContactForm";
 import ProfilePage from "./Components/ProfilePage";
+import Youtube from "./Components/Youtube";
+import Guide from "./Components/Guide"
 
 function App() {
   return (
@@ -104,6 +106,7 @@ function App() {
         <Route path="/Employee" element={<Admindashboard><Employee /></Admindashboard>} />
 
         <Route path="/PrivacyPolicyTable" element={<Admindashboard><PrivacyPolicyTable /></Admindashboard>} />
+        <Route path="/Youtube" element={<Admindashboard><Youtube /></Admindashboard>} />
 
         <Route path="/Distributorregister" element={<Admindashboard><Distributorregister /></Admindashboard>} />
         <Route path="/Recentapplications" element={<Admindashboard><Recentapplications /></Admindashboard>} />
@@ -139,6 +142,8 @@ function App() {
         <Route path="/Usercompletedlist" element={<Customerdashboard><Usercompletedlist /></Customerdashboard>} />
         <Route path="/Customerapply" element={<Customerdashboard><Customerapply /></Customerdashboard>} />
         <Route path="/Feedback" element={<Customerdashboard><Feedback /></Customerdashboard>} />
+        <Route path="/Guide" element={<Customerdashboard><Guide /></Customerdashboard>} />
+
         <Route path="/Checkapplication" element={<Customerdashboard><Checkapplication /></Customerdashboard>} />
         <Route path="/Adderrorrequest" element={<Customerdashboard><Adderrorrequest /></Customerdashboard>} />
         <Route path="/Customerhistory" element={<Customerdashboard><Customerhistory /></Customerdashboard>} />

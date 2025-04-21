@@ -42,7 +42,10 @@ const Sidebar = ({ onNavigate }) => {
             { icon: <FaClipboardList />, label: "Request History", path: "/Customererrorhistory" },
             { icon: <FaClipboardList />, label: "Applications", path: "/Customerapply" },
             { icon: <FaCommentDots />, label: "Feedback", path: "/Feedback" },
+            { icon: <FaCommentDots />, label: "Guide", path: "/Guide" },
+
           ].map((item, index) => (
+
             <li
               key={index}
               className={`flex items-center p-4 rounded-lg cursor-pointer transition duration-300 ease-in-out mb-4 

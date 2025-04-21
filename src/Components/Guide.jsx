@@ -1,0 +1,78 @@
+// src/Components/Guide.jsx
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+
+const GUIDE_API_URL = 'https://mazedakhale.in/api/images';
+
+export default function Guide() {
+    const [images, setImages] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        (async () => {
+            try {
+                const { data } = await axios.get(GUIDE_API_URL);
+                setImages(data);
+            } catch (err) {
+                console.error('Error fetching guide images:', err);
+                setError('Failed to load images');
+            } finally {
+                setLoading(false);
+            }
+        })();
+    }, []);
+
+    if (loading) return <p className="ml-[300px] mt-[80px]">Loading guide…</p>;
+    if (error) return <p className="ml-[300px] mt-[80px] text-red-600">{error}</p>;
+
+    return (
+        <div className="ml-[300px] mt-[80px] p-6 w-[calc(100%-300px)]">
+            <h1 className="text-2xl font-bold mb-4">Guide</h1>
+
+            {images.length === 0 ? (
+                <p>No images available.</p>
+            ) : (
+                <ul className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {images.map(img => (
+                        <li
+                            key={img.id}
+                            className="border rounded overflow-hidden shadow-sm"
+                        >
+                            <img
+                                src={img.imageUrl}
+                                alt={img.description || `Image ${img.id}`}
+                                className="w-full h-48 object-cover"
+                            />
+                            <div className="p-4">
+                                <p className="font-semibold mb-2">
+                                    {img.description || '(No description)'}
+                                </p>
+
+                                {/* YouTube Link */}
+                                {img.youtubeLink && (
+                                    <>
+                                        <a
+                                            href={img.youtubeLink}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="text-blue-600 hover:underline"
+                                        >
+                                            Watch on YouTube
+                                        </a>
+                                        {/* YouTube Description */}
+                                        {img.youtubeDescription && (
+                                            <p className="mt-1 text-sm text-gray-600">
+                                                {img.youtubeDescription}
+                                            </p>
+                                        )}
+                                    </>
+                                )}
+                            </div>
+                        </li>
+                    ))}
+                </ul>
+            )}
+        </div>
+    );
+}
