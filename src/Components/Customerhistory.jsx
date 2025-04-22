@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { FaFileAlt, FaDownload, FaExclamationTriangle } from "react-icons/fa";
+import { FaFileAlt, FaDownload, FaExclamationTriangle, FaTimes } from "react-icons/fa";
 import jwtDecode from "jwt-decode";
 import { useNavigate } from "react-router-dom";
 
@@ -9,6 +9,7 @@ const CustomerHistory = () => {
   const [certificates, setCertificates] = useState([]);
   const [userId, setUserId] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [isAdding, setIsAdding] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -137,10 +138,19 @@ const CustomerHistory = () => {
   return (
     <div className="ml-[250px] flex flex-col items-center min-h-screen p-6 bg-gray-100">
       <div className="w-[100%] max-w-6xl bg-white shadow-lg rounded-lg">
-        <div className="border-t-4 border-orange-400 bg-[#F4F4F4] text-center p-4 rounded-t-lg relative">                    <h2 className="text-xl font-bold text-center text-gray-800">
-          Completed List
-        </h2>
-          <div className="absolute bottom-[-2px] left-0 w-full h-1 bg-gray-300 shadow-md"></div>
+        <div className="relative border-t-4 border-orange-400 bg-[#F4F4F4] p-4 rounded-t-lg">
+          <h2 className="text-2xl font-bold text-gray-800 text-center">
+            Completed Applications List
+          </h2>
+          <button
+            onClick={() => {
+              setIsAdding(false);
+              navigate("/Cdashinner");
+            }}
+            className="absolute top-1/2 right-4 transform -translate-y-1/2 text-gray-600 hover:text-gray-800"
+          >
+            <FaTimes size={20} />
+          </button>
         </div>
 
         {/* Search Bar */}

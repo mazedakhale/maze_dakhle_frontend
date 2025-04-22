@@ -221,7 +221,7 @@ const CustomerDashboard = () => {
             count: completedCount,
             label: "Total Completed",
             color: "bg-[#22C55E]", // Green
-            onClick: () => navigate("/Usercompletedlist"),
+            onClick: () => navigate("/Customerhistory"),
           },
           {
             icon: <FaRupeeSign size={30} />,

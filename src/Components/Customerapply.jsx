@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { FaFileAlt, FaFileInvoice, FaDownload, FaCheck } from "react-icons/fa";
+import { FaFileAlt, FaFileInvoice, FaDownload, FaCheck, FaTimes } from "react-icons/fa";
 import jwtDecode from "jwt-decode";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
@@ -11,8 +11,8 @@ const CustomerApply = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [certificates, setCertificates] = useState([]); // State for certificates
+  const [isAdding, setIsAdding] = useState(false);
   const navigate = useNavigate();
-
   // Fetch user ID from token
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -183,12 +183,21 @@ const CustomerApply = () => {
   };
 
   return (
-    <div className="ml-[280px] flex flex-col items-center min-h-screen p-6 bg-gray-100">
-      <div className="w-[100%] max-w-7xl bg-white shadow-lg rounded-lg">
-        <div className="bg-[#F4F4F4] border-t-4 shadow-lg rounded border-orange-400 p-4">
-          <h2 className="text-xl font-bold text-center text-gray-800">
-            Customer Applications
+    <div className="ml-[250px] flex flex-col items-center min-h-screen p-6 bg-gray-100">
+      <div className="w-[100%] max-w-6xl bg-white shadow-lg rounded-lg">
+        <div className="relative border-t-4 border-orange-400 bg-[#F4F4F4] p-4 rounded-t-lg">
+          <h2 className="text-2xl font-bold text-gray-800 text-center">
+            Applications List
           </h2>
+          <button
+            onClick={() => {
+              setIsAdding(false);
+              navigate("/Cdashinner");
+            }}
+            className="absolute top-1/2 right-4 transform -translate-y-1/2 text-gray-600 hover:text-gray-800"
+          >
+            <FaTimes size={20} />
+          </button>
         </div>
 
         {/* Search & Filter */}

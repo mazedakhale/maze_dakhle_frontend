@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { FaFilePdf, FaFileAlt } from "react-icons/fa";
+import { FaFilePdf, FaFileAlt, FaTimes } from "react-icons/fa";
 
 const Categories = () => {
   const navigate = useNavigate();
   const [categories, setCategories] = useState([]);
   const [subcategories, setSubcategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
-
+  const [isAdding, setIsAdding] = useState(false)
   const API_BASE_URL = "https://mazedakhale.in/api/categories";
   const SUBCATEGORIES_API_URL = "https://mazedakhale.in/api/subcategories";
 
@@ -54,8 +54,18 @@ const Categories = () => {
       <div className="flex-1 bg-gray-100 text-[#1e293b] min-h-screen animate-fadeIn p-6 pt-12">
         <section className="relative bg-[#F58A3B] text-black py-16 px-6 text-center shadow-[0px_2px_4px_rgba(0,0,0,0.4)]">
           <div className="max-w-7xl mx-auto">
-            <h1 className="text-3xl text-white font-bold -mt-9 mb-1">Government Document Services</h1>
-            <p className="text-lg -mb-10 text-white">
+            <h2 className="text-2xl font-bold text-gray-800 text-center">
+              Apply for Government Document
+            </h2>
+            <button
+              onClick={() => {
+                setIsAdding(false);
+                navigate("/Cdashinner");
+              }}
+              className="absolute top-1/2 right-4 transform -translate-y-1/2 text-gray-600 hover:text-gray-800"
+            >
+              <FaTimes size={20} />
+            </button>            <p className="text-lg -mb-10 text-black">
               Apply for various government documents quickly and hassle-free. Select a category below to proceed with your application.
             </p>
           </div>

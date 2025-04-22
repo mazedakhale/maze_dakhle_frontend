@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useLocation } from "react-router-dom";
 import Swal from 'sweetalert2';
+import { useNavigate } from "react-router-dom";
+import { FaFileAlt, FaDownload, FaExclamationTriangle, FaTimes } from "react-icons/fa";
 
 const Apply = () => {
   const [documentNames, setDocumentNames] = useState([]);
@@ -10,6 +12,8 @@ const Apply = () => {
   const location = useLocation();
   const { categoryId, categoryName, subcategoryId, subcategoryName } = location.state || {};
   const [fieldNames, setFieldNames] = useState([]);
+  const [isAdding, setIsAdding] = useState(false);
+  const navigate = useNavigate();
   const token = localStorage.getItem("token");
   const [userData, setUserData] = useState({
     user_id: "",
@@ -228,8 +232,20 @@ const Apply = () => {
   };
 
   return (
-    <div className="ml-[320px] flex flex-col items-center min-h-screen p-10 bg-gray-100">
-      <div className="flex-1 flex justify-center pt-9 bg-white items-center py-9 px-9">
+    <div className="ml-[250px] flex flex-col items-center min-h-screen p-6 bg-gray-100">
+      <div className="w-[100%] max-w-6xl bg-white shadow-lg rounded-lg">
+        <div className="relative border-t-4 border-orange-400 bg-[#F4F4F4] p-4 rounded-t-lg">
+
+          <button
+            onClick={() => {
+              setIsAdding(false);
+              navigate("/Cdashinner");
+            }}
+            className="absolute top-1/2 right-4 transform -translate-y-1/2 text-gray-600 hover:text-gray-800"
+          >
+            <FaTimes size={20} />
+          </button>
+        </div>
         <form
           className="bg-white p-6 rounded-2xl shadow-2xl w-full max-w-6xxl border border-gray-200"
           onSubmit={handleSubmit}
@@ -366,7 +382,7 @@ const Apply = () => {
           <div className="mt-5 flex justify-center">
             <button
               type="submit"
-              className="w-full bg-orange-600 text-white font-bold p-3 rounded-lg shadow-lg hover:bg-orange-700 transition-all text-lg"
+              className="w-2/5 bg-orange-600 text-white font-bold p-3 rounded-lg shadow-lg hover:bg-orange-700 transition-all text-lg"
             >
               Submit Application
             </button>

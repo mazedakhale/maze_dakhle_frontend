@@ -1,12 +1,16 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
-import { FaDownload } from "react-icons/fa";
+import { FaFileAlt, FaDownload, FaExclamationTriangle, FaTimes } from "react-icons/fa";
+
+import { useNavigate } from "react-router-dom";
 
 const ErrorRequests = () => {
   const [errorRequests, setErrorRequests] = useState([]);
   const [certificates, setCertificates] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [isAdding, setIsAdding] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchErrorRequests();
@@ -106,12 +110,21 @@ const ErrorRequests = () => {
 
   //const ErrorRequests = ({ searchTerm, setSearchTerm, filteredRequests, getCertificateByDocumentId, handleViewCertificate, handleDownloadCertificate }) => {
   return (
-    <div className="w-[calc(90%-260px)] ml-[360px] mt-[80px] p-6">
-      {/* Header Section */}
-      <div className="relative bg-white shadow-lg rounded-lg border border-gray-300 overflow-hidden">
-        <div className="border-t-4 border-orange-400 bg-[#f4f4f4] text-center p-4 rounded-t-lg relative">
-          <h2 className="text-2xl font-bold text-gray-800">Completed Error Requests</h2>
-          <div className="absolute bottom-[-2px] left-0 w-full h-1 bg-gray-300 shadow-md"></div>
+    <div className="ml-[250px] flex flex-col items-center min-h-screen p-6 bg-gray-100">
+      <div className="w-[100%] max-w-6xl bg-white shadow-lg rounded-lg">
+        <div className="relative border-t-4 border-orange-400 bg-[#F4F4F4] p-4 rounded-t-lg">
+          <h2 className="text-2xl font-bold text-gray-800 text-center">
+            Completed Error List
+          </h2>
+          <button
+            onClick={() => {
+              setIsAdding(false);
+              navigate("/Cdashinner");
+            }}
+            className="absolute top-1/2 right-4 transform -translate-y-1/2 text-gray-600 hover:text-gray-800"
+          >
+            <FaTimes size={20} />
+          </button>
         </div>
 
         {/* Search Bar */}

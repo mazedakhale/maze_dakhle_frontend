@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Paper, Typography, Button, IconButton } from "@mui/material";
+import { FaFileAlt, FaDownload, FaExclamationTriangle, FaTimes } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
+
 import StarIcon from "@mui/icons-material/Star";
 import jwtDecode from "jwt-decode"; // To decode token
 
@@ -8,7 +11,8 @@ const Feedback = () => {
     const [comment, setComment] = useState("");
     const [rating, setRating] = useState(0);
     const [user, setUser] = useState(null);
-
+    const [isAdding, setIsAdding] = useState(false);
+    const navigate = useNavigate();
     // Get user info from token
     useEffect(() => {
         const token = localStorage.getItem("token");
@@ -95,7 +99,18 @@ const Feedback = () => {
                         borderTop: "15px solid #f48236",
                     }}></div>
                 </div>
+                <div className="relative border-t-4 p-4 rounded-t-lg">
 
+                    <button
+                        onClick={() => {
+                            setIsAdding(false);
+                            navigate("/Cdashinner");
+                        }}
+                        className="absolute top-1/2 right-4 transform -translate-y-1/2 text-gray-600 hover:text-gray-800"
+                    >
+                        <FaTimes size={20} />
+                    </button>
+                </div>
                 {/* User Name */}
                 {user ? (
                     <Typography style={{ textAlign: "left", fontWeight: "bold", marginBottom: "10px" }}>

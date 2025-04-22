@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
+import { FaFileAlt, FaFileInvoice, FaDownload, FaCheck, FaTimes } from "react-icons/fa";
 
 const AddErrorRequestPage = () => {
   const navigate = useNavigate();
@@ -19,6 +20,7 @@ const AddErrorRequestPage = () => {
   const [requestDescription, setRequestDescription] = useState("");
   const [errorDocument, setErrorDocument] = useState(null);
   const [uploading, setUploading] = useState(false);
+  const [isAdding, setIsAdding] = useState(false);
 
   // Handle file selection
   const handleFileChange = (e) => {
@@ -93,9 +95,21 @@ const AddErrorRequestPage = () => {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100">
-      <div className="bg-white p-8 rounded-lg shadow-lg w-[500px]">
-        <h2 className="text-2xl font-bold mb-4 text-center">Add Error Request</h2>
+    <div className="flex justify-center items-center min-h-screen bg-gray-100 p-6">
+      {/* make this container relative so the close button can be absolute */}
+      <div className="relative bg-white p-8 rounded-lg shadow-lg w-[500px]">
+        {/* Close button, absolute top-right */}
+        <button
+          onClick={() => navigate("/Cdashinner")}
+          className="absolute top-4 right-4 text-gray-600 hover:text-gray-800"
+        >
+          <FaTimes size={20} />
+        </button>
+
+        {/* Your heading */}
+        <h2 className="text-2xl font-bold mb-4 text-center">
+          Add Error Request
+        </h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block font-semibold mb-1">Request Description:</label>
