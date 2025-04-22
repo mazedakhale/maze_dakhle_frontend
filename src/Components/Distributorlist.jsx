@@ -7,11 +7,15 @@ import { useNavigate } from "react-router-dom";
 // Set default timeout for all axios requests
 axios.defaults.timeout = 30000; // 30 seconds
 
+// Import form validators
+import { isValidEmail, isValidPhone, isValidPassword, validateRegistration } from "../utils/formValidators";
+
 const DistributorList = () => {
     const [distributors, setDistributors] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingId, setEditingId] = useState(null);
     const [updatedPassword, setUpdatedPassword] = useState("");
+    const [emailExists, setEmailExists] = useState(false);
     const [formData, setFormData] = useState({
         name: "",
         email: "",
@@ -21,11 +25,19 @@ const DistributorList = () => {
         shopAddress: "",
         aadharCard: null,
         panCard: null,
-        errors: { aadharCard: "", panCard: "" },
+        errors: {
+            name: "",
+            email: "",
+            password: "",
+            phone: "",
+            address: "",
+            aadharCard: "",
+            panCard: ""
+        },
     });
     const navigate = useNavigate();
 
-    const apiUrl = " https://mazedakhale.in/api/users/distributors";
+    const apiUrl = "https://mazedakhale.in/api/users/distributors";
 
     useEffect(() => {
         fetchDistributors();
@@ -41,6 +53,16 @@ const DistributorList = () => {
         }
     };
 
+    const checkEmailExists = async (email) => {
+        try {
+            const response = await axios.get(`https://mazedakhale.in/api/users/check-email/${email}`, { timeout: 30000 });
+            return response.data.exists;
+        } catch (error) {
+            console.error("Error checking email:", error);
+            return false;
+        }
+    };
+
     const handleAddDistributor = () => {
         setIsModalOpen(true);
         setFormData({
@@ -52,8 +74,74 @@ const DistributorList = () => {
             shopAddress: "",
             aadharCard: null,
             panCard: null,
-            errors: { aadharCard: "", panCard: "" },
+            errors: {
+                name: "",
+                email: "",
+                password: "",
+                phone: "",
+                address: "",
+                aadharCard: "",
+                panCard: ""
+            },
         });
+        setEmailExists(false);
+    };
+
+    const validateField = async (name, value) => {
+        const newErrors = { ...formData.errors };
+
+        switch (name) {
+            case 'name':
+                newErrors.name = value.trim() === '' ? 'Name is required' : '';
+                break;
+            case 'email':
+                if (!isValidEmail(value)) {
+                    newErrors.email = 'Please enter a valid email address.';
+                } else {
+                    const exists = await checkEmailExists(value);
+                    if (exists) {
+                        newErrors.email = 'Email already exists.';
+                        setEmailExists(true);
+                    } else {
+                        newErrors.email = '';
+                        setEmailExists(false);
+                    }
+                }
+                break;
+            case 'password':
+                newErrors.password = isValidPassword(value) ? '' :
+                    'Password must be at least 8 characters and include uppercase, lowercase, a number, and a special character.';
+                break;
+            case 'phone':
+                newErrors.phone = isValidPhone(value) ? '' : 'Phone number must be exactly 10 digits.';
+                break;
+            case 'address':
+                newErrors.address = value.trim() === '' ? 'Address is required' : '';
+                break;
+            default:
+                break;
+        }
+
+        return newErrors;
+    };
+
+    const handleInputChange = async (e) => {
+        const { name, value } = e.target;
+
+        // Update the field value
+        setFormData(prev => ({
+            ...prev,
+            [name]: value
+        }));
+
+        // Validate the field in real-time
+        if (name !== 'shopAddress') { // Skip validation for optional field
+            const newErrors = await validateField(name, value);
+            setFormData(prev => ({
+                ...prev,
+                errors: newErrors
+            }));
+        }
     };
 
     const handleFileChange = (e, field) => {
@@ -86,17 +174,70 @@ const DistributorList = () => {
         }
     };
 
+    const validateForm = () => {
+        let isValid = true;
+        const newErrors = { ...formData.errors };
+
+        // Validate all fields
+        if (formData.name.trim() === '') {
+            newErrors.name = 'Name is required';
+            isValid = false;
+        }
+
+        if (!isValidEmail(formData.email)) {
+            newErrors.email = 'Please enter a valid email address.';
+            isValid = false;
+        }
+
+        if (!isValidPassword(formData.password)) {
+            newErrors.password = 'Password must be at least 8 characters and include uppercase, lowercase, a number, and a special character.';
+            isValid = false;
+        }
+
+        if (!isValidPhone(formData.phone)) {
+            newErrors.phone = 'Phone number must be exactly 10 digits.';
+            isValid = false;
+        }
+
+        if (formData.address.trim() === '') {
+            newErrors.address = 'Address is required';
+            isValid = false;
+        }
+
+        if (!formData.aadharCard) {
+            newErrors.aadharCard = 'Aadhar Card is required';
+            isValid = false;
+        }
+
+        if (!formData.panCard) {
+            newErrors.panCard = 'PAN Card is required';
+            isValid = false;
+        }
+
+        setFormData(prev => ({
+            ...prev,
+            errors: newErrors
+        }));
+
+        return isValid;
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // Validate that both Aadhar Card and PAN Card are uploaded
-        if (!formData.aadharCard || !formData.panCard) {
-            Swal.fire({
-                title: "Error",
-                text: "Please upload both Aadhar Card and PAN Card.",
-                icon: "error",
-                confirmButtonColor: "#d33",
-            });
+        // Validate the form before submission
+        if (!validateForm()) {
+            return;
+        }
+
+        // Check if email exists one more time before submitting
+        const exists = await checkEmailExists(formData.email);
+        if (exists) {
+            setFormData(prev => ({
+                ...prev,
+                errors: { ...prev.errors, email: 'Email already exists.' }
+            }));
+            setEmailExists(true);
             return;
         }
 
@@ -105,9 +246,9 @@ const DistributorList = () => {
             title: "Processing",
             text: "Please wait while your request is being processed...",
             icon: "info",
-            allowOutsideClick: false, // Prevent closing by clicking outside
+            allowOutsideClick: false,
             didOpen: () => {
-                Swal.showLoading(); // Show loading spinner
+                Swal.showLoading();
             },
         });
 
@@ -118,9 +259,9 @@ const DistributorList = () => {
         formDataToSend.append("password", formData.password);
         formDataToSend.append("phone", formData.phone);
         formDataToSend.append("address", formData.address);
-        formDataToSend.append("shop_address", formData.shopAddress || ""); // Optional field
-        formDataToSend.append("role", "Distributor"); // Hardcode role as "Distributor"
-        formDataToSend.append("user_login_status", "Active"); // Set login status as "Active"
+        formDataToSend.append("shop_address", formData.shopAddress || "");
+        formDataToSend.append("role", "Distributor");
+        formDataToSend.append("user_login_status", "Active");
 
         // Append files and document types
         formDataToSend.append("files", formData.aadharCard);
@@ -129,33 +270,35 @@ const DistributorList = () => {
         formDataToSend.append("documentTypes", "PAN Card");
 
         try {
-            // Send the registration request to the backend
-            const response = await axios.post(" https://mazedakhale.in/api/users/register", formDataToSend, {
+            const response = await axios.post("https://mazedakhale.in/api/users/register", formDataToSend, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                 },
-                timeout: 30000, // Increase timeout to 30 seconds
+                timeout: 30000,
             });
 
-            console.log("API Response:", response.data); // Log the response
+            console.log("API Response:", response.data);
 
-            // Close the "Processing" alert and show success message
             Swal.fire({
                 title: "Success",
                 text: "Distributor added successfully!",
                 icon: "success",
                 confirmButtonText: "OK",
             }).then(() => {
-                fetchDistributors(); // Refresh the list
-                setIsModalOpen(false); // Close the modal
+                fetchDistributors();
+                setIsModalOpen(false);
             });
         } catch (error) {
             console.error("Error adding distributor:", error);
 
-            // Close the "Processing" alert and show error message
+            let errorMessage = "Failed to add distributor. Please try again.";
+            if (error.response && error.response.data && error.response.data.message) {
+                errorMessage = error.response.data.message;
+            }
+
             Swal.fire({
                 title: "Error",
-                text: "Failed to add distributor. Please try again.",
+                text: errorMessage,
                 icon: "error",
                 confirmButtonColor: "#d33",
             });
@@ -170,7 +313,7 @@ const DistributorList = () => {
     const handleUpdateDistributor = async (id) => {
         try {
             if (updatedPassword) {
-                await axios.patch(` https://mazedakhale.in/api/users/password/${id}`,
+                await axios.patch(`https://mazedakhale.in/api/users/password/${id}`,
                     { newPassword: updatedPassword },
                     { timeout: 30000 }
                 );
@@ -233,7 +376,7 @@ const DistributorList = () => {
             });
 
             try {
-                await axios.delete(` https://mazedakhale.in/api/users/delete/${id}`, { timeout: 30000 });
+                await axios.delete(`https://mazedakhale.in/api/users/delete/${id}`, { timeout: 30000 });
 
                 Swal.fire({
                     title: "Deleted!",
@@ -262,7 +405,7 @@ const DistributorList = () => {
                 )
             );
 
-            await axios.patch(` https://mazedakhale.in/api/users/status/${id}`,
+            await axios.patch(`https://mazedakhale.in/api/users/status/${id}`,
                 { status: newStatus },
                 { timeout: 30000 }
             );
@@ -338,10 +481,7 @@ const DistributorList = () => {
                                             )}
                                         </td>
                                         <td className="px-4 py-3 border border-[#776D6DA8] text-center">{distributor.address}</td>
-
                                         <td className="px-4 py-3 border border-[#776D6DA8] text-center">{distributor.shop_address}</td>
-
-
                                         <td className="px-4 py-3 border border-[#776D6DA8] text-center">
                                             {Array.isArray(distributor.user_documents) ? (
                                                 distributor.user_documents.map((doc, index) => (
@@ -410,7 +550,7 @@ const DistributorList = () => {
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan="7" className="px-4 py-3 border border-[#776D6DA8] text-center">
+                                    <td colSpan="10" className="px-4 py-3 border border-[#776D6DA8] text-center">
                                         No distributors found.
                                     </td>
                                 </tr>
@@ -426,59 +566,91 @@ const DistributorList = () => {
                         <h2 className="text-xl font-bold text-gray-800 mb-4">Add Distributor</h2>
 
                         <form onSubmit={handleSubmit} className="space-y-3">
-                            <input
-                                type="text"
-                                name="name"
-                                placeholder="Name"
-                                value={formData.name}
-                                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                className="w-full p-2 border rounded text-xs"
-                                required
-                            />
-                            <input
-                                type="email"
-                                name="email"
-                                placeholder="Email"
-                                value={formData.email}
-                                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                className="w-full p-2 border rounded text-xs"
-                                required
-                            />
-                            <input
-                                type="password"
-                                name="password"
-                                placeholder="Password"
-                                value={formData.password}
-                                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                                className="w-full p-2 border rounded text-xs"
-                                required
-                            />
-                            <input
-                                type="text"
-                                name="phone"
-                                placeholder="Phone"
-                                value={formData.phone}
-                                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                                className="w-full p-2 border rounded text-xs"
-                                required
-                            />
-                            <input
-                                type="text"
-                                name="address"
-                                placeholder="Address"
-                                value={formData.address}
-                                onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                                className="w-full p-2 border rounded text-xs"
-                                required
-                            />
-                            <input
-                                type="text"
-                                name="shopAddress"
-                                placeholder="Shop Address (Optional)"
-                                value={formData.shopAddress}
-                                onChange={(e) => setFormData({ ...formData, shopAddress: e.target.value })}
-                                className="w-full p-2 border rounded text-xs"
-                            />
+                            <div>
+                                <input
+                                    type="text"
+                                    name="name"
+                                    placeholder="Name"
+                                    value={formData.name}
+                                    onChange={handleInputChange}
+                                    className={`w-full p-2 border rounded text-xs ${formData.errors.name ? 'border-red-500' : ''}`}
+                                    required
+                                />
+                                {formData.errors.name && (
+                                    <p className="text-red-500 text-xs mt-1">{formData.errors.name}</p>
+                                )}
+                            </div>
+
+                            <div>
+                                <input
+                                    type="email"
+                                    name="email"
+                                    placeholder="Email"
+                                    value={formData.email}
+                                    onChange={handleInputChange}
+                                    className={`w-full p-2 border rounded text-xs ${formData.errors.email ? 'border-red-500' : ''}`}
+                                    required
+                                />
+                                {formData.errors.email && (
+                                    <p className="text-red-500 text-xs mt-1">{formData.errors.email}</p>
+                                )}
+                            </div>
+
+                            <div>
+                                <input
+                                    type="password"
+                                    name="password"
+                                    placeholder="Password"
+                                    value={formData.password}
+                                    onChange={handleInputChange}
+                                    className={`w-full p-2 border rounded text-xs ${formData.errors.password ? 'border-red-500' : ''}`}
+                                    required
+                                />
+                                {formData.errors.password && (
+                                    <p className="text-red-500 text-xs mt-1">{formData.errors.password}</p>
+                                )}
+                            </div>
+
+                            <div>
+                                <input
+                                    type="text"
+                                    name="phone"
+                                    placeholder="Phone"
+                                    value={formData.phone}
+                                    onChange={handleInputChange}
+                                    className={`w-full p-2 border rounded text-xs ${formData.errors.phone ? 'border-red-500' : ''}`}
+                                    required
+                                />
+                                {formData.errors.phone && (
+                                    <p className="text-red-500 text-xs mt-1">{formData.errors.phone}</p>
+                                )}
+                            </div>
+
+                            <div>
+                                <input
+                                    type="text"
+                                    name="address"
+                                    placeholder="Address"
+                                    value={formData.address}
+                                    onChange={handleInputChange}
+                                    className={`w-full p-2 border rounded text-xs ${formData.errors.address ? 'border-red-500' : ''}`}
+                                    required
+                                />
+                                {formData.errors.address && (
+                                    <p className="text-red-500 text-xs mt-1">{formData.errors.address}</p>
+                                )}
+                            </div>
+
+                            <div>
+                                <input
+                                    type="text"
+                                    name="shopAddress"
+                                    placeholder="Shop Address (Optional)"
+                                    value={formData.shopAddress}
+                                    onChange={(e) => setFormData({ ...formData, shopAddress: e.target.value })}
+                                    className="w-full p-2 border rounded text-xs"
+                                />
+                            </div>
 
                             {/* Aadhar Card Upload */}
                             <div>
@@ -486,7 +658,7 @@ const DistributorList = () => {
                                 <input
                                     type="file"
                                     onChange={(e) => handleFileChange(e, "aadharCard")}
-                                    className="w-full text-xs"
+                                    className={`w-full text-xs ${formData.errors.aadharCard ? 'border-red-500' : ''}`}
                                     accept=".pdf,.jpg,.jpeg,.png"
                                 />
                                 {formData.errors.aadharCard && (
@@ -500,7 +672,7 @@ const DistributorList = () => {
                                 <input
                                     type="file"
                                     onChange={(e) => handleFileChange(e, "panCard")}
-                                    className="w-full text-xs"
+                                    className={`w-full text-xs ${formData.errors.panCard ? 'border-red-500' : ''}`}
                                     accept=".pdf,.jpg,.jpeg,.png"
                                 />
                                 {formData.errors.panCard && (
@@ -522,7 +694,6 @@ const DistributorList = () => {
                                 >
                                     Add Distributor
                                 </button>
-                                
                             </div>
                         </form>
                     </div>

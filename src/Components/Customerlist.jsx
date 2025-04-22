@@ -88,7 +88,7 @@ const CustomerList = () => {
 
     const updateEditRequestStatus = async (id, newStatus) => {
         try {
-            await axios.patch(`https://mazedakhale.in/api/users/edit-request/${id}`, {
+            await axios.patch(`https://mazedakhale.in/api/users/request-edit/${id}`, {
                 status: newStatus,
             });
             setCustomers((prev) =>
