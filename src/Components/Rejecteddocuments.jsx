@@ -217,14 +217,11 @@ const Rejecteddocuments = () => {
         fileInput.click();
     };
     return (
-        <div className="w-[calc(90%-350px)] ml-[330px] mt-[80px] p-6">
-            {/* Outer Container */}
-            <div className="relative bg-white shadow-lg rounded-lg border border-gray-300 overflow-hidden">
-
-                {/* Header */}
+        <div className="ml-[250px] flex flex-col items-center min-h-screen p-6 bg-gray-100">
+            <div className="w-[90%] max-w-6xl bg-white shadow-lg rounded-lg">
                 <div className="relative border-t-4 border-orange-400 bg-[#F4F4F4] p-4 rounded-t-lg">
                     <h2 className="text-2xl font-bold text-gray-800 text-center">
-                        Rejected Applications  List
+                        Rejcectd Applications
                     </h2>
                     <button
                         onClick={() => {
@@ -236,6 +233,7 @@ const Rejecteddocuments = () => {
                         <FaTimes size={20} />
                     </button>
                 </div>
+
 
 
                 {/* Filters */}

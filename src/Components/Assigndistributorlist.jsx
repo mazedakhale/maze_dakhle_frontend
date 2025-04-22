@@ -176,13 +176,11 @@ const AssignedDistributorsList = () => {
     console.log("Document Fields:", document.document_fields);
 
     return (
-        <div className="w-[calc(90%-280px)] ml-[320px] mt-[80px] p-6">
-            {/* Outer Container */}
-            <div className=" bg-white shadow-lg rounded-lg border border-gray-300 ">
-
+        <div className="ml-[250px] flex flex-col items-center min-h-screen p-6 bg-gray-100">
+            <div className="w-[90%] max-w-6xl bg-white shadow-lg rounded-lg">
                 <div className="relative border-t-4 border-orange-400 bg-[#F4F4F4] p-4 rounded-t-lg">
                     <h2 className="text-2xl font-bold text-gray-800 text-center">
-                        Assigned Distributor List
+                        Assigned Distributor  List
                     </h2>
                     <button
                         onClick={() => {
@@ -194,6 +192,7 @@ const AssignedDistributorsList = () => {
                         <FaTimes size={20} />
                     </button>
                 </div>
+
 
                 {/* Filters */}
                 <div className="p-4 flex justify-between items-center bg-gray-100 border-b border-gray-300">
