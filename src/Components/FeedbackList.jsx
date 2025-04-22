@@ -4,13 +4,17 @@ import axios from "axios";
 import StarIcon from "@mui/icons-material/Star";
 import jwtDecode from "jwt-decode";
 import Swal from "sweetalert2";
+import { useNavigate } from "react-router-dom";
+import { FaTag, FaEdit, FaTrash, FaPlus, FaTimes } from "react-icons/fa";
+
 
 const API_BASE = "https://mazedakhale.in/api/feedback";
 
 const FeedbackList = () => {
     const [feedbackList, setFeedbackList] = useState([]);
     const [user, setUser] = useState(null);
-
+    const [isAdding, setIsAdding] = useState(false);
+    const navigate = useNavigate();
     // Decode user from JWT token
     useEffect(() => {
         const token = localStorage.getItem("token");
@@ -124,8 +128,19 @@ const FeedbackList = () => {
     return (
         <div className="ml-[300px] mt-[80px] p-6 w-[calc(100%-260px)] overflow-x-hidden">
             <div className="bg-white shadow-lg rounded-lg border overflow-hidden">
-                <div className="bg-[#F4F4F4] border-t-4 border-orange-400 p-4 text-center rounded-t-lg">
-                    <h2 className="text-2xl font-bold text-gray-800">Feedback List</h2>
+                <div className="relative border-t-4 border-orange-400 bg-[#F4F4F4] p-4 rounded-t-lg">
+                    <h2 className="text-2xl font-bold text-gray-800 text-center">
+                        Feedback List
+                    </h2>
+                    <button
+                        onClick={() => {
+                            setIsAdding(false);
+                            navigate("/Adashinner");
+                        }}
+                        className="absolute top-1/2 right-4 transform -translate-y-1/2 text-gray-600 hover:text-gray-800"
+                    >
+                        <FaTimes size={20} />
+                    </button>
                 </div>
                 <div className="p-6 overflow-x-auto">
                     <table className="w-full bg-white text-sm border border-[#776D6DA8] rounded-md shadow-md">

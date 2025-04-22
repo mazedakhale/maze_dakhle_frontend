@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { FaEdit, FaTrash, FaPlus } from "react-icons/fa";
+import { FaEdit, FaTrash, FaPlus, FaTimes } from "react-icons/fa";
 import Swal from "sweetalert2";
+import { useNavigate } from "react-router-dom";
+
 
 const Addsubcategory = () => {
   const [subcategories, setSubcategories] = useState([]);
@@ -10,6 +12,7 @@ const Addsubcategory = () => {
   const [editingId, setEditingId] = useState(null);
   const [updatedName, setUpdatedName] = useState("");
   const [isAdding, setIsAdding] = useState(false);
+  const navigate = useNavigate();
 
   const API_BASE_URL = "https://mazedakhale.in/api";
 
@@ -114,13 +117,22 @@ const Addsubcategory = () => {
 
   return (
     <div className="ml-[300px] mt-[80px] p-6 w-[calc(100%-260px)] overflow-x-hidden">
-
       <div className="relative bg-white shadow-lg rounded-lg border border-gray-300 overflow-hidden">
-        <div className="border-t-4 border-orange-400 bg-[#F4F4F4] text-center p-4 rounded-t-lg relative">
-          <h2 className="text-2xl font-bold text-gray-800">Subcategory List</h2>
-          <div className="absolute bottom-[-2px] left-0 w-full h-1 bg-gray-300 shadow-md"></div>
-        </div>
 
+        <div className="relative border-t-4 border-orange-400 bg-[#F4F4F4] p-4 rounded-t-lg">
+          <h2 className="text-2xl font-bold text-gray-800 text-center">
+            SubCategory List
+          </h2>
+          <button
+            onClick={() => {
+              setIsAdding(false);
+              navigate("/Adashinner");
+            }}
+            className="absolute top-1/2 right-4 transform -translate-y-1/2 text-gray-600 hover:text-gray-800"
+          >
+            <FaTimes size={20} />
+          </button>
+        </div>
         {/* Add Button */}
         <div className="p-4 flex justify-end">
           <button
@@ -202,53 +214,55 @@ const Addsubcategory = () => {
         </div>
       </div>
 
-      {isAdding && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-[400px]">
-            <h2 className="text-xl font-bold text-gray-800 mb-4">Add Subcategory</h2>
+      {
+        isAdding && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+            <div className="bg-white p-6 rounded-lg shadow-lg w-[400px]">
+              <h2 className="text-xl font-bold text-gray-800 mb-4">Add Subcategory</h2>
 
-            {/* Category Dropdown */}
-            <select
-              value={newSubcategory.category_id}
-              onChange={(e) => setNewSubcategory({ ...newSubcategory, category_id: e.target.value })}
-              className="w-full p-2 border border-gray-300 rounded mb-4"
-            >
-              <option value="">Select Category</option>
-              {categories.map((cat) => (
-                <option key={cat.category_id} value={cat.category_id}>
-                  {cat.category_name}
-                </option>
-              ))}
-            </select>
-
-            {/* Subcategory Input */}
-            <input
-              type="text"
-              placeholder="Enter Subcategory Name"
-              value={newSubcategory.subcategory_name}
-              onChange={(e) => setNewSubcategory({ ...newSubcategory, subcategory_name: e.target.value })}
-              className="w-full p-2 border border-gray-300 rounded mb-4"
-            />
-
-            {/* Buttons */}
-            <div className="flex justify-end gap-3">
-              <button
-                onClick={() => setIsAdding(false)}
-                className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+              {/* Category Dropdown */}
+              <select
+                value={newSubcategory.category_id}
+                onChange={(e) => setNewSubcategory({ ...newSubcategory, category_id: e.target.value })}
+                className="w-full p-2 border border-gray-300 rounded mb-4"
               >
-                Cancel
-              </button>
-              <button
-                onClick={addSubcategory}
-                className="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600"
-              >
-                Save
-              </button>
+                <option value="">Select Category</option>
+                {categories.map((cat) => (
+                  <option key={cat.category_id} value={cat.category_id}>
+                    {cat.category_name}
+                  </option>
+                ))}
+              </select>
+
+              {/* Subcategory Input */}
+              <input
+                type="text"
+                placeholder="Enter Subcategory Name"
+                value={newSubcategory.subcategory_name}
+                onChange={(e) => setNewSubcategory({ ...newSubcategory, subcategory_name: e.target.value })}
+                className="w-full p-2 border border-gray-300 rounded mb-4"
+              />
+
+              {/* Buttons */}
+              <div className="flex justify-end gap-3">
+                <button
+                  onClick={() => setIsAdding(false)}
+                  className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={addSubcategory}
+                  className="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600"
+                >
+                  Save
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
-    </div>
+        )
+      }
+    </div >
   );
 };
 

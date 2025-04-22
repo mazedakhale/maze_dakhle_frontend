@@ -1,10 +1,15 @@
 import React, { useEffect, useState } from "react";
+import { FaTag, FaEdit, FaTrash, FaPlus, FaTimes } from "react-icons/fa";
+
 import axios from "axios";
 import Swal from "sweetalert2";
+import { useNavigate } from "react-router-dom";
 
 const Contact = () => {
     const [contacts, setContacts] = useState([]);
-    const [fieldKeys, setFieldKeys] = useState([]); // fields from Field API
+    const [fieldKeys, setFieldKeys] = useState([]);
+    const [isAdding, setIsAdding] = useState(false);// fields from Field API
+    const navigate = useNavigate();
 
     const contactApiUrl = "https://mazedakhale.in/api/contact";
     const fieldApiUrl = "https://mazedakhale.in/api/field";
@@ -49,8 +54,22 @@ const Contact = () => {
     return (
         <div className="ml-[300px] mt-[80px] p-6 w-[calc(100%-260px)] overflow-x-auto">
             <div className="bg-white border border-gray-300 rounded-lg shadow-lg">
-                <div className="border-t-4 border-orange-400 bg-[#F4F4F4] text-center p-4 rounded-t-lg">
-                    <h2 className="text-2xl font-bold text-gray-800">Submitted Contact Entries</h2>
+                <div className="relative bg-white shadow-lg rounded-lg border border-gray-300 overflow-hidden">
+                    {/* Header */}
+                    <div className="relative border-t-4 border-orange-400 bg-[#F4F4F4] p-4 rounded-t-lg">
+                        <h2 className="text-2xl font-bold text-gray-800 text-center">
+                            User Contacts List
+                        </h2>
+                        <button
+                            onClick={() => {
+                                setIsAdding(false);
+                                navigate("/Adashinner");
+                            }}
+                            className="absolute top-1/2 right-4 transform -translate-y-1/2 text-gray-600 hover:text-gray-800"
+                        >
+                            <FaTimes size={20} />
+                        </button>
+                    </div>
                 </div>
 
                 <div className="p-6">

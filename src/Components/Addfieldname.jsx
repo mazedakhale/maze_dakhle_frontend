@@ -2,7 +2,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
-import { FaPlus, FaEdit, FaTrash, FaSave } from "react-icons/fa";
+import { FaPlus, FaEdit, FaTrash, FaSave, FaTimes } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 
 const FieldNames = () => {
@@ -17,7 +18,8 @@ const FieldNames = () => {
   });
   const [editId, setEditId] = useState(null);
   const [editableField, setEditableField] = useState("");
-
+  const [isAdding, setIsAdding] = useState(false);
+  const navigate = useNavigate();
   // Fetch fields and categories
   useEffect(() => {
     fetchFields();
@@ -136,11 +138,22 @@ const FieldNames = () => {
 
   return (
     <div className="ml-[300px] mt-[80px] p-6 w-[calc(100%-260px)] overflow-x-hidden">
+
       <div className="relative bg-white shadow-lg rounded-lg border border-gray-300 overflow-hidden">
         {/* Header */}
-        <div className="border-t-4 border-orange-400 bg-[#F4F4F4] text-center p-4 rounded-t-lg relative">
-          <h2 className="text-2xl font-bold text-gray-800">Field Names List</h2>
-          <div className="absolute bottom-[-2px] left-0 w-full h-1 bg-gray-300 shadow-md"></div>
+        <div className="relative border-t-4 border-orange-400 bg-[#F4F4F4] p-4 rounded-t-lg">
+          <h2 className="text-2xl font-bold text-gray-800 text-center">
+            Fields  List
+          </h2>
+          <button
+            onClick={() => {
+              setIsAdding(false);
+              navigate("/Adashinner");
+            }}
+            className="absolute top-1/2 right-4 transform -translate-y-1/2 text-gray-600 hover:text-gray-800"
+          >
+            <FaTimes size={20} />
+          </button>
         </div>
 
         {/* Add Button */}

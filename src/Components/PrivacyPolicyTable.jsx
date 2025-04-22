@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { FaEdit, FaTrash, FaPlus } from "react-icons/fa";
+import { FaTag, FaEdit, FaTrash, FaPlus, FaTimes } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
+
 import Swal from "sweetalert2";
 
 const PrivacyPolicyTable = () => {
@@ -8,7 +10,10 @@ const PrivacyPolicyTable = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [formData, setFormData] = useState({ file: null });
     const [isEditing, setIsEditing] = useState(false);
+    const [isAdding, setIsAdding] = useState(false);
+
     const [editingId, setEditingId] = useState(null);
+    const navigate = useNavigate();
 
     const apiUrl = "https://mazedakhale.in/api/privacy-policy";
 
@@ -114,13 +119,27 @@ const PrivacyPolicyTable = () => {
 
     return (
         <div className="ml-[300px] mt-[80px] p-6 w-[calc(100%-260px)] overflow-x-hidden">
-            {/* Main Container */}
+
             <div className="relative bg-white shadow-lg rounded-lg border border-gray-300 overflow-hidden">
                 {/* Header */}
-                <div className="border-t-4 border-orange-400 bg-[#F4F4F4] text-center p-4 rounded-t-lg relative">
-                    <h2 className="text-2xl font-bold text-gray-800">Privacy Policy</h2>
-                    <div className="absolute bottom-[-2px] left-0 w-full h-1 bg-gray-300 shadow-md"></div>
+                <div className="relative border-t-4 border-orange-400 bg-[#F4F4F4] p-4 rounded-t-lg">
+                    <h2 className="text-2xl font-bold text-gray-800 text-center">
+                        Privacy Policy List
+                    </h2>
+                    <button
+                        onClick={() => {
+                            setIsAdding(false);
+                            navigate("/Adashinner");
+                        }}
+                        className="absolute top-1/2 right-4 transform -translate-y-1/2 text-gray-600 hover:text-gray-800"
+                    >
+                        <FaTimes size={20} />
+                    </button>
                 </div>
+
+
+
+
 
                 {/* Add Button (Disabled if there is at least one policy) */}
                 <div className="p-4 flex justify-end">
@@ -136,7 +155,6 @@ const PrivacyPolicyTable = () => {
                         <FaPlus /> Add Policy
                     </button>
                 </div>
-
                 {/* Table */}
                 <div className="p-6 overflow-x-auto">
                     <table className="w-full border border-[#776D6DA8] text-sm bg-white shadow-md rounded-md">

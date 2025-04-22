@@ -1,12 +1,18 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { FaTag, FaEdit, FaTrash, FaPlus, FaTimes } from "react-icons/fa";
+
 import Swal from "sweetalert2";
 import { FaDownload } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
+
 
 const ErrorRequests = () => {
   const [errorRequests, setErrorRequests] = useState([]);
   const [certificates, setCertificates] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [isAdding, setIsAdding] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchErrorRequests();
@@ -100,10 +106,22 @@ const ErrorRequests = () => {
 
   return (
     <div className="ml-[300px] mt-[80px] p-6 w-[calc(100%-260px)] overflow-x-hidden">
+
       <div className="relative bg-white shadow-lg rounded-lg border border-gray-300 overflow-hidden">
-        <div className="border-t-4 border-orange-400 bg-[#F4F4F4] text-center p-4 rounded-t-lg relative">
-          <h2 className="text-2xl font-bold text-gray-800">Error Requests History </h2>
-          <div className="absolute bottom-[-2px] left-0 w-full h-1 bg-gray-300 shadow-md"></div>
+        {/* Header */}
+        <div className="relative border-t-4 border-orange-400 bg-[#F4F4F4] p-4 rounded-t-lg">
+          <h2 className="text-2xl font-bold text-gray-800 text-center">
+            Error Request History
+          </h2>
+          <button
+            onClick={() => {
+              setIsAdding(false);
+              navigate("/Adashinner");
+            }}
+            className="absolute top-1/2 right-4 transform -translate-y-1/2 text-gray-600 hover:text-gray-800"
+          >
+            <FaTimes size={20} />
+          </button>
         </div>
 
         <div className="p-4 flex justify-between items-center">

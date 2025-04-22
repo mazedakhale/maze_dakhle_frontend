@@ -1,59 +1,58 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { FaEdit, FaTrash, FaPlus } from "react-icons/fa";
+import { FaEdit, FaTrash, FaPlus, FaTimes } from "react-icons/fa";
 import Swal from "sweetalert2";
+import { useNavigate } from "react-router-dom";
 
 const DocumentTable = () => {
   const [documents, setDocuments] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [formData, setFormData] = useState({ doc_type_name: "", description: "" }); // Added description field
+  const [formData, setFormData] = useState({ doc_type_name: "", description: "" });
   const [editingDoc, setEditingDoc] = useState(null);
+  const [isAdding, setIsAdding] = useState(false);
 
-  // Fetch documents from the API
+  const navigate = useNavigate();
+
   useEffect(() => {
     fetchDocuments();
   }, []);
 
   const fetchDocuments = async () => {
     try {
-      const response = await axios.get("https://mazedakhale.in/api/document-types");
-      setDocuments(response.data);
+      const { data } = await axios.get("https://mazedakhale.in/api/document-types");
+      setDocuments(data);
     } catch (error) {
       console.error("Error fetching documents:", error);
     }
   };
 
-  // Handle input changes in the form
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  const handleChange = e =>
+    setFormData(fd => ({ ...fd, [e.target.name]: e.target.value }));
 
-  // Handle form submission (add or edit document)
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
     try {
       if (editingDoc) {
-        // Update existing document
         await axios.put(
           `https://mazedakhale.in/api/document-types/${editingDoc.doc_type_id}`,
           formData
         );
       } else {
-        // Add new document
         await axios.post("https://mazedakhale.in/api/document-types/", formData);
       }
       setIsModalOpen(false);
-      fetchDocuments(); // Refresh the document list
-      setFormData({ doc_type_name: "", description: "" }); // Reset form data
       setEditingDoc(null);
-    } catch (error) {
-      console.error("Error submitting document:", error);
+
+      setFormData({ doc_type_name: "", description: "" });
+      fetchDocuments();
+      Swal.fire("Success", "Document saved!", "success");
+    } catch {
+      Swal.fire("Error", "Failed to save document", "error");
     }
   };
 
-  // Handle document deletion
-  const handleDelete = async (id) => {
-    const confirmDelete = await Swal.fire({
+  const handleDelete = async id => {
+    const res = await Swal.fire({
       title: "Are you sure?",
       text: "This document will be deleted permanently!",
       icon: "warning",
@@ -62,76 +61,94 @@ const DocumentTable = () => {
       cancelButtonColor: "#3085d6",
       confirmButtonText: "Yes, delete it!",
     });
-
-    if (confirmDelete.isConfirmed) {
+    if (res.isConfirmed) {
       try {
         await axios.delete(`https://mazedakhale.in/api/document-types/${id}`);
-        fetchDocuments(); // Refresh the document list
+        fetchDocuments();
         Swal.fire("Deleted!", "Document has been deleted.", "success");
-      } catch (error) {
-        console.error("Error deleting document:", error);
+      } catch {
         Swal.fire("Error", "Failed to delete document", "error");
       }
     }
   };
 
-  // Handle editing a document
-  const handleEdit = (doc) => {
-    setFormData({ doc_type_name: doc.doc_type_name, description: doc.description }); // Set form data with description
+  const handleEdit = doc => {
+    setFormData({ doc_type_name: doc.doc_type_name, description: doc.description });
     setEditingDoc(doc);
     setIsModalOpen(true);
   };
 
   return (
-    <div className="ml-[330px] flex flex-col items-center min-h-screen p-10 bg-gray-100">
-      {/* Right Section - Document Table */}
-      <div className="w-full">
-        <div className="w-full max-w-8xl bg-white p-6 shadow-lg">
-          {/* Header and Button in Same Row */}
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold text-gray-800">Add Services</h2>
-            <button
-              className="bg-[#00234E] text-white px-4 py-2 rounded flex items-center hover:bg-blue-600"
-              onClick={() => setIsModalOpen(true)}
-            >
-              <FaPlus className="mr-2" /> Add Document
-            </button>
-          </div>
+    <div className="ml-[300px] mt-[80px] p-6 w-[calc(100%-260px)] overflow-x-hidden">
 
-          {/* Table Container */}
-          <div className="overflow-x-auto max-h-[600px] overflow-y-auto border border-gray-300 rounded-lg shadow-md">
+      <div className="relative bg-white shadow-lg rounded-lg border border-gray-300 overflow-hidden">
+        {/* Header */}
+        <div className="relative border-t-4 border-orange-400 bg-[#F4F4F4] p-4 rounded-t-lg">
+
+          <h2 className="text-2xl font-bold text-gray-800 text-center">
+            Services List
+          </h2>
+          <button
+            onClick={() => {
+              setIsAdding(false);
+              navigate("/Adashinner");
+            }}
+            className="absolute top-1/2 right-4 transform -translate-y-1/2 text-gray-600 hover:text-gray-800"
+          >
+            <FaTimes size={20} />
+          </button>
+        </div>
+
+
+
+        {/* Add Button */}
+        <div className="p-4 flex justify-end">
+          <button
+            className="bg-[#00234E] text-white px-4 py-2 rounded flex items-center hover:bg-blue-600"
+            onClick={() => setIsModalOpen(true)}
+          >
+            <FaPlus className="mr-2" /> Add Document
+          </button>
+        </div>
+
+
+        {/* TABLE */}
+        <div className="p-6 overflow-x-auto">
+          <div className="overflow-x-auto max-h-[600px] overflow-y-auto">
             <table className="w-full border-collapse">
               <thead className="bg-gray-300 sticky top-0">
                 <tr>
-                  <th className="p-3 text-left border-r border-gray-400">ID</th>
-                  <th className="p-3 text-left border-r border-gray-400">Document Name</th>
-                  <th className="p-3 text-left border-r border-gray-400">Description</th>
-                  <th className="p-3 text-left border-r border-gray-400">Actions</th>
+                  {["ID", "Document Name", "Description", "Actions"].map((h, i) => (
+                    <th
+                      key={i}
+                      className="p-3 border border-gray-400 text-left font-semibold"
+                    >
+                      {h}
+                    </th>
+                  ))}
                 </tr>
               </thead>
               <tbody>
                 {documents.length > 0 ? (
-                  documents.map((doc, index) => (
+                  documents.map((doc, idx) => (
                     <tr
                       key={doc.doc_type_id}
-                      className={`${index % 2 === 0 ? "bg-white" : "bg-gray-50"
+                      className={`${idx % 2 === 0 ? "bg-white" : "bg-gray-50"
                         } hover:bg-gray-100 transition-colors`}
                     >
-                      <td className="p-3 text-left border border-gray-300">{doc.doc_type_id}</td>
-                      <td className="p-3 text-left border border-gray-300">{doc.doc_type_name}</td>
-                      <td className="p-3 text-left border border-gray-300">{doc.description}</td>
-                      <td className="p-3 text-left border border-gray-300 gap-2">
+                      <td className="p-3 border border-gray-300">{doc.doc_type_id}</td>
+                      <td className="p-3 border border-gray-300">{doc.doc_type_name}</td>
+                      <td className="p-3 border border-gray-300">{doc.description}</td>
+                      <td className="p-3 border border-gray-300 flex gap-4">
                         <button
                           onClick={() => handleEdit(doc)}
                           className="text-blue-500 hover:text-blue-700"
-                          title="Edit"
                         >
                           <FaEdit />
                         </button>
                         <button
                           onClick={() => handleDelete(doc.doc_type_id)}
                           className="text-red-500 hover:text-red-700"
-                          title="Delete"
                         >
                           <FaTrash />
                         </button>
@@ -140,7 +157,10 @@ const DocumentTable = () => {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="4" className="text-center p-4 text-gray-500 border border-gray-300">
+                    <td
+                      colSpan={4}
+                      className="p-4 text-center text-gray-500 border border-gray-300"
+                    >
                       No documents found.
                     </td>
                   </tr>
@@ -149,57 +169,70 @@ const DocumentTable = () => {
             </table>
           </div>
         </div>
-      </div>
 
-      {/* Modal for Adding/Editing Documents */}
-      {isModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
-          <div className="bg-white p-6 rounded-lg w-96 shadow-lg">
-            <h2 className="text-xl font-semibold mb-4">{editingDoc ? "Edit Document" : "Add Document"}</h2>
-            <form onSubmit={handleSubmit}>
-              {/* Document Name Field */}
-              <label className="block mb-2">Document Name:</label>
-              <input
-                type="text"
-                name="doc_type_name"
-                value={formData.doc_type_name}
-                onChange={handleChange}
-                required
-                className="w-full px-3 py-2 border rounded-lg mb-4"
-              />
+        {/* MODAL */}
+        {isModalOpen && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+            <div className="relative bg-white p-6 rounded-lg shadow-lg w-96">
+              {/* Modal Close */}
+              <button
+                onClick={() => {
+                  setIsModalOpen(false);
+                  setEditingDoc(null);
+                  setFormData({ doc_type_name: "", description: "" });
+                }}
+                className="absolute top-3 right-3 text-gray-600 hover:text-gray-800"
+              >
+                <FaTimes size={18} />
+              </button>
+              <h2 className="text-xl font-semibold mb-4 text-center">
+                {editingDoc ? "Edit Document" : "Add Document"}
+              </h2>
+              <form onSubmit={handleSubmit}>
+                <label className="block mb-2">Document Name:</label>
+                <input
+                  name="doc_type_name"
+                  value={formData.doc_type_name}
+                  onChange={handleChange}
+                  required
+                  className="w-full p-2 border rounded mb-4"
+                />
 
-              {/* Description Field */}
-              <label className="block mb-2">Description:</label>
-              <textarea
-                name="description"
-                value={formData.description}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border rounded-lg mb-4"
-                rows={3}
-              />
+                <label className="block mb-2">Description:</label>
+                <textarea
+                  name="description"
+                  value={formData.description}
+                  onChange={handleChange}
+                  rows={3}
+                  className="w-full p-2 border rounded mb-4"
+                />
 
-              {/* Buttons */}
-              <div className="flex justify-end">
-                <button
-                  type="button"
-                  className="mr-2 px-4 py-2 bg-gray-400 text-white rounded"
-                  onClick={() => {
-                    setIsModalOpen(false);
-                    setEditingDoc(null);
-                    setFormData({ doc_type_name: "", description: "" }); // Reset form data
-                  }}
-                >
-                  Cancel
-                </button>
-                <button type="submit" className="px-4 py-2 bg-[#00234E] text-white rounded">
-                  {editingDoc ? "Update" : "Add"} Document
-                </button>
-              </div>
-            </form>
+                <div className="flex justify-end gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsModalOpen(false);
+                      setEditingDoc(null);
+                      setFormData({ doc_type_name: "", description: "" });
+                    }}
+                    className="px-4 py-2 bg-gray-400 text-white rounded"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-4 py-2 bg-[#00234E] text-white rounded"
+                  >
+                    {editingDoc ? "Update" : "Add"} Document
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
+    </div >
+
   );
 };
 

@@ -10,6 +10,8 @@ const Verifydocumentshistory = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [documents, setDocuments] = useState([]);
+  const [isAdding, setIsAdding] = useState(false);
+
   const [users, setUsers] = useState([]);
   const navigate = useNavigate();
 
@@ -195,10 +197,19 @@ const Verifydocumentshistory = () => {
   return (
     <div className="ml-[250px] flex flex-col items-center min-h-screen p-6 bg-gray-100">
       <div className="w-[90%] max-w-6xl bg-white shadow-lg rounded-lg">
-        <div className="border-t-4 border-orange-400 bg-[#F4F4F4] text-center p-4 rounded-t-lg relative">                    <h2 className="text-xl font-bold text-center text-gray-800">
-          Compelted List
-        </h2>
-          <div className="absolute bottom-[-2px] left-0 w-full h-1 bg-gray-300 shadow-md"></div>
+        <div className="relative border-t-4 border-orange-400 bg-[#F4F4F4] p-4 rounded-t-lg">
+          <h2 className="text-2xl font-bold text-gray-800 text-center">
+            Applications Completed List
+          </h2>
+          <button
+            onClick={() => {
+              setIsAdding(false);
+              navigate("/Adashinner");
+            }}
+            className="absolute top-1/2 right-4 transform -translate-y-1/2 text-gray-600 hover:text-gray-800"
+          >
+            <FaTimes size={20} />
+          </button>
         </div>
 
         {/* Filters */}

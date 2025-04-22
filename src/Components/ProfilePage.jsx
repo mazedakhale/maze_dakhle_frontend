@@ -357,7 +357,7 @@ export default function ProfilePage() {
                                 disabled={user.edit_request_status === 'Pending'}
                                 className="px-4 py-2 bg-blue-600 text-white rounded"
                             >
-                                Request Edit
+                                Request  PRofile Edit
                             </button>
                         )}
                     </div>

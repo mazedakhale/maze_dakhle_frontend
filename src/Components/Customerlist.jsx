@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { FaEdit, FaTrash } from "react-icons/fa";
+import { FaTag, FaEdit, FaTrash, FaPlus, FaTimes } from "react-icons/fa";
 import Swal from "sweetalert2";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -8,7 +8,8 @@ const CustomerList = () => {
     const [customers, setCustomers] = useState([]);
     const [editingId, setEditingId] = useState(null);
     const [updatedPassword, setUpdatedPassword] = useState("");
-
+    const [isAdding, setIsAdding] = useState(false);
+    const navigate = useNavigate();
     const apiUrl = "https://mazedakhale.in/api/users/customers";
 
     useEffect(() => {
@@ -104,11 +105,26 @@ const CustomerList = () => {
     };
 
     return (
-        <div className="ml-[300px] mt-[80px] p-6 w-[calc(100%-260px)] overflow-x-auto">
-            <div className="bg-white border shadow-lg rounded-lg overflow-hidden">
-                <div className="bg-[#F4F4F4] border-t-4 border-orange-400 p-4 text-center">
-                    <h2 className="text-2xl font-bold text-gray-800">Customer List</h2>
+        <div className="ml-[300px] mt-[80px] p-6 w-[calc(100%-260px)] overflow-x-hidden">
+
+            <div className="relative bg-white shadow-lg rounded-lg border border-gray-300 overflow-hidden">
+                {/* Header */}
+                <div className="relative border-t-4 border-orange-400 bg-[#F4F4F4] p-4 rounded-t-lg">
+                    <h2 className="text-2xl font-bold text-gray-800 text-center">
+                        Customer List
+                    </h2>
+                    <button
+                        onClick={() => {
+                            setIsAdding(false);
+                            navigate("/Adashinner");
+                        }}
+                        className="absolute top-1/2 right-4 transform -translate-y-1/2 text-gray-600 hover:text-gray-800"
+                    >
+                        <FaTimes size={20} />
+                    </button>
                 </div>
+
+
 
                 <table className="w-full text-sm border">
                     <thead className="bg-[#F58A3B14]">
