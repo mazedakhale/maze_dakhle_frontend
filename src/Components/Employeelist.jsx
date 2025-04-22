@@ -22,7 +22,7 @@ const EmployeeList = () => {
         role: "Employee",
     });
 
-    const apiUrl = "https://mazedakhale.in/api/users/register";
+    const apiUrl = "https://mazedakhale.in/api/users/employee";
 
     // fetch list on mount
     useEffect(() => {
@@ -163,6 +163,22 @@ const EmployeeList = () => {
             Swal.fire("Error", "Failed to update status", "error");
         }
     };
+    const updateEditRequestStatus = async (id, newStatus) => {
+        try {
+            await axios.patch(`https://mazedakhale.in/api/users/request-edit/${id}`, {
+                status: newStatus,
+            });
+            setEmployees((prev) =>
+                prev.map((d) =>
+                    d.user_id === id ? { ...d, edit_request_status: newStatus } : d
+                )
+            );
+            Swal.fire("Success", `Edit request ${newStatus.toLowerCase()}!`, "success");
+        } catch (error) {
+            console.error("Edit request error", error);
+            Swal.fire("Error", "Failed to update edit request", "error");
+        }
+    };
 
     return (
         <div className="ml-[300px] mt-[80px] p-6 w-[calc(100%-260px)]">
@@ -190,6 +206,7 @@ const EmployeeList = () => {
                                     "Address",
                                     "Status",
                                     "Update",
+                                    "Request",
                                     "Actions",
                                 ].map((h) => (
                                     <th key={h} className="px-4 py-2 border">
@@ -248,6 +265,18 @@ const EmployeeList = () => {
                                         >
                                             Inactive
                                         </button>
+                                    </td>
+                                    <td className="text-center border">
+                                        <div className="text-sm font-semibold">{emp.edit_request_status}</div>
+                                        <div className="flex gap-1 justify-center mt-1">
+                                            <button onClick={() => updateEditRequestStatus(emp.user_id, "Approved")} className="bg-green-500 text-white px-2 py-1 rounded text-xs hover:bg-green-600">
+
+                                                Approve
+                                            </button>
+                                            <button onClick={() => updateEditRequestStatus(emp.user_id, "Rejected")} className="bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600">
+                                                Reject
+                                            </button>
+                                        </div>
                                     </td>
                                     <td className="border px-4 py-2 flex justify-center gap-2">
                                         {editingId === emp.user_id ? (

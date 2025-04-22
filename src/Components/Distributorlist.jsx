@@ -426,6 +426,22 @@ const DistributorList = () => {
             Swal.fire("Error", "Failed to update status", "error");
         }
     };
+    const updateEditRequestStatus = async (id, newStatus) => {
+        try {
+            await axios.patch(`https://mazedakhale.in/api/users/request-edit/${id}`, {
+                status: newStatus,
+            });
+            setDistributors((prev) =>
+                prev.map((d) =>
+                    d.user_id === id ? { ...d, edit_request_status: newStatus } : d
+                )
+            );
+            Swal.fire("Success", `Edit request ${newStatus.toLowerCase()}!`, "success");
+        } catch (error) {
+            console.error("Edit request error", error);
+            Swal.fire("Error", "Failed to update edit request", "error");
+        }
+    };
 
     return (
         <div className="ml-[300px] mt-[80px] p-6 w-[calc(100%-260px)] overflow-x-hidden">
@@ -451,7 +467,7 @@ const DistributorList = () => {
                     <table className="w-full border border-[#776D6DA8] text-sm bg-white shadow-md rounded-md">
                         <thead className="bg-[#F58A3B14] border-b-2 border-[#776D6DA8]">
                             <tr>
-                                {["ID", "Name", "Email", "Password", "Address", "ShopAddress", "Documents", "Status", "Update", "Actions"].map((header, index) => (
+                                {["ID", "Name", "Email", "Password", "Address", "ShopAddress", "Documents", "Status", "Update", "Request", "Actions"].map((header, index) => (
                                     <th key={index} className="px-4 py-3 border border-[#776D6DA8] text-black font-semibold text-center">
                                         {header}
                                     </th>
@@ -522,6 +538,17 @@ const DistributorList = () => {
                                             >
                                                 Inactive
                                             </button>
+                                        </td>
+                                        <td className="text-center border">
+                                            <div className="text-sm font-semibold">{distributor.edit_request_status}</div>
+                                            <div className="flex gap-1 justify-center mt-1">
+                                                <button onClick={() => updateEditRequestStatus(distributor.user_id, "Approved")} className="bg-green-500 text-white px-2 py-1 rounded text-xs hover:bg-green-600">
+                                                    Approve
+                                                </button>
+                                                <button onClick={() => updateEditRequestStatus(distributor.user_id, "Rejected")} className="bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600">
+                                                    Reject
+                                                </button>
+                                            </div>
                                         </td>
                                         <td className="px-4 py-3 border border-[#776D6DA8] text-center">
                                             {editingId === distributor.user_id ? (

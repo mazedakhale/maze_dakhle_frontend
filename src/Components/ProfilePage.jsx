@@ -234,7 +234,6 @@ export default function ProfilePage() {
         fd.append('shop_address', formValues.shopAddress);
         fd.append('district', formValues.district);
         fd.append('taluka', formValues.taluka);
-        fd.append('user_login_status', 'Active');
 
         // Aadhar
         let aFile = formValues.aadharCard;
