@@ -4,6 +4,7 @@ import axios from 'axios';
 import jwtDecode from 'jwt-decode';
 import Swal from 'sweetalert2';
 import { FaEye, FaEyeSlash, FaEdit, FaSave, FaTimes } from 'react-icons/fa';
+import { isValidEmail, isValidPhone, isValidPassword } from '../utils/formValidators'; // Import your validators
 
 const USER_API_BASE = 'https://mazedakhale.in/api/users';
 const PASSWORD_API = `${USER_API_BASE}/password`;
@@ -13,6 +14,7 @@ export default function ProfilePage() {
     const [passMode, setPassMode] = useState(false);
     const [showPass, setShowPass] = useState(false);
     const [newPass, setNewPass] = useState('');
+    const [passError, setPassError] = useState('');
     const [editMode, setEditMode] = useState(false);
     const [formValues, setFormValues] = useState({
         phone: '',
@@ -24,12 +26,65 @@ export default function ProfilePage() {
         panCard: null,
         existingAadharPath: '',
         existingPanPath: '',
-        errors: { aadharCard: '', panCard: '' },
+        errors: {
+            phone: '',
+            aadharCard: '',
+            panCard: ''
+        },
     });
 
     const navigate = useNavigate();
 
-    // 1) fetchProfile does your GET + state setup
+    // Password validation
+    const validatePassword = (password) => {
+        if (!password) {
+            setPassError('Password is required');
+            return false;
+        }
+        if (!isValidPassword(password)) {
+            setPassError('Password must be at least 8 characters and include uppercase, lowercase, number, and special character');
+            return false;
+        }
+        setPassError('');
+        return true;
+    };
+
+    // Phone validation
+    const validatePhone = (phone) => {
+        if (!phone) {
+            setFormValues(fv => ({
+                ...fv,
+                errors: { ...fv.errors, phone: 'Phone is required' }
+            }));
+            return false;
+        }
+        if (!isValidPhone(phone)) {
+            setFormValues(fv => ({
+                ...fv,
+                errors: { ...fv.errors, phone: 'Phone must be exactly 10 digits' }
+            }));
+            return false;
+        }
+        setFormValues(fv => ({
+            ...fv,
+            errors: { ...fv.errors, phone: '' }
+        }));
+        return true;
+    };
+
+    // Email validation
+    const validateEmail = (email) => {
+        if (!email) {
+            Swal.fire('Error', 'Email is required', 'error');
+            return false;
+        }
+        if (!isValidEmail(email)) {
+            Swal.fire('Error', 'Please enter a valid email address', 'error');
+            return false;
+        }
+        return true;
+    };
+
     const fetchProfile = async () => {
         const token = localStorage.getItem('token');
         if (!token) return navigate('/Login');
@@ -44,7 +99,6 @@ export default function ProfilePage() {
 
         try {
             const resp = await axios.get(`${USER_API_BASE}/${decoded.user_id}`);
-            // if your API returns { user: { … } }, do resp.data.user instead
             const data = resp.data.user || resp.data;
 
             setUser(data);
@@ -63,14 +117,17 @@ export default function ProfilePage() {
                 panCard: null,
                 existingAadharPath: aDoc?.file_path || '',
                 existingPanPath: pDoc?.file_path || '',
-                errors: { aadharCard: '', panCard: '' },
+                errors: {
+                    phone: '',
+                    aadharCard: '',
+                    panCard: ''
+                },
             });
         } catch {
             Swal.fire('Error', 'Could not load profile', 'error');
         }
     };
 
-    // call once on mount
     useEffect(() => {
         fetchProfile();
     }, []);
@@ -79,13 +136,32 @@ export default function ProfilePage() {
         return <div className="flex justify-center items-center min-h-screen">Loading…</div>;
     }
 
-    // password update (unchanged)
+    // Password change handler with validation
+    const handlePasswordChange = (e) => {
+        const value = e.target.value;
+        setNewPass(value);
+        validatePassword(value);
+    };
+
+    // Phone change handler with validation
+    const handlePhoneChange = (e) => {
+        const value = e.target.value;
+        setFormValues(fv => ({
+            ...fv,
+            phone: value
+        }));
+        validatePhone(value);
+    };
+
     const savePassword = async () => {
-        if (!newPass) return Swal.fire('Warning', 'Enter a password', 'warning');
+        if (!validatePassword(newPass)) return;
+
         try {
             await axios.patch(`${PASSWORD_API}/${user.user_id}`, { newPassword: newPass });
             setUser(u => ({ ...u, password: newPass }));
-            setPassMode(false); setNewPass(''); setShowPass(false);
+            setPassMode(false);
+            setNewPass('');
+            setShowPass(false);
             Swal.fire('Success', 'Password updated', 'success');
         } catch {
             Swal.fire('Error', 'Failed to update password', 'error');
@@ -102,7 +178,6 @@ export default function ProfilePage() {
         }
     };
 
-    // file inputs
     const handleFileChange = (e, field) => {
         const file = e.target.files[0];
         if (!file) return;
@@ -126,7 +201,6 @@ export default function ProfilePage() {
         }));
     };
 
-    // helper to wrap existing URL in a File
     const fetchAsFile = async url => {
         const resp = await fetch(url);
         const blob = await resp.blob();
@@ -134,9 +208,11 @@ export default function ProfilePage() {
         return new File([blob], name, { type: blob.type });
     };
 
-    // 2) saveProfile now re-calls fetchProfile on success
     const saveProfile = async () => {
-        // require aadhar+pan
+        // Validate phone
+        if (!validatePhone(formValues.phone)) return;
+
+        // Validate documents
         if (!formValues.existingAadharPath && !formValues.aadharCard) {
             return setFormValues(fv => ({
                 ...fv,
@@ -151,7 +227,6 @@ export default function ProfilePage() {
         }
 
         const fd = new FormData();
-        // scalars
         fd.append('name', user.name);
         fd.append('email', user.email);
         fd.append('phone', formValues.phone);
@@ -181,16 +256,12 @@ export default function ProfilePage() {
             fd.append('documentTypes', 'PAN Card');
         }
 
-        // debug
-        for (let [k, v] of fd.entries()) console.log('→', k, v);
-
         try {
             await axios.put(
                 `${USER_API_BASE}/update/${user.user_id}`,
                 fd,
                 { headers: { 'Content-Type': 'multipart/form-data' } }
             );
-            // re-fetch so UI shows new file URLs immediately
             await fetchProfile();
             setEditMode(false);
             Swal.fire('Success', 'Profile updated', 'success');
@@ -217,26 +288,35 @@ export default function ProfilePage() {
                     <div className="flex items-center">
                         <span className="font-semibold mr-2">Password:</span>
                         {passMode ? (
-                            <input
-                                type={showPass ? 'text' : 'password'}
-                                className="border p-1 rounded w-48"
-                                value={newPass}
-                                onChange={e => setNewPass(e.target.value)}
-                            />
+                            <div className="flex flex-col">
+                                <div className="flex items-center">
+                                    <input
+                                        type={showPass ? 'text' : 'password'}
+                                        className={`border p-1 rounded w-48 ${passError ? 'border-red-500' : ''}`}
+                                        value={newPass}
+                                        onChange={handlePasswordChange}
+                                    />
+                                    <button onClick={() => setShowPass(s => !s)} className="ml-2 text-gray-600">
+                                        {showPass ? <FaEyeSlash /> : <FaEye />}
+                                    </button>
+                                </div>
+                                {passError && <span className="text-red-500 text-xs">{passError}</span>}
+                            </div>
                         ) : (
                             <span>{showPass ? user.password : '•'.repeat(8)}</span>
                         )}
-                        <button onClick={() => setShowPass(s => !s)} className="ml-2 text-gray-600">
-                            {showPass ? <FaEyeSlash /> : <FaEye />}
-                        </button>
                     </div>
                     {passMode ? (
                         <>
-                            <button onClick={savePassword} className="text-green-600 mr-2">
+                            <button
+                                onClick={savePassword}
+                                className="text-green-600 mr-2"
+                                disabled={!!passError}
+                            >
                                 <FaSave /> Save
                             </button>
                             <button
-                                onClick={() => { setPassMode(false); setNewPass(''); setShowPass(false) }}
+                                onClick={() => { setPassMode(false); setNewPass(''); setShowPass(false); setPassError(''); }}
                                 className="text-red-600"
                             >
                                 <FaTimes /> Cancel
@@ -296,8 +376,27 @@ export default function ProfilePage() {
                         <span className="flex-1">{user.email}</span>
                     </div>
 
-                    {/* phone, address, shopAddress, district, taluka */}
-                    {['phone', 'address', 'shopAddress', 'district', 'taluka'].map(f => (
+                    {/* Phone with validation */}
+                    <div className="mb-2 flex items-center">
+                        <span className="w-32 font-semibold">Phone:</span>
+                        {editMode ? (
+                            <div className="flex flex-col flex-1">
+                                <input
+                                    className={`border p-1 rounded ${formValues.errors.phone ? 'border-red-500' : ''}`}
+                                    value={formValues.phone}
+                                    onChange={handlePhoneChange}
+                                />
+                                {formValues.errors.phone && (
+                                    <span className="text-red-500 text-xs">{formValues.errors.phone}</span>
+                                )}
+                            </div>
+                        ) : (
+                            <span className="flex-1">{user.phone || '—'}</span>
+                        )}
+                    </div>
+
+                    {/* Other fields */}
+                    {['address', 'shopAddress', 'district', 'taluka'].map(f => (
                         <div key={f} className="mb-2 flex items-center">
                             <span className="w-32 font-semibold">
                                 {f.replace(/([A-Z])/g, ' $1').replace(/^./, s => s.toUpperCase())}:
@@ -331,16 +430,18 @@ export default function ProfilePage() {
                             </a>
                         ) : <span className="mr-4">No file</span>}
                         {editMode && (
-                            <input
-                                type="file"
-                                accept=".pdf,.jpg,.jpeg,.png"
-                                onChange={e => handleFileChange(e, 'aadharCard')}
-                            />
-                        )}
-                        {formValues.errors.aadharCard && (
-                            <p className="text-red-500 text-xs">
-                                {formValues.errors.aadharCard}
-                            </p>
+                            <div className="flex flex-col">
+                                <input
+                                    type="file"
+                                    accept=".pdf,.jpg,.jpeg,.png"
+                                    onChange={e => handleFileChange(e, 'aadharCard')}
+                                />
+                                {formValues.errors.aadharCard && (
+                                    <span className="text-red-500 text-xs">
+                                        {formValues.errors.aadharCard}
+                                    </span>
+                                )}
+                            </div>
                         )}
                     </div>
 
@@ -357,16 +458,18 @@ export default function ProfilePage() {
                             </a>
                         ) : <span className="mr-4">No file</span>}
                         {editMode && (
-                            <input
-                                type="file"
-                                accept=".pdf,.jpg,.jpeg,.png"
-                                onChange={e => handleFileChange(e, 'panCard')}
-                            />
-                        )}
-                        {formValues.errors.panCard && (
-                            <p className="text-red-500 text-xs">
-                                {formValues.errors.panCard}
-                            </p>
+                            <div className="flex flex-col">
+                                <input
+                                    type="file"
+                                    accept=".pdf,.jpg,.jpeg,.png"
+                                    onChange={e => handleFileChange(e, 'panCard')}
+                                />
+                                {formValues.errors.panCard && (
+                                    <span className="text-red-500 text-xs">
+                                        {formValues.errors.panCard}
+                                    </span>
+                                )}
+                            </div>
                         )}
                     </div>
 
@@ -375,12 +478,16 @@ export default function ProfilePage() {
                         <div className="flex justify-center gap-4 mt-4">
                             <button
                                 onClick={saveProfile}
-                                className="px-4 py-2 bg-green-500 text-white rounded"
+                                disabled={!!formValues.errors.phone || !!formValues.errors.aadharCard || !!formValues.errors.panCard}
+                                className={`px-4 py-2 text-white rounded ${!!formValues.errors.phone || !!formValues.errors.aadharCard || !!formValues.errors.panCard ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-500'}`}
                             >
                                 <FaSave /> Save Profile
                             </button>
                             <button
-                                onClick={() => setEditMode(false)}
+                                onClick={() => {
+                                    setEditMode(false);
+                                    fetchProfile(); // Reset form values
+                                }}
                                 className="px-4 py-2 bg-red-500 text-white rounded"
                             >
                                 <FaTimes /> Cancel

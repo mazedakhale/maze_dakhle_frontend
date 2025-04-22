@@ -310,6 +310,7 @@ const Register = () => {
             </div>
 
             {/* Agree to Terms */}
+            {/* Agree to Terms */}
             <div className="flex items-start mt-2">
               <input
                 type="checkbox"
@@ -319,12 +320,16 @@ const Register = () => {
                 className={`h-4 w-4 mt-1 text-[#F58A3B] rounded ${formData.errors.agreeToTerms ? "border-red-500" : ""}`}
               />
               <label className="ml-2 text-xs text-gray-700">
-                I agree to the <Link to="/PrivacyPolicy" className="text-[#F58A3B] hover:underline">Terms & Conditions</Link>
+                I agree to the <a
+                  href="/PrivacyPolicy"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[#F58A3B] hover:underline"
+                >
+                  Terms & Conditions
+                </a>
               </label>
             </div>
-            {formData.errors.agreeToTerms && (
-              <p className="text-xs text-red-600 mt-1">{formData.errors.agreeToTerms}</p>
-            )}
 
             {/* Submit */}
             <button
