@@ -11,6 +11,8 @@ const Distributorrejected = () => {
     const [statusFilter, setStatusFilter] = useState("");
     const [documents, setDocuments] = useState([]);
     const [users, setUsers] = useState([]);
+    const [isAdding, setIsAdding] = useState(false);
+
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -299,12 +301,20 @@ const Distributorrejected = () => {
     return (
         <div className="ml-[250px] flex flex-col items-center min-h-screen p-6 bg-gray-100">
             <div className="w-[90%] max-w-6xl bg-white shadow-lg rounded-lg">
-                <div className="border-t-4 border-orange-400 bg-[#F4F4F4] text-center p-4 rounded-t-lg relative">                    <h2 className="text-xl font-bold text-center text-gray-800">
-                    Uploaded List
-                </h2>
-                    <div className="absolute bottom-[-2px] left-0 w-full h-1 bg-gray-300 shadow-md"></div>
+                <div className="relative border-t-4 border-orange-400 bg-[#F4F4F4] p-4 rounded-t-lg">
+                    <h2 className="text-2xl font-bold text-gray-800 text-center">
+                        Rejected   Applications
+                    </h2>
+                    <button
+                        onClick={() => {
+                            setIsAdding(false);
+                            navigate("/Ddashinner");
+                        }}
+                        className="absolute top-1/2 right-4 transform -translate-y-1/2 text-gray-600 hover:text-gray-800"
+                    >
+                        <FaTimes size={20} />
+                    </button>
                 </div>
-
                 <div className="p-4 flex justify-between items-center bg-white border-b border-gray-300">
                     <div className="flex items-center space-x-4">
                         <label htmlFor="statusFilter" className="text-sm font-medium">Filter by Status:</label>
@@ -365,16 +375,23 @@ const Distributorrejected = () => {
                                 >
                                     <td className="border p-2 text-center">{index + 1}</td>
                                     <td className="border p-2 text-center">{doc.application_id}</td>
-                                    <td className="border p-2">
-                                        {new Date(doc.uploaded_at).toLocaleString('en-US', {
-                                            year: 'numeric',
-                                            month: '2-digit',
-                                            day: '2-digit',
-                                            hour: '2-digit',
-                                            minute: '2-digit',
-                                            second: '2-digit',  // Added seconds
-                                            hour12: true, // Use AM/PM
-                                        })}
+                                    <td className="border p-2 text-center">
+                                        {(() => {
+                                            const date = new Date(doc.uploaded_at);
+                                            const formattedDate = `${String(date.getDate()).padStart(2, '0')}-${String(date.getMonth() + 1).padStart(2, '0')}-${date.getFullYear()}`;
+                                            const formattedTime = date.toLocaleTimeString('en-US', {
+                                                hour: '2-digit',
+                                                minute: '2-digit',
+                                                second: '2-digit',
+                                                hour12: true,
+                                            });
+                                            return (
+                                                <>
+                                                    <div>{formattedDate}</div>
+                                                    <div className="text-sm text-gray-600">{formattedTime}</div>
+                                                </>
+                                            );
+                                        })()}
                                     </td>
 
 

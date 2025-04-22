@@ -13,6 +13,8 @@ const VerifyDocuments = () => {
   const [showPreview, setShowPreview] = useState(false);
   const [previewFile, setPreviewFile] = useState(null);
   const [distributorId, setDistributorId] = useState(null);
+  const [isAdding, setIsAdding] = useState(false);
+
   const navigate = useNavigate();
 
   // Fetch user ID, documents, and certificates on mount
@@ -156,10 +158,21 @@ const VerifyDocuments = () => {
   };
 
   return (
-    <div className="ml-[280px] flex flex-col items-center min-h-screen p-6 bg-gray-100">
-      <div className="relative bg-white shadow-lg rounded-lg border overflow-hidden">
-        <div className="border-t-4 border-orange-400 bg-[#f4f4f4] p-4 text-center rounded-t-lg">
-          <h2 className="text-2xl font-bold text-gray-800">Manage Distributor List</h2>
+    <div className="ml-[250px] flex flex-col items-center min-h-screen p-6 bg-gray-100">
+      <div className="w-[90%] max-w-6xl bg-white shadow-lg rounded-lg">
+        <div className="relative border-t-4 border-orange-400 bg-[#F4F4F4] p-4 rounded-t-lg">
+          <h2 className="text-2xl font-bold text-gray-800 text-center">
+            Manage  Applications  List
+          </h2>
+          <button
+            onClick={() => {
+              setIsAdding(false);
+              navigate("/Ddashinner");
+            }}
+            className="absolute top-1/2 right-4 transform -translate-y-1/2 text-gray-600 hover:text-gray-800"
+          >
+            <FaTimes size={20} />
+          </button>
         </div>
         <div className="p-6 overflow-x-auto">
           <table className="w-full border border-gray-300">
@@ -195,10 +208,22 @@ const VerifyDocuments = () => {
                       : doc.document_fields["APPLICANT NAME"] || "-"}
                   </td>
                   <td className="border p-2 text-center">
-                    {new Date(doc.uploaded_at).toLocaleString('en-US', {
-                      year: 'numeric', month: '2-digit', day: '2-digit',
-                      hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true
-                    })}
+                    {(() => {
+                      const date = new Date(doc.uploaded_at);
+                      const formattedDate = `${String(date.getDate()).padStart(2, '0')}-${String(date.getMonth() + 1).padStart(2, '0')}-${date.getFullYear()}`;
+                      const formattedTime = date.toLocaleTimeString('en-US', {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit',
+                        hour12: true,
+                      });
+                      return (
+                        <>
+                          <div>{formattedDate}</div>
+                          <div className="text-sm text-gray-600">{formattedTime}</div>
+                        </>
+                      );
+                    })()}
                   </td>
                   <td className="border p-3 text-center">{doc.category_name}</td>
                   <td className="border p-3 text-center">{doc.subcategory_name}</td>

@@ -2,13 +2,15 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
 import jwtDecode from "jwt-decode";
-import { FaDownload } from "react-icons/fa";
+import { FaDownload, FaTimes } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 const ErrorRequests = () => {
   const [errorRequests, setErrorRequests] = useState([]);
   const [certificates, setCertificates] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-
+  const navigate = useNavigate();
+  const [isAdding, setIsAdding] = useState(false);
   // Get distributor_id from JWT token
   const getDistributorId = () => {
     const token = localStorage.getItem("token");
@@ -133,11 +135,20 @@ const ErrorRequests = () => {
 
   return (
     <div className="ml-[250px] flex flex-col items-center min-h-screen p-6 bg-gray-100">
-      <div className="w-[90%] max-w-6xl bg-white shadow-md rounded-lg">
-
-        {/* Header Section */}
-        <div className="bg-[#F4F4F4] border-t-4 shadow-md rounded border-orange-400 p-4">
-          <h2 className="text-xl font-bold text-center text-gray-800">Error Requests History</h2>
+      <div className="w-[90%] max-w-6xl bg-white shadow-lg rounded-lg">
+        <div className="relative border-t-4 border-orange-400 bg-[#F4F4F4] p-4 rounded-t-lg">
+          <h2 className="text-2xl font-bold text-gray-800 text-center">
+            Error Request History
+          </h2>
+          <button
+            onClick={() => {
+              setIsAdding(false);
+              navigate("/Ddashinner");
+            }}
+            className="absolute top-1/2 right-4 transform -translate-y-1/2 text-gray-600 hover:text-gray-800"
+          >
+            <FaTimes size={20} />
+          </button>
         </div>
 
         {/* Search Bar */}

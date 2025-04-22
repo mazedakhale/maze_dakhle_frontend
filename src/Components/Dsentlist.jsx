@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { FaFileInvoice, FaDownload } from "react-icons/fa"; // Document icon
+import { FaFileInvoice, FaDownload, FaTimes } from "react-icons/fa"; // Document icon
 import jwtDecode from "jwt-decode"; // JWT decoder
 import Swal from "sweetalert2"; // Popup notifications
 import { useNavigate } from "react-router-dom";
@@ -11,6 +11,7 @@ const Dsentlist = () => {
     const [distributorId, setDistributorId] = useState(null);
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(false);
+    const [isAdding, setIsAdding] = useState(false);
 
     // Decode token and extract user ID
     useEffect(() => {
@@ -176,11 +177,21 @@ const Dsentlist = () => {
     }
 
     return (
-        <div className="ml-[300px] flex flex-col items-center min-h-screen p-6 bg-gray-100">
-            <div className="relative bg-white shadow-lg rounded-lg border border-gray-300 overflow-hidden">
-                <div className="border-t-4 border-orange-400 bg-[#f4f4f4] text-center p-4 rounded-t-lg relative">
-                    <h2 className="text-2xl font-bold text-gray-800">Manage Distributor History</h2>
-                    <div className="absolute bottom-[-2px] left-0 w-full h-1 bg-gray-300 shadow-md"></div>
+        <div className="ml-[250px] flex flex-col items-center min-h-screen p-6 bg-gray-100">
+            <div className="w-[90%] max-w-6xl bg-white shadow-lg rounded-lg">
+                <div className="relative border-t-4 border-orange-400 bg-[#F4F4F4] p-4 rounded-t-lg">
+                    <h2 className="text-2xl font-bold text-gray-800 text-center">
+                        Receipt Uploaded  Applications
+                    </h2>
+                    <button
+                        onClick={() => {
+                            setIsAdding(false);
+                            navigate("/Ddashinner");
+                        }}
+                        className="absolute top-1/2 right-4 transform -translate-y-1/2 text-gray-600 hover:text-gray-800"
+                    >
+                        <FaTimes size={20} />
+                    </button>
                 </div>
                 <div className=" overflow-x-auto">
                     <table className="w-full border border-gray-300">
@@ -237,16 +248,23 @@ const Dsentlist = () => {
                                             <p className="text-gray-500">No fields available</p>
                                         )}
                                     </td>
-                                    <td className="border p-2">
-                                        {new Date(doc.uploaded_at).toLocaleString('en-US', {
-                                            year: 'numeric',
-                                            month: '2-digit',
-                                            day: '2-digit',
-                                            hour: '2-digit',
-                                            minute: '2-digit',
-                                            second: '2-digit',
-                                            hour12: true,
-                                        })}
+                                    <td className="border p-2 text-center">
+                                        {(() => {
+                                            const date = new Date(doc.uploaded_at);
+                                            const formattedDate = `${String(date.getDate()).padStart(2, '0')}-${String(date.getMonth() + 1).padStart(2, '0')}-${date.getFullYear()}`;
+                                            const formattedTime = date.toLocaleTimeString('en-US', {
+                                                hour: '2-digit',
+                                                minute: '2-digit',
+                                                second: '2-digit',
+                                                hour12: true,
+                                            });
+                                            return (
+                                                <>
+                                                    <div>{formattedDate}</div>
+                                                    <div className="text-sm text-gray-600">{formattedTime}</div>
+                                                </>
+                                            );
+                                        })()}
                                     </td>
                                     <td className="border p-3 text-center">{doc.category_name}</td>
                                     <td className="border p-3 text-center">{doc.subcategory_name}</td>

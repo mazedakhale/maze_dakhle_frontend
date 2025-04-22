@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
 import jwtDecode from "jwt-decode";
+import { useNavigate } from "react-router-dom";
+import { FaFileInvoice, FaDownload, FaTimes } from "react-icons/fa"; // Document icon
 
 const ErrorRequests = () => {
   const [errorRequests, setErrorRequests] = useState([]);
@@ -9,7 +11,8 @@ const ErrorRequests = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedFile, setSelectedFile] = useState(null);
   const [uploadingDocumentId, setUploadingDocumentId] = useState(null);
-
+  const navigate = useNavigate();
+  const [isAdding, setIsAdding] = useState(false);
   // Get distributor_id from JWT token
   const getDistributorId = () => {
     const token = localStorage.getItem("token");
@@ -238,10 +241,22 @@ const ErrorRequests = () => {
   );
 
   return (
+
     <div className="ml-[250px] flex flex-col items-center min-h-screen p-6 bg-gray-100">
       <div className="w-[90%] max-w-6xl bg-white shadow-lg rounded-lg">
-        <div className="bg-[#F4F4F4] border-t-4 shadow-lg rounded border-orange-400 p-4">
-          <h2 className="text-xl font-bold text-center text-gray-800">Error Requests</h2>
+        <div className="relative border-t-4 border-orange-400 bg-[#F4F4F4] p-4 rounded-t-lg">
+          <h2 className="text-2xl font-bold text-gray-800 text-center">
+            Manage ErrorRequest  Applications
+          </h2>
+          <button
+            onClick={() => {
+              setIsAdding(false);
+              navigate("/Ddashinner");
+            }}
+            className="absolute top-1/2 right-4 transform -translate-y-1/2 text-gray-600 hover:text-gray-800"
+          >
+            <FaTimes size={20} />
+          </button>
         </div>
 
         {/* Search Bar */}
@@ -319,26 +334,59 @@ const ErrorRequests = () => {
                         View Document
                       </a>
                     </td>
+                    <td className="border p-2">
+                      <div className="flex flex-col gap-1">
+                        {/* Status Badge */}
+                        <span
+                          className={`px-3 py-1 rounded-full text-white text-xs ${doc.status === "Approved"
+                            ? "bg-green-500"
+                            : doc.status === "Rejected"
+                              ? "bg-red-500"
+                              : doc.status === "Completed"
+                                ? "bg-yellow-500" // Color for Completed
+                                : "bg-blue-500" // Default color
+                            }`}
+                        >
+                          {doc.status}
+                        </span>
 
-                    <td className="border p-3 text-center">
-                      <span
-                        className={`px-3 py-1 rounded-full text-white text-sm ${request.request_status === "Approved"
-                          ? "bg-green-500"
-                          : request.request_status === "Distributor Rejected"
-                            ? "bg-red-500"
-                            : request.request_status === "Completed"
-                              ? "bg-blue-500"
-                              : request.request_status === "Uploaded"
-                                ? "bg-purple-500"
-                                : "bg-yellow-500"
-                          }`}
-                      >
-                        {request.request_status}
-                      </span>
+                        {/* Latest Status Date and Time */}
+                        {doc.status_history
+                          ?.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at)) // Sort by latest date
+                          .slice(0, 1) // Take the first entry (latest status)
+                          .map((statusEntry, index) => (
+                            <div key={index} className="text-xs text-gray-600">
+                              {new Date(statusEntry.updated_at).toLocaleString("en-US", {
+                                year: "numeric",
+                                month: "2-digit",
+                                day: "2-digit",
+                                hour: "2-digit",
+                                minute: "2-digit",
+                                second: "2-digit", // Added seconds
+                                hour12: true, // Use AM/PM
+                              })}
+                            </div>
+                          ))}
+                      </div>
                     </td>
 
-                    <td className="border p-3 text-center">
-                      {new Date(request.request_date).toLocaleString()}
+                    <td className="border p-2 text-center">
+                      {(() => {
+                        const date = new Date(doc.uploaded_at);
+                        const formattedDate = `${String(date.getDate()).padStart(2, '0')}-${String(date.getMonth() + 1).padStart(2, '0')}-${date.getFullYear()}`;
+                        const formattedTime = date.toLocaleTimeString('en-US', {
+                          hour: '2-digit',
+                          minute: '2-digit',
+                          second: '2-digit',
+                          hour12: true,
+                        });
+                        return (
+                          <>
+                            <div>{formattedDate}</div>
+                            <div className="text-sm text-gray-600">{formattedTime}</div>
+                          </>
+                        );
+                      })()}
                     </td>
 
                     <td className="border p-3 text-center">

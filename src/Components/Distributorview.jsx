@@ -2,6 +2,8 @@ import React, { useEffect, useState, useCallback, useRef } from 'react';
 import axios from 'axios';
 import { useLocation, useParams } from 'react-router-dom';
 import logo1 from '../assets/logo.png';
+import { useNavigate } from "react-router-dom";
+import { FaFileInvoice, FaDownload, FaTimes } from "react-icons/fa"; // Document icon
 
 const ApplicationView = () => {
   const { documentId } = useParams();
@@ -11,7 +13,8 @@ const ApplicationView = () => {
   const [documentData, setDocumentData] = useState({});
   const [documentNames, setDocumentNames] = useState([]);
   const printRef = useRef();
-
+  const navigate = useNavigate();
+  const [isAdding, setIsAdding] = useState(false);
   useEffect(() => {
     console.log("Fetched from previous page state:");
     console.log("Document ID:", documentId);
@@ -43,7 +46,16 @@ const ApplicationView = () => {
       fetchDocumentData();
     }
   }, [documentId, fetchDocumentData]);
-
+  const formatDateTime = (iso) => {
+    const d = new Date(iso);
+    const dd = String(d.getDate()).padStart(2, '0');
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const yyyy = d.getFullYear();
+    const hh = String(d.getHours()).padStart(2, '0');
+    const min = String(d.getMinutes()).padStart(2, '0');
+    const ss = String(d.getSeconds()).padStart(2, '0');
+    return `${dd}-${mm}-${yyyy} ${hh}:${min}:${ss}`;
+  };
   // Print Handler
   // Print Handler
   const handlePrint = () => {
@@ -86,6 +98,18 @@ const ApplicationView = () => {
     <div className="fixed inset-0 flex items-center justify-center bg-gray-100 z-50">
       <div className="w-4/5 max-w-4xl border rounded-lg shadow-lg bg-white p-6 overflow-auto h-[90vh] relative">
 
+        <div className="relative border-t-4 p-4 rounded-t-lg">
+
+          <button
+            onClick={() => {
+              setIsAdding(false);
+              navigate("/Ddashinner");
+            }}
+            className="absolute top-1/2 right-4 transform -translate-y-1/2 text-gray-600 hover:text-gray-800"
+          >
+            <FaTimes size={20} />
+          </button>
+        </div>
         {/* Centered Print Button */}
         <div className="w-full flex justify-center mb-4 print:hidden">
           <button
@@ -112,7 +136,9 @@ const ApplicationView = () => {
                 <tbody>
                   <tr className="border-b border-gray-300">
                     <td className="font-semibold pr-2 border-r border-gray-300 p-2">Date:</td>
-                    <td className="p-2">{documentData.uploaded_at ? new Date(documentData.uploaded_at).toLocaleDateString() : 'N/A'}</td>
+                    <td className="border p-2 text-center">
+                      {formatDateTime(documentData.uploaded_at)}
+                    </td>
                   </tr>
                   <tr>
                     <td className="font-semibold pr-2 border-r border-gray-300 p-2">Application ID:</td>

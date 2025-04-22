@@ -82,7 +82,7 @@ const InvoicePage = () => {
   const [showDistributorList, setShowDistributorList] = useState(false);
   const [showRejectBox, setShowRejectBox] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-
+  const [isAdding, setIsAdding] = useState(false);
   const nodeRef = useRef(null);
 
   useEffect(() => {
@@ -371,7 +371,16 @@ const InvoicePage = () => {
       setIsProcessing(false);
     }
   };
-
+  const formatDateTime = (iso) => {
+    const d = new Date(iso);
+    const dd = String(d.getDate()).padStart(2, '0');
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const yyyy = d.getFullYear();
+    const hh = String(d.getHours()).padStart(2, '0');
+    const min = String(d.getMinutes()).padStart(2, '0');
+    const ss = String(d.getSeconds()).padStart(2, '0');
+    return `${dd}-${mm}-${yyyy} ${hh}:${min}:${ss}`;
+  };
 
   const handleCheckboxChange = (userId) => {
     setSelectedDistributor(userId === selectedDistributor ? null : userId);
@@ -407,7 +416,24 @@ const InvoicePage = () => {
 
   return (
     <div className="max-w-8xl mx-auto p-6 bg-white shadow-lg rounded-lg mt-10">
+      <div className="relative border-t-4 border-orange-400 bg-[#F4F4F4] p-4 rounded-t-lg">
 
+
+
+        {/* Replace this block: */}
+
+
+        {/* Cross button */}
+        <button
+          onClick={() => {
+            setIsAdding(false);
+            navigate("/Adashinner");
+          }}
+          className="absolute top-1/2 right-4 transform -translate-y-1/2 text-gray-600 hover:text-gray-800"
+        >
+          <FaTimes size={20} />
+        </button>
+      </div>
 
       <div className="flex space-x-6">
         {/* Left-Side Container (Smaller) */}
@@ -424,8 +450,9 @@ const InvoicePage = () => {
                     <tbody>
                       <tr className="border-b border-gray-300">
                         <td className="font-semibold pr-2 border-r border-gray-300 p-2">Date:</td>
-                        <td className="p-2">{new Date(documentData.uploaded_at).toLocaleDateString()}</td>
-                      </tr>
+                        <td className="border p-2 text-center">
+                          {formatDateTime(documentData.uploaded_at)}
+                        </td>                      </tr>
                       <tr>
                         <td className="font-semibold pr-2 border-r border-gray-300 p-2">Application ID:</td>
                         <td className="p-2">{documentData.application_id}</td>

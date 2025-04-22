@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
-import { useParams, useLocation } from 'react-router-dom';
+import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { FaCheck, FaTimes, FaUserPlus } from 'react-icons/fa';
 import logo1 from '../assets/logo.png';
 import jwtDecode from 'jwt-decode';
@@ -31,6 +31,8 @@ const InvoicePage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedDistributor, setSelectedDistributor] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isAdding, setIsAdding] = useState(false);
+  const navigate = useNavigate();
 
   const nodeRef = useRef(null);
 
@@ -388,41 +390,44 @@ const InvoicePage = () => {
   };
 
   if (!documentData) return <div className="text-center text-lg mt-10">Loading Invoice...</div>;
-
+  const formatDateTime = (iso) => {
+    const d = new Date(iso);
+    const dd = String(d.getDate()).padStart(2, '0');
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const yyyy = d.getFullYear();
+    const hh = String(d.getHours()).padStart(2, '0');
+    const min = String(d.getMinutes()).padStart(2, '0');
+    const ss = String(d.getSeconds()).padStart(2, '0');
+    return `${dd}-${mm}-${yyyy} ${hh}:${min}:${ss}`;
+  };
   return (
     <div className="max-w-8xl mx-auto p-6 bg-white shadow-lg rounded-lg mt-10">
 
-      <nav className="flex items-center justify-between bg-[#00234E] text-white p-4 shadow-md fixed top-0 left-0 right-0 z-50">
-        {/* Logo */}
+      <nav className="flex items-center justify-between bg-[#00234E] text-white p-4 fixed top-0 left-0 right-0 z-50">
         <div className="flex items-center">
           <img src={logo1} alt="Logo" className="h-10 mr-3" />
           <span className="text-xl font-bold">Vendor Management System</span>
         </div>
+        <div className="relative border-t-4 border-orange-400 bg-[#F4F4F4] p-4 rounded-t-lg">
 
-        {/* Profile Icon */}
-        <div className="relative">
-          <FaUserCircle
-            className="h-10 w-10 cursor-pointer"
-            onClick={() => setDropdownOpen(!dropdownOpen)}
-          />
-          {dropdownOpen && (
-            <div className="absolute right-0 mt-2 w-48 bg-white text-black shadow-lg rounded-lg z-10">
-              <div className="p-4 border-b text-center">
-                {userEmail ? (
-                  <p className="text-sm font-medium">{userEmail}</p>
-                ) : (
-                  <p className="text-sm">No user logged in.</p>
-                )}
-              </div>
-              <button
-                onClick={handleLogout}
-                className="w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-              >
-                Logout
-              </button>
-            </div>
-          )}
+
+
+          {/* Replace this block: */}
+
+
+          {/* Cross button */}
+          <button
+            onClick={() => {
+              setIsAdding(false);
+              navigate("/Cdashinner");
+            }}
+            className="absolute top-1/2 right-4 transform -translate-y-1/2 text-gray-600 hover:text-gray-800"
+          >
+            <FaTimes size={20} />
+          </button>
         </div>
+
+
       </nav>
 
 
@@ -456,8 +461,11 @@ const InvoicePage = () => {
                   <table className="text-sm text-gray-700 border border-gray-300">
                     <tbody>
                       <tr className="border-b border-gray-300">
-                        <td className="font-semibold pr-2 border-r border-gray-300 p-2">Date:</td>
-                        <td className="p-2">{new Date(documentData.uploaded_at).toLocaleDateString()}</td>
+                        <td className="font-semibold pr-2 border-r border-gray-300 p-2"> Date:</td>
+
+
+                        <td className="p-2">    {formatDateTime(documentData.uploaded_at)}</td>
+
                       </tr>
                       <tr>
                         <td className="font-semibold pr-2 border-r border-gray-300 p-2">Application ID:</td>

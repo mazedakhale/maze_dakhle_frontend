@@ -104,7 +104,7 @@ const FeedbackD = () => {
                     <button
                         onClick={() => {
                             setIsAdding(false);
-                            navigate("/Cdashinner");
+                            navigate("/Ddashinner");
                         }}
                         className="absolute top-1/2 right-4 transform -translate-y-1/2 text-gray-600 hover:text-gray-800"
                     >
