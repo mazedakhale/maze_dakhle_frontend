@@ -76,7 +76,7 @@ import ProfilePage from "./Components/ProfilePage";
 import Youtube from "./Components/Youtube";
 import Guide from "./Components/Guide"
 import Contact from "./Components/Contact"
-
+import RejectedBefore from "./Components/RejectedBefore"
 
 function App() {
   return (
@@ -123,6 +123,8 @@ function App() {
         <Route path="/Assigndistributorlist" element={<Admindashboard><Assigndistributorlist /></Admindashboard>} />
         <Route path="/Uploadeddocuments" element={<Admindashboard><Uploadeddocuments /></Admindashboard>} />
         <Route path="/Rejecteddocuments" element={<Admindashboard><Rejecteddocuments /></Admindashboard>} />
+        <Route path="/RejectedBefore" element={<Admindashboard><RejectedBefore /></Admindashboard>} />
+
         <Route path="/Lazycharts" element={<Admindashboard><LazyCharts /></Admindashboard>} />
         <Route path="/Received" element={<Admindashboard><Received /></Admindashboard>} />
 

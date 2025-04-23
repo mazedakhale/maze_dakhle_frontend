@@ -61,7 +61,10 @@ const Sidebar = ({ onNavigate }) => {
             { icon: <FaFileAlt />, label: "Required Documents", path: "/Requireddocuments" },
             { icon: <FaShapes />, label: "Field Names", path: "/Addfieldname" },
             { icon: <FaCheckCircle />, label: "Customer Request", path: "/Verifydocuments" },
-            { icon: <FaCheckCircle />, label: " Rejected  List", path: "/Rejecteddocuments" },
+            { icon: <FaCheckCircle />, label: " Rejected  List", path: "/RejectedBefore" },
+
+            { icon: <FaCheckCircle />, label: " Assigned Distributor Rejected  List", path: "/Rejecteddocuments" },
+
 
             { icon: <FaCheckCircle />, label: "Applications History", path: "/Verifydocumentshistory" },
             { icon: <FaCheckCircle />, label: "Assigned Distributor List", path: "/Assigndistributorlist" },

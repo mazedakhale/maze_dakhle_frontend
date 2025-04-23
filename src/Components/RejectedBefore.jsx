@@ -17,7 +17,7 @@ const Rejecteddocuments = () => {
     useEffect(() => {
         // Fetch assigned documents from the new API
         axios
-            .get(`https://mazedakhale.in/api/documents/assigned-list`)
+            .get(`https://mazedakhale.in/api/documents/list`)
             .then((response) => {
                 const sortedDocuments = response.data.documents.sort(
                     (a, b) => new Date(b.uploaded_at) - new Date(a.uploaded_at)
@@ -71,23 +71,21 @@ const Rejecteddocuments = () => {
     };
 
     const filteredDocuments = documents
-        .filter((doc) => doc.status === "Rejected") // Only include documents with status "Uploaded"
-        .filter((doc) =>
-            statusFilter ? doc.status?.toLowerCase() === statusFilter.toLowerCase() : true
+        .filter(doc => doc.status === "Rejected")        // only rejected
+        .filter(doc => !doc.distributor_id)               // only those without distributor_id
+        .filter(doc => statusFilter
+            ? doc.status.toLowerCase() === statusFilter.toLowerCase()
+            : true
         )
-        .filter((doc) => {
+        .filter(doc => {
             if (!searchQuery) return true;
-
-            const lowerQuery = searchQuery.toLowerCase();
-
+            const q = searchQuery.toLowerCase();
             return (
-                doc.document_id?.toString().toLowerCase().includes(lowerQuery) ||
-                doc.name?.toLowerCase().includes(lowerQuery) ||
-                doc.email?.toLowerCase().includes(lowerQuery) ||
-                doc.phone?.toString().toLowerCase().includes(lowerQuery) ||
-                doc.category_name?.toLowerCase().includes(lowerQuery) ||
-                doc.subcategory_name?.toLowerCase().includes(lowerQuery) ||
-                doc.address?.toLowerCase().includes(lowerQuery)
+                doc.application_id.toString().toLowerCase().includes(q) ||
+                doc.name?.toLowerCase().includes(q) ||
+                doc.email?.toLowerCase().includes(q) ||
+                doc.category_name?.toLowerCase().includes(q) ||
+                doc.subcategory_name?.toLowerCase().includes(q)
             );
         });
 
