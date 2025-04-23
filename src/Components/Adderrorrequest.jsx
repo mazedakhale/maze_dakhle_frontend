@@ -1,11 +1,13 @@
+// src/pages/AddCertificateRequestPage.jsx
+
 import React, { useState } from "react";
 import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
-import { FaFileAlt, FaFileInvoice, FaDownload, FaCheck, FaTimes } from "react-icons/fa";
+import { FaTimes } from "react-icons/fa";
+import Swal from "sweetalert2";
 
-const AddErrorRequestPage = () => {
+export default function AddCertificateRequestPage() {
   const navigate = useNavigate();
-  const location = useLocation();
   const {
     documentId,
     applicationId,
@@ -15,52 +17,33 @@ const AddErrorRequestPage = () => {
     subcategoryId,
     name,
     email,
-  } = location.state || {};
+  } = useLocation().state || {};
 
-  const [requestDescription, setRequestDescription] = useState("");
-  const [errorDocument, setErrorDocument] = useState(null);
-  const [uploading, setUploading] = useState(false);
-  const [isAdding, setIsAdding] = useState(false);
+  const [errorType, setErrorType] = useState("certificate");
+  const [description, setDescription] = useState("");
+  const [certFile, setCertFile] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
 
-  // Handle file selection
   const handleFileChange = (e) => {
-    const file = e.target.files[0];
-
-    if (file && (file.type === "application/pdf" || file.type.startsWith("image/"))) {
-      console.log("📂 Selected File:", file.name);
-      setErrorDocument(file);
+    const f = e.target.files[0];
+    if (f && (f.type === "application/pdf" || f.type.startsWith("image/"))) {
+      setCertFile(f);
     } else {
-      alert("Only PDF or image files are allowed.");
-      setErrorDocument(null);
+      Swal.fire("Error", "Only PDF or image files allowed.", "error");
+      setCertFile(null);
     }
   };
 
-  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!requestDescription || !errorDocument) {
-      alert("Please fill all required fields.");
-      return;
+    if (!description.trim() || !certFile) {
+      return Swal.fire("Error", "All fields are required.", "error");
     }
 
-    // Debugging logs
-    console.log("📝 Request Description:", requestDescription);
-    console.log("📂 Error Document:", errorDocument.name);
-    console.log("📄 Document ID:", documentId);
-    console.log("📄 Application ID:", applicationId);
-    console.log("📌 Distributor ID:", distributorId);
-    console.log("👤 User ID:", userId);
-    console.log("📑 Category ID:", categoryId);
-    console.log("📂 Subcategory ID:", subcategoryId);
-    console.log("📂 Name:", name);
-    console.log("📂 Email:", email);
-
-    setUploading(true);
-
+    setSubmitting(true);
     const formData = new FormData();
-    formData.append("request_description", requestDescription);
-    formData.append("file", errorDocument); // 🔥 Match with @UploadedFile() in NestJS
+    formData.append("request_description", description);
+    formData.append("file", certFile);
     formData.append("document_id", String(documentId));
     formData.append("application_id", String(applicationId));
     formData.append("distributor_id", String(distributorId));
@@ -69,83 +52,97 @@ const AddErrorRequestPage = () => {
     formData.append("subcategory_id", String(subcategoryId));
     formData.append("request_name", String(name));
     formData.append("request_email", String(email));
+    formData.append("error_type", errorType);  // now dynamic!
 
     try {
-      const response = await axios.post(
+      const resp = await axios.post(
         "https://mazedakhale.in/api/request-errors/create",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
+        formData
       );
-
-      if (response.status === 201) {
-        console.log("✅ Submission Successful:", response.data);
-        alert("Error request submitted successfully!");
+      if (resp.status === 201 || resp.status === 200) {
+        Swal.fire("Success", "Error request submitted!", "success");
         navigate("/Customerhistory");
+      } else {
+        throw new Error("Unexpected response status");
       }
-    } catch (error) {
-      console.error("❌ Submission Failed:", error.response?.data || error.message);
-      alert("Submission failed. Please try again.");
+    } catch (err) {
+      console.error("Submission failed:", err.response?.data || err.message);
+      Swal.fire("Error", "Failed to submit. Please try again.", "error");
     } finally {
-      setUploading(false);
+      setSubmitting(false);
     }
   };
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100 p-6">
-      {/* make this container relative so the close button can be absolute */}
       <div className="relative bg-white p-8 rounded-lg shadow-lg w-[500px]">
-        {/* Close button, absolute top-right */}
         <button
-          onClick={() => navigate("/Cdashinner")}
+          onClick={() => navigate(-1)}
           className="absolute top-4 right-4 text-gray-600 hover:text-gray-800"
         >
           <FaTimes size={20} />
         </button>
-
-        {/* Your heading */}
         <h2 className="text-2xl font-bold mb-4 text-center">
-          Add Error Request
+          Report an Error
         </h2>
         <form onSubmit={handleSubmit} className="space-y-4">
+
+          {/* Error Type Selector */}
           <div>
-            <label className="block font-semibold mb-1">Request Description:</label>
-            <textarea
-              value={requestDescription}
-              onChange={(e) => setRequestDescription(e.target.value)}
+            <label className="block font-semibold mb-1">
+              Select Error Type
+            </label>
+            <select
+              value={errorType}
+              onChange={(e) => setErrorType(e.target.value)}
               className="w-full p-2 border rounded"
-              rows="4"
-              placeholder="Describe the issue..."
+            >
+              <option value="certificate">Certificate</option>
+              <option value="receipt">Receipt</option>
+              <option value="payment">Payment</option>
+            </select>
+          </div>
+
+          {/* Description */}
+          <div>
+            <label className="block font-semibold mb-1">
+              What’s wrong?
+            </label>
+            <textarea
+              className="w-full p-2 border rounded"
+              rows={4}
+              placeholder="Describe the issue…"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
               required
             />
           </div>
 
+          {/* File Upload */}
           <div>
-            <label className="block font-semibold mb-1">Upload Error Document:</label>
+            <label className="block font-semibold mb-1">
+              Upload Relevant File
+            </label>
             <input
               type="file"
-              onChange={handleFileChange}
               accept="application/pdf, image/*"
+              onChange={handleFileChange}
               className="w-full p-2 border rounded"
               required
             />
           </div>
 
+          {/* Submit */}
           <button
             type="submit"
-            disabled={uploading}
-            className={`w-full py-2 text-white rounded ${uploading ? "bg-gray-500" : "bg-blue-600 hover:bg-blue-700"
+            disabled={submitting}
+            className={`w-full py-2 text-white rounded ${submitting ? "bg-gray-500" : "bg-blue-600 hover:bg-blue-700"
               }`}
           >
-            {uploading ? "Submitting..." : "Submit Error Request"}
+            {submitting ? "Submitting…" : "Submit Error Request"}
           </button>
         </form>
       </div>
     </div>
   );
-};
-
-export default AddErrorRequestPage;
+}

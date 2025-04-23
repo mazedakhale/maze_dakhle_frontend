@@ -50,8 +50,10 @@ const Sidebar = ({ onNavigate }) => {
             { icon: <FaList />, label: "Users Contact  Forms ", path: "/Contact " },
 
 
-            { icon: <FaExclamationTriangle />, label: "Error Request", path: "/Adminrequest" },
-            { icon: <FaHistory />, label: "Error Request History", path: "/Adminerrorhistory" },
+            // { icon: <FaExclamationTriangle />, label: " Certificate Error Request", path: "/Adminrequest" },
+            { icon: <FaExclamationTriangle />, label: "  Error Request", path: "/ReceiptErrorRequests" },
+
+            // { icon: <FaHistory />, label: "Error Request History", path: "/Adminerrorhistory" },
             { icon: <FaUserShield />, label: "Distributor Credentials", path: "/Distributorlist" },
             { icon: <FaUserShield />, label: "Employee Credentials", path: "/Employeelist" },
             { icon: <FaUserShield />, label: "Employee ", path: "/Employee" },

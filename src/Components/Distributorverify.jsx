@@ -51,6 +51,27 @@ const VerifyDocuments = () => {
       console.error("Error fetching certificates:", err);
     }
   };
+  const handleDownloadReceipt = (receiptUrl, documentName) => {
+    try {
+      // Extract the file extension from the URL (e.g., "pdf", "jpg", "png")
+      const fileExtension = receiptUrl.split('.').pop().toLowerCase();
+
+      // Generate the file name (e.g., "MyDocument_receipt.pdf")
+      const fileName = `${documentName}_receipt.${fileExtension}`;
+
+      // Create a temporary <a> element to trigger the download
+      const link = document.createElement("a");
+      link.href = receiptUrl;
+      link.download = fileName; // Set the file name for the download
+      link.style.display = "none"; // Hide the link element
+      document.body.appendChild(link); // Add the link to the DOM
+      link.click(); // Trigger the download
+      document.body.removeChild(link); // Clean up by removing the link
+    } catch (error) {
+      console.error("Error downloading receipt:", error);
+      Swal.fire("Error", "Failed to download receipt. Please try again.", "error");
+    }
+  };
 
   // Get list of documents, excluding only those still 'Sent'
   const fetchDocuments = async (distributorId) => {

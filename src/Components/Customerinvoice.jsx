@@ -349,46 +349,32 @@ const InvoicePage = () => {
 
     fileInput.onchange = async (e) => {
       const file = e.target.files[0];
-      if (file) {
-        try {
-          const formData = new FormData();
-          formData.append('file', file);
-          formData.append('documentType', documentType);
+      if (!file) return;
 
-          const response = await axios.post(
-            `https://mazedakhale.in/api/documents/reupload/${documentId}`,
-            formData,
-            {
-              headers: {
-                'Content-Type': 'multipart/form-data',
-              },
-            }
-          );
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('documentType', documentType);
 
-          console.log('Reupload successful:', response.data);
-          alert('Document reuploaded successfully.');
-
-          const updatedDocuments = documents.map((doc) =>
-            documentData.document_id === documentId ? response.documentData.document : doc
-          );
-          setDocuments(updatedDocuments);
-        } catch (error) {
-          console.error('Error reuploading document:', error);
-          let errorMessage = 'Failed to reupload document. Please try again.';
-          if (error.response) {
-            errorMessage = error.response.data.message || errorMessage;
-          } else if (error.request) {
-            errorMessage = 'Network error. Please check your connection.';
-          }
-          alert(errorMessage);
-        }
+      try {
+        const { data: updatedDocument } = await axios.post(
+          `https://mazedakhale.in/api/documents/reupload/${documentId}`,
+          formData,
+          { headers: { 'Content-Type': 'multipart/form-data' } }
+        );
+        // Overwrite local state
+        setDocumentData(updatedDocument);
+        alert('Document reuploaded successfully.');
+      } catch (error) {
+        console.error('Error reuploading document:', error);
+        let errorMessage = 'Failed to reupload document. Please try again.';
+        if (error.response?.data?.message) errorMessage = error.response.data.message;
+        else if (error.request) errorMessage = 'Network error. Please check your connection.';
+        alert(errorMessage);
       }
-
     };
 
     fileInput.click();
   };
-
   if (!documentData) return <div className="text-center text-lg mt-10">Loading Invoice...</div>;
   const formatDateTime = (iso) => {
     const d = new Date(iso);

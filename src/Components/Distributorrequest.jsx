@@ -1,435 +1,378 @@
+// import React, { useEffect, useState } from "react";
+// import axios from "axios";
+// import Swal from "sweetalert2";
+// import jwtDecode from "jwt-decode";
+// import { useNavigate } from "react-router-dom";
+// import { FaDownload, FaTimes } from "react-icons/fa";
+
+// const ErrorRequests = () => {
+//   const [errorRequests, setErrorRequests] = useState([]);
+//   const [certificates, setCertificates] = useState([]);
+//   const [searchTerm, setSearchTerm] = useState("");
+//   const [filterType, setFilterType] = useState("all");
+//   const [statusFilter, setStatusFilter] = useState("all");
+
+//   const [selectedFile, setSelectedFile] = useState({});
+//   const navigate = useNavigate();
+
+//   const distributorId = jwtDecode(localStorage.getItem("token"))?.user_id || null;
+
+//   useEffect(() => {
+//     if (distributorId) {
+//       fetchErrorRequests();
+//       fetchCertificates();
+//     }
+//   }, [distributorId]);
+
+//   const fetchErrorRequests = async () => {
+//     const { data } = await axios.get(
+//       `https://mazedakhale.in/api/request-errors/distributor/${distributorId}`
+//     );
+//     setErrorRequests(data.filter(req => req.request_status !== "Distributor Rejected" && req.request_status !== "Completed"));
+//   };
+
+//   const fetchCertificates = async () => {
+//     const { data } = await axios.get("https://mazedakhale.in/api/certificates");
+//     setCertificates(data);
+//   };
+
+//   const updateRequestStatus = async (requestId, status, reason = "") => {
+//     await axios.patch(`https://mazedakhale.in/api/request-errors/update-status/${requestId}`, {
+//       request_status: status,
+//       rejectionReason: reason,
+//     });
+//   };
+
+//   const handleRejectStatus = async requestId => {
+//     const { value: reason } = await Swal.fire({
+//       title: 'Rejection Reason',
+//       input: 'text',
+//       showCancelButton: true,
+//       inputValidator: v => !v.trim() && 'Reason required',
+//     });
+//     if (!reason) return;
+
+//     Swal.showLoading();
+//     await updateRequestStatus(requestId, 'Distributor Rejected', reason);
+//     await fetchErrorRequests();
+//     Swal.fire('Rejected', '', 'success');
+//   };
+
+//   const handleDownload = (url, name, type) => {
+//     const link = document.createElement("a");
+//     link.href = url;
+//     link.download = `${name}_${type}.${url.split('.').pop()}`;
+//     link.click();
+//   };
+
+//   const handleFileChange = (e, docId) => {
+//     setSelectedFile(prev => ({ ...prev, [docId]: e.target.files[0] }));
+//   };
+
+//   const handleUploadFile = async (req, type) => {
+//     const file = selectedFile[req.document_id];
+//     if (!file) return Swal.fire('Error', 'Please select a file.', 'error');
+
+//     const formData = new FormData();
+//     formData.append(type === 'certificate' ? 'file' : 'receipt', file);
+//     if (type === 'certificate') formData.append('user_id', distributorId);
+
+//     const url =
+//       type === 'certificate'
+//         ? `https://mazedakhale.in/api/certificates/update/${req.document_id}`
+//         : `https://mazedakhale.in/api/documents/update-receipt/${req.document_id}`;
+
+//     const method = type === 'certificate' ? 'patch' : 'put';
+
+//     try {
+//       await axios[method](url, formData);
+//       await updateRequestStatus(req.request_id, type === 'certificate' ? 'Uploaded' : 'Receipt Uploaded');
+//       await fetchErrorRequests();
+//       Swal.fire('Uploaded', `${type.charAt(0).toUpperCase() + type.slice(1)} uploaded successfully.`, 'success');
+//     } catch {
+//       Swal.fire('Error', `Failed to upload ${type}.`, 'error');
+//     }
+//   };
+
+//   const filtered = errorRequests.filter(r =>
+//     (filterType === "all" || r.error_type === filterType) &&
+//     (statusFilter === "all" || r.request_status === statusFilter) &&
+//     Object.values(r).some(v => v?.toString().toLowerCase().includes(searchTerm.toLowerCase()))
+//   );
+
+//   return (
+//     <div className="ml-[250px] flex flex-col items-center min-h-screen p-6 bg-gray-100">
+//       <div className="w-[90%] max-w-6xl bg-white shadow-lg rounded-lg">
+//         <div className="relative border-t-4 border-orange-400 bg-[#F4F4F4] p-4 rounded-t-lg">
+//           <h2 className="text-2xl font-bold text-center">Manage Error Requests</h2>
+//           <button onClick={() => navigate('/Ddashinner')} className="absolute top-4 right-4 text-gray-600 hover:text-gray-800">
+//             <FaTimes size={20} />
+//           </button>
+//         </div>
+//         <div className="p-4 flex items-center gap-4">
+//           <select className="border p-2 rounded-md" value={filterType} onChange={e => setFilterType(e.target.value)}>
+//             <option value="all">All Types</option>
+//             <option value="certificate">Certificate</option>
+//             <option value="receipt">Receipt</option>
+//             <option value="payment">Payment</option>
+//           </select>
+//           <select className="border p-2 rounded-md" value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
+//             <option value="all">All Statuses</option>
+//             <option>Pending</option>
+//             <option>Uploaded</option>
+//             <option>Approved</option>
+//             <option>Rejected</option>
+//             <option>Receipt Uploaded</option>
+//           </select>
+//           <input className="ml-auto border p-2 rounded-md w-64" placeholder="Search..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
+//         </div>
+//         <div className="p-6 overflow-x-auto">
+//           <table className="w-full border border-gray-300">
+//             <thead className="bg-[#F58A3B14]">
+//               <tr>
+//                 {["Req ID", "App ID", "Name", "Type", "Desc", "Doc", "Status", "Date", "Reject", "Download", "Upload"].map(h => (
+//                   <th key={h} className="border p-2">{h}</th>
+//                 ))}
+//               </tr>
+//             </thead>
+//             <tbody>
+//               {filtered.length ? filtered.map((r, i) => (
+//                 <tr key={r.request_id} className={i % 2 ? 'bg-[#F58A3B14]' : 'bg-white'}>
+//                   <td className="border p-2">{r.request_id}</td>
+//                   <td className="border p-2">{r.application_id}</td>
+//                   <td className="border p-2">{r.document_fields?.["APPLICANT NAME"] || 'N/A'}</td>
+//                   <td className="border p-2 capitalize">{r.error_type}</td>
+//                   <td className="border p-2">{r.request_description}</td>
+//                   <td className="border p-2 text-center">
+//                     <a href={r.error_document} target="_blank" rel="noopener" className="text-blue-500">View</a>
+//                   </td>
+//                   <td className="border p-2">{r.request_status}</td>
+//                   <td className="border p-2 text-center">
+//                     {(() => {
+//                       const date = new Date(r.uploaded_at);
+//                       const formattedDate = `${String(date.getDate()).padStart(2, '0')}-${String(date.getMonth() + 1).padStart(2, '0')}-${date.getFullYear()}`;
+//                       const formattedTime = date.toLocaleTimeString('en-US', {
+//                         hour: '2-digit',
+//                         minute: '2-digit',
+//                         second: '2-digit',
+//                         hour12: true,
+//                       });
+//                       return (
+//                         <>
+//                           <div>{formattedDate}</div>
+//                           <div className="text-sm text-gray-600">{formattedTime}</div>
+//                         </>
+//                       );
+//                     })()}
+//                   </td>                  <td className="border p-2 text-center">
+//                     <button className="bg-red-500 text-white px-2 rounded" onClick={() => handleRejectStatus(r.request_id)}>Reject</button>
+//                   </td>
+//                   <td className="border p-2 text-center">
+//                     {r.receipt_url && <FaDownload className="mx-auto cursor-pointer" onClick={() => handleDownload(r.receipt_url, r.name, 'receipt')} />}
+//                   </td>
+//                   <td className="border p-2">
+//                     <input type="file" className="mb-1" onChange={e => handleFileChange(e, r.document_id)} />
+//                     <button className="bg-blue-500 text-white px-2 rounded" onClick={() => handleUploadFile(r, r.error_type)}>Upload</button>
+//                   </td>
+//                 </tr>
+//               )) : (
+//                 <tr><td colSpan={11} className="text-center py-4">No requests found.</td></tr>
+//               )}
+//             </tbody>
+//           </table>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default ErrorRequests;
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
 import jwtDecode from "jwt-decode";
 import { useNavigate } from "react-router-dom";
-import { FaFileInvoice, FaDownload, FaTimes } from "react-icons/fa"; // Document icon
+import { FaDownload, FaTimes } from "react-icons/fa";
 
 const ErrorRequests = () => {
   const [errorRequests, setErrorRequests] = useState([]);
   const [certificates, setCertificates] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [uploadingDocumentId, setUploadingDocumentId] = useState(null);
-  const navigate = useNavigate();
-  const [isAdding, setIsAdding] = useState(false);
-  // Get distributor_id from JWT token
-  const getDistributorId = () => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      const decoded = jwtDecode(token);
-      console.log("Decoded Token:", decoded);
-      return decoded.user_id;
-    }
-    return null;
-  };
+  const [filterType, setFilterType] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("all");
 
-  const distributorId = getDistributorId();
-  console.log("Distributor ID:", distributorId);
+  const [selectedFile, setSelectedFile] = useState({});
+  const navigate = useNavigate();
+
+  const distributorId = jwtDecode(localStorage.getItem("token"))?.user_id || null;
 
   useEffect(() => {
     if (distributorId) {
-      fetchErrorRequests(distributorId);
+      fetchErrorRequests();
       fetchCertificates();
     }
   }, [distributorId]);
 
-  // Fetch error requests for the distributor
-  const fetchErrorRequests = async (distributorId) => {
-    try {
-      console.log(`Fetching error requests for distributor ID: ${distributorId}`);
-      const response = await axios.get(
-        `https://mazedakhale.in/api/request-errors/distributor/${distributorId}`
-      );
-      console.log("Error Requests API Response:", response.data);
-
-      // Filter out rejected requests
-      const filteredRequests = response.data.filter(
-        (request) => request.request_status !== "Distributor Rejected" && request.request_status !== "Completed"
-      );
-
-      setErrorRequests(filteredRequests);
-    } catch (error) {
-      console.error("Error fetching error requests:", error);
-    }
-  };
-
-  // Fetch all certificates
-  const fetchCertificates = async () => {
-    try {
-      console.log("Fetching certificates...");
-      const response = await axios.get("https://mazedakhale.in/api/certificates");
-      console.log("Certificates API Response:", response.data);
-      setCertificates(response.data);
-    } catch (error) {
-      console.error("Error fetching certificates:", error);
-    }
-  };
-
-  // Get certificate by document_id
-  const getCertificateByDocumentId = (documentId) => {
-    const matchedCertificate = certificates.find(
-      (cert) => cert.document_id === documentId
+  const fetchErrorRequests = async () => {
+    const { data } = await axios.get(
+      `https://mazedakhale.in/api/request-errors/distributor/${distributorId}`
     );
-    console.log(`Certificate found for Document ID ${documentId}:`, matchedCertificate);
-    return matchedCertificate ? matchedCertificate.certificate_id : null;
+    setErrorRequests(data.filter(req => req.request_status !== "Distributor Rejected" && req.request_status !== "Completed"));
   };
 
-  // View certificate
-  const handleViewCertificate = async (documentId) => {
-    const certificateId = getCertificateByDocumentId(documentId);
-    if (!certificateId) {
-      Swal.fire("Error", "Certificate not found.", "error");
-      return;
-    }
-    try {
-      console.log(`Fetching certificate for Certificate ID: ${certificateId}`);
-      const response = await axios.get(`https://mazedakhale.in/api/certificates/${certificateId}`);
-      console.log("View Certificate API Response:", response.data);
-
-      if (response.data && response.data.file_url) {
-        window.open(response.data.file_url, "_blank");
-      } else {
-        Swal.fire("Error", "Certificate not found.", "error");
-      }
-    } catch (error) {
-      console.error("Error fetching certificate:", error);
-      Swal.fire("Error", "Failed to fetch certificate.", "error");
-    }
+  const fetchCertificates = async () => {
+    const { data } = await axios.get("https://mazedakhale.in/api/certificates");
+    setCertificates(data);
   };
 
-  // Reject request
-  // const handleRejectStatus = async (requestId) => {
-  //   try {
-  //     console.log(`Rejecting request with Request ID: ${requestId}`);
-  //     await axios.patch(`https://mazedakhale.in/api/request-errors/update-status/${requestId}`, {
-  //       request_status: "Distributor Rejected",
-  //     });
-  //     fetchErrorRequests(distributorId);
-  //     Swal.fire("Updated!", "Request has been rejected.", "success");
-  //   } catch (error) {
-  //     console.error("Error updating request status:", error);
-  //     Swal.fire("Error", "Failed to reject request.", "error");
-  //   }
-  // };
-
-
-
-  const handleRejectStatus = async (requestId) => {
-    const { value: rejectionReason } = await Swal.fire({
-      title: "Enter Rejection Reason",
-      input: "text",
-      inputPlaceholder: "Type your reason here...",
-      showCancelButton: true,
-      confirmButtonText: "Reject",
-      cancelButtonText: "Cancel",
-      inputValidator: (value) => {
-        if (!value.trim()) {
-          return "Rejection reason is required!";
-        }
-      }
+  const updateRequestStatus = async (requestId, status, reason = "") => {
+    await axios.patch(`https://mazedakhale.in/api/request-errors/update-status/${requestId}`, {
+      request_status: status,
+      rejectionReason: reason,
     });
-
-    // Ensure rejection reason is captured correctly
-    if (!rejectionReason || rejectionReason.trim() === "") {
-      console.error("❌ No rejection reason provided.");
-      return;
-    }
-
-    try {
-      console.log(`🔹 Rejecting request ID: ${requestId} with reason: ${rejectionReason}`);
-
-      const response = await axios.patch(`https://mazedakhale.in/api/request-errors/update-status/${requestId}`, {
-        request_status: "Distributor Rejected",
-        rejectionReason: rejectionReason.trim(), // Ensure it's not undefined
-      });
-
-      console.log("✅ API Response:", response.data);
-
-      fetchErrorRequests(distributorId);
-
-      Swal.fire({
-        icon: "success",
-        title: "Updated!",
-        text: "Request has been rejected successfully.",
-        confirmButtonText: "OK",
-      });
-
-    } catch (error) {
-      console.error("❌ Error updating request status:", error);
-
-      if (error.response) {
-        console.error("🛑 Server Response:", error.response.data);
-        Swal.fire({
-          icon: "error",
-          title: "Error",
-          text: `Failed to reject request: ${error.response.data.message || "Unknown error"}`,
-          confirmButtonText: "OK",
-        });
-      } else {
-        Swal.fire({
-          icon: "error",
-          title: "Error",
-          text: "Failed to reject request. Please try again later.",
-          confirmButtonText: "OK",
-        });
-      }
-    }
   };
 
+  const handleRejectStatus = async requestId => {
+    const { value: reason } = await Swal.fire({
+      title: 'Rejection Reason',
+      input: 'text',
+      showCancelButton: true,
+      inputValidator: v => !v.trim() && 'Reason required',
+    });
+    if (!reason) return;
 
-
-
-  // Handle file selection
-  const handleFileChange = (event, documentId) => {
-    console.log("File selected:", event.target.files[0], "for Document ID:", documentId);
-    setSelectedFile(event.target.files[0]);
-    setUploadingDocumentId(documentId);
+    Swal.showLoading();
+    await updateRequestStatus(requestId, 'Distributor Rejected', reason);
+    await fetchErrorRequests();
+    Swal.fire('Rejected', '', 'success');
   };
 
-  // Upload certificate
-  const handleUploadCertificate = async (documentId, requestId) => {
-    if (!selectedFile || uploadingDocumentId !== documentId) {
-      Swal.fire("Error", "Please select a file to upload.", "error");
-      return;
-    }
+  const handleDownload = (url, name, type) => {
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `${name}_${type}.${url.split('.').pop()}`;
+    link.click();
+  };
 
-    console.log(`Uploading certificate for Document ID: ${documentId}, Request ID: ${requestId}`);
-    console.log("Selected file:", selectedFile);
+  const handleFileChange = (e, docId) => {
+    setSelectedFile(prev => ({ ...prev, [docId]: e.target.files[0] }));
+  };
+
+  const handleUploadFile = async (req, type) => {
+    const file = selectedFile[req.document_id];
+    if (!file) return Swal.fire('Error', 'Please select a file.', 'error');
 
     const formData = new FormData();
-    formData.append("file", selectedFile);
-    formData.append("user_id", distributorId);
+    formData.append(type === 'certificate' ? 'file' : 'receipt', file);
+    if (type === 'certificate') formData.append('user_id', distributorId);
+
+    const url =
+      type === 'certificate'
+        ? `https://mazedakhale.in/api/certificates/update/${req.document_id}`
+        : `https://mazedakhale.in/api/documents/update-receipt/${req.document_id}`;
+
+    const method = type === 'certificate' ? 'patch' : 'put';
 
     try {
-      const uploadResponse = await axios.patch(
-        `https://mazedakhale.in/api/certificates/update/${documentId}`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data", // Important
-          },
-        }
-      );
-      console.log("Certificate Upload Response:", uploadResponse.data);
-
-      // Update request status to "Uploaded"
-      const updateStatusResponse = await axios.patch(
-        `https://mazedakhale.in/api/request-errors/update-status/${requestId}`,
-        { request_status: "Uploaded" }
-      );
-      console.log("Update Request Status Response:", updateStatusResponse.data);
-
-      setSelectedFile(null);
-      setUploadingDocumentId(null);
-      fetchErrorRequests(distributorId);
-      Swal.fire("Success", "Certificate uploaded successfully.", "success");
-    } catch (error) {
-      console.error("Error uploading certificate:", error);
-      Swal.fire("Error", `Failed to upload certificate: ${error.response?.data?.message || "Unknown error"}`, "error");
+      await axios[method](url, formData);
+      await updateRequestStatus(req.request_id, type === 'certificate' ? 'Uploaded' : 'Receipt Uploaded');
+      await fetchErrorRequests();
+      Swal.fire('Uploaded', `${type.charAt(0).toUpperCase() + type.slice(1)} uploaded successfully.`, 'success');
+    } catch {
+      Swal.fire('Error', `Failed to upload ${type}.`, 'error');
     }
   };
 
-
-  // Filter search results
-  const filteredRequests = errorRequests.filter((request) =>
-    Object.values(request).some(
-      (value) =>
-        value &&
-        value.toString().toLowerCase().includes(searchTerm.toLowerCase())
-    )
+  const filtered = errorRequests.filter(r =>
+    (filterType === "all" || r.error_type === filterType) &&
+    (statusFilter === "all" || r.request_status === statusFilter) &&
+    Object.values(r).some(v => v?.toString().toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   return (
-
     <div className="ml-[250px] flex flex-col items-center min-h-screen p-6 bg-gray-100">
       <div className="w-[90%] max-w-6xl bg-white shadow-lg rounded-lg">
         <div className="relative border-t-4 border-orange-400 bg-[#F4F4F4] p-4 rounded-t-lg">
-          <h2 className="text-2xl font-bold text-gray-800 text-center">
-            Manage ErrorRequest  Applications
-          </h2>
-          <button
-            onClick={() => {
-              setIsAdding(false);
-              navigate("/Ddashinner");
-            }}
-            className="absolute top-1/2 right-4 transform -translate-y-1/2 text-gray-600 hover:text-gray-800"
-          >
+          <h2 className="text-2xl font-bold text-center">Manage Error Requests</h2>
+          <button onClick={() => navigate('/Ddashinner')} className="absolute top-4 right-4 text-gray-600 hover:text-gray-800">
             <FaTimes size={20} />
           </button>
         </div>
-
-        {/* Search Bar */}
-        <div className="p-4 flex justify-between items-center">
-          <input
-            type="text"
-            placeholder="Search..."
-            className="border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-300"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+        <div className="p-4 flex items-center gap-4">
+          <select className="border p-2 rounded-md" value={filterType} onChange={e => setFilterType(e.target.value)}>
+            <option value="all">All Types</option>
+            <option value="certificate">Certificate</option>
+            <option value="receipt">Receipt</option>
+            <option value="payment">Payment</option>
+          </select>
+          <select className="border p-2 rounded-md" value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
+            <option value="all">All Statuses</option>
+            <option>Pending</option>
+            <option>Uploaded</option>
+            <option>Approved</option>
+            <option>Rejected</option>
+            <option>Receipt Uploaded</option>
+          </select>
+          <input className="ml-auto border p-2 rounded-md w-64" placeholder="Search..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
         </div>
-
-        {/* Table */}
         <div className="p-6 overflow-x-auto">
           <table className="w-full border border-gray-300">
             <thead className="bg-[#F58A3B14]">
               <tr>
-                {[
-                  "Request ID",
-                  "Application ID",
-                  "Applicant Name",
-                  "Description",
-                  "Error Document",
-                  "Request Status",
-                  "Request Date",
-                  "Actions",
-                  "Upload Certificate",
-                ].map((header, index) => (
-                  <th
-                    key={index}
-                    className="border border-gray-300 p-3 text-center font-semibold text-black"
-                  >
-                    {header}
-                  </th>
+                {["Req ID", "App ID", "Name", "Type", "Desc", "Doc", "Status", "Date", "Reject", "Download", "Upload"].map(h => (
+                  <th key={h} className="border p-2">{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
-              {filteredRequests.length > 0 ? (
-                filteredRequests.map((request, index) => (
-                  <tr
-                    key={request.request_id}
-                    className={`border border-gray-300 ${index % 2 === 0 ? "bg-[#FFFFFF]" : "bg-[#F58A3B14]"
-                      } hover:bg-gray-100`}
-                  >
-                    <td className="border p-3 text-center">{request.request_id}</td>
-                    <td className="border p-3 text-center">{request.application_id}</td>
-                    <td className="px-4 py-2 border">
-                      {document?.document_fields ? ( // Use `document` instead of `doc`
-                        Array.isArray(document.document_fields) ? (
-                          document.document_fields.find((field) => field.field_name === "APPLICANT NAME") ? (
-                            <p>{document.document_fields.find((field) => field.field_name === "APPLICANT NAME").field_value}</p>
-                          ) : (
-                            <p className="text-gray-500">No applicant name available</p>
-                          )
-                        ) : (
-                          document.document_fields["APPLICANT NAME"] ? (
-                            <p>{document.document_fields["APPLICANT NAME"]}</p>
-                          ) : (
-                            <p className="text-gray-500">No applicant name available</p>
-                          )
-                        )
-                      ) : (
-                        <p className="text-gray-500">No fields available</p>
-                      )}
-                    </td>
-                    <td className="border p-3">{request.request_description}</td>
-                    <td className="border p-3 text-center">
-                      <a
-                        href={request.error_document}
-                        target="_blank"
-                        className="text-blue-500 underline"
-                      >
-                        View Document
-                      </a>
-                    </td>
-                    <td className="border p-2">
-                      <div className="flex flex-col gap-1">
-                        {/* Status Badge */}
-                        <span
-                          className={`px-3 py-1 rounded-full text-white text-xs ${doc.status === "Approved"
-                            ? "bg-green-500"
-                            : doc.status === "Rejected"
-                              ? "bg-red-500"
-                              : doc.status === "Completed"
-                                ? "bg-yellow-500" // Color for Completed
-                                : "bg-blue-500" // Default color
-                            }`}
-                        >
-                          {doc.status}
-                        </span>
-
-                        {/* Latest Status Date and Time */}
-                        {doc.status_history
-                          ?.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at)) // Sort by latest date
-                          .slice(0, 1) // Take the first entry (latest status)
-                          .map((statusEntry, index) => (
-                            <div key={index} className="text-xs text-gray-600">
-                              {new Date(statusEntry.updated_at).toLocaleString("en-US", {
-                                year: "numeric",
-                                month: "2-digit",
-                                day: "2-digit",
-                                hour: "2-digit",
-                                minute: "2-digit",
-                                second: "2-digit", // Added seconds
-                                hour12: true, // Use AM/PM
-                              })}
-                            </div>
-                          ))}
-                      </div>
-                    </td>
-
-                    <td className="border p-2 text-center">
-                      {(() => {
-                        const date = new Date(doc.uploaded_at);
-                        const formattedDate = `${String(date.getDate()).padStart(2, '0')}-${String(date.getMonth() + 1).padStart(2, '0')}-${date.getFullYear()}`;
-                        const formattedTime = date.toLocaleTimeString('en-US', {
-                          hour: '2-digit',
-                          minute: '2-digit',
-                          second: '2-digit',
-                          hour12: true,
-                        });
-                        return (
-                          <>
-                            <div>{formattedDate}</div>
-                            <div className="text-sm text-gray-600">{formattedTime}</div>
-                          </>
-                        );
-                      })()}
-                    </td>
-
-                    <td className="border p-3 text-center">
-                      <button
-                        onClick={() => handleRejectStatus(request.request_id)}
-                        className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition"
-                      >
-                        Distributor Rejected
-                      </button>
-                    </td>
-
-                    <td className="border p-3 text-center">
-                      <input
-                        type="file"
-                        className="border border-gray-300 p-2 rounded-md"
-                        onChange={(e) => handleFileChange(e, request.document_id)}
-                      />
-                      <button
-                        onClick={() =>
-                          handleUploadCertificate(request.document_id, request.request_id)
-                        }
-                        className="bg-blue-500 text-white px-3 py-1 rounded ml-2 hover:bg-blue-600 transition"
-                      >
-                        Upload
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="8" className="text-center py-4 text-gray-600">
-                    No error requests found.
+              {filtered.length ? filtered.map((r, i) => (
+                <tr key={r.request_id} className={i % 2 ? 'bg-[#F58A3B14]' : 'bg-white'}>
+                  <td className="border p-2">{r.request_id}</td>
+                  <td className="border p-2">{r.application_id}</td>
+                  <td className="border p-2">{r.document_fields?.["APPLICANT NAME"] || 'N/A'}</td>
+                  <td className="border p-2 capitalize">{r.error_type}</td>
+                  <td className="border p-2">{r.request_description}</td>
+                  <td className="border p-2 text-center">
+                    <a href={r.error_document} target="_blank" rel="noopener" className="text-blue-500">View</a>
+                  </td>
+                  <td className="border p-2">{r.request_status}</td>
+                  <td className="border p-2 text-center">
+                    {(() => {
+                      const date = new Date(r.uploaded_at);
+                      const formattedDate = `${String(date.getDate()).padStart(2, '0')}-${String(date.getMonth() + 1).padStart(2, '0')}-${date.getFullYear()}`;
+                      const formattedTime = date.toLocaleTimeString('en-US', {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit',
+                        hour12: true,
+                      });
+                      return (
+                        <>
+                          <div>{formattedDate}</div>
+                          <div className="text-sm text-gray-600">{formattedTime}</div>
+                        </>
+                      );
+                    })()}
+                  </td>                  <td className="border p-2 text-center">
+                    <button className="bg-red-500 text-white px-2 rounded" onClick={() => handleRejectStatus(r.request_id)}>Reject</button>
+                  </td>
+                  <td className="border p-2 text-center">
+                    {r.receipt_url && <FaDownload className="mx-auto cursor-pointer" onClick={() => handleDownload(r.receipt_url, r.name, 'receipt')} />}
+                  </td>
+                  <td className="border p-2">
+                    <input type="file" className="mb-1" onChange={e => handleFileChange(e, r.document_id)} />
+                    <button className="bg-blue-500 text-white px-2 rounded" onClick={() => handleUploadFile(r, r.error_type)}>Upload</button>
                   </td>
                 </tr>
+              )) : (
+                <tr><td colSpan={11} className="text-center py-4">No requests found.</td></tr>
               )}
             </tbody>
-
           </table>
         </div>
       </div>
     </div>
   );
-
 };
 
 export default ErrorRequests;

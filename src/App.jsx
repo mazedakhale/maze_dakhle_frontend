@@ -51,6 +51,7 @@ import Registerdocument from "./Components/Registerdocument";
 import Customerlist from "./Components/Customerlist";
 import Feedback from "./Components/Feedback";
 import FeedbackD from "./Components/FeedbackD";
+// import Addreceiptrequest from "./Components/Addreceiptrequest"
 
 
 import FeedbackList from "./Components/FeedbackList";
@@ -77,7 +78,7 @@ import Youtube from "./Components/Youtube";
 import Guide from "./Components/Guide"
 import Contact from "./Components/Contact"
 import RejectedBefore from "./Components/RejectedBefore"
-
+import ReceiptErrorRequests from "./Components/ReceiptErrorRequests"
 function App() {
   return (
     <Router>
@@ -117,6 +118,8 @@ function App() {
         <Route path="/Distributorlistonly" element={<Admindashboard><Distributorlistonly /></Admindashboard>} />
         <Route path="/Addnotifications" element={<Admindashboard><Addnotifications /></Admindashboard>} />
         <Route path="/Adminrequest" element={<Admindashboard><Adminrequest /></Admindashboard>} />
+        <Route path="/ReceiptErrorRequests" element={<Admindashboard><ReceiptErrorRequests /></Admindashboard>} />
+
         <Route path="/Adminerrorhistory" element={<Admindashboard><Adminerrorhistory /></Admindashboard>} />
         <Route path="/FeedbackList" element={<Admindashboard><FeedbackList /></Admindashboard>} />
         <Route path="/Verifydocumentshistory" element={<Admindashboard><Verifydocumentshistory /></Admindashboard>} />
@@ -151,6 +154,8 @@ function App() {
 
         <Route path="/Checkapplication" element={<Customerdashboard><Checkapplication /></Customerdashboard>} />
         <Route path="/Adderrorrequest" element={<Customerdashboard><Adderrorrequest /></Customerdashboard>} />
+        {/* <Route path="/Addreceiptrequest" element={<Customerdashboard><Addreceiptrequest /></Customerdashboard>} /> */}
+
         <Route path="/Customerhistory" element={<Customerdashboard><Customerhistory /></Customerdashboard>} />
         <Route path="/Customererrorhistory" element={<Customerdashboard><Customererrorhistory /></Customerdashboard>} />
         <Route path="/Apply" element={<Customerdashboard><Apply /></Customerdashboard>} />
