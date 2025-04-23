@@ -39,7 +39,7 @@ const Sidebar = ({ onNavigate }) => {
             { icon: <FaClipboardList />, label: "Check Application", path: "/Checkapplication" },
             { icon: <FaFileAlt />, label: "Fill Form", path: "/Category" },
             { icon: <FaClipboardList />, label: " Applications History", path: "/Customerhistory" },
-            { icon: <FaClipboardList />, label: "Submit error", path: "/Adderrorrequest" },
+            // { icon: <FaClipboardList />, label: "Submit error", path: "/Adderrorrequest" },
             { icon: <FaClipboardList />, label: "Applications", path: "/Customerapply" },
             { icon: <FaCommentDots />, label: "Feedback", path: "/Feedback" },
             { icon: <FaCommentDots />, label: "Guide", path: "/Guide" },
