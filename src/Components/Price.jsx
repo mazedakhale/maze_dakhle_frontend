@@ -3,7 +3,7 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import { FaEdit, FaTrash, FaPlus, FaTimes } from "react-icons/fa";
 
-const Addprice = () => {
+const Price = () => {
     const [prices, setPrices] = useState([]);
     const [categories, setCategories] = useState([]);
 
@@ -296,4 +296,5 @@ const Addprice = () => {
     );
 };
 
-export default Addprice;
+export default Price;
+

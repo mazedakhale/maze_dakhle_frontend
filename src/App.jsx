@@ -58,7 +58,7 @@ import Rejecteddocuments from "./Components/Rejecteddocuments";
 import Employeelist from "./Components/Employeelist"
 import "./App.css";
 import LazyCharts from "./Components/Lazycharts";
-import Addprice from "./Components/Price";
+import Price from "./Components/Price";
 import Edashinner from "./Components/Edashinner";
 import Employeedashboard from "./Components/Employeedashboard";
 import Employee from "./Components/Employee";
