@@ -52,13 +52,13 @@ import Customerlist from "./Components/Customerlist";
 import Feedback from "./Components/Feedback";
 import FeedbackD from "./Components/FeedbackD";
 // import Addreceiptrequest from "./Components/Addreceiptrequest"
-import Addprice from "./Components/AddPrice";
 import FeedbackList from "./Components/FeedbackList";
 import Uploadeddocuments from "./Components/Uploadeddocuments";
 import Rejecteddocuments from "./Components/Rejecteddocuments";
 import Employeelist from "./Components/Employeelist"
 import "./App.css";
 import LazyCharts from "./Components/Lazycharts";
+import Addprice from "./Components/Price";
 import Edashinner from "./Components/Edashinner";
 import Employeedashboard from "./Components/Employeedashboard";
 import Employee from "./Components/Employee";
@@ -98,7 +98,7 @@ function App() {
         <Route path="/Addcategory" element={<Admindashboard><Addcategory /></Admindashboard>} />
         <Route path="/Addsubcategory" element={<Admindashboard><Addsubcategory /></Admindashboard>} />
         <Route path="/Requireddocuments" element={<Admindashboard><RequiredDocuments /></Admindashboard>} />
-        <Route path="/Addprice" element={<Admindashboard><Addprice /></Admindashboard>} />
+        <Route path="/Price" element={<Admindashboard><Price /></Admindashboard>} />
 
         <Route path="/ContactTable" element={<Admindashboard><ContactTable /></Admindashboard>} />
         <Route path="/Contact" element={<Admindashboard><Contact /></Admindashboard>} />
