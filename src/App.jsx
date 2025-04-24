@@ -51,6 +51,7 @@ import Registerdocument from "./Components/Registerdocument";
 import Customerlist from "./Components/Customerlist";
 import Feedback from "./Components/Feedback";
 import FeedbackD from "./Components/FeedbackD";
+import PriceTable from "./Components/Pricetable";
 // import Addreceiptrequest from "./Components/Addreceiptrequest"
 
 
@@ -99,6 +100,8 @@ function App() {
         <Route path="/Addcategory" element={<Admindashboard><Addcategory /></Admindashboard>} />
         <Route path="/Addsubcategory" element={<Admindashboard><Addsubcategory /></Admindashboard>} />
         <Route path="/Requireddocuments" element={<Admindashboard><RequiredDocuments /></Admindashboard>} />
+        <Route path="/PriceTable" element={<Admindashboard><PriceTable /></Admindashboard>} />
+
         <Route path="/ContactTable" element={<Admindashboard><ContactTable /></Admindashboard>} />
         <Route path="/Contact" element={<Admindashboard><Contact /></Admindashboard>} />
 

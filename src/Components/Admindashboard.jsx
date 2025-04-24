@@ -61,6 +61,8 @@ const Sidebar = ({ onNavigate }) => {
             { icon: <FaUserShield />, label: "Customer Credentials", path: "/Customerlist" },
             { icon: <FaBell />, label: "Notifications", path: "/Addnotifications" },
             { icon: <FaFileAlt />, label: "Required Documents", path: "/Requireddocuments" },
+            { icon: <FaFileAlt />, label: "Add Price", path: "/PriceTable" },
+
             { icon: <FaShapes />, label: "Field Names", path: "/Addfieldname" },
             { icon: <FaCheckCircle />, label: "Customer Request", path: "/Verifydocuments" },
             { icon: <FaCheckCircle />, label: " Rejected  List", path: "/RejectedBefore" },
