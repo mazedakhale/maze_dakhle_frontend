@@ -79,7 +79,7 @@ import Guide from "./Components/Guide"
 import Contact from "./Components/Contact"
 import RejectedBefore from "./Components/RejectedBefore"
 import ReceiptErrorRequests from "./Components/ReceiptErrorRequests"
-import PriceTable from "./Components/Pricetable";
+import Pricetable from "./Components/Pricetable";
 function App() {
   return (
     <Router>
@@ -100,7 +100,7 @@ function App() {
         <Route path="/Addcategory" element={<Admindashboard><Addcategory /></Admindashboard>} />
         <Route path="/Addsubcategory" element={<Admindashboard><Addsubcategory /></Admindashboard>} />
         <Route path="/Requireddocuments" element={<Admindashboard><RequiredDocuments /></Admindashboard>} />
-        <Route path="/Pricetable" element={<Admindashboard><PriceTable /></Admindashboard>} />
+        <Route path="/Pricetable" element={<Admindashboard><Pricetable /></Admindashboard>} />
 
         <Route path="/ContactTable" element={<Admindashboard><ContactTable /></Admindashboard>} />
         <Route path="/Contact" element={<Admindashboard><Contact /></Admindashboard>} />
