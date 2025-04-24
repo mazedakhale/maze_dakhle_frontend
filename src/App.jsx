@@ -52,7 +52,7 @@ import Customerlist from "./Components/Customerlist";
 import Feedback from "./Components/Feedback";
 import FeedbackD from "./Components/FeedbackD";
 // import Addreceiptrequest from "./Components/Addreceiptrequest"
-
+import Addprice from "./Components/AddPrice";
 
 import FeedbackList from "./Components/FeedbackList";
 import Uploadeddocuments from "./Components/Uploadeddocuments";
@@ -79,7 +79,6 @@ import Guide from "./Components/Guide"
 import Contact from "./Components/Contact"
 import RejectedBefore from "./Components/RejectedBefore"
 import ReceiptErrorRequests from "./Components/ReceiptErrorRequests"
-import Pricetable from "./Components/Pricetable";
 function App() {
   return (
     <Router>
@@ -100,7 +99,7 @@ function App() {
         <Route path="/Addcategory" element={<Admindashboard><Addcategory /></Admindashboard>} />
         <Route path="/Addsubcategory" element={<Admindashboard><Addsubcategory /></Admindashboard>} />
         <Route path="/Requireddocuments" element={<Admindashboard><RequiredDocuments /></Admindashboard>} />
-        <Route path="/Pricetable" element={<Admindashboard><Pricetable /></Admindashboard>} />
+        <Route path="/Addprice" element={<Admindashboard><Addprice /></Admindashboard>} />
 
         <Route path="/ContactTable" element={<Admindashboard><ContactTable /></Admindashboard>} />
         <Route path="/Contact" element={<Admindashboard><Contact /></Admindashboard>} />
