@@ -79,8 +79,7 @@ import Guide from "./Components/Guide"
 import Contact from "./Components/Contact"
 import RejectedBefore from "./Components/RejectedBefore"
 import ReceiptErrorRequests from "./Components/ReceiptErrorRequests"
-import PrivacyPolicy from "./Components/Privacypolicy";
-
+import PriceTable from "./Components/Pricetable";
 function App() {
   return (
     <Router>
