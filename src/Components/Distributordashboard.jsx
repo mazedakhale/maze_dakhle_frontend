@@ -34,7 +34,7 @@ const Sidebar = ({ onNavigate }) => {
             { icon: <FaClockRotateLeft />, label: "Sent History", path: "/Dsentlist" },
             { icon: <FaClockRotateLeft />, label: "Rejected History", path: "/Distributorrejected" },
             { icon: <FaUserCheck />, label: "Distributor Request", path: "/Distributorrequest" },
-            { icon: <FaFileSignature />, label: "Request History", path: "/Distributorhistory" },
+            // { icon: <FaFileSignature />, label: "Request History", path: "/Distributorhistory" },
             { icon: <FaFileSignature />, label: "Feedback", path: "/FeedbackD" },
 
           ].map((item, index) => (
