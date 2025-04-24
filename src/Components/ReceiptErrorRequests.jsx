@@ -85,7 +85,7 @@ const ReceiptErrorRequests = () => {
     const handleDownloadReceipt = async (applicationId) => {
         try {
             const { data } = await axios.get(
-                `https://mazedakhale.in/documents/receipt/${applicationId}`
+                `https://mazedakhale.in/api//documents/receipt/${applicationId}`
             );
             const url = data.receipt_url;
             const appId = data.application_id;
