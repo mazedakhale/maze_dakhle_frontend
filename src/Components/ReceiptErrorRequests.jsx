@@ -1,61 +1,113 @@
 // src/pages/ReceiptErrorRequests.jsx
-
 import React, { useEffect, useState } from "react";
-import { FaTimes } from "react-icons/fa";
+import { FaTimes, FaDownload } from "react-icons/fa";
 import axios from "axios";
+import jwtDecode from "jwt-decode";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 
 const ReceiptErrorRequests = () => {
     const [errorRequests, setErrorRequests] = useState([]);
-    const [receipts, setReceipts] = useState([]);
+    const [users, setUsers] = useState([]);
+    const [distributors, setDistributors] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
     const [filterType, setFilterType] = useState("all");
-    const [statusFilter, setStatusFilter] = useState("all");    // new
+    const [statusFilter, setStatusFilter] = useState("all");
     const navigate = useNavigate();
 
+    // On mount, verify token and fetch data
     useEffect(() => {
-        fetchErrorRequests();
-        fetchReceipts();
+        const token = localStorage.getItem("token");
+        if (!token) return;
+        try {
+            jwtDecode(token);
+            fetchAll();
+        } catch (err) {
+            console.error("Invalid token:", err);
+        }
     }, []);
+
+    const fetchAll = () => {
+        fetchErrorRequests();
+        fetchUsers();
+        fetchDistributors();
+    };
 
     const fetchErrorRequests = async () => {
         try {
-            const { data } = await axios.get("https://mazedakhale.in/api/request-errors");
+            const { data } = await axios.get(
+                "https://mazedakhale.in/api/request-errors"
+            );
             setErrorRequests(data);
         } catch (err) {
             console.error("Error fetching error requests:", err);
         }
     };
 
-    const fetchReceipts = async () => {
+    const fetchUsers = async () => {
         try {
-            const { data } = await axios.get("https://mazedakhale.in/api/receipts");
-            setReceipts(data);
+            const { data } = await axios.get(
+                "https://mazedakhale.in/api/users/register"
+            );
+            setUsers(data);
         } catch (err) {
-            console.error("Error fetching receipts:", err);
+            console.error("Error fetching users:", err);
         }
     };
 
-    const getCorrectReceiptId = (documentId) =>
-        receipts.find((r) => r.document_id === documentId)?.receipt_id || null;
-
-    const handleViewCorrectReceipt = async (documentId) => {
-        const id = getCorrectReceiptId(documentId);
-        if (!id) {
-            Swal.fire("Error", "No valid receipt found.", "error");
-            return;
-        }
+    const fetchDistributors = async () => {
         try {
-            const { data } = await axios.get(`https://mazedakhale.in/api/receipts/${id}`);
-            if (data.file_url) {
-                window.open(data.file_url, "_blank");
-            } else {
-                Swal.fire("Error", "Receipt URL missing.", "error");
-            }
+            const { data } = await axios.get(
+                "https://mazedakhale.in/api/users/distributors"
+            );
+            setDistributors(data);
         } catch (err) {
-            console.error(err);
-            Swal.fire("Error", "Failed to fetch receipt.", "error");
+            console.error("Error fetching distributors:", err);
+        }
+    };
+
+    const getUserNameById = (id) => {
+        const user = users.find(
+            (u) => String(u.user_id) === String(id) || String(u.id) === String(id)
+        );
+        return user ? user.name || user.full_name || user.username : id;
+    };
+
+    const getDistributorNameById = (id) => {
+        const dist = distributors.find(
+            (d) =>
+                String(d.distributor_id) === String(id) || String(d.id) === String(id)
+        );
+        return dist ? dist.name || dist.company_name : id;
+    };
+
+    // Download receipt via your new controller endpoint
+    const handleDownloadReceipt = async (applicationId) => {
+        try {
+            const { data } = await axios.get(
+                `https://mazedakhale.in/api/documents/receipt/${applicationId}`
+            );
+            const url = data.receipt_url;
+            const appId = data.application_id;
+
+            if (!url) {
+                return Swal.fire("Error", "No receipt available.", "error");
+            }
+
+            const ext = url.split(".").pop().split(/[?#]/)[0];
+            const filename = `${appId}_receipt.${ext}`;
+
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        } catch (err) {
+            console.error("Error downloading receipt:", err);
+            const msg =
+                err.response?.data?.message || "Failed to download receipt.";
+            Swal.fire("Error", msg, "error");
         }
     };
 
@@ -73,12 +125,19 @@ const ReceiptErrorRequests = () => {
             rejectionReason = value.trim();
         }
 
-        setErrorRequests((rs) =>
-            rs.map((r) =>
-                r.request_id === requestId ? { ...r, request_status: newStatus } : r
+        setErrorRequests((prev) =>
+            prev.map((r) =>
+                r.request_id === requestId
+                    ? { ...r, request_status: newStatus }
+                    : r
             )
         );
-        Swal.fire({ icon: "success", title: "Updated!", timer: 1500, showConfirmButton: false });
+        Swal.fire({
+            icon: "success",
+            title: "Updated!",
+            timer: 1500,
+            showConfirmButton: false,
+        });
 
         try {
             await axios.patch(
@@ -92,24 +151,20 @@ const ReceiptErrorRequests = () => {
         }
     };
 
-    // Apply filters: error type, status, and search
     const filtered = errorRequests
-        .filter((r) =>
-            filterType === "all" ? true : r.error_type === filterType
-        )
+        .filter((r) => (filterType === "all" ? true : r.error_type === filterType))
         .filter((r) =>
             statusFilter === "all" ? true : r.request_status === statusFilter
         )
         .filter((r) =>
             Object.values(r).some((v) =>
-                v?.toString().toLowerCase().includes(searchTerm.toLowerCase())
+                String(v).toLowerCase().includes(searchTerm.toLowerCase())
             )
         );
 
     return (
         <div className="ml-[300px] mt-[80px] p-6 w-[calc(100%-260px)] overflow-x-auto">
             <div className="relative bg-white shadow-lg rounded-lg border border-gray-300">
-                {/* Header */}
                 <div className="relative border-t-4 border-orange-400 bg-[#F4F4F4] p-4 rounded-t-lg">
                     <h2 className="text-2xl font-bold text-center">Error Requests</h2>
                     <button
@@ -120,59 +175,50 @@ const ReceiptErrorRequests = () => {
                     </button>
                 </div>
 
-                <div>
-
-                    {/* Filters */}
-                    <div className="p-4 flex items-center gap-4">
-                        {/* Error Type */}
-                        <div>
-                            <label className="block text-sm font-semibold mb-1">Error Type</label>
-                            <select
-                                value={filterType}
-                                onChange={(e) => setFilterType(e.target.value)}
-                                className="border p-2 rounded-md"
-                            >
-                                <option value="all">All</option>
-                                <option value="certificate">Certificate</option>
-                                <option value="receipt">Receipt</option>
-                                <option value="payment">Payment</option>
-                            </select>
-                        </div>
-
-                        {/* Status */}
-                        <div>
-                            <label className="block text-sm font-semibold mb-1">Status</label>
-                            <select
-                                value={statusFilter}
-                                onChange={(e) => setStatusFilter(e.target.value)}
-                                className="border p-2 rounded-md"
-                            >
-                                <option value="all">All</option>
-                                <option value="Pending">Pending</option>
-                                <option value="Uploaded">Uploaded</option>
-                                <option value="Approved">Approved</option>
-                                <option value="Rejected">Rejected</option>
-                                <option value="Completed">Completed</option>
-                            </select>
-                        </div>
-
-                        {/* Search (small, right-aligned) */}
-                        <div className="ml-auto w-48">
-                            <label className="block text-sm font-semibold mb-1">Search</label>
-                            <input
-                                type="text"
-                                placeholder="Search…"
-                                className="w-full border p-2 rounded-md focus:outline-none focus:ring focus:border-blue-300"
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                            />
-                        </div>
+                <div className="p-4 flex items-center gap-4">
+                    <div>
+                        <label className="block text-sm font-semibold mb-1">
+                            Error Type
+                        </label>
+                        <select
+                            value={filterType}
+                            onChange={(e) => setFilterType(e.target.value)}
+                            className="border p-2 rounded-md"
+                        >
+                            <option value="all">All</option>
+                            <option value="certificate">Certificate</option>
+                            <option value="receipt">Receipt</option>
+                            <option value="payment">Payment</option>
+                        </select>
                     </div>
-
+                    <div>
+                        <label className="block text-sm font-semibold mb-1">Status</label>
+                        <select
+                            value={statusFilter}
+                            onChange={(e) => setStatusFilter(e.target.value)}
+                            className="border p-2 rounded-md"
+                        >
+                            <option value="all">All</option>
+                            <option>Pending</option>
+                            <option>Uploaded</option>
+                            <option>Approved</option>
+                            <option>Rejected</option>
+                            <option>Completed</option>
+                        </select>
+                    </div>
+                    <div className="ml-auto w-48">
+                        <label className="block text-sm font-semibold mb-1">Search</label>
+                        <input
+                            type="text"
+                            placeholder="Search…"
+                            className="w-full border p-2 rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                    </div>
                 </div>
 
-                {/* Table */}
-                <div className="p-6">
+                <div className="p-6 overflow-x-auto">
                     <table className="w-full border border-[#776D6DA8] text-sm bg-white shadow-md rounded-md">
                         <thead className="bg-[#F58A3B14] border-b-2 border-[#776D6DA8]">
                             <tr>
@@ -183,9 +229,9 @@ const ReceiptErrorRequests = () => {
                                     "Description",
                                     "Error Doc",
                                     "Doc ID",
-                                    "User ID",
-                                    "Dist ID",
-                                    "Correct Receipt",
+                                    "Applicant",
+                                    "Distributor",
+                                    "Receipt",
                                     "Status",
                                     "Date",
                                     "Actions",
@@ -206,10 +252,18 @@ const ReceiptErrorRequests = () => {
                                         key={r.request_id}
                                         className={i % 2 === 0 ? "bg-white" : "bg-[#F58A3B14]"}
                                     >
-                                        <td className="px-4 py-2 border text-center">{r.request_id}</td>
-                                        <td className="px-4 py-2 border text-center">{r.application_id}</td>
-                                        <td className="px-4 py-2 border text-center">{r.error_type}</td>
-                                        <td className="px-4 py-2 border text-center">{r.request_description}</td>
+                                        <td className="px-4 py-2 border text-center">
+                                            {r.request_id}
+                                        </td>
+                                        <td className="px-4 py-2 border text-center">
+                                            {r.application_id}
+                                        </td>
+                                        <td className="px-4 py-2 border text-center">
+                                            {r.error_type}
+                                        </td>
+                                        <td className="px-4 py-2 border text-center">
+                                            {r.request_description}
+                                        </td>
                                         <td className="px-4 py-2 border text-center">
                                             <a
                                                 href={r.error_document}
@@ -220,20 +274,22 @@ const ReceiptErrorRequests = () => {
                                                 View
                                             </a>
                                         </td>
-                                        <td className="px-4 py-2 border text-center">{r.document_id}</td>
-                                        <td className="px-4 py-2 border text-center">{r.user_id}</td>
-                                        <td className="px-4 py-2 border text-center">{r.distributor_id}</td>
                                         <td className="px-4 py-2 border text-center">
-                                            {getCorrectReceiptId(r.document_id) ? (
-                                                <button
-                                                    onClick={() => handleViewCorrectReceipt(r.document_id)}
-                                                    className="bg-green-500 text-white px-2 py-1 rounded"
-                                                >
-                                                    View
-                                                </button>
-                                            ) : (
-                                                <span className="text-gray-500">—</span>
-                                            )}
+                                            {r.document_id}
+                                        </td>
+                                        <td className="px-4 py-2 border text-center">
+                                            {getUserNameById(r.user_id)}
+                                        </td>
+                                        <td className="px-4 py-2 border text-center">
+                                            {getDistributorNameById(r.distributor_id)}
+                                        </td>
+                                        <td className="px-4 py-2 border text-center">
+                                            <button
+                                                onClick={() => handleDownloadReceipt(r.application_id)}
+                                                className="bg-blue-500 text-white px-2 py-1 rounded flex items-center justify-center hover:bg-blue-600 transition"
+                                            >
+                                                <FaDownload className="mr-1" /> Download
+                                            </button>
                                         </td>
                                         <td className="px-4 py-2 border text-center">
                                             <span
@@ -254,7 +310,7 @@ const ReceiptErrorRequests = () => {
                                         <td className="px-4 py-2 border text-center">
                                             {new Date(r.request_date).toLocaleString()}
                                         </td>
-                                        <td className="px-4 py-2 border text-center">
+                                        <td className="px-4 py-2	border text-center">
                                             <select
                                                 className="border p-1 rounded"
                                                 value={r.request_status}
@@ -273,8 +329,8 @@ const ReceiptErrorRequests = () => {
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan={12} className="py-4 border text-center">
-                                        No matching error‐type requests.
+                                    <td colSpan={12} className="py-4	border text-center">
+                                        No matching requests.
                                     </td>
                                 </tr>
                             )}
