@@ -1,6 +1,6 @@
 // src/pages/ReceiptErrorRequests.jsx
 import React, { useEffect, useState } from "react";
-import { FaTimes, FaDownload } from "react-icons/fa";
+import { FaTimes, FaDownload, FaCheck } from "react-icons/fa";
 import axios from "axios";
 import jwtDecode from "jwt-decode";
 import { useNavigate } from "react-router-dom";
@@ -67,36 +67,33 @@ const ReceiptErrorRequests = () => {
     };
 
     const getUserNameById = (id) => {
-        const user = users.find(
-            (u) => String(u.user_id) === String(id) || String(u.id) === String(id)
+        const u = users.find(
+            (x) => String(x.user_id) === String(id) || String(x.id) === String(id)
         );
-        return user ? user.name || user.full_name || user.username : id;
+        return u ? u.name || u.full_name || u.username : id;
     };
 
     const getDistributorNameById = (id) => {
-        const dist = distributors.find(
-            (d) =>
-                String(d.distributor_id) === String(id) || String(d.id) === String(id)
+        const d = distributors.find(
+            (x) =>
+                String(x.distributor_id) === String(id) || String(x.id) === String(id)
         );
-        return dist ? dist.name || dist.company_name : id;
+        return d ? d.name || d.company_name : id;
     };
 
-    // Download receipt via your new controller endpoint
+    // Download receipt
     const handleDownloadReceipt = async (applicationId) => {
         try {
             const { data } = await axios.get(
-                `https://mazedakhale.in/api/documents/receipt/${applicationId}`
+                `https://mazedakhale.in/documents/receipt/${applicationId}`
             );
             const url = data.receipt_url;
             const appId = data.application_id;
-
             if (!url) {
                 return Swal.fire("Error", "No receipt available.", "error");
             }
-
             const ext = url.split(".").pop().split(/[?#]/)[0];
             const filename = `${appId}_receipt.${ext}`;
-
             const link = document.createElement("a");
             link.href = url;
             link.download = filename;
@@ -105,9 +102,40 @@ const ReceiptErrorRequests = () => {
             document.body.removeChild(link);
         } catch (err) {
             console.error("Error downloading receipt:", err);
-            const msg =
-                err.response?.data?.message || "Failed to download receipt.";
-            Swal.fire("Error", msg, "error");
+            Swal.fire(
+                "Error",
+                err.response?.data?.message || "Failed to download receipt.",
+                "error"
+            );
+        }
+    };
+
+    // Download certificate
+    const handleDownloadCertificate = async (applicationId) => {
+        try {
+            const { data } = await axios.get(
+                `https://mazedakhale.in/api/certificates/certificate/${applicationId}`
+            );
+            const url = data.certificate_url;
+            const appId = data.application_id;
+            if (!url) {
+                return Swal.fire("Error", "No certificate available.", "error");
+            }
+            const ext = url.split(".").pop().split(/[?#]/)[0];
+            const filename = `${appId}_certificate.${ext}`;
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        } catch (err) {
+            console.error("Error downloading certificate:", err);
+            Swal.fire(
+                "Error",
+                err.response?.data?.message || "Failed to download certificate.",
+                "error"
+            );
         }
     };
 
@@ -127,9 +155,7 @@ const ReceiptErrorRequests = () => {
 
         setErrorRequests((prev) =>
             prev.map((r) =>
-                r.request_id === requestId
-                    ? { ...r, request_status: newStatus }
-                    : r
+                r.request_id === requestId ? { ...r, request_status: newStatus } : r
             )
         );
         Swal.fire({
@@ -175,11 +201,10 @@ const ReceiptErrorRequests = () => {
                     </button>
                 </div>
 
+                {/* Filters */}
                 <div className="p-4 flex items-center gap-4">
                     <div>
-                        <label className="block text-sm font-semibold mb-1">
-                            Error Type
-                        </label>
+                        <label className="block text-sm font-semibold mb-1">Error Type</label>
                         <select
                             value={filterType}
                             onChange={(e) => setFilterType(e.target.value)}
@@ -218,6 +243,7 @@ const ReceiptErrorRequests = () => {
                     </div>
                 </div>
 
+                {/* Table */}
                 <div className="p-6 overflow-x-auto">
                     <table className="w-full border border-[#776D6DA8] text-sm bg-white shadow-md rounded-md">
                         <thead className="bg-[#F58A3B14] border-b-2 border-[#776D6DA8]">
@@ -231,7 +257,7 @@ const ReceiptErrorRequests = () => {
                                     "Doc ID",
                                     "Applicant",
                                     "Distributor",
-                                    "Receipt",
+                                    "Download",
                                     "Status",
                                     "Date",
                                     "Actions",
@@ -255,16 +281,16 @@ const ReceiptErrorRequests = () => {
                                         <td className="px-4 py-2 border text-center">
                                             {r.request_id}
                                         </td>
-                                        <td className="px-4 py-2 border text-center">
+                                        <td className="px-4 py-2	border text-center">
                                             {r.application_id}
                                         </td>
-                                        <td className="px-4 py-2 border text-center">
+                                        <td className="px-4 py-2	border text-center">
                                             {r.error_type}
                                         </td>
-                                        <td className="px-4 py-2 border text-center">
+                                        <td className="px-4 py-2	border text-center">
                                             {r.request_description}
                                         </td>
-                                        <td className="px-4 py-2 border text-center">
+                                        <td className="px-4 py-2	border text-center">
                                             <a
                                                 href={r.error_document}
                                                 target="_blank"
@@ -274,24 +300,37 @@ const ReceiptErrorRequests = () => {
                                                 View
                                             </a>
                                         </td>
-                                        <td className="px-4 py-2 border text-center">
+                                        <td className="px-4 py-2	border text-center">
                                             {r.document_id}
                                         </td>
-                                        <td className="px-4 py-2 border text-center">
+                                        <td className="px-4 py-2	border text-center">
                                             {getUserNameById(r.user_id)}
                                         </td>
-                                        <td className="px-4 py-2 border text-center">
+                                        <td className="px-4 py-2	border text-center">
                                             {getDistributorNameById(r.distributor_id)}
                                         </td>
-                                        <td className="px-4 py-2 border text-center">
-                                            <button
-                                                onClick={() => handleDownloadReceipt(r.application_id)}
-                                                className="bg-blue-500 text-white px-2 py-1 rounded flex items-center justify-center hover:bg-blue-600 transition"
-                                            >
-                                                <FaDownload className="mr-1" /> Download
-                                            </button>
+                                        <td className="px-4 py-2	border text-center">
+                                            {r.error_type === "certificate" ? (
+                                                <button
+                                                    onClick={() =>
+                                                        handleDownloadCertificate(r.application_id)
+                                                    }
+                                                    className="bg-green-500 text-white px-2 py-1 rounded flex items-center justify-center hover:bg-green-600 transition"
+                                                >
+                                                    <FaCheck className="mr-1" /> Download Cert
+                                                </button>
+                                            ) : (
+                                                <button
+                                                    onClick={() =>
+                                                        handleDownloadReceipt(r.application_id)
+                                                    }
+                                                    className="bg-blue-500 text-white px-2 py-1 rounded flex items-center justify-center hover:bg-blue-600 transition"
+                                                >
+                                                    <FaDownload className="mr-1" /> Download Rec
+                                                </button>
+                                            )}
                                         </td>
-                                        <td className="px-4 py-2 border text-center">
+                                        <td className="px-4 py-2	border text-center">
                                             <span
                                                 className={`px-2 py-1 rounded-full text-white text-sm ${r.request_status === "Approved"
                                                     ? "bg-green-500"
@@ -307,7 +346,7 @@ const ReceiptErrorRequests = () => {
                                                 {r.request_status}
                                             </span>
                                         </td>
-                                        <td className="px-4 py-2 border text-center">
+                                        <td className="px-4 py-2	border text-center">
                                             {new Date(r.request_date).toLocaleString()}
                                         </td>
                                         <td className="px-4 py-2	border text-center">
