@@ -305,7 +305,24 @@ const ErrorRequests = () => {
                       </span>
                     </td>
                     <td className="border p-2 text-center">
-                      {new Date(r.request_date).toLocaleString()}
+                      {(() => {
+                        const date = new Date(r.request_date
+
+                        );
+                        const formattedDate = `${String(date.getDate()).padStart(2, '0')}-${String(date.getMonth() + 1).padStart(2, '0')}-${date.getFullYear()}`;
+                        const formattedTime = date.toLocaleTimeString('en-US', {
+                          hour: '2-digit',
+                          minute: '2-digit',
+                          second: '2-digit',
+                          hour12: true,
+                        });
+                        return (
+                          <>
+                            <div>{formattedDate}</div>
+                            <div className="text-sm text-gray-600">{formattedTime}</div>
+                          </>
+                        );
+                      })()}
                     </td>
                     <td className="border p-2 text-center">
                       <button
