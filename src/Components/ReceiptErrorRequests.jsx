@@ -189,10 +189,11 @@ const ReceiptErrorRequests = () => {
         );
 
     return (
-        <div className="ml-[300px] mt-[80px] p-6 w-[calc(100%-260px)] overflow-x-auto">
-            <div className="relative bg-white shadow-lg rounded-lg border border-gray-300">
+        <div className="ml-[250px] flex flex-col items-center min-h-screen p-6 bg-gray-100">
+            <div className="w-[90%] max-w-6xl bg-white shadow-lg rounded-lg">
                 <div className="relative border-t-4 border-orange-400 bg-[#F4F4F4] p-4 rounded-t-lg">
-                    <h2 className="text-2xl font-bold text-center">Error Requests</h2>
+                    <h2 className="text-2xl font-bold text-gray-800 text-center">
+                        Error requests lits                    </h2>
                     <button
                         onClick={() => navigate("/Adashinner")}
                         className="absolute top-1/2 right-4 transform -translate-y-1/2 text-gray-600 hover:text-gray-800"
