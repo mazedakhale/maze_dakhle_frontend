@@ -78,6 +78,8 @@ import Guide from "./Components/Guide"
 import Contact from "./Components/Contact"
 import RejectedBefore from "./Components/RejectedBefore"
 import ReceiptErrorRequests from "./Components/ReceiptErrorRequests"
+import RefundCancellationPolicy from "./Components/RefundCancellationPolicy"
+import TermsAndConditions from "./Components/TermsAndConditions"
 function App() {
   return (
     <Router>
@@ -89,7 +91,8 @@ function App() {
         <Route path="/Registration" element={<Registration />} />
         <Route path="/Privacypolicy" element={<PrivacyPolicy />} />
         <Route path="/ContactForm" element={<ContactForm />} />
-
+        <Route path="/RefundCancellationPolicy" element={<RefundCancellationPolicy />} />
+        <Route path="/TermsAndConditions" element={<TermsAndConditions />} />
         {/* Admin Routes */}
         <Route path="/Admindashboard" element={<Admindashboard />} />
         <Route path="/Adashinner" element={<Admindashboard><Adashinner /></Admindashboard>} />

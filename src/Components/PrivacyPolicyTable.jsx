@@ -1,125 +1,113 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { FaTag, FaEdit, FaTrash, FaPlus, FaTimes } from "react-icons/fa";
+import { FaEdit, FaTrash, FaPlus, FaTimes } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-
 import Swal from "sweetalert2";
 
 const PrivacyPolicyTable = () => {
-    const [policies, setPolicies] = useState([]); // State for all policies
+    const [policies, setPolicies] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [formData, setFormData] = useState({ file: null });
     const [isEditing, setIsEditing] = useState(false);
-    const [isAdding, setIsAdding] = useState(false);
-
     const [editingId, setEditingId] = useState(null);
-    const navigate = useNavigate();
+    const [formData, setFormData] = useState({
+        file: null,
+        policyType: "",
+    });
 
     const apiUrl = "https://mazedakhale.in/api/privacy-policy";
+    const navigate = useNavigate();
 
-    // Fetch all privacy policies from the API
     useEffect(() => {
         fetchPolicies();
     }, []);
 
     const fetchPolicies = async () => {
         try {
-            const response = await axios.get(apiUrl);
-            console.log("API Response:", response.data);
-
-            // Set the policies state with the fetched data
-            if (response.data) {
-                setPolicies(response.data);
-            } else {
-                setPolicies([]);
-            }
-        } catch (error) {
-            console.error("Error fetching privacy policies:", error);
+            const { data } = await axios.get(apiUrl);
+            setPolicies(Array.isArray(data) ? data : []);
+        } catch (err) {
+            console.error("Error fetching privacy policies:", err);
         }
     };
 
-    // Handle file input changes
     const handleFileChange = (e) => {
         setFormData({ ...formData, file: e.target.files[0] });
     };
 
-    // Handle form submission (add or edit policy)
+    const handleTypeChange = (e) => {
+        setFormData({ ...formData, policyType: e.target.value });
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
-        try {
-            const formDataToSend = new FormData();
-            formDataToSend.append("file", formData.file);
+        if (!formData.file) {
+            return Swal.fire("Error", "Please select a file.", "error");
+        }
+        if (!formData.policyType) {
+            return Swal.fire("Error", "Please select a policy type.", "error");
+        }
 
+        const toSend = new FormData();
+        toSend.append("file", formData.file);
+        toSend.append("policyType", formData.policyType);
+
+        try {
             if (isEditing) {
-                // Update existing policy
-                await axios.put(`${apiUrl}/${editingId}`, formDataToSend, {
-                    headers: {
-                        "Content-Type": "multipart/form-data",
-                    },
+                await axios.put(`${apiUrl}/${editingId}`, toSend, {
+                    headers: { "Content-Type": "multipart/form-data" },
                 });
             } else {
-                // Add new policy
-                await axios.post(apiUrl, formDataToSend, {
-                    headers: {
-                        "Content-Type": "multipart/form-data",
-                    },
+                await axios.post(apiUrl, toSend, {
+                    headers: { "Content-Type": "multipart/form-data" },
                 });
             }
 
             setIsModalOpen(false);
-            fetchPolicies(); // Refresh the policies
-            setFormData({ file: null });
+            setFormData({ file: null, policyType: "" });
             setIsEditing(false);
             setEditingId(null);
+            fetchPolicies();
             Swal.fire("Success", "Policy saved successfully!", "success");
-        } catch (error) {
-            console.error("Error submitting policy:", error);
+        } catch (err) {
+            console.error("Error submitting policy:", err);
             Swal.fire("Error", "Failed to save policy", "error");
         }
     };
 
-    // Handle policy deletion
     const handleDelete = async (id) => {
-        const confirmDelete = await Swal.fire({
+        const result = await Swal.fire({
             title: "Enter Deletion Code",
-            text: "Please enter the code to confirm deletion.",
             input: "text",
             inputPlaceholder: "Enter code here...",
             showCancelButton: true,
-            confirmButtonColor: "#d33",
-            cancelButtonColor: "#3085d6",
             confirmButtonText: "Delete",
-            preConfirm: (inputValue) => {
-                if (inputValue !== "0000") {
+            preConfirm: (val) => {
+                if (val !== "0000") {
                     Swal.showValidationMessage("Incorrect code! Deletion not allowed.");
-                    return false;
                 }
-                return true;
             },
         });
-
-        if (confirmDelete.isConfirmed) {
+        if (result.isConfirmed) {
             try {
                 await axios.delete(`${apiUrl}/${id}`);
-                fetchPolicies(); // Refresh the policies
+                fetchPolicies();
                 Swal.fire("Deleted!", "Policy has been deleted.", "success");
-            } catch (error) {
-                console.error("Error deleting policy:", error);
+            } catch (err) {
+                console.error("Error deleting policy:", err);
                 Swal.fire("Error", "Failed to delete policy", "error");
             }
         }
     };
 
-    // Handle editing the policy
     const handleEdit = (policy) => {
         setEditingId(policy.id);
         setIsEditing(true);
+        setFormData({ file: null, policyType: policy.policyType });
         setIsModalOpen(true);
     };
 
     return (
         <div className="ml-[300px] mt-[80px] p-6 w-[calc(100%-260px)] overflow-x-hidden">
-
             <div className="relative bg-white shadow-lg rounded-lg border border-gray-300 overflow-hidden">
                 {/* Header */}
                 <div className="relative border-t-4 border-orange-400 bg-[#F4F4F4] p-4 rounded-t-lg">
@@ -127,54 +115,62 @@ const PrivacyPolicyTable = () => {
                         Privacy Policy List
                     </h2>
                     <button
-                        onClick={() => {
-                            setIsAdding(false);
-                            navigate("/Adashinner");
-                        }}
+                        onClick={() => navigate("/Adashinner")}
                         className="absolute top-1/2 right-4 transform -translate-y-1/2 text-gray-600 hover:text-gray-800"
                     >
                         <FaTimes size={20} />
                     </button>
                 </div>
 
-
-
-
-
-                {/* Add Button (Disabled if there is at least one policy) */}
+                {/* Add Button (always enabled) */}
                 <div className="p-4 flex justify-end">
                     <button
                         onClick={() => {
                             setIsEditing(false);
+                            setFormData({ file: null, policyType: "" });
                             setIsModalOpen(true);
                         }}
-                        className={`bg-orange-500 text-white px-4 py-2 rounded flex items-center gap-2 ${policies.length > 0 ? "opacity-50 cursor-not-allowed" : "hover:bg-orange-600"
-                            } transition duration-200`}
-                        disabled={policies.length > 0} // Disable button if there is at least one policy
+                        className="bg-orange-500 text-white px-4 py-2 rounded flex items-center gap-2 hover:bg-orange-600 transition duration-200"
                     >
                         <FaPlus /> Add Policy
                     </button>
                 </div>
+
                 {/* Table */}
                 <div className="p-6 overflow-x-auto">
                     <table className="w-full border border-[#776D6DA8] text-sm bg-white shadow-md rounded-md">
                         <thead className="bg-[#F58A3B14] border-b-2 border-[#776D6DA8]">
                             <tr>
-                                {["ID", "File URL", "Created At", "Actions"].map((header, index) => (
-                                    <th key={index} className="px-4 py-3 border border-[#776D6DA8] text-black font-semibold text-center">
-                                        {header}
-                                    </th>
-                                ))}
+                                {["ID", "File URL", "Type", "Created At", "Actions"].map(
+                                    (header, i) => (
+                                        <th
+                                            key={i}
+                                            className="px-4 py-3 border border-[#776D6DA8] text-black font-semibold text-center"
+                                        >
+                                            {header}
+                                        </th>
+                                    )
+                                )}
                             </tr>
                         </thead>
                         <tbody>
-                            {policies.length > 0 ? (
-                                policies.map((policy) => (
-                                    <tr key={policy.id} className="bg-[#FFFFFF] hover:bg-orange-100 transition duration-200">
-                                        <td className="px-4 py-3 border border-[#776D6DA8] text-center">{policy.id}</td>
+                            {policies.length ? (
+                                policies.map((p) => (
+                                    <tr
+                                        key={p.id}
+                                        className="bg-white hover:bg-orange-100 transition duration-200"
+                                    >
                                         <td className="px-4 py-3 border border-[#776D6DA8] text-center">
-                                            {policy.policyFileUrl ? (
-                                                <a href={policy.policyFileUrl} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">
+                                            {p.id}
+                                        </td>
+                                        <td className="px-4 py-3 border border-[#776D6DA8] text-center">
+                                            {p.policyFileUrl ? (
+                                                <a
+                                                    href={p.policyFileUrl}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="text-blue-500 hover:underline"
+                                                >
                                                     View File
                                                 </a>
                                             ) : (
@@ -182,28 +178,29 @@ const PrivacyPolicyTable = () => {
                                             )}
                                         </td>
                                         <td className="px-4 py-3 border border-[#776D6DA8] text-center">
-                                            {(() => {
-                                                const dateObj = new Date(policy.createdAt);
-                                                const day = String(dateObj.getDate()).padStart(2, "0");
-                                                const month = String(dateObj.getMonth() + 1).padStart(2, "0");
-                                                const year = dateObj.getFullYear();
-                                                const hours = String(dateObj.getHours()).padStart(2, "0");
-                                                const minutes = String(dateObj.getMinutes()).padStart(2, "0");
-                                                const seconds = String(dateObj.getSeconds()).padStart(2, "0");
-                                                return `${day}-${month}-${year} ${hours}:${minutes}:${seconds}`;
-                                            })()}
+                                            {p.policyType}
                                         </td>
-
-
+                                        <td className="px-4 py-3 border border-[#776D6DA8] text-center">
+                                            {new Date(p.createdAt)
+                                                .toLocaleString("en-GB", {
+                                                    day: "2-digit",
+                                                    month: "2-digit",
+                                                    year: "numeric",
+                                                    hour: "2-digit",
+                                                    minute: "2-digit",
+                                                    second: "2-digit",
+                                                })
+                                                .replace(",", "")}
+                                        </td>
                                         <td className="px-4 py-3 border border-[#776D6DA8] text-center">
                                             <button
-                                                onClick={() => handleEdit(policy)}
+                                                onClick={() => handleEdit(p)}
                                                 className="bg-blue-500 text-white px-3 py-1 rounded mr-2 hover:bg-blue-600"
                                             >
                                                 <FaEdit />
                                             </button>
                                             <button
-                                                onClick={() => handleDelete(policy.id)}
+                                                onClick={() => handleDelete(p.id)}
                                                 className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
                                             >
                                                 <FaTrash />
@@ -213,7 +210,10 @@ const PrivacyPolicyTable = () => {
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan="4" className="px-4 py-3 border border-[#776D6DA8] text-center">
+                                    <td
+                                        colSpan="5"
+                                        className="px-4 py-3 border border-[#776D6DA8] text-center"
+                                    >
                                         No policies found.
                                     </td>
                                 </tr>
@@ -223,7 +223,7 @@ const PrivacyPolicyTable = () => {
                 </div>
             </div>
 
-            {/* Modal for Adding/Editing Policies */}
+            {/* Modal for Add/Edit */}
             {isModalOpen && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
                     <div className="bg-white p-6 rounded-lg shadow-lg w-[400px]">
@@ -231,16 +231,31 @@ const PrivacyPolicyTable = () => {
                             {isEditing ? "Edit Policy" : "Add Policy"}
                         </h2>
 
+                        {/* Policy Type */}
+                        <label className="block mb-2 font-medium">Policy Type:</label>
+                        <select
+                            value={formData.policyType}
+                            onChange={handleTypeChange}
+                            className="w-full p-2 mb-4 border border-gray-300 rounded"
+                        >
+                            <option value="">-- Select Type --</option>
+                            <option value="Terms and Conditions">Terms and Conditions</option>
+                            <option value="Privacy Policy">Privacy Policy</option>
+                            <option value="Return Policy">
+                                Refund and Cancellation Policy
+                            </option>
+                        </select>
+
+                        {/* File Input */}
                         <input
                             type="file"
-                            name="file"
                             onChange={handleFileChange}
                             className="w-full p-2 border border-gray-300 rounded mb-4"
                         />
 
                         <button
                             onClick={handleSubmit}
-                            className="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600"
+                            className="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600 w-full"
                         >
                             {isEditing ? "Update" : "Save"}
                         </button>
