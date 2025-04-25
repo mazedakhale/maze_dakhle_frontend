@@ -43,6 +43,8 @@ const Sidebar = ({ onNavigate }) => {
             { icon: <FaPlus />, label: "Add Category", path: "/Addcategory" },
             { icon: <FaList />, label: "Subcategory", path: "/Addsubcategory" },
             { icon: <FaList />, label: "Add Services", path: "/DocumentTable " },
+            { icon: <FaList />, label: "Add News", path: "/Newstable " },
+
             { icon: <FaList />, label: "Add Privacy", path: "/PrivacyPolicyTable " },
             { icon: <FaList />, label: "Add Youtube Link", path: "/Youtube " },
 

@@ -81,6 +81,8 @@ import ReceiptErrorRequests from "./Components/ReceiptErrorRequests"
 import RefundCancellationPolicy from "./Components/RefundCancellationPolicy"
 import TermsAndConditions from "./Components/TermsAndConditions"
 import Pricing from "./Components/Pricing";
+import Newstable from "./Components/Newstable"
+import News from "./Components/News"
 function App() {
   return (
     <Router>
@@ -95,6 +97,7 @@ function App() {
         <Route path="/RefundCancellationPolicy" element={<RefundCancellationPolicy />} />
         <Route path="/TermsAndConditions" element={<TermsAndConditions />} />
         <Route path="/Pricing" element={<Pricing />} />
+        <Route path="/News" element={<News />} />
 
         {/* Admin Routes */}
         <Route path="/Admindashboard" element={<Admindashboard />} />
@@ -110,6 +113,8 @@ function App() {
         <Route path="/Contact" element={<Admindashboard><Contact /></Admindashboard>} />
 
         <Route path="/Documenttable" element={<Admindashboard><DocumentTable /></Admindashboard>} />
+        <Route path="/Newstable" element={<Admindashboard><Newstable /></Admindashboard>} />
+
         <Route path="/Addfieldname" element={<Admindashboard><Addfieldname /></Admindashboard>} />
         <Route path="/Verifydocuments" element={<Admindashboard><Verifydocuments /></Admindashboard>} />
         <Route path="/Distributorlist" element={<Admindashboard><DistributorList /></Admindashboard>} />

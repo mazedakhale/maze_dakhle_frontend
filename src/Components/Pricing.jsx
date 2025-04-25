@@ -59,25 +59,43 @@ const Header = () => (
                     <FaEnvelope />
                     <span>demomazedhakale@gmail.com</span>
                 </div>
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-4">
                     <FaPhone />
                     <span>+91 0987654321</span>
+                    <FaFacebookF className="cursor-pointer" />
+                    <FaTwitter className="cursor-pointer" />
+                    <FaLinkedinIn className="cursor-pointer" />
                 </div>
             </div>
             <nav className="flex items-center space-x-4">
-                <Link to="/" className="text-black px-3 py-1 bg-white rounded">Home</Link>
-                <Link to="/pricing" className="text-black px-3 py-1 bg-white rounded">Pricing</Link>
+                <Link
+                    to="/"
+                    className="bg-white text-black px-3 py-1 rounded hover:bg-gray-200 transition"
+                >
+                    Home
+                </Link>
+                <Link
+                    to="/Pricing"
+                    className="bg-white text-black px-3 py-1 rounded hover:bg-gray-200 transition"
+                >
+                    Pricing
+                </Link>
                 <a
                     href="#"
-                    className="bg-green-500 text-white px-3 py-1 rounded-md flex items-center space-x-1 shadow-md"
+                    className="bg-green-500 text-white px-3 py-1 rounded-md flex items-center space-x-1 shadow-md transition"
                 >
-                    <FaWhatsapp /><span>WhatsApp</span>
+                    <FaWhatsapp />
+                    <span>WhatsApp</span>
                 </a>
-                <Link to="/login">
-                    <button className="bg-gray-100 text-black px-3 py-1 rounded">Login</button>
+                <Link to="/Login">
+                    <button className="bg-gray-100 text-black px-3 py-1 rounded hover:bg-gray-200 transition">
+                        Login
+                    </button>
                 </Link>
-                <Link to="/registration">
-                    <button className="bg-white text-black px-3 py-1 border rounded">Register</button>
+                <Link to="/Registration">
+                    <button className="bg-white text-black px-3 py-1 border rounded hover:bg-gray-50 transition">
+                        Register
+                    </button>
                 </Link>
             </nav>
         </div>

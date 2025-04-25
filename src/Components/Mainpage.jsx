@@ -1,40 +1,31 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
-import { FaBullhorn } from "react-icons/fa";  // ← make sure this is imported
-
-import Logo from "../assets/logo.png";
-import MainBanner from "../assets/Mainpage.jpg";
-
 import {
     FaCertificate,
-    FaUsers,
-    FaGraduationCap,
-    FaUserShield,
-    FaTractor,
-    FaPeopleCarry,
-    FaBriefcase,
-    FaUserTimes,
-    FaHandshake,
-    FaUserCheck,
-    FaIdBadge,
-    FaHome,
-    FaUserTie,
-    FaPiggyBank,
-    FaUserAltSlash,
     FaEnvelope,
     FaPhone,
     FaWhatsapp,
     FaGooglePlay,
     FaApple,
+    FaBullhorn,
+    FaPause,
+    FaPlay,
+    FaIdBadge,
+    FaHome,
+    FaUserTie,
+    FaPiggyBank,
+    FaUserShield,
     FaFacebookF,
     FaLinkedinIn,
     FaTwitter,
-    FaBell,             // ← notification bell icon
 } from "react-icons/fa";
 import { BsStopCircle } from "react-icons/bs";
 
-// Navigation labels for footer
+import Logo from "../assets/logo.png";
+import MainBanner from "../assets/Mainpage.jpg";
+
+// Footer nav labels
 const navLabels = [
     "Home",
     "Login",
@@ -45,7 +36,7 @@ const navLabels = [
     "RefundCancellationPolicy",
 ];
 
-// Icon mapping for document types
+// Icon map
 const iconMapping = {
     Adhaar: FaIdBadge,
     "Income Certificate": FaPiggyBank,
@@ -55,7 +46,6 @@ const iconMapping = {
     Alpabhudharak: FaUserShield,
 };
 
-// Header Component
 const Header = () => (
     <header className="bg-[#F79711] py-3 shadow-md">
         <div className="container mx-auto flex justify-between items-center px-4">
@@ -74,56 +64,43 @@ const Header = () => (
                     <FaEnvelope />
                     <span>demomazedhakale@gmail.com</span>
                 </div>
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-4">
                     <FaPhone />
                     <span>+91 0987654321</span>
-                    <span></span>
-
-                    <FaHome className="cursor-pointer" />
-                    <span></span>
-
-
                     <FaFacebookF className="cursor-pointer" />
-                    <span></span>
-
                     <FaTwitter className="cursor-pointer" />
-                    <span></span>
-
                     <FaLinkedinIn className="cursor-pointer" />
-                    <span></span>
-
                 </div>
             </div>
-
 
             {/* Navigation & Actions */}
             <nav className="flex items-center space-x-4">
                 <Link
                     to="/"
-                    className="text-black px-3 py-1 hover:bg-white bg-white hover:text-black rounded"
+                    className="bg-white text-black px-3 py-1 rounded hover:bg-gray-200 transition"
                 >
                     Home
                 </Link>
                 <Link
                     to="/Pricing"
-                    className="text-black px-3 py-1 hover:bg-white bg-white hover:text-black rounded"
+                    className="bg-white text-black px-3 py-1 rounded hover:bg-gray-200 transition"
                 >
                     Pricing
                 </Link>
                 <a
                     href="#"
-                    className="bg-green-500 text-white px-3 py-1 rounded-md flex items-center space-x-1 shadow-md"
+                    className="bg-green-500 text-white px-3 py-1 rounded-md flex items-center space-x-1 shadow-md transition"
                 >
                     <FaWhatsapp />
                     <span>WhatsApp</span>
                 </a>
                 <Link to="/Login">
-                    <button className="bg-gray-100 text-black px-3 py-1 rounded">
+                    <button className="bg-gray-100 text-black px-3 py-1 rounded hover:bg-gray-200 transition">
                         Login
                     </button>
                 </Link>
                 <Link to="/Registration">
-                    <button className="bg-white text-black px-3 py-1 border rounded">
+                    <button className="bg-white text-black px-3 py-1 border rounded hover:bg-gray-50 transition">
                         Register
                     </button>
                 </Link>
@@ -132,13 +109,9 @@ const Header = () => (
     </header>
 );
 
-// Purple marquee banner with bell icon
-
-// at the top with your other imports
-
-// Purple marquee banner with megaphone icon inside the scroll
+// Purple marquee
 const PurpleBanner = () => (
-    <div className="bg-[#673DE6] text-white py-3 mt-4 overflow-hidden">
+    <div className="bg-[#673DE6] text-white py-3 overflow-hidden mt-4">
         <div className="container mx-auto px-6">
             <marquee
                 behavior="scroll"
@@ -147,23 +120,12 @@ const PurpleBanner = () => (
                 className="whitespace-nowrap text-sm"
             >
                 <FaBullhorn className="inline-block mr-2 text-xl" />
-                हमारी वेबसाइट पर आप सभी यूज़र्स का स्वागत है । हम सभी यूज़र्स को बेहतरीन
-                सर्विस प्रोवाइड करते हैं । हमसे जुड़ने के लिए धन्यवाद । 📞 0998766534 ।
-                हमारी ट्रेनिंग वीडियो देखने के लिए नीचे क्लिक करें…                &nbsp;&nbsp;&nbsp;&nbsp;
-                <FaBullhorn className="inline-block mr-2 text-xl" />
-                हमारी वेबसाइट पर आप सभी यूज़र्स का स्वागत है । हम सभी यूज़र्स को बेहतरीन
-                सर्विस प्रोवाइड करते हैं । हमसे जुड़ने के लिए धन्यवाद । 📞 0998766534 ।
-                हमारी ट्रेनिंग वीडियो देखने के लिए नीचे क्लिक करें…
-                <FaBullhorn className="inline-block mr-2 text-xl" />
-                हमारी वेबसाइट पर आप सभी यूज़र्स का स्वागत है । हम सभी यूज़र्स को बेहतरीन
-                सर्विस प्रोवाइड करते हैं । हमसे जुड़ने के लिए धन्यवाद । 📞 0998766534 ।
-                हमारी ट्रेनिंग वीडियो देखने के लिए नीचे क्लिक करें…       </marquee>
+                हमारी वेबसाइट पर आप सभी यूज़र्स का स्वागत है… 📞 0998766534 …
+            </marquee>
         </div>
     </div>
 );
 
-
-// Footer Component
 const Footer = () => (
     <footer className="bg-[#FDF6EC] pt-12 pb-8">
         <div className="container mx-auto px-6 flex flex-wrap justify-between">
@@ -248,63 +210,40 @@ const Footer = () => (
     </footer>
 );
 
-// Mainpage Component
 const Mainpage = () => {
     const [documentTypes, setDocumentTypes] = useState([]);
-    const [feedbacks, setFeedbacks] = useState([]);
+    const [newsList, setNewsList] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    // Fetch document types
+    const marqueeRef = useRef(null);
+    const [playing, setPlaying] = useState(true);
+
     useEffect(() => {
-        const fetchDocumentTypes = async () => {
-            try {
-                const res = await fetch("https://mazedakhale.in/api/document-types");
-                if (!res.ok) throw new Error(`Status ${res.status}`);
-                const contentType = res.headers.get("content-type") || "";
-                if (!contentType.includes("application/json")) {
-                    throw new Error("Server did not return JSON");
-                }
-                const data = await res.json();
+        fetch("https://mazedakhale.in/api/document-types")
+            .then((res) => (res.ok ? res.json() : Promise.reject(res.status)))
+            .then((data) =>
                 setDocumentTypes(
                     Array.isArray(data)
                         ? data
                         : Array.isArray(data.documentTypes)
                             ? data.documentTypes
                             : []
-                );
-            } catch (err) {
-                setError(err.message);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchDocumentTypes();
+                )
+            )
+            .catch(() => setError("Failed to load documents"));
+
+        axios
+            .get("https://mazedakhale.in/api/news")
+            .then((res) => setNewsList(res.data))
+            .catch(() => setError("Failed to load news"))
+            .finally(() => setLoading(false));
     }, []);
 
-    // Fetch and filter feedbacks
     useEffect(() => {
-        const fetchFeedbacks = async () => {
-            try {
-                const { data } = await axios.get("https://mazedakhale.in/api/feedback");
-                let arr = Array.isArray(data)
-                    ? data
-                    : Array.isArray(data.feedbacks)
-                        ? data.feedbacks
-                        : Array.isArray(data.data)
-                            ? data.data
-                            : [];
-                const normalized = arr.map((fb) => ({
-                    ...fb,
-                    status: fb.feedback_status ?? fb.status,
-                }));
-                setFeedbacks(normalized.filter((fb) => fb.status === 1));
-            } catch {
-                setError("Failed to load feedbacks");
-            }
-        };
-        fetchFeedbacks();
-    }, []);
+        if (!marqueeRef.current) return;
+        playing ? marqueeRef.current.start() : marqueeRef.current.stop();
+    }, [playing]);
 
     if (loading)
         return (
@@ -322,9 +261,8 @@ const Mainpage = () => {
                 <Header />
                 <PurpleBanner />
                 <img src={MainBanner} alt="Maze Dakhale" className="w-full" />
-                <div className="container mx-auto py-10 text-center">
-                    <h2 className="text-red-600 text-2xl font-semibold">Error</h2>
-                    <p className="text-gray-700">{error}</p>
+                <div className="container mx-auto py-10 text-center text-red-600">
+                    {error}
                 </div>
             </div>
         );
@@ -335,54 +273,93 @@ const Mainpage = () => {
             <PurpleBanner />
             <img src={MainBanner} alt="Maze Dakhale" className="w-full" />
 
-            {/* Document Type Cards */}
-            {documentTypes.length > 0 && (
-                <div className="container mx-auto py-10">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                        {documentTypes.map((doc) => {
+            {/* Certificates + What's New */}
+            <section className="container mx-auto mt-8 px-4">
+                <div className="flex gap-6">
+                    {/* LEFT: 60% width for first four cards */}
+                    <div className="w-3/5 grid grid-cols-2 grid-rows-2 gap-6">
+                        {documentTypes.slice(0, 4).map((doc) => {
                             const Icon = iconMapping[doc.doc_type_name] || FaCertificate;
                             return (
                                 <div
                                     key={doc.doc_type_id}
-                                    className="bg-white shadow-md rounded-lg p-4 flex flex-col items-center text-center"
+                                    className="bg-white p-6 rounded-lg shadow hover:shadow-lg transition"
                                 >
-                                    <Icon className="text-[#F79711] text-3xl" />
-                                    <h3 className="text-lg font-semibold mt-2">
-                                        {doc.doc_type_name}
-                                    </h3>
-                                    <p className="text-gray-600 text-sm">
+                                    <Icon className="text-[#F79711] text-3xl mb-2" />
+                                    <h3 className="text-lg font-semibold">{doc.doc_type_name}</h3>
+                                    <p className="text-gray-600 text-sm mt-1">
                                         Register your {doc.doc_type_name}
                                     </p>
                                 </div>
                             );
                         })}
                     </div>
-                </div>
-            )}
 
-            {/* Feedback Section */}
-            {feedbacks.length > 0 && (
-                <section className="container mx-auto py-10">
-                    <h2 className="text-2xl font-bold mb-6 text-center">
-                        What People Are Saying
-                    </h2>
-                    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                        {feedbacks.map((fb) => (
-                            <blockquote
-                                key={fb.feedback_feedback_id}
-                                className="bg-white p-6 rounded-lg shadow-lg border"
+                    {/* RIGHT: 40% width for What's New panel */}
+                    <div className="w-2/5 flex flex-col">
+                        {/* Header now Orange */}
+                        <div className="bg-[#F79711] p-4 rounded-t-lg shadow flex justify-between items-center">
+                            <h3 className="text-white font-bold">What's New</h3>
+                            <div className="flex space-x-2">
+                                <button
+                                    onClick={() => setPlaying(false)}
+                                    className="p-1 bg-white text-[#F79711] rounded hover:bg-gray-200"
+                                >
+                                    <FaPause />
+                                </button>
+                                <button
+                                    onClick={() => setPlaying(true)}
+                                    className="p-1 bg-white text-[#F79711] rounded hover:bg-gray-200"
+                                >
+                                    <FaPlay />
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Scrollable body */}
+                        <div className="flex-1 bg-[#F79711]/10 p-4 overflow-y-auto">
+                            <marquee
+                                ref={marqueeRef}
+                                direction="up"
+                                scrollamount="1"
+                                className="space-y-2 text-gray-800 text-sm"
                             >
-                                <p className="text-gray-800 italic mb-4">
-                                    “{fb.feedback_comment}”
-                                </p>
-                                <footer className="text-right text-sm font-semibold text-gray-600">
-                                    — {fb.users_name || "Anonymous"}
-                                </footer>
-                            </blockquote>
-                        ))}
+                                {newsList.slice(0, 5).map((n) => (
+                                    <div key={n.id}>• {n.description}</div>
+                                ))}
+                            </marquee>
+                        </div>
+
+                        {/* Footer */}
+                        <div className="bg-[#F79711] text-white text-right p-2 rounded-b-lg">
+                            <Link to="/news" className="font-semibold hover:underline">
+                                View all &gt;&gt;
+                            </Link>
+                        </div>
                     </div>
-                </section>
-            )}
+                </div>
+
+                {/* Bottom row: remaining certificates */}
+                {documentTypes.length > 4 && (
+                    <div className="grid grid-cols-4 gap-6 mt-6">
+                        {documentTypes.slice(4).map((doc) => {
+                            const Icon = iconMapping[doc.doc_type_name] || FaCertificate;
+                            return (
+                                <div
+                                    key={doc.doc_type_id}
+                                    className="bg-white p-6 rounded-lg shadow hover:shadow-lg transition"
+                                >
+                                    <Icon className="text-[#F79711] text-3xl mb-2" />
+                                    <h3 className="text-lg font-semibold">{doc.doc_type_name}</h3>
+                                    <p className="text-gray-600 text-sm mt-1">
+                                        Register your {doc.doc_type_name}
+                                    </p>
+                                </div>
+                            );
+                        })}
+                    </div>
+                )}
+            </section>
 
             <Footer />
         </div>
