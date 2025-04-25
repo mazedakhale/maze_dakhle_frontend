@@ -80,6 +80,7 @@ import RejectedBefore from "./Components/RejectedBefore"
 import ReceiptErrorRequests from "./Components/ReceiptErrorRequests"
 import RefundCancellationPolicy from "./Components/RefundCancellationPolicy"
 import TermsAndConditions from "./Components/TermsAndConditions"
+import Pricing from "./Components/Pricing";
 function App() {
   return (
     <Router>
@@ -93,6 +94,8 @@ function App() {
         <Route path="/ContactForm" element={<ContactForm />} />
         <Route path="/RefundCancellationPolicy" element={<RefundCancellationPolicy />} />
         <Route path="/TermsAndConditions" element={<TermsAndConditions />} />
+        <Route path="/Pricing" element={<Pricing />} />
+
         {/* Admin Routes */}
         <Route path="/Admindashboard" element={<Admindashboard />} />
         <Route path="/Adashinner" element={<Admindashboard><Adashinner /></Admindashboard>} />
