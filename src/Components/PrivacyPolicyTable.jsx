@@ -1,3 +1,4 @@
+// src/pages/PrivacyPolicyTable.jsx
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { FaEdit, FaTrash, FaPlus, FaTimes } from "react-icons/fa";
@@ -62,10 +63,7 @@ const PrivacyPolicyTable = () => {
                 });
             }
 
-            setIsModalOpen(false);
-            setFormData({ file: null, policyType: "" });
-            setIsEditing(false);
-            setEditingId(null);
+            closeModal();
             fetchPolicies();
             Swal.fire("Success", "Policy saved successfully!", "success");
         } catch (err) {
@@ -106,6 +104,20 @@ const PrivacyPolicyTable = () => {
         setIsModalOpen(true);
     };
 
+    const openModal = () => {
+        setIsEditing(false);
+        setEditingId(null);
+        setFormData({ file: null, policyType: "" });
+        setIsModalOpen(true);
+    };
+
+    const closeModal = () => {
+        setIsModalOpen(false);
+        setIsEditing(false);
+        setEditingId(null);
+        setFormData({ file: null, policyType: "" });
+    };
+
     return (
         <div className="ml-[300px] mt-[80px] p-6 w-[calc(100%-260px)] overflow-x-hidden">
             <div className="relative bg-white shadow-lg rounded-lg border border-gray-300 overflow-hidden">
@@ -122,14 +134,10 @@ const PrivacyPolicyTable = () => {
                     </button>
                 </div>
 
-                {/* Add Button (always enabled) */}
+                {/* Add Button */}
                 <div className="p-4 flex justify-end">
                     <button
-                        onClick={() => {
-                            setIsEditing(false);
-                            setFormData({ file: null, policyType: "" });
-                            setIsModalOpen(true);
-                        }}
+                        onClick={openModal}
                         className="bg-orange-500 text-white px-4 py-2 rounded flex items-center gap-2 hover:bg-orange-600 transition duration-200"
                     >
                         <FaPlus /> Add Policy
@@ -231,34 +239,45 @@ const PrivacyPolicyTable = () => {
                             {isEditing ? "Edit Policy" : "Add Policy"}
                         </h2>
 
-                        {/* Policy Type */}
-                        <label className="block mb-2 font-medium">Policy Type:</label>
-                        <select
-                            value={formData.policyType}
-                            onChange={handleTypeChange}
-                            className="w-full p-2 mb-4 border border-gray-300 rounded"
-                        >
-                            <option value="">-- Select Type --</option>
-                            <option value="Terms and Conditions">Terms and Conditions</option>
-                            <option value="Privacy Policy">Privacy Policy</option>
-                            <option value="Return Policy">
-                                Refund and Cancellation Policy
-                            </option>
-                        </select>
+                        <form onSubmit={handleSubmit}>
+                            {/* Policy Type */}
+                            <label className="block mb-2 font-medium">Policy Type:</label>
+                            <select
+                                value={formData.policyType}
+                                onChange={handleTypeChange}
+                                className="w-full p-2 mb-4 border border-gray-300 rounded"
+                            >
+                                <option value="">-- Select Type --</option>
+                                <option value="Terms and Conditions">Terms and Conditions</option>
+                                <option value="Privacy Policy">Privacy Policy</option>
+                                <option value="Return Policy">
+                                    Refund and Cancellation Policy
+                                </option>
+                            </select>
 
-                        {/* File Input */}
-                        <input
-                            type="file"
-                            onChange={handleFileChange}
-                            className="w-full p-2 border border-gray-300 rounded mb-4"
-                        />
+                            {/* File Input */}
+                            <input
+                                type="file"
+                                onChange={handleFileChange}
+                                className="w-full p-2 border border-gray-300 rounded mb-4"
+                            />
 
-                        <button
-                            onClick={handleSubmit}
-                            className="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600 w-full"
-                        >
-                            {isEditing ? "Update" : "Save"}
-                        </button>
+                            <div className="flex justify-end space-x-4">
+                                <button
+                                    type="button"
+                                    onClick={closeModal}
+                                    className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    className="px-4 py-2 bg-orange-500 text-white rounded hover:bg-orange-600"
+                                >
+                                    {isEditing ? "Update" : "Save"}
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             )}
