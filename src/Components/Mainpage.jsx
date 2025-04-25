@@ -77,8 +77,24 @@ const Header = () => (
                 <div className="flex items-center space-x-2">
                     <FaPhone />
                     <span>+91 0987654321</span>
+                    <span></span>
+
+                    <FaHome className="cursor-pointer" />
+                    <span></span>
+
+
+                    <FaFacebookF className="cursor-pointer" />
+                    <span></span>
+
+                    <FaTwitter className="cursor-pointer" />
+                    <span></span>
+
+                    <FaLinkedinIn className="cursor-pointer" />
+                    <span></span>
+
                 </div>
             </div>
+
 
             {/* Navigation & Actions */}
             <nav className="flex items-center space-x-4">
