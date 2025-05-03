@@ -83,6 +83,7 @@ import TermsAndConditions from "./Components/TermsAndConditions"
 import Pricing from "./Components/Pricing";
 import Newstable from "./Components/Newstable"
 import News from "./Components/News"
+import ResetPassword from "./Components/ResetPassword";
 function App() {
   return (
     <Router>
@@ -91,6 +92,8 @@ function App() {
         <Route path="/" element={<MainPage />} />
 
         <Route path="/Login" element={<Login />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+
         <Route path="/Registration" element={<Registration />} />
         <Route path="/Privacypolicy" element={<PrivacyPolicy />} />
         <Route path="/ContactForm" element={<ContactForm />} />
