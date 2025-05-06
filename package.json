@@ -38,7 +38,8 @@
     "react-toastify": "^11.0.5",
     "recharts": "^2.15.1",
     "sweetalert2": "^11.16.0",
-    "swr": "^2.3.3"
+    "swr": "^2.3.3",
+    "tailwind-scrollbar-hide": "^2.0.0"
   },
   "devDependencies": {
     "@types/express": "^5.0.0",

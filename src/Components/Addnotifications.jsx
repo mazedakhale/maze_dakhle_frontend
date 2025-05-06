@@ -1,17 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 import { FaTag, FaEdit, FaTrash, FaPlus, FaTimes } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
-import axios from 'axios';
+import axios from "axios";
 import Swal from "sweetalert2";
 
 const NotificationManager = () => {
   const [notifications, setNotifications] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newNotification, setNewNotification] = useState({
-    distributor_notification: '',
-    customer_notification: '',
-    notification_date: '',
+    distributor_notification: "",
+    customer_notification: "",
+    notification_date: "",
   });
   const [editingId, setEditingId] = useState(null);
   const [editData, setEditData] = useState({});
@@ -21,10 +21,12 @@ const NotificationManager = () => {
   // Fetch all notifications
   const fetchNotifications = async () => {
     try {
-      const response = await axios.get('https://mazedakhale.in/api/notifications'); // Adjust API URL as needed
+      const response = await axios.get(
+        "https://mazedakhale.in/api/notifications"
+      ); // Adjust API URL as needed
       setNotifications(Array.isArray(response.data) ? response.data : []);
     } catch (err) {
-      console.error('Error fetching notifications:', err);
+      console.error("Error fetching notifications:", err);
     }
   };
 
@@ -43,14 +45,19 @@ const NotificationManager = () => {
     try {
       const payload = {
         ...newNotification,
-        notification_date: newNotification.notification_date || new Date().toISOString(),
+        notification_date:
+          newNotification.notification_date || new Date().toISOString(),
       };
-      await axios.post('https://mazedakhale.in/api/notifications', payload);
+      await axios.post("https://mazedakhale.in/api/notifications", payload);
       fetchNotifications();
       setIsModalOpen(false);
-      setNewNotification({ distributor_notification: '', customer_notification: '', notification_date: '' });
+      setNewNotification({
+        distributor_notification: "",
+        customer_notification: "",
+        notification_date: "",
+      });
     } catch (err) {
-      console.error('Error adding notification:', err);
+      console.error("Error adding notification:", err);
     }
   };
 
@@ -74,7 +81,7 @@ const NotificationManager = () => {
         }
         return true;
       },
-      allowOutsideClick: () => !Swal.isLoading()
+      allowOutsideClick: () => !Swal.isLoading(),
     });
 
     if (confirmDelete.isConfirmed) {
@@ -100,8 +107,6 @@ const NotificationManager = () => {
     }
   };
 
-
-
   // Start editing a notification
   const handleEdit = (id) => {
     setEditingId(id);
@@ -121,28 +126,35 @@ const NotificationManager = () => {
   // Save edited notification
   const handleSaveEdit = async (id) => {
     try {
-      await axios.put(`https://mazedakhale.in/api/notifications/${id}`, editData);
+      await axios.put(
+        `https://mazedakhale.in/api/notifications/${id}`,
+        editData
+      );
       setEditingId(null);
       fetchNotifications();
     } catch (err) {
-      console.error('Error saving edit:', err);
+      console.error("Error saving edit:", err);
     }
   };
 
   // Toggle notification status
   const handleToggleStatus = async (id, currentStatus) => {
     try {
-      const newStatus = currentStatus === 'Active' ? 'Inactive' : 'Active';
-      await axios.patch(`https://mazedakhale.in/api/notifications/status/${id}`, { notification_status: newStatus });
+      const newStatus = currentStatus === "Active" ? "Inactive" : "Active";
+      await axios.patch(
+        `https://mazedakhale.in/api/notifications/status/${id}`,
+        {
+          notification_status: newStatus,
+        }
+      );
       fetchNotifications();
     } catch (err) {
-      console.error('Error updating status:', err);
+      console.error("Error updating status:", err);
     }
   };
 
   return (
     <div className="ml-[300px] mt-[80px] p-6 w-[calc(100%-260px)] overflow-x-hidden">
-
       <div className="relative bg-white shadow-lg rounded-lg border border-gray-300 overflow-hidden">
         {/* Header */}
         <div className="relative border-t-4 border-orange-400 bg-[#F4F4F4] p-4 rounded-t-lg">
@@ -160,7 +172,6 @@ const NotificationManager = () => {
           </button>
         </div>
 
-
         {/* Add Button */}
         <div className="p-4 flex justify-end">
           <button
@@ -176,8 +187,18 @@ const NotificationManager = () => {
           <table className="w-full border border-[#776D6DA8] text-sm bg-white shadow-md rounded-md">
             <thead className="bg-[#F58A3B14] border-b-2 border-[#776D6DA8]">
               <tr>
-                {["ID", "Distributor Notification", "Customer Notification", "Date", "Status", "Actions"].map((header, index) => (
-                  <th key={index} className="px-4 py-3 border border-[#776D6DA8] text-black font-semibold text-center">
+                {[
+                  "ID",
+                  "Distributor Notification",
+                  "Customer Notification",
+                  "Date",
+                  "Status",
+                  "Actions",
+                ].map((header, index) => (
+                  <th
+                    key={index}
+                    className="px-4 py-3 border border-[#776D6DA8] text-black font-semibold text-center"
+                  >
                     {header}
                   </th>
                 ))}
@@ -188,9 +209,13 @@ const NotificationManager = () => {
                 notifications.map((notification, index) => (
                   <tr
                     key={notification.notification_id}
-                    className={`${index % 2 === 0 ? "bg-[#FFFFFF]" : "bg-[#F58A3B14]"} hover:bg-orange-100 transition duration-200`}
+                    className={`${
+                      index % 2 === 0 ? "bg-[#FFFFFF]" : "bg-[#F58A3B14]"
+                    } hover:bg-orange-100 transition duration-200`}
                   >
-                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">{notification.notification_id}</td>
+                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">
+                      {notification.notification_id}
+                    </td>
                     <td className="px-4 py-3 border border-[#776D6DA8] text-center">
                       {editingId === notification.notification_id ? (
                         <input
@@ -220,26 +245,38 @@ const NotificationManager = () => {
                     <td className="px-4 py-3 border border-[#776D6DA8] text-center">
                       {(() => {
                         const date = new Date(notification.notification_date);
-                        const day = String(date.getDate()).padStart(2, '0');
-                        const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+                        const day = String(date.getDate()).padStart(2, "0");
+                        const month = String(date.getMonth() + 1).padStart(
+                          2,
+                          "0"
+                        ); // Months are 0-based
                         const year = date.getFullYear();
-                        const hours = String(date.getHours()).padStart(2, '0');
-                        const minutes = String(date.getMinutes()).padStart(2, '0');
-                        const seconds = String(date.getSeconds()).padStart(2, '0');
+                        const hours = String(date.getHours()).padStart(2, "0");
+                        const minutes = String(date.getMinutes()).padStart(
+                          2,
+                          "0"
+                        );
+                        const seconds = String(date.getSeconds()).padStart(
+                          2,
+                          "0"
+                        );
                         return `${day}-${month}-${year} ${hours}:${minutes}:${seconds}`;
                       })()}
                     </td>
 
-
                     <td className="px-4 py-3 border border-[#776D6DA8] text-center">
                       <button
-                        className={`px-3 py-1 rounded text-white ${notification.notification_status === "Active"
-                          ? "bg-green-500 cursor-default"
-                          : "bg-gray-500 hover:bg-green-600"
-                          }`}
+                        className={`px-3 py-1 rounded text-white ${
+                          notification.notification_status === "Active"
+                            ? "bg-green-500 cursor-default"
+                            : "bg-gray-500 hover:bg-green-600"
+                        }`}
                         disabled={notification.notification_status === "Active"}
                         onClick={() =>
-                          handleToggleStatus(notification.notification_id, notification.notification_status)
+                          handleToggleStatus(
+                            notification.notification_id,
+                            notification.notification_status
+                          )
                         }
                       >
                         {notification.notification_status}
@@ -249,21 +286,27 @@ const NotificationManager = () => {
                       {editingId === notification.notification_id ? (
                         <button
                           className="bg-green-500 text-white px-3 py-1 rounded mr-2 hover:bg-green-600"
-                          onClick={() => handleSaveEdit(notification.notification_id)}
+                          onClick={() =>
+                            handleSaveEdit(notification.notification_id)
+                          }
                         >
                           Save
                         </button>
                       ) : (
                         <button
                           className="bg-blue-500 text-white px-3 py-1 rounded mr-2 hover:bg-blue-600"
-                          onClick={() => handleEdit(notification.notification_id)}
+                          onClick={() =>
+                            handleEdit(notification.notification_id)
+                          }
                         >
                           Edit
                         </button>
                       )}
                       <button
                         className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-                        onClick={() => handleDelete(notification.notification_id)}
+                        onClick={() =>
+                          handleDelete(notification.notification_id)
+                        }
                       >
                         Delete
                       </button>
@@ -272,7 +315,10 @@ const NotificationManager = () => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="6" className="px-4 py-3 border border-[#776D6DA8] text-center">
+                  <td
+                    colSpan="6"
+                    className="px-4 py-3 border border-[#776D6DA8] text-center"
+                  >
                     No notifications found.
                   </td>
                 </tr>
@@ -322,7 +368,6 @@ const NotificationManager = () => {
       )}
     </div>
   );
-
 };
 
 export default NotificationManager;

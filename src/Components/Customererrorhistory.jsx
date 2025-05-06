@@ -1,7 +1,12 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
-import { FaFileAlt, FaDownload, FaExclamationTriangle, FaTimes } from "react-icons/fa";
+import {
+  FaFileAlt,
+  FaDownload,
+  FaExclamationTriangle,
+  FaTimes,
+} from "react-icons/fa";
 
 import { useNavigate } from "react-router-dom";
 
@@ -20,7 +25,9 @@ const ErrorRequests = () => {
   // Fetch error requests (only completed ones)
   const fetchErrorRequests = async () => {
     try {
-      const response = await axios.get("https://mazedakhale.in/api/request-errors");
+      const response = await axios.get(
+        "https://mazedakhale.in/api/request-errors"
+      );
 
       // ✅ Filter requests to include only those with status "Completed"
       const completedRequests = response.data.filter(
@@ -36,7 +43,9 @@ const ErrorRequests = () => {
   // Fetch certificates
   const fetchCertificates = async () => {
     try {
-      const response = await axios.get("https://mazedakhale.in/api/certificates");
+      const response = await axios.get(
+        "https://mazedakhale.in/api/certificates"
+      );
       setCertificates(response.data);
     } catch (error) {
       console.error("Error fetching certificates:", error);
@@ -154,7 +163,10 @@ const ErrorRequests = () => {
                   "Certificate",
                   "Download Certificate",
                 ].map((header, index) => (
-                  <th key={index} className="px-4 py-3 border text-black font-semibold text-center border-[#776D6DA8]">
+                  <th
+                    key={index}
+                    className="px-4 py-3 border text-black font-semibold text-center border-[#776D6DA8]"
+                  >
                     {header}
                   </th>
                 ))}
@@ -167,8 +179,9 @@ const ErrorRequests = () => {
                 filteredRequests.map((request, index) => (
                   <tr
                     key={request.request_id}
-                    className={`${index % 2 === 0 ? "bg-[#FFFFFF]" : "bg-[#F58A3B14]"
-                      } hover:bg-orange-100 transition duration-200`}
+                    className={`${
+                      index % 2 === 0 ? "bg-[#FFFFFF]" : "bg-[#F58A3B14]"
+                    } hover:bg-orange-100 transition duration-200`}
                   >
                     <td className="px-4 py-3 border text-center border-[#776D6DA8]">
                       {request.request_id}
@@ -200,7 +213,9 @@ const ErrorRequests = () => {
                     <td className="px-4 py-3 border text-center border-[#776D6DA8]">
                       {getCertificateByDocumentId(request.document_id) ? (
                         <button
-                          onClick={() => handleViewCertificate(request.document_id)}
+                          onClick={() =>
+                            handleViewCertificate(request.document_id)
+                          }
                           className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 transition"
                         >
                           View Certificate
@@ -213,21 +228,29 @@ const ErrorRequests = () => {
                       {getCertificateByDocumentId(request.document_id) ? (
                         <button
                           onClick={() =>
-                            handleDownloadCertificate(request.document_id, request.request_name)
+                            handleDownloadCertificate(
+                              request.document_id,
+                              request.request_name
+                            )
                           }
                           className="bg-green-500 text-white px-3 py-1 rounded flex justify-center items-center hover:bg-green-600 transition"
                         >
                           <FaDownload className="mr-1" /> Download
                         </button>
                       ) : (
-                        <span className="text-gray-500 text-center">Not Available</span>
+                        <span className="text-gray-500 text-center">
+                          Not Available
+                        </span>
                       )}
                     </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan="8" className="px-4 py-3 border text-center border-[#776D6DA8]">
+                  <td
+                    colSpan="8"
+                    className="px-4 py-3 border text-center border-[#776D6DA8]"
+                  >
                     No completed error requests found.
                   </td>
                 </tr>

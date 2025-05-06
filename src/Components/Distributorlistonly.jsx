@@ -8,7 +8,12 @@ import { useNavigate } from "react-router-dom";
 axios.defaults.timeout = 30000; // 30 seconds
 
 // Import form validators
-import { isValidEmail, isValidPhone, isValidPassword, validateRegistration } from "../utils/formValidators";
+import {
+  isValidEmail,
+  isValidPhone,
+  isValidPassword,
+  validateRegistration,
+} from "../utils/formValidators";
 
 const UserTable = () => {
   const [distributors, setDistributors] = useState([]);
@@ -34,7 +39,7 @@ const UserTable = () => {
       phone: "",
       address: "",
       aadharCard: "",
-      panCard: ""
+      panCard: "",
     },
   });
   const navigate = useNavigate();
@@ -51,13 +56,20 @@ const UserTable = () => {
       setDistributors(response.data);
     } catch (error) {
       console.error("Error fetching distributors:", error);
-      Swal.fire("Error", "Failed to fetch distributors. Server might be down.", "error");
+      Swal.fire(
+        "Error",
+        "Failed to fetch distributors. Server might be down.",
+        "error"
+      );
     }
   };
 
   const checkEmailExists = async (email) => {
     try {
-      const response = await axios.get(`https://mazedakhale.in/api/users/check-email/${email}`, { timeout: 30000 });
+      const response = await axios.get(
+        `https://mazedakhale.in/api/users/check-email/${email}`,
+        { timeout: 30000 }
+      );
       return response.data.exists;
     } catch (error) {
       console.error("Error checking email:", error);
@@ -83,7 +95,7 @@ const UserTable = () => {
         phone: "",
         address: "",
         aadharCard: "",
-        panCard: ""
+        panCard: "",
       },
     });
     setEmailExists(false);
@@ -93,32 +105,35 @@ const UserTable = () => {
     const newErrors = { ...formData.errors };
 
     switch (name) {
-      case 'name':
-        newErrors.name = value.trim() === '' ? 'Name is required' : '';
+      case "name":
+        newErrors.name = value.trim() === "" ? "Name is required" : "";
         break;
-      case 'email':
+      case "email":
         if (!isValidEmail(value)) {
-          newErrors.email = 'Please enter a valid email address.';
+          newErrors.email = "Please enter a valid email address.";
         } else {
           const exists = await checkEmailExists(value);
           if (exists) {
-            newErrors.email = 'Email already exists.';
+            newErrors.email = "Email already exists.";
             setEmailExists(true);
           } else {
-            newErrors.email = '';
+            newErrors.email = "";
             setEmailExists(false);
           }
         }
         break;
-      case 'password':
-        newErrors.password = isValidPassword(value) ? '' :
-          'Password must be at least 8 characters and include uppercase, lowercase, a number, and a special character.';
+      case "password":
+        newErrors.password = isValidPassword(value)
+          ? ""
+          : "Password must be at least 8 characters and include uppercase, lowercase, a number, and a special character.";
         break;
-      case 'phone':
-        newErrors.phone = isValidPhone(value) ? '' : 'Phone number must be exactly 10 digits.';
+      case "phone":
+        newErrors.phone = isValidPhone(value)
+          ? ""
+          : "Phone number must be exactly 10 digits.";
         break;
-      case 'address':
-        newErrors.address = value.trim() === '' ? 'Address is required' : '';
+      case "address":
+        newErrors.address = value.trim() === "" ? "Address is required" : "";
         break;
       default:
         break;
@@ -131,17 +146,18 @@ const UserTable = () => {
     const { name, value } = e.target;
 
     // Update the field value
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
 
     // Validate the field in real-time
-    if (name !== 'shopAddress') { // Skip validation for optional field
+    if (name !== "shopAddress") {
+      // Skip validation for optional field
       const newErrors = await validateField(name, value);
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
-        errors: newErrors
+        errors: newErrors,
       }));
     }
   };
@@ -155,7 +171,11 @@ const UserTable = () => {
       if (!allowedTypes.includes(file.type)) {
         setFormData((prev) => ({
           ...prev,
-          errors: { ...prev.errors, [field]: "File type not supported. Please upload a PDF, JPG, or PNG file." },
+          errors: {
+            ...prev.errors,
+            [field]:
+              "File type not supported. Please upload a PDF, JPG, or PNG file.",
+          },
         }));
         return;
       }
@@ -163,7 +183,10 @@ const UserTable = () => {
       if (file.size > maxSize) {
         setFormData((prev) => ({
           ...prev,
-          errors: { ...prev.errors, [field]: "File size exceeds 500KB. Please upload a smaller file." },
+          errors: {
+            ...prev.errors,
+            [field]: "File size exceeds 500KB. Please upload a smaller file.",
+          },
         }));
         return;
       }
@@ -181,44 +204,45 @@ const UserTable = () => {
     const newErrors = { ...formData.errors };
 
     // Validate all fields
-    if (formData.name.trim() === '') {
-      newErrors.name = 'Name is required';
+    if (formData.name.trim() === "") {
+      newErrors.name = "Name is required";
       isValid = false;
     }
 
     if (!isValidEmail(formData.email)) {
-      newErrors.email = 'Please enter a valid email address.';
+      newErrors.email = "Please enter a valid email address.";
       isValid = false;
     }
 
     if (!isValidPassword(formData.password)) {
-      newErrors.password = 'Password must be at least 8 characters and include uppercase, lowercase, a number, and a special character.';
+      newErrors.password =
+        "Password must be at least 8 characters and include uppercase, lowercase, a number, and a special character.";
       isValid = false;
     }
 
     if (!isValidPhone(formData.phone)) {
-      newErrors.phone = 'Phone number must be exactly 10 digits.';
+      newErrors.phone = "Phone number must be exactly 10 digits.";
       isValid = false;
     }
 
-    if (formData.address.trim() === '') {
-      newErrors.address = 'Address is required';
+    if (formData.address.trim() === "") {
+      newErrors.address = "Address is required";
       isValid = false;
     }
 
     if (!formData.aadharCard) {
-      newErrors.aadharCard = 'Aadhar Card is required';
+      newErrors.aadharCard = "Aadhar Card is required";
       isValid = false;
     }
 
     if (!formData.panCard) {
-      newErrors.panCard = 'PAN Card is required';
+      newErrors.panCard = "PAN Card is required";
       isValid = false;
     }
 
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      errors: newErrors
+      errors: newErrors,
     }));
 
     return isValid;
@@ -235,9 +259,9 @@ const UserTable = () => {
     // Check if email exists one more time before submitting
     const exists = await checkEmailExists(formData.email);
     if (exists) {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
-        errors: { ...prev.errors, email: 'Email already exists.' }
+        errors: { ...prev.errors, email: "Email already exists." },
       }));
       setEmailExists(true);
       return;
@@ -272,12 +296,16 @@ const UserTable = () => {
     formDataToSend.append("documentTypes", "PAN Card");
 
     try {
-      const response = await axios.post("https://mazedakhale.in/api/users/register", formDataToSend, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-        timeout: 30000,
-      });
+      const response = await axios.post(
+        "https://mazedakhale.in/api/users/register",
+        formDataToSend,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+          timeout: 30000,
+        }
+      );
 
       console.log("API Response:", response.data);
 
@@ -294,7 +322,11 @@ const UserTable = () => {
       console.error("Error adding distributor:", error);
 
       let errorMessage = "Failed to add distributor. Please try again.";
-      if (error.response && error.response.data && error.response.data.message) {
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.message
+      ) {
         errorMessage = error.response.data.message;
       }
 
@@ -315,7 +347,8 @@ const UserTable = () => {
   const handleUpdateDistributor = async (id) => {
     try {
       if (updatedPassword) {
-        await axios.patch(`https://mazedakhale.in/api/users/password/${id}`,
+        await axios.patch(
+          `https://mazedakhale.in/api/users/password/${id}`,
           { newPassword: updatedPassword },
           { timeout: 30000 }
         );
@@ -337,7 +370,7 @@ const UserTable = () => {
         text: "Distributor password updated successfully!",
         icon: "success",
         timer: 1500,
-        showConfirmButton: false
+        showConfirmButton: false,
       });
     } catch (error) {
       console.error("Error updating distributor:", error);
@@ -364,7 +397,7 @@ const UserTable = () => {
         }
         return true;
       },
-      allowOutsideClick: () => !Swal.isLoading()
+      allowOutsideClick: () => !Swal.isLoading(),
     });
 
     if (confirmDelete.isConfirmed) {
@@ -374,18 +407,20 @@ const UserTable = () => {
         allowOutsideClick: false,
         didOpen: () => {
           Swal.showLoading();
-        }
+        },
       });
 
       try {
-        await axios.delete(`https://mazedakhale.in/api/users/delete/${id}`, { timeout: 30000 });
+        await axios.delete(`https://mazedakhale.in/api/users/delete/${id}`, {
+          timeout: 30000,
+        });
 
         Swal.fire({
           title: "Deleted!",
           text: "Distributor has been deleted.",
           icon: "success",
           timer: 1500,
-          showConfirmButton: false
+          showConfirmButton: false,
         });
 
         setDistributors((prevDistributors) =>
@@ -403,11 +438,14 @@ const UserTable = () => {
       // Update the UI immediately
       setDistributors((prevDistributors) =>
         prevDistributors.map((distributor) =>
-          distributor.user_id === id ? { ...distributor, user_login_status: newStatus } : distributor
+          distributor.user_id === id
+            ? { ...distributor, user_login_status: newStatus }
+            : distributor
         )
       );
 
-      await axios.patch(`https://mazedakhale.in/api/users/status/${id}`,
+      await axios.patch(
+        `https://mazedakhale.in/api/users/status/${id}`,
         { status: newStatus },
         { timeout: 30000 }
       );
@@ -417,7 +455,7 @@ const UserTable = () => {
         text: `Status changed to ${newStatus}`,
         icon: "success",
         timer: 1000,
-        showConfirmButton: false
+        showConfirmButton: false,
       });
     } catch (error) {
       console.error("Error updating status:", error);
@@ -438,7 +476,11 @@ const UserTable = () => {
           d.user_id === id ? { ...d, edit_request_status: newStatus } : d
         )
       );
-      Swal.fire("Success", `Edit request ${newStatus.toLowerCase()}!`, "success");
+      Swal.fire(
+        "Success",
+        `Edit request ${newStatus.toLowerCase()}!`,
+        "success"
+      );
     } catch (error) {
       console.error("Edit request error", error);
       Swal.fire("Error", "Failed to update edit request", "error");
@@ -447,7 +489,6 @@ const UserTable = () => {
 
   return (
     <div className="ml-[300px] mt-[80px] p-6 w-[calc(100%-260px)] overflow-x-hidden">
-
       <div className="relative bg-white shadow-lg rounded-lg border border-gray-300 overflow-hidden">
         {/* Header */}
         <div className="relative border-t-4 border-orange-400 bg-[#F4F4F4] p-4 rounded-t-lg">
@@ -465,8 +506,6 @@ const UserTable = () => {
           </button>
         </div>
 
-
-
         <div className="p-4 flex justify-end">
           <button
             onClick={handleAddDistributor}
@@ -481,8 +520,23 @@ const UserTable = () => {
           <table className="w-full border border-[#776D6DA8] text-sm bg-white shadow-md rounded-md">
             <thead className="bg-[#F58A3B14] border-b-2 border-[#776D6DA8]">
               <tr>
-                {["ID", "Name", "Email", "Password", "Address", "ShopAddress", "Documents", "Status", "Update", "Request", "Actions"].map((header, index) => (
-                  <th key={index} className="px-4 py-3 border border-[#776D6DA8] text-black font-semibold text-center">
+                {[
+                  "ID",
+                  "Name",
+                  "Email",
+                  "Password",
+                  "Address",
+                  "ShopAddress",
+                  "Documents",
+                  "Status",
+                  "Update",
+                  "Request",
+                  "Actions",
+                ].map((header, index) => (
+                  <th
+                    key={index}
+                    className="px-4 py-3 border border-[#776D6DA8] text-black font-semibold text-center"
+                  >
                     {header}
                   </th>
                 ))}
@@ -493,11 +547,19 @@ const UserTable = () => {
                 distributors.map((distributor, index) => (
                   <tr
                     key={distributor.user_id}
-                    className={`${index % 2 === 0 ? "bg-[#FFFFFF]" : "bg-[#F58A3B14]"} hover:bg-orange-100 transition duration-200`}
+                    className={`${
+                      index % 2 === 0 ? "bg-[#FFFFFF]" : "bg-[#F58A3B14]"
+                    } hover:bg-orange-100 transition duration-200`}
                   >
-                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">{distributor.user_id}</td>
-                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">{distributor.name}</td>
-                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">{distributor.email}</td>
+                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">
+                      {distributor.user_id}
+                    </td>
+                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">
+                      {distributor.name}
+                    </td>
+                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">
+                      {distributor.email}
+                    </td>
                     <td className="px-4 py-3 border border-[#776D6DA8] text-center">
                       {editingId === distributor.user_id ? (
                         <input
@@ -510,8 +572,12 @@ const UserTable = () => {
                         distributor.password
                       )}
                     </td>
-                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">{distributor.address}</td>
-                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">{distributor.shop_address}</td>
+                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">
+                      {distributor.address}
+                    </td>
+                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">
+                      {distributor.shop_address}
+                    </td>
                     <td className="px-4 py-3 border border-[#776D6DA8] text-center">
                       {Array.isArray(distributor.user_documents) ? (
                         distributor.user_documents.map((doc, index) => (
@@ -527,39 +593,67 @@ const UserTable = () => {
                           </div>
                         ))
                       ) : (
-                        <span className="text-gray-400 italic">No documents</span>
+                        <span className="text-gray-400 italic">
+                          No documents
+                        </span>
                       )}
                     </td>
-                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">{distributor.user_login_status}</td>
+                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">
+                      {distributor.user_login_status}
+                    </td>
                     <td className="px-4 py-3 border border-[#776D6DA8] text-center">
                       <button
-                        onClick={() => handleStatusChange(distributor.user_id, "Active")}
-                        className={`px-3 py-1 rounded text-white mr-2 ${distributor.user_login_status === "Active"
-                          ? "bg-green-500 cursor-default"
-                          : "bg-gray-500 hover:bg-green-600"
-                          }`}
+                        onClick={() =>
+                          handleStatusChange(distributor.user_id, "Active")
+                        }
+                        className={`px-3 py-1 rounded text-white mr-2 ${
+                          distributor.user_login_status === "Active"
+                            ? "bg-green-500 cursor-default"
+                            : "bg-gray-500 hover:bg-green-600"
+                        }`}
                         disabled={distributor.user_login_status === "Active"}
                       >
                         Active
                       </button>
                       <button
-                        onClick={() => handleStatusChange(distributor.user_id, "InActive")}
-                        className={`px-3 py-1 rounded text-white ${distributor.user_login_status === "InActive"
-                          ? "bg-red-500 cursor-default"
-                          : "bg-gray-500 hover:bg-red-600"
-                          }`}
+                        onClick={() =>
+                          handleStatusChange(distributor.user_id, "InActive")
+                        }
+                        className={`px-3 py-1 rounded text-white ${
+                          distributor.user_login_status === "InActive"
+                            ? "bg-red-500 cursor-default"
+                            : "bg-gray-500 hover:bg-red-600"
+                        }`}
                         disabled={distributor.user_login_status === "InActive"}
                       >
                         Inactive
                       </button>
                     </td>
                     <td className="text-center border">
-                      <div className="text-sm font-semibold">{distributor.edit_request_status}</div>
+                      <div className="text-sm font-semibold">
+                        {distributor.edit_request_status}
+                      </div>
                       <div className="flex gap-1 justify-center mt-1">
-                        <button onClick={() => updateEditRequestStatus(distributor.user_id, "Approved")} className="bg-green-500 text-white px-2 py-1 rounded text-xs hover:bg-green-600">
+                        <button
+                          onClick={() =>
+                            updateEditRequestStatus(
+                              distributor.user_id,
+                              "Approved"
+                            )
+                          }
+                          className="bg-green-500 text-white px-2 py-1 rounded text-xs hover:bg-green-600"
+                        >
                           Approve
                         </button>
-                        <button onClick={() => updateEditRequestStatus(distributor.user_id, "Rejected")} className="bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600">
+                        <button
+                          onClick={() =>
+                            updateEditRequestStatus(
+                              distributor.user_id,
+                              "Rejected"
+                            )
+                          }
+                          className="bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600"
+                        >
                           Reject
                         </button>
                       </div>
@@ -567,7 +661,9 @@ const UserTable = () => {
                     <td className="px-4 py-3 border border-[#776D6DA8] text-center">
                       {editingId === distributor.user_id ? (
                         <button
-                          onClick={() => handleUpdateDistributor(distributor.user_id)}
+                          onClick={() =>
+                            handleUpdateDistributor(distributor.user_id)
+                          }
                           className="bg-green-500 text-white px-3 py-1 rounded mr-2 hover:bg-green-600"
                         >
                           Save
@@ -581,7 +677,9 @@ const UserTable = () => {
                         </button>
                       )}
                       <button
-                        onClick={() => handleDeleteDistributor(distributor.user_id)}
+                        onClick={() =>
+                          handleDeleteDistributor(distributor.user_id)
+                        }
                         className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
                       >
                         <FaTrash />
@@ -591,7 +689,10 @@ const UserTable = () => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="10" className="px-4 py-3 border border-[#776D6DA8] text-center">
+                  <td
+                    colSpan="10"
+                    className="px-4 py-3 border border-[#776D6DA8] text-center"
+                  >
                     No distributors found.
                   </td>
                 </tr>
@@ -604,7 +705,9 @@ const UserTable = () => {
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
           <div className="bg-white p-6 rounded-lg shadow-lg w-[400px]">
-            <h2 className="text-xl font-bold text-gray-800 mb-4">Add Distributor</h2>
+            <h2 className="text-xl font-bold text-gray-800 mb-4">
+              Add Distributor
+            </h2>
 
             <form onSubmit={handleSubmit} className="space-y-3">
               <div>
@@ -614,11 +717,15 @@ const UserTable = () => {
                   placeholder="Name"
                   value={formData.name}
                   onChange={handleInputChange}
-                  className={`w-full p-2 border rounded text-xs ${formData.errors.name ? 'border-red-500' : ''}`}
+                  className={`w-full p-2 border rounded text-xs ${
+                    formData.errors.name ? "border-red-500" : ""
+                  }`}
                   required
                 />
                 {formData.errors.name && (
-                  <p className="text-red-500 text-xs mt-1">{formData.errors.name}</p>
+                  <p className="text-red-500 text-xs mt-1">
+                    {formData.errors.name}
+                  </p>
                 )}
               </div>
 
@@ -629,11 +736,15 @@ const UserTable = () => {
                   placeholder="Email"
                   value={formData.email}
                   onChange={handleInputChange}
-                  className={`w-full p-2 border rounded text-xs ${formData.errors.email ? 'border-red-500' : ''}`}
+                  className={`w-full p-2 border rounded text-xs ${
+                    formData.errors.email ? "border-red-500" : ""
+                  }`}
                   required
                 />
                 {formData.errors.email && (
-                  <p className="text-red-500 text-xs mt-1">{formData.errors.email}</p>
+                  <p className="text-red-500 text-xs mt-1">
+                    {formData.errors.email}
+                  </p>
                 )}
               </div>
 
@@ -644,11 +755,15 @@ const UserTable = () => {
                   placeholder="Password"
                   value={formData.password}
                   onChange={handleInputChange}
-                  className={`w-full p-2 border rounded text-xs ${formData.errors.password ? 'border-red-500' : ''}`}
+                  className={`w-full p-2 border rounded text-xs ${
+                    formData.errors.password ? "border-red-500" : ""
+                  }`}
                   required
                 />
                 {formData.errors.password && (
-                  <p className="text-red-500 text-xs mt-1">{formData.errors.password}</p>
+                  <p className="text-red-500 text-xs mt-1">
+                    {formData.errors.password}
+                  </p>
                 )}
               </div>
 
@@ -659,11 +774,15 @@ const UserTable = () => {
                   placeholder="Phone"
                   value={formData.phone}
                   onChange={handleInputChange}
-                  className={`w-full p-2 border rounded text-xs ${formData.errors.phone ? 'border-red-500' : ''}`}
+                  className={`w-full p-2 border rounded text-xs ${
+                    formData.errors.phone ? "border-red-500" : ""
+                  }`}
                   required
                 />
                 {formData.errors.phone && (
-                  <p className="text-red-500 text-xs mt-1">{formData.errors.phone}</p>
+                  <p className="text-red-500 text-xs mt-1">
+                    {formData.errors.phone}
+                  </p>
                 )}
               </div>
 
@@ -674,11 +793,15 @@ const UserTable = () => {
                   placeholder="Address"
                   value={formData.address}
                   onChange={handleInputChange}
-                  className={`w-full p-2 border rounded text-xs ${formData.errors.address ? 'border-red-500' : ''}`}
+                  className={`w-full p-2 border rounded text-xs ${
+                    formData.errors.address ? "border-red-500" : ""
+                  }`}
                   required
                 />
                 {formData.errors.address && (
-                  <p className="text-red-500 text-xs mt-1">{formData.errors.address}</p>
+                  <p className="text-red-500 text-xs mt-1">
+                    {formData.errors.address}
+                  </p>
                 )}
               </div>
 
@@ -688,36 +811,50 @@ const UserTable = () => {
                   name="shopAddress"
                   placeholder="Shop Address (Optional)"
                   value={formData.shopAddress}
-                  onChange={(e) => setFormData({ ...formData, shopAddress: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, shopAddress: e.target.value })
+                  }
                   className="w-full p-2 border rounded text-xs"
                 />
               </div>
 
               {/* Aadhar Card Upload */}
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">Aadhar Card (Max: 500KB)</label>
+                <label className="block text-xs font-medium text-gray-700 mb-1">
+                  Aadhar Card (Max: 500KB)
+                </label>
                 <input
                   type="file"
                   onChange={(e) => handleFileChange(e, "aadharCard")}
-                  className={`w-full text-xs ${formData.errors.aadharCard ? 'border-red-500' : ''}`}
+                  className={`w-full text-xs ${
+                    formData.errors.aadharCard ? "border-red-500" : ""
+                  }`}
                   accept=".pdf,.jpg,.jpeg,.png"
                 />
                 {formData.errors.aadharCard && (
-                  <p className="text-red-500 text-xs mt-1">{formData.errors.aadharCard}</p>
+                  <p className="text-red-500 text-xs mt-1">
+                    {formData.errors.aadharCard}
+                  </p>
                 )}
               </div>
 
               {/* PAN Card Upload */}
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">PAN Card (Max: 500KB)</label>
+                <label className="block text-xs font-medium text-gray-700 mb-1">
+                  PAN Card (Max: 500KB)
+                </label>
                 <input
                   type="file"
                   onChange={(e) => handleFileChange(e, "panCard")}
-                  className={`w-full text-xs ${formData.errors.panCard ? 'border-red-500' : ''}`}
+                  className={`w-full text-xs ${
+                    formData.errors.panCard ? "border-red-500" : ""
+                  }`}
                   accept=".pdf,.jpg,.jpeg,.png"
                 />
                 {formData.errors.panCard && (
-                  <p className="text-red-500 text-xs mt-1">{formData.errors.panCard}</p>
+                  <p className="text-red-500 text-xs mt-1">
+                    {formData.errors.panCard}
+                  </p>
                 )}
               </div>
 

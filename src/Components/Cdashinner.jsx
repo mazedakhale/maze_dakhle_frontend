@@ -1,15 +1,34 @@
 import React, { useEffect, useState } from "react";
 import {
-  PieChart, Pie, Cell, Tooltip, Legend,
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, LabelList,
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip,
+  Legend,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  ResponsiveContainer,
+  LabelList,
 } from "recharts";
 import { motion } from "framer-motion";
 import { Card, CardContent } from "@mui/material";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import {
-  FaClipboardList, FaCheckCircle, FaRupeeSign, FaClock,
-  FaFolderOpen, FaFilePdf, FaFileAlt, FaEdit, FaTrash, FaPlus, FaTimes
+  FaClipboardList,
+  FaCheckCircle,
+  FaRupeeSign,
+  FaClock,
+  FaFolderOpen,
+  FaFilePdf,
+  FaFileAlt,
+  FaEdit,
+  FaTrash,
+  FaPlus,
+  FaTimes,
 } from "react-icons/fa";
 
 const CustomerDashboard = () => {
@@ -57,16 +76,19 @@ const CustomerDashboard = () => {
   useEffect(() => {
     if (!userId) return;
 
-    axios.get(`https://mazedakhale.in/api/userdashboard/total-applied/${userId}`)
-      .then(res => setAppliedCount(res.data.totalCount))
-      .catch(() => { });
+    axios
+      .get(`https://mazedakhale.in/api/userdashboard/total-applied/${userId}`)
+      .then((res) => setAppliedCount(res.data.totalCount))
+      .catch(() => {});
 
-    axios.get(`https://mazedakhale.in/api/userdashboard/total-completed/${userId}`)
-      .then(res => setCompletedCount(res.data.totalCompleted))
-      .catch(() => { });
+    axios
+      .get(`https://mazedakhale.in/api/userdashboard/total-completed/${userId}`)
+      .then((res) => setCompletedCount(res.data.totalCompleted))
+      .catch(() => {});
 
-    axios.get(`https://mazedakhale.in/api/userdashboard/category-counts/${userId}`)
-      .then(res => {
+    axios
+      .get(`https://mazedakhale.in/api/userdashboard/category-counts/${userId}`)
+      .then((res) => {
         const withColors = res.data.categories.map((item, i) => ({
           name: item.category,
           value: item.totalApplications,
@@ -77,20 +99,24 @@ const CustomerDashboard = () => {
         setCategoryCounts(res.data.categories);
         setSubcategoryCounts(res.data.subcategories);
       })
-      .catch(() => { });
+      .catch(() => {});
 
-    axios.get(`https://mazedakhale.in/api/userdashboard/status-count/${userId}`)
-      .then(res => {
-        setStatusData(res.data.map(item => ({
-          status: item.status,
-          count: +item.count
-        })));
+    axios
+      .get(`https://mazedakhale.in/api/userdashboard/status-count/${userId}`)
+      .then((res) => {
+        setStatusData(
+          res.data.map((item) => ({
+            status: item.status,
+            count: +item.count,
+          }))
+        );
       })
-      .catch(() => { });
+      .catch(() => {});
 
-    axios.get("https://mazedakhale.in/api/notifications/active")
-      .then(res => setNotifications(res.data))
-      .catch(() => { });
+    axios
+      .get("https://mazedakhale.in/api/notifications/active")
+      .then((res) => setNotifications(res.data))
+      .catch(() => {});
 
     fetchCategories();
     fetchSubcategories();
@@ -101,21 +127,21 @@ const CustomerDashboard = () => {
     try {
       const { data } = await axios.get(API_BASE_URL);
       setCategories(data);
-    } catch { }
+    } catch {}
   };
 
   const fetchSubcategories = async () => {
     try {
       const { data } = await axios.get(SUBCATEGORIES_API_URL);
       setSubcategories(data);
-    } catch { }
+    } catch {}
   };
 
   const fetchPrices = async () => {
     try {
       const { data } = await axios.get("https://mazedakhale.in/api/prices");
-      setPrices(data.map(p => ({ ...p, amount: Number(p.amount) })));
-    } catch { }
+      setPrices(data.map((p) => ({ ...p, amount: Number(p.amount) })));
+    } catch {}
   };
 
   const fetchRequiredDocuments = async (catId, subId) => {
@@ -125,17 +151,15 @@ const CustomerDashboard = () => {
       );
       setRequiredDocuments(data);
       const files = {};
-      data.forEach(doc => {
+      data.forEach((doc) => {
         if (doc.file_url) files[doc.id] = doc.file_url;
       });
       setSelectedFiles(files);
       setIsModalOpen(true);
-    } catch { }
+    } catch {}
   };
 
-  const handleSubcategorySelect = (
-    catId, catName, subId, subName, action
-  ) => {
+  const handleSubcategorySelect = (catId, catName, subId, subName, action) => {
     setSelectedCategory({ categoryId: catId, categoryName: catName });
     setSelectedSubcategory({ subcategoryId: subId, subcategoryName: subName });
 
@@ -143,7 +167,7 @@ const CustomerDashboard = () => {
       fetchRequiredDocuments(catId, subId);
     } else {
       navigate("/Clistpage", {
-        state: { catId, catName, subId, subName }
+        state: { catId, catName, subId, subName },
       });
     }
   };
@@ -160,22 +184,27 @@ const CustomerDashboard = () => {
         ...selectedCategory,
         ...selectedSubcategory,
         selectedDocuments: requiredDocuments,
-      }
+      },
     });
   };
 
-  const generateColor = index => `hsl(${(index * 137.508) % 360},70%,50%)`;
+  const generateColor = (index) => `hsl(${(index * 137.508) % 360},70%,50%)`;
 
   return (
     <div className="ml-80 mt-14 p-6 bg-gray-100 min-h-screen">
       {/* Notifications */}
       <div className="mb-6">
-        {notifications.length ? notifications.map((n, i) =>
-          n.customer_notification ? (
-            <marquee key={i} className="text-lg font-semibold text-blue-600 mb-2">
-              📢 {n.customer_notification}
-            </marquee>
-          ) : null
+        {notifications.length ? (
+          notifications.map((n, i) =>
+            n.customer_notification ? (
+              <marquee
+                key={i}
+                className="text-lg font-semibold text-blue-600 mb-2"
+              >
+                📢 {n.customer_notification}
+              </marquee>
+            ) : null
+          )
         ) : (
           <p className="text-gray-500 text-center">No active notifications</p>
         )}
@@ -184,41 +213,50 @@ const CustomerDashboard = () => {
       {/* Top Cards */}
       <motion.div
         className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8"
-        initial={{ opacity: 0, y: -50 }} animate={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0, y: -50 }}
+        animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8 }}
       >
         {[
           {
             icon: <FaClipboardList size={30} />,
-            count: appliedCount, label: "Total Document",
+            count: appliedCount,
+            label: "Total Document",
             color: "bg-[#FE1008]",
-            onClick: () => navigate("/customerapply")
+            onClick: () => navigate("/customerapply"),
           },
           {
             icon: <FaCheckCircle size={30} />,
-            count: completedCount, label: "Total Completed",
+            count: completedCount,
+            label: "Total Completed",
             color: "bg-[#22C55E]",
-            onClick: () => navigate("/Customerhistory")
+            onClick: () => navigate("/Customerhistory"),
           },
           {
             icon: <FaRupeeSign size={30} />,
-            count: `₹${appliedCount * 150}`, label: "Total Transaction",
-            color: "bg-[#7C00FF]"
+            count: `₹${appliedCount * 150}`,
+            label: "Total Transaction",
+            color: "bg-[#7C00FF]",
           },
           {
             icon: <FaClock size={30} />,
             count: Math.max(appliedCount - completedCount, 0),
-            label: "Pending Application", color: "bg-[#FFC510]",
-            onClick: () => navigate("/Userpendinglist")
-          }
+            label: "Pending Application",
+            color: "bg-[#FFC510]",
+            onClick: () => navigate("/Userpendinglist"),
+          },
         ].map((item, i) => (
           <motion.div
             key={i}
             className={`${item.color} text-white flex items-center rounded-lg shadow-md cursor-pointer`}
-            whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
-            onClick={item.onClick} style={{ width: 250, height: 80 }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={item.onClick}
+            style={{ width: 250, height: 80 }}
           >
-            <div className={`${item.color} flex items-center justify-center w-1/4 h-full`}>
+            <div
+              className={`${item.color} flex items-center justify-center w-1/4 h-full`}
+            >
               {React.cloneElement(item.icon, { className: "text-white" })}
             </div>
             <div className="w-[2px] h-3/4 bg-white opacity-70"></div>
@@ -232,10 +270,15 @@ const CustomerDashboard = () => {
 
       {/* Categories Header */}
       <Card style={{ backgroundColor: "#374151", marginTop: 50 }}>
-        <CardContent style={{
-          backgroundColor: "#f97316", color: "white",
-          fontWeight: 600, display: "flex", alignItems: "center"
-        }}>
+        <CardContent
+          style={{
+            backgroundColor: "#f97316",
+            color: "white",
+            fontWeight: 600,
+            display: "flex",
+            alignItems: "center",
+          }}
+        >
           <span className="mr-2">📂</span>
           Application For Categories and Subcategories
         </CardContent>
@@ -243,10 +286,14 @@ const CustomerDashboard = () => {
 
       {/* Category & Subcategory Cards */}
       <div className="w-full max-w-7xl mx-auto mt-6">
-        {categories.map(cat => {
-          const catCount = categoryCounts.find(c => c.category === cat.category_name);
+        {categories.map((cat) => {
+          const catCount = categoryCounts.find(
+            (c) => c.category === cat.category_name
+          );
           const pendingCat = catCount?.pendingApplications || 0;
-          const children = subcategories.filter(s => s.category.category_id === cat.category_id);
+          const children = subcategories.filter(
+            (s) => s.category.category_id === cat.category_id
+          );
 
           return (
             <div key={cat.category_id} className="mb-8">
@@ -256,11 +303,16 @@ const CustomerDashboard = () => {
                 onClick={() => fetchSubcategories(cat.category_id)}
               >
                 <div className="bg-[#FDEDD3] p-3 flex items-center">
-                  {cat.isPdf ? <FaFilePdf className="text-orange-500" />
-                    : <FaFileAlt className="text-orange-500" />}
+                  {cat.isPdf ? (
+                    <FaFilePdf className="text-orange-500" />
+                  ) : (
+                    <FaFileAlt className="text-orange-500" />
+                  )}
                 </div>
                 <div className="flex-1 bg-gray-100 p-4 hover:bg-orange-200">
-                  <span className="text-lg font-medium">{cat.category_name}</span>
+                  <span className="text-lg font-medium">
+                    {cat.category_name}
+                  </span>
                   <span className="block text-sm text-gray-600">
                     Pending: {pendingCat}
                   </span>
@@ -269,15 +321,19 @@ const CustomerDashboard = () => {
 
               {/* Subcategory Cards */}
               <div className="grid grid-cols-3 gap-4 mt-4">
-                {children.map(sub => {
+                {children.map((sub) => {
                   const subCount = subcategoryCounts.find(
-                    c => c.subcategory === sub.subcategory_name && c.category === cat.category_name
+                    (c) =>
+                      c.subcategory === sub.subcategory_name &&
+                      c.category === cat.category_name
                   );
                   const pendingSub = subCount?.pendingApplications || 0;
 
                   // find price for this cat+sub
                   const priceRec = prices.find(
-                    p => p.category_id === cat.category_id && p.subcategory_id === sub.subcategory_id
+                    (p) =>
+                      p.category_id === cat.category_id &&
+                      p.subcategory_id === sub.subcategory_id
                   );
 
                   return (
@@ -285,34 +341,42 @@ const CustomerDashboard = () => {
                       key={sub.subcategory_id}
                       className="w-64 p-4 bg-[#F58A3B14] border border-orange-400 rounded-lg shadow-md text-center"
                     >
-                      <h3 className="text-lg font-semibold">{sub.subcategory_name}</h3>
+                      <h3 className="text-lg font-semibold">
+                        {sub.subcategory_name}
+                      </h3>
                       <p className="text-sm text-gray-800 mt-1">
-                        Price: {priceRec ? `₹${priceRec.amount.toFixed(2)}` : "N/A"}
+                        Price:{" "}
+                        {priceRec ? `₹${priceRec.amount.toFixed(2)}` : "N/A"}
                       </p>
                       <p className="text-sm text-gray-800 mt-1">
-
-
-
                         Pending: {pendingSub}
                       </p>
                       <div className="flex justify-center gap-3 mt-3">
                         <button
                           className="bg-blue-600 text-white px-4 py-1 rounded-md"
-                          onClick={() => handleSubcategorySelect(
-                            cat.category_id, cat.category_name,
-                            sub.subcategory_id, sub.subcategory_name,
-                            "list"
-                          )}
+                          onClick={() =>
+                            handleSubcategorySelect(
+                              cat.category_id,
+                              cat.category_name,
+                              sub.subcategory_id,
+                              sub.subcategory_name,
+                              "list"
+                            )
+                          }
                         >
                           List
                         </button>
                         <button
                           className="bg-green-600 text-white px-4 py-1 rounded-md"
-                          onClick={() => handleSubcategorySelect(
-                            cat.category_id, cat.category_name,
-                            sub.subcategory_id, sub.subcategory_name,
-                            "apply"
-                          )}
+                          onClick={() =>
+                            handleSubcategorySelect(
+                              cat.category_id,
+                              cat.category_name,
+                              sub.subcategory_id,
+                              sub.subcategory_name,
+                              "apply"
+                            )
+                          }
                         >
                           Apply
                         </button>
@@ -329,7 +393,9 @@ const CustomerDashboard = () => {
       {/* Charts */}
       <div className="flex gap-6 mt-8">
         <div className="w-1/2 bg-white shadow-md p-6 rounded-xl">
-          <h2 className="text-xl font-bold mb-4">Application Status Overview</h2>
+          <h2 className="text-xl font-bold mb-4">
+            Application Status Overview
+          </h2>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={statusData}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -348,11 +414,14 @@ const CustomerDashboard = () => {
             <PieChart width={350} height={300}>
               <Pie
                 data={categoryData}
-                cx="50%" cy="50%"
+                cx="50%"
+                cy="50%"
                 outerRadius={100}
                 dataKey="value"
                 nameKey="name"
-                label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                label={({ name, percent }) =>
+                  `${name} ${(percent * 100).toFixed(0)}%`
+                }
               >
                 {categoryData.map((entry, i) => (
                   <Cell key={i} fill={entry.color} />
@@ -377,9 +446,11 @@ const CustomerDashboard = () => {
             >
               <FaTimes />
             </button>
-            <h2 className="text-xl font-bold mb-4 text-center">Required Documents</h2>
+            <h2 className="text-xl font-bold mb-4 text-center">
+              Required Documents
+            </h2>
             <ul className="mb-4">
-              {requiredDocuments.map(doc => (
+              {requiredDocuments.map((doc) => (
                 <li key={doc.id} className="mb-4">
                   <span className="font-semibold">{doc.document_names}</span>
                   {selectedFiles[doc.id] && (

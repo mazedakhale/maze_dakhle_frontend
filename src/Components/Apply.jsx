@@ -1,16 +1,22 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useLocation } from "react-router-dom";
-import Swal from 'sweetalert2';
+import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
-import { FaFileAlt, FaDownload, FaExclamationTriangle, FaTimes } from "react-icons/fa";
+import {
+  FaFileAlt,
+  FaDownload,
+  FaExclamationTriangle,
+  FaTimes,
+} from "react-icons/fa";
 
 const Apply = () => {
   const [documentNames, setDocumentNames] = useState([]);
   const [selectedFiles, setSelectedFiles] = useState({});
   const [errors, setErrors] = useState({});
   const location = useLocation();
-  const { categoryId, categoryName, subcategoryId, subcategoryName } = location.state || {};
+  const { categoryId, categoryName, subcategoryId, subcategoryName } =
+    location.state || {};
   const [fieldNames, setFieldNames] = useState([]);
   const [isAdding, setIsAdding] = useState(false);
   const navigate = useNavigate();
@@ -30,7 +36,9 @@ const Apply = () => {
         const decodedPayload = JSON.parse(atob(base64));
 
         setUserData({
-          user_id: decodedPayload?.user_id ? String(decodedPayload.user_id) : "",
+          user_id: decodedPayload?.user_id
+            ? String(decodedPayload.user_id)
+            : "",
           name: decodedPayload?.name || "",
           email: decodedPayload?.email || "",
           phone: decodedPayload?.phone || "",
@@ -70,12 +78,18 @@ const Apply = () => {
   useEffect(() => {
     if (formData.category_id && formData.subcategory_id) {
       axios
-        .get(` https://mazedakhale.in/api/required-documents/${formData.category_id}/${formData.subcategory_id}`)
+        .get(
+          ` https://mazedakhale.in/api/required-documents/${formData.category_id}/${formData.subcategory_id}`
+        )
         .then((response) => {
           if (response.data.length > 0 && response.data[0].document_names) {
-            const documentsArray = response.data[0].document_names.split(",").map((doc) => doc.trim());
+            const documentsArray = response.data[0].document_names
+              .split(",")
+              .map((doc) => doc.trim());
             setDocumentNames(documentsArray);
-            setSelectedFiles(documentsArray.reduce((acc, doc) => ({ ...acc, [doc]: null }), {}));
+            setSelectedFiles(
+              documentsArray.reduce((acc, doc) => ({ ...acc, [doc]: null }), {})
+            );
           } else {
             setDocumentNames([]);
           }
@@ -89,14 +103,21 @@ const Apply = () => {
   useEffect(() => {
     if (formData.category_id && formData.subcategory_id) {
       axios
-        .get(` https://mazedakhale.in/api/field-names/${formData.category_id}/${formData.subcategory_id}`)
+        .get(
+          ` https://mazedakhale.in/api/field-names/${formData.category_id}/${formData.subcategory_id}`
+        )
         .then((response) => {
           if (response.data.length > 0 && response.data[0].document_fields) {
-            const fieldsArray = response.data[0].document_fields.split(",").map((field) => field.trim());
+            const fieldsArray = response.data[0].document_fields
+              .split(",")
+              .map((field) => field.trim());
             setFieldNames(fieldsArray);
             setFormData((prev) => ({
               ...prev,
-              document_fields: fieldsArray.reduce((acc, field) => ({ ...acc, [field]: "" }), {}),
+              document_fields: fieldsArray.reduce(
+                (acc, field) => ({ ...acc, [field]: "" }),
+                {}
+              ),
             }));
           } else {
             setFieldNames([]);
@@ -120,7 +141,10 @@ const Apply = () => {
     const file = e.target.files[0];
     if (file) {
       if (file.size > 500 * 1024) {
-        setErrors((prev) => ({ ...prev, [docName]: "File size is more than 500 KB." }));
+        setErrors((prev) => ({
+          ...prev,
+          [docName]: "File size is more than 500 KB.",
+        }));
       } else {
         setErrors((prev) => ({ ...prev, [docName]: "" }));
         setSelectedFiles((prev) => ({ ...prev, [docName]: file }));
@@ -152,7 +176,11 @@ const Apply = () => {
 
     documentNames.forEach((doc) => {
       // Skip validation if the document name is "other" or "others"
-      if (doc.toLowerCase() !== "other" && doc.toLowerCase() !== "others" && !selectedFiles[doc]) {
+      if (
+        doc.toLowerCase() !== "other" &&
+        doc.toLowerCase() !== "others" &&
+        !selectedFiles[doc]
+      ) {
         newErrors[doc] = `${doc} file is required.`;
       }
     });
@@ -165,32 +193,35 @@ const Apply = () => {
 
     if (!validateForm()) {
       Swal.fire({
-        icon: 'error',
-        title: 'Form Incomplete',
-        text: 'Please fill in all required fields.',
+        icon: "error",
+        title: "Form Incomplete",
+        text: "Please fill in all required fields.",
       });
       return;
     }
 
     Swal.fire({
-      title: 'Processing...',
-      text: 'Please wait while your application is being submitted.',
+      title: "Processing...",
+      text: "Please wait while your application is being submitted.",
       allowOutsideClick: false,
       didOpen: () => {
         Swal.showLoading();
-      }
+      },
     });
 
     // Create an ordered array of field objects
-    const orderedDocumentFields = fieldNames.map(fieldName => ({
+    const orderedDocumentFields = fieldNames.map((fieldName) => ({
       field_name: fieldName,
-      field_value: formData.document_fields[fieldName] || ""
+      field_value: formData.document_fields[fieldName] || "",
     }));
 
     const formDataToSend = new FormData();
 
     // Add the ordered document fields
-    formDataToSend.append('document_fields', JSON.stringify(orderedDocumentFields));
+    formDataToSend.append(
+      "document_fields",
+      JSON.stringify(orderedDocumentFields)
+    );
 
     // Add other form data
     Object.entries(formData).forEach(([key, value]) => {
@@ -217,15 +248,14 @@ const Apply = () => {
       );
 
       Swal.fire({
-        icon: 'success',
-        title: 'Success!',
-        text: 'Your application has been submitted successfully!',
-      }).then(() => window.location.href = '/customerapply');
-
+        icon: "success",
+        title: "Success!",
+        text: "Your application has been submitted successfully!",
+      }).then(() => (window.location.href = "/customerapply"));
     } catch (error) {
       Swal.fire({
-        icon: 'error',
-        title: 'Submission Failed',
+        icon: "error",
+        title: "Submission Failed",
         text: error.response?.data?.message || error.message,
       });
     }
@@ -235,7 +265,6 @@ const Apply = () => {
     <div className="ml-[250px] flex flex-col items-center min-h-screen p-6 bg-gray-100">
       <div className="w-[100%] max-w-6xl bg-white shadow-lg rounded-lg">
         <div className="relative border-t-4 border-orange-400 bg-[#F4F4F4] p-4 rounded-t-lg">
-
           <button
             onClick={() => {
               setIsAdding(false);
@@ -253,7 +282,6 @@ const Apply = () => {
           <h2 className="text-3xl font-bold text-center text-orange-600 mb-3 shadow-md pb-2 rounded-lg">
             Apply for {formData.subcategory_name}
           </h2>
-
 
           <div className="grid grid-cols-3 gap-4 mb-4">
             <div>
@@ -290,10 +318,14 @@ const Apply = () => {
                 onChange={handleChange}
                 value={formData.name || ""}
                 readOnly
-                className={`w-full mt-1 p-2 border ${errors.name ? 'border-red-500' : 'border-gray-300'} rounded-md bg-gray-100 shadow-sm cursor-not-allowed text-sm`}
+                className={`w-full mt-1 p-2 border ${
+                  errors.name ? "border-red-500" : "border-gray-300"
+                } rounded-md bg-gray-100 shadow-sm cursor-not-allowed text-sm`}
                 placeholder="Enter Full Name"
               />
-              {errors.name && <p className="text-red-500 text-xs">{errors.name}</p>}
+              {errors.name && (
+                <p className="text-red-500 text-xs">{errors.name}</p>
+              )}
             </div>
           </div>
 
@@ -308,10 +340,14 @@ const Apply = () => {
                 onChange={handleChange}
                 value={formData.email || ""}
                 readOnly
-                className={`w-full mt-1 p-2 border ${errors.email ? 'border-red-500' : 'border-gray-300'} rounded-md bg-gray-100 shadow-sm cursor-not-allowed text-sm`}
+                className={`w-full mt-1 p-2 border ${
+                  errors.email ? "border-red-500" : "border-gray-300"
+                } rounded-md bg-gray-100 shadow-sm cursor-not-allowed text-sm`}
                 placeholder="Enter Email"
               />
-              {errors.email && <p className="text-red-500 text-xs">{errors.email}</p>}
+              {errors.email && (
+                <p className="text-red-500 text-xs">{errors.email}</p>
+              )}
             </div>
 
             <div>
@@ -324,17 +360,20 @@ const Apply = () => {
                 onChange={handleChange}
                 value={formData.phone || ""}
                 readOnly
-                className={`w-full mt-1 p-2 border ${errors.phone ? 'border-red-500' : 'border-gray-300'} rounded-md bg-gray-100 shadow-sm cursor-not-allowed text-sm`}
+                className={`w-full mt-1 p-2 border ${
+                  errors.phone ? "border-red-500" : "border-gray-300"
+                } rounded-md bg-gray-100 shadow-sm cursor-not-allowed text-sm`}
                 placeholder="Enter Phone Number"
               />
-              {errors.phone && <p className="text-red-500 text-xs">{errors.phone}</p>}
+              {errors.phone && (
+                <p className="text-red-500 text-xs">{errors.phone}</p>
+              )}
             </div>
           </div>
 
-
           <div className="mb-6">
             <label className="block text-orange-700 font-bold text-lg text-center">
-              APPLICANT  INFORMATION <span className="text-red-500">*</span>
+              APPLICANT INFORMATION <span className="text-red-500">*</span>
             </label>
             <div className="grid grid-cols-3 gap-6">
               {fieldNames.map((field, index) => (
@@ -346,34 +385,45 @@ const Apply = () => {
                     type="text"
                     value={formData.document_fields[field] || ""}
                     onChange={(e) => handleFieldChange(e, field)}
-                    className={`w-full p-3 border ${errors[field] ? 'border-red-500' : 'border-gray-300'} rounded-lg shadow-md`}
+                    className={`w-full p-3 border ${
+                      errors[field] ? "border-red-500" : "border-gray-300"
+                    } rounded-lg shadow-md`}
                     placeholder={`Enter ${field}`}
                   />
-                  {errors[field] && <p className="text-red-500 text-sm mt-1">{errors[field]}</p>}
+                  {errors[field] && (
+                    <p className="text-red-500 text-sm mt-1">{errors[field]}</p>
+                  )}
                 </div>
               ))}
             </div>
           </div>
 
           <div className="mb-6">
-            <label className="block text-orange-700 font-bold text-lg text-center">UPLOAD DOCUMENTS <span className="text-red-500">*</span></label>
+            <label className="block text-orange-700 font-bold text-lg text-center">
+              UPLOAD DOCUMENTS <span className="text-red-500">*</span>
+            </label>
             <div className="grid grid-cols-3 gap-6">
               {documentNames.map((docName, index) => (
                 <div key={index} className="mb-2">
                   <label className="block text-gray-700 font-semibold">
                     {docName}
                     {/* Conditionally render the red asterisk */}
-                    {docName.toLowerCase() !== "other" && docName.toLowerCase() !== "others" && (
-                      <span className="text-red-500"> *</span>
-                    )}
+                    {docName.toLowerCase() !== "other" &&
+                      docName.toLowerCase() !== "others" && (
+                        <span className="text-red-500"> *</span>
+                      )}
                   </label>
                   <input
                     type="file"
                     onChange={(e) => handleFileUpload(e, docName)}
-                    className={`w-full mt-2 p-3 border ${errors[docName] ? 'border-red-500' : 'border-gray-300'} rounded-lg bg-gray-100 shadow-md`}
+                    className={`w-full mt-2 p-3 border ${
+                      errors[docName] ? "border-red-500" : "border-gray-300"
+                    } rounded-lg bg-gray-100 shadow-md`}
                     accept=".pdf,.doc,.docx,.png,.jpg,.jpeg"
                   />
-                  {errors[docName] && <p className="text-red-500 text-sm">{errors[docName]}</p>}
+                  {errors[docName] && (
+                    <p className="text-red-500 text-sm">{errors[docName]}</p>
+                  )}
                 </div>
               ))}
             </div>

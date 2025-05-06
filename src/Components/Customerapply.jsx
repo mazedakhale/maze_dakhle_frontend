@@ -6,7 +6,7 @@ import {
   FaDownload,
   FaCheck,
   FaTimes,
-  FaExclamationTriangle
+  FaExclamationTriangle,
 } from "react-icons/fa";
 import jwtDecode from "jwt-decode";
 import { useNavigate } from "react-router-dom";
@@ -37,29 +37,48 @@ const CustomerApply = () => {
   useEffect(() => {
     if (!userId) return;
 
-    const allowedStatuses = ["Received", "Pending", "Approved", "Rejected", "Uploaded"];
-    axios.get("https://mazedakhale.in/api/documents/list")
-      .then(response => {
+    const allowedStatuses = [
+      "Received",
+      "Pending",
+      "Approved",
+      "Rejected",
+      "Uploaded",
+    ];
+    axios
+      .get("https://mazedakhale.in/api/documents/list")
+      .then((response) => {
         const allDocs = response.data.documents;
         const filtered = allDocs
-          .filter(doc => doc.user_id === userId && allowedStatuses.includes(doc.status))
+          .filter(
+            (doc) =>
+              doc.user_id === userId && allowedStatuses.includes(doc.status)
+          )
           .reverse();
         setDocuments(filtered);
       })
-      .catch(err => console.error("Error fetching documents:", err));
+      .catch((err) => console.error("Error fetching documents:", err));
 
-    axios.get("https://mazedakhale.in/api/certificates")
-      .then(res => setCertificates(res.data))
-      .catch(err => console.error("Error fetching certificates:", err));
+    axios
+      .get("https://mazedakhale.in/api/certificates")
+      .then((res) => setCertificates(res.data))
+      .catch((err) => console.error("Error fetching certificates:", err));
   }, [userId]);
 
   // Helpers & handlers (unchanged)
-  const filteredDocuments = documents.filter(doc => {
+  const filteredDocuments = documents.filter((doc) => {
     const searchString = [
-      doc.user_id, doc.document_id, doc.category_name,
-      doc.subcategory_name, doc.name, doc.email,
-      doc.phone, doc.address, doc.application_id
-    ].join(" ").toLowerCase();
+      doc.user_id,
+      doc.document_id,
+      doc.category_name,
+      doc.subcategory_name,
+      doc.name,
+      doc.email,
+      doc.phone,
+      doc.address,
+      doc.application_id,
+    ]
+      .join(" ")
+      .toLowerCase();
     const matchesSearch = searchString.includes(searchQuery.toLowerCase());
     const matchesStatus = statusFilter
       ? doc.status.toLowerCase() === statusFilter.toLowerCase()
@@ -67,14 +86,18 @@ const CustomerApply = () => {
     return matchesSearch && matchesStatus;
   });
 
-  const getCertificateByDocumentId = id =>
-    certificates.find(c => c.document_id === id);
+  const getCertificateByDocumentId = (id) =>
+    certificates.find((c) => c.document_id === id);
 
   const handleView = (documentId, categoryId, subcategoryId) =>
-    navigate(`/Customerview/${documentId}`, { state: { categoryId, subcategoryId } });
+    navigate(`/Customerview/${documentId}`, {
+      state: { categoryId, subcategoryId },
+    });
 
   const handleViewInvoice = (documentId, categoryId, subcategoryId) =>
-    navigate(`/Customerinvoice/${documentId}`, { state: { categoryId, subcategoryId } });
+    navigate(`/Customerinvoice/${documentId}`, {
+      state: { categoryId, subcategoryId },
+    });
 
   const handleDownloadReceipt = (receiptUrl, documentName) => {
     try {
@@ -88,11 +111,15 @@ const CustomerApply = () => {
       document.body.removeChild(link);
     } catch (error) {
       console.error("Error downloading receipt:", error);
-      Swal.fire("Error", "Failed to download receipt. Please try again.", "error");
+      Swal.fire(
+        "Error",
+        "Failed to download receipt. Please try again.",
+        "error"
+      );
     }
   };
 
-  const handleViewCertificate = async documentId => {
+  const handleViewCertificate = async (documentId) => {
     const cert = getCertificateByDocumentId(documentId);
     if (!cert) {
       Swal.fire("Error", "Certificate not found.", "error");
@@ -111,7 +138,7 @@ const CustomerApply = () => {
   };
 
   // NEW: navigate to receipt-error page
-  const handleReportReceiptError = doc =>
+  const handleReportReceiptError = (doc) =>
     navigate("/Adderrorrequest", {
       state: {
         documentId: doc.document_id,
@@ -122,7 +149,7 @@ const CustomerApply = () => {
         subcategoryId: doc.subcategory_id,
         name: doc.name,
         email: doc.email,
-      }
+      },
     });
 
   return (
@@ -146,18 +173,22 @@ const CustomerApply = () => {
             type="text"
             placeholder="Search..."
             value={searchQuery}
-            onChange={e => setSearchQuery(e.target.value)}
+            onChange={(e) => setSearchQuery(e.target.value)}
             className="border p-2 rounded-md focus:outline-none focus:ring w-64 text-sm"
           />
           <select
             value={statusFilter}
-            onChange={e => setStatusFilter(e.target.value)}
+            onChange={(e) => setStatusFilter(e.target.value)}
             className="border p-2 rounded-md focus:outline-none focus:ring text-sm"
           >
             <option value="">All Status</option>
-            {["Received", "Pending", "Approved", "Rejected", "Uploaded"].map(s => (
-              <option key={s} value={s}>{s}</option>
-            ))}
+            {["Received", "Pending", "Approved", "Rejected", "Uploaded"].map(
+              (s) => (
+                <option key={s} value={s}>
+                  {s}
+                </option>
+              )
+            )}
           </select>
         </div>
 
@@ -167,12 +198,23 @@ const CustomerApply = () => {
             <thead className="bg-[#F58A3B14]">
               <tr>
                 {[
-                  "Sr.No", "Application ID", "Applicant Name", "Datetime",
-                  "Category", "Subcategory", "VLE Name", "VLE Email", "VLE Phone no",
-                  "Action", "View", "Documents", "Verification",
-                  "Download Receipt", "Certificate",
-                  "Report Receipt Error"  // ← new header
-                ].map(hdr => (
+                  "Sr.No",
+                  "Application ID",
+                  "Applicant Name",
+                  "Datetime",
+                  "Category",
+                  "Subcategory",
+                  "VLE Name",
+                  "VLE Email",
+                  "VLE Phone no",
+                  "Action",
+                  "View",
+                  "Documents",
+                  "Verification",
+                  "Download Receipt",
+                  "Certificate",
+                  "Report Receipt Error", // ← new header
+                ].map((hdr) => (
                   <th
                     key={hdr}
                     className="px-4 py-3 border text-center font-semibold"
@@ -191,27 +233,39 @@ const CustomerApply = () => {
                   >
                     {/* existing columns unchanged... */}
                     <td className="border px-4 py-3 text-center">{idx + 1}</td>
-                    <td className="border px-4 py-3 text-center">{doc.application_id}</td>
+                    <td className="border px-4 py-3 text-center">
+                      {doc.application_id}
+                    </td>
                     <td className="border px-4 py-2">
                       {Array.isArray(doc.document_fields)
-                        ? doc.document_fields.find(f => f.field_name === "APPLICANT NAME")
-                          ?.field_value || "-"
+                        ? doc.document_fields.find(
+                            (f) => f.field_name === "APPLICANT NAME"
+                          )?.field_value || "-"
                         : doc.document_fields["APPLICANT NAME"] || "-"}
                     </td>
                     <td className="border px-4 py-2 text-center">
                       {new Date(doc.uploaded_at).toLocaleString()}
                     </td>
-                    <td className="border px-4 py-3 text-center">{doc.category_name}</td>
-                    <td className="border px-4 py-3 text-center">{doc.subcategory_name}</td>
+                    <td className="border px-4 py-3 text-center">
+                      {doc.category_name}
+                    </td>
+                    <td className="border px-4 py-3 text-center">
+                      {doc.subcategory_name}
+                    </td>
                     <td className="border px-4 py-3 text-center">{doc.name}</td>
-                    <td className="border px-4 py-3 text-center">{doc.email}</td>
-                    <td className="border px-4 py-3 text-center">{doc.phone}</td>
+                    <td className="border px-4 py-3 text-center">
+                      {doc.email}
+                    </td>
+                    <td className="border px-4 py-3 text-center">
+                      {doc.phone}
+                    </td>
                     <td className="border px-4 py-2 text-center">
                       <button
                         onClick={() => handleViewInvoice(doc.document_id)}
                         className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
                       >
-                        <FaFileInvoice className="inline-block mr-1" />Action
+                        <FaFileInvoice className="inline-block mr-1" />
+                        Action
                       </button>
                     </td>
                     <td className="border px-4 py-2 text-center">
@@ -219,13 +273,19 @@ const CustomerApply = () => {
                         onClick={() => handleView(doc.document_id)}
                         className="bg-indigo-500 text-white px-3 py-1 rounded hover:bg-indigo-600"
                       >
-                        <FaFileInvoice className="inline-block mr-1" />View
+                        <FaFileInvoice className="inline-block mr-1" />
+                        View
                       </button>
                     </td>
                     <td className="border px-4 py-3 text-center">
                       <div className="flex justify-center gap-2">
                         {doc.documents?.map((f, i) => (
-                          <a key={i} href={f.file_path} target="_blank" rel="noreferrer">
+                          <a
+                            key={i}
+                            href={f.file_path}
+                            target="_blank"
+                            rel="noreferrer"
+                          >
                             <FaFileAlt className="text-blue-500 text-xl" />
                           </a>
                         ))}
@@ -234,33 +294,44 @@ const CustomerApply = () => {
                     <td className="border px-4 py-3 text-center">
                       <div className="flex flex-col items-center gap-1">
                         <span
-                          className={`px-3 py-1 rounded-full text-white text-xs ${doc.status === "Approved" ? "bg-green-500" :
-                            doc.status === "Rejected" ? "bg-red-500" : "bg-yellow-500"
-                            }`}
+                          className={`px-3 py-1 rounded-full text-white text-xs ${
+                            doc.status === "Approved"
+                              ? "bg-green-500"
+                              : doc.status === "Rejected"
+                              ? "bg-red-500"
+                              : "bg-yellow-500"
+                          }`}
                         >
                           {doc.status}
                         </span>
                       </div>
                     </td>
                     <td className="border px-4 py-3 text-center">
-                      {(doc.status === "Received" || doc.status === "Uploaded") && doc.receipt_url ? (
+                      {(doc.status === "Received" ||
+                        doc.status === "Uploaded") &&
+                      doc.receipt_url ? (
                         <button
-                          onClick={() => handleDownloadReceipt(doc.receipt_url, doc.name)}
+                          onClick={() =>
+                            handleDownloadReceipt(doc.receipt_url, doc.name)
+                          }
                           className="bg-orange-500 text-white px-3 py-1 rounded hover:bg-orange-600"
                         >
-                          <FaDownload className="inline-block mr-1" />Receipt
+                          <FaDownload className="inline-block mr-1" />
+                          Receipt
                         </button>
                       ) : (
                         <span className="text-gray-500">Not Available</span>
                       )}
                     </td>
                     <td className="border px-4 py-3 text-center">
-                      {doc.status === "Completed" && getCertificateByDocumentId(doc.document_id) ? (
+                      {doc.status === "Completed" &&
+                      getCertificateByDocumentId(doc.document_id) ? (
                         <button
                           onClick={() => handleViewCertificate(doc.document_id)}
                           className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
                         >
-                          <FaCheck className="inline-block mr-1" />Certificate
+                          <FaCheck className="inline-block mr-1" />
+                          Certificate
                         </button>
                       ) : (
                         <span className="text-gray-500">Not Available</span>
@@ -285,7 +356,10 @@ const CustomerApply = () => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={16} className="px-4 py-4 text-center text-gray-500">
+                  <td
+                    colSpan={16}
+                    className="px-4 py-4 text-center text-gray-500"
+                  >
                     No documents found.
                   </td>
                 </tr>

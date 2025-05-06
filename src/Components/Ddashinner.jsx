@@ -1,33 +1,40 @@
-import React, { useEffect, useState, useMemo } from 'react';
-import { Card, CardContent, Grid, Typography } from '@mui/material';
-import { Bar } from 'react-chartjs-2';
-import { Chart as ChartJS, BarElement, CategoryScale, LinearScale, Tooltip, Legend } from 'chart.js';
-import jwtDecode from 'jwt-decode';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import InsertChartIcon from '@mui/icons-material/InsertChart';
-import PeopleIcon from '@mui/icons-material/People';
-import VerifiedUserIcon from '@mui/icons-material/VerifiedUser';
+import React, { useEffect, useState, useMemo } from "react";
+import { Card, CardContent, Grid, Typography } from "@mui/material";
+import { Bar } from "react-chartjs-2";
+import {
+  Chart as ChartJS,
+  BarElement,
+  CategoryScale,
+  LinearScale,
+  Tooltip,
+  Legend,
+} from "chart.js";
+import jwtDecode from "jwt-decode";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import InsertChartIcon from "@mui/icons-material/InsertChart";
+import PeopleIcon from "@mui/icons-material/People";
+import VerifiedUserIcon from "@mui/icons-material/VerifiedUser";
 
 ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 
 // Base URL for API calls
-const BASE_URL = 'https://mazedakhale.in/api';
+const BASE_URL = "https://mazedakhale.in/api";
 
 // Configure axios for faster responses
 axios.defaults.timeout = 5000; // 5 second timeout
 const api = axios.create({
   baseURL: BASE_URL,
   headers: {
-    'Cache-Control': 'no-cache',
-    Pragma: 'no-cache',
-    Expires: '0',
+    "Cache-Control": "no-cache",
+    Pragma: "no-cache",
+    Expires: "0",
   },
 });
 
 // Default notification
 const DEFAULT_NOTIFICATION =
-  'Welcome to the Distributor Management Portal! Manage your distributors, verify documents, and track requests seamlessly!';
+  "Welcome to the Distributor Management Portal! Manage your distributors, verify documents, and track requests seamlessly!";
 
 const Ddashinner = () => {
   const [counts, setCounts] = useState({
@@ -49,12 +56,15 @@ const Ddashinner = () => {
   useEffect(() => {
     try {
       // Load cached data immediately
-      const cachedCategories = localStorage.getItem('distributorCategories');
-      const cachedSubcategories = localStorage.getItem('distributorSubcategories');
-      const cachedDashboard = localStorage.getItem('distributorDashboardData');
+      const cachedCategories = localStorage.getItem("distributorCategories");
+      const cachedSubcategories = localStorage.getItem(
+        "distributorSubcategories"
+      );
+      const cachedDashboard = localStorage.getItem("distributorDashboardData");
 
       if (cachedCategories) setCategories(JSON.parse(cachedCategories));
-      if (cachedSubcategories) setSubcategories(JSON.parse(cachedSubcategories));
+      if (cachedSubcategories)
+        setSubcategories(JSON.parse(cachedSubcategories));
 
       if (cachedDashboard) {
         const dashData = JSON.parse(cachedDashboard);
@@ -64,17 +74,17 @@ const Ddashinner = () => {
         setNotifications(dashData.notifications || []);
       }
     } catch (e) {
-      console.error('Error loading cached data:', e);
+      console.error("Error loading cached data:", e);
     }
 
     // Get distributor ID from token
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     if (token) {
       try {
         const decodedToken = jwtDecode(token);
         setDistributorId(decodedToken.user_id);
       } catch (error) {
-        console.error('Error decoding token:', error);
+        console.error("Error decoding token:", error);
       }
     }
   }, []);
@@ -86,10 +96,13 @@ const Ddashinner = () => {
       .get(`/categories`)
       .then((response) => {
         setCategories(response.data);
-        localStorage.setItem('distributorCategories', JSON.stringify(response.data));
+        localStorage.setItem(
+          "distributorCategories",
+          JSON.stringify(response.data)
+        );
       })
       .catch((error) => {
-        console.error('Error fetching categories:', error);
+        console.error("Error fetching categories:", error);
       });
 
     // Fetch subcategories (no dependencies, fetch immediately)
@@ -109,10 +122,13 @@ const Ddashinner = () => {
         });
 
         setSubcategories(subsByCategory);
-        localStorage.setItem('distributorSubcategories', JSON.stringify(subsByCategory));
+        localStorage.setItem(
+          "distributorSubcategories",
+          JSON.stringify(subsByCategory)
+        );
       })
       .catch((error) => {
-        console.error('Error fetching subcategories:', error);
+        console.error("Error fetching subcategories:", error);
       });
 
     // Fetch notifications (no dependencies, fetch immediately)
@@ -120,12 +136,14 @@ const Ddashinner = () => {
       .get(`/notifications/active`)
       .then((response) => {
         const distributorNotifications = response.data.filter(
-          (notif) => notif.distributor_notification && notif.notification_status === 'Active'
+          (notif) =>
+            notif.distributor_notification &&
+            notif.notification_status === "Active"
         );
         setNotifications(distributorNotifications);
       })
       .catch((error) => {
-        console.error('Error fetching notifications:', error);
+        console.error("Error fetching notifications:", error);
       });
   }, []);
 
@@ -156,7 +174,7 @@ const Ddashinner = () => {
         setSubcategoryCounts(subCounts);
       })
       .catch((error) => {
-        console.error('Error fetching pending counts:', error);
+        console.error("Error fetching pending counts:", error);
       });
 
     // Fetch counts
@@ -172,10 +190,13 @@ const Ddashinner = () => {
           subcategoryCounts: subcategoryCounts,
           notifications: notifications,
         };
-        localStorage.setItem('distributorDashboardData', JSON.stringify(cacheData));
+        localStorage.setItem(
+          "distributorDashboardData",
+          JSON.stringify(cacheData)
+        );
       })
       .catch((error) => {
-        console.error('Error fetching distributor counts:', error);
+        console.error("Error fetching distributor counts:", error);
       });
   }, [distributorId, categoryCounts, subcategoryCounts, notifications]);
 
@@ -189,7 +210,7 @@ const Ddashinner = () => {
     if (!selectedCategory) return;
 
     const { categoryId, categoryName } = selectedCategory;
-    navigate('/DlistPage', {
+    navigate("/DlistPage", {
       state: { categoryId, categoryName, subcategoryId, subcategoryName },
     });
   };
@@ -204,19 +225,25 @@ const Ddashinner = () => {
     };
 
     statusCounts.forEach((item) => {
-      if (item.status === 'Completed') statusData.Uploaded += parseInt(item.count);
-      if (item.status === 'Pending') statusData.Pending += parseInt(item.count);
-      if (item.status === 'Rejected') statusData.Rejected += parseInt(item.count);
+      if (item.status === "Completed")
+        statusData.Uploaded += parseInt(item.count);
+      if (item.status === "Pending") statusData.Pending += parseInt(item.count);
+      if (item.status === "Rejected")
+        statusData.Rejected += parseInt(item.count);
     });
 
     return {
-      labels: ['Uploaded', 'Rejected', 'Pending'],
+      labels: ["Uploaded", "Rejected", "Pending"],
       datasets: [
         {
-          label: 'Status Counts',
-          data: [statusData.Uploaded || 0, statusData.Rejected || 0, statusData.Pending || 0],
-          backgroundColor: ['green', 'red', 'orange'],
-          borderColor: ['darkgreen', 'darkred', 'darkorange'],
+          label: "Status Counts",
+          data: [
+            statusData.Uploaded || 0,
+            statusData.Rejected || 0,
+            statusData.Pending || 0,
+          ],
+          backgroundColor: ["green", "red", "orange"],
+          borderColor: ["darkgreen", "darkred", "darkorange"],
           borderWidth: 1,
         },
       ],
@@ -239,16 +266,20 @@ const Ddashinner = () => {
         {/* Notification Marquee - Always visible */}
         <div
           style={{
-            backgroundColor: '#FFFF99',
-            padding: '10px',
-            borderRadius: '6px',
-            marginBottom: '50px',
-            boxShadow: '0px 4px 8px rgba(0,0,0,0.1)',
+            backgroundColor: "#FFFF99",
+            padding: "10px",
+            borderRadius: "6px",
+            marginBottom: "50px",
+            boxShadow: "0px 4px 8px rgba(0,0,0,0.1)",
           }}
         >
-          <marquee style={{ color: '#FF0000', fontWeight: 'bold', fontSize: '16px' }}>
+          <marquee
+            style={{ color: "#FF0000", fontWeight: "bold", fontSize: "16px" }}
+          >
             {notifications.length > 0
-              ? notifications.map((notif, index) => `📢 ${notif.distributor_notification} `)
+              ? notifications.map(
+                  (notif, index) => `📢 ${notif.distributor_notification} `
+                )
               : DEFAULT_NOTIFICATION}
           </marquee>
         </div>
@@ -258,28 +289,36 @@ const Ddashinner = () => {
           <Grid item xs={12} sm={4} md={4}>
             <Card
               style={{
-                display: 'flex',
-                alignItems: 'center',
-                backgroundColor: '#e74c3c',
-                color: 'white',
-                padding: '10px',
-                borderRadius: '8px',
-                boxShadow: '0px 4px 8px rgba(0,0,0,0.1)',
+                display: "flex",
+                alignItems: "center",
+                backgroundColor: "#e74c3c",
+                color: "white",
+                padding: "10px",
+                borderRadius: "8px",
+                boxShadow: "0px 4px 8px rgba(0,0,0,0.1)",
               }}
             >
-              <InsertChartIcon style={{ fontSize: '40px', marginRight: '90px' }} />
+              <InsertChartIcon
+                style={{ fontSize: "40px", marginRight: "90px" }}
+              />
               <div
                 style={{
                   flexGrow: 1,
-                  marginLeft: '-75px',
-                  borderLeft: '2px solid white',
-                  paddingLeft: '10px',
+                  marginLeft: "-75px",
+                  borderLeft: "2px solid white",
+                  paddingLeft: "10px",
                 }}
               >
-                <Typography variant="h6" style={{ fontSize: '16px', fontWeight: 'bold' }}>
+                <Typography
+                  variant="h6"
+                  style={{ fontSize: "16px", fontWeight: "bold" }}
+                >
                   Total Documents
                 </Typography>
-                <Typography variant="h4" style={{ textAlign: 'right', fontWeight: 'bold' }}>
+                <Typography
+                  variant="h4"
+                  style={{ textAlign: "right", fontWeight: "bold" }}
+                >
                   {counts.totalDocuments || 0}
                 </Typography>
               </div>
@@ -289,28 +328,34 @@ const Ddashinner = () => {
           <Grid item xs={12} sm={4} md={4}>
             <Card
               style={{
-                display: 'flex',
-                alignItems: 'center',
-                backgroundColor: '#3498db',
-                color: 'white',
-                padding: '10px',
-                borderRadius: '8px',
-                boxShadow: '0px 4px 8px rgba(0,0,0,0.1)',
+                display: "flex",
+                alignItems: "center",
+                backgroundColor: "#3498db",
+                color: "white",
+                padding: "10px",
+                borderRadius: "8px",
+                boxShadow: "0px 4px 8px rgba(0,0,0,0.1)",
               }}
             >
-              <PeopleIcon style={{ fontSize: '40px', marginRight: '105px' }} />
+              <PeopleIcon style={{ fontSize: "40px", marginRight: "105px" }} />
               <div
                 style={{
                   flexGrow: 1,
-                  marginLeft: '-90px',
-                  borderLeft: '2px solid white',
-                  paddingLeft: '10px',
+                  marginLeft: "-90px",
+                  borderLeft: "2px solid white",
+                  paddingLeft: "10px",
                 }}
               >
-                <Typography variant="h6" style={{ fontSize: '16px', fontWeight: 'bold' }}>
+                <Typography
+                  variant="h6"
+                  style={{ fontSize: "16px", fontWeight: "bold" }}
+                >
                   Total Users
                 </Typography>
-                <Typography variant="h4" style={{ textAlign: 'right', fontWeight: 'bold' }}>
+                <Typography
+                  variant="h4"
+                  style={{ textAlign: "right", fontWeight: "bold" }}
+                >
                   {counts.totalUsers || 0}
                 </Typography>
               </div>
@@ -320,28 +365,36 @@ const Ddashinner = () => {
           <Grid item xs={12} sm={4} md={4}>
             <Card
               style={{
-                display: 'flex',
-                alignItems: 'center',
-                backgroundColor: '#f1c40f',
-                color: 'white',
-                padding: '10px',
-                borderRadius: '8px',
-                boxShadow: '0px 4px 8px rgba(0,0,0,0.1)',
+                display: "flex",
+                alignItems: "center",
+                backgroundColor: "#f1c40f",
+                color: "white",
+                padding: "10px",
+                borderRadius: "8px",
+                boxShadow: "0px 4px 8px rgba(0,0,0,0.1)",
               }}
             >
-              <VerifiedUserIcon style={{ fontSize: '40px', marginRight: '75px' }} />
+              <VerifiedUserIcon
+                style={{ fontSize: "40px", marginRight: "75px" }}
+              />
               <div
                 style={{
                   flexGrow: 1,
-                  marginLeft: '-60px',
-                  borderLeft: '2px solid white',
-                  paddingLeft: '10px',
+                  marginLeft: "-60px",
+                  borderLeft: "2px solid white",
+                  paddingLeft: "10px",
                 }}
               >
-                <Typography variant="h6" style={{ fontSize: '16px', fontWeight: 'bold' }}>
+                <Typography
+                  variant="h6"
+                  style={{ fontSize: "16px", fontWeight: "bold" }}
+                >
                   Total Certified Users
                 </Typography>
-                <Typography variant="h4" style={{ textAlign: 'right', fontWeight: 'bold' }}>
+                <Typography
+                  variant="h4"
+                  style={{ textAlign: "right", fontWeight: "bold" }}
+                >
                   {counts.totalCompletedCertifiedUsers || 0}
                 </Typography>
               </div>
@@ -350,30 +403,37 @@ const Ddashinner = () => {
         </Grid>
 
         {/* Application Section Header - Static */}
-        <Card style={{ backgroundColor: '#374151', padding: '1px', marginTop: '50px' }}>
+        <Card
+          style={{
+            backgroundColor: "#374151",
+            padding: "1px",
+            marginTop: "50px",
+          }}
+        >
           <CardContent
             style={{
-              backgroundColor: '#f97316',
-              color: 'white',
-              fontSize: '16px',
-              fontWeight: '600',
-              padding: '5px',
-              display: 'flex',
-              alignItems: 'left',
-              marginRight: '675px',
+              backgroundColor: "#f97316",
+              color: "white",
+              fontSize: "16px",
+              fontWeight: "600",
+              padding: "5px",
+              display: "flex",
+              alignItems: "left",
+              marginRight: "675px",
             }}
           >
-            <span style={{ marginRight: '15px' }}>📂</span> Application For Categories and Subcategories
+            <span style={{ marginRight: "15px" }}>📂</span> Application For
+            Categories and Subcategories
           </CardContent>
           <div
             style={{
-              width: '12px',
-              height: '12px',
-              backgroundColor: '#f97316',
-              margin: 'auto',
-              transform: 'rotate(45deg)',
-              marginTop: '-6px',
-              marginLeft: '200px',
+              width: "12px",
+              height: "12px",
+              backgroundColor: "#f97316",
+              margin: "auto",
+              transform: "rotate(45deg)",
+              marginTop: "-6px",
+              marginLeft: "200px",
             }}
           ></div>
         </Card>
@@ -382,54 +442,71 @@ const Ddashinner = () => {
         <div className="grid grid-cols-3 gap-6 w-full max-w-7xl mx-auto mt-6">
           {!selectedCategory
             ? categories.map((category) => (
-              <div
-                key={category.category_id}
-                className="flex w-full rounded-lg shadow-[0px_2px_4px_rgba(0,0,0,0.4)] cursor-pointer transition-all duration-300 overflow-hidden"
-                onClick={() => handleCategorySelect(category.category_id, category.category_name)}
-              >
-                {/* Icon Section */}
-                <div className="bg-[#FDEDD3] p-3 flex items-center justify-center border-r border-gray-300">
-                  <span className="text-orange-600 font-bold">PDF</span>
-                </div>
+                <div
+                  key={category.category_id}
+                  className="flex w-full rounded-lg shadow-[0px_2px_4px_rgba(0,0,0,0.4)] cursor-pointer transition-all duration-300 overflow-hidden"
+                  onClick={() =>
+                    handleCategorySelect(
+                      category.category_id,
+                      category.category_name
+                    )
+                  }
+                >
+                  {/* Icon Section */}
+                  <div className="bg-[#FDEDD3] p-3 flex items-center justify-center border-r border-gray-300">
+                    <span className="text-orange-600 font-bold">PDF</span>
+                  </div>
 
-                {/* Category Name Section */}
-                <div className="flex-1 bg-gray-100 hover:bg-orange-200 p-4 flex justify-between items-center">
-                  <h3 className="text-lg md:text-xl text-black">{category.category_name}</h3>
-                  <h3 className="text-lg md:text-2xl text-gray-700">
-                    {getCategoryCount(category.category_name)}
-                  </h3>
+                  {/* Category Name Section */}
+                  <div className="flex-1 bg-gray-100 hover:bg-orange-200 p-4 flex justify-between items-center">
+                    <h3 className="text-lg md:text-xl text-black">
+                      {category.category_name}
+                    </h3>
+                    <h3 className="text-lg md:text-2xl text-gray-700">
+                      {getCategoryCount(category.category_name)}
+                    </h3>
+                  </div>
                 </div>
-              </div>
-            ))
-            : (subcategories[selectedCategory.categoryId] || []).map((subcategory) => (
-              <div
-                key={subcategory.subcategory_id}
-                className="flex w-full rounded-lg shadow-[0px_2px_4px_rgba(0,0,0,0.4)] cursor-pointer transition-all duration-300 overflow-hidden"
-                onClick={() =>
-                  handleSubcategorySelect(subcategory.subcategory_id, subcategory.subcategory_name)
-                }
-              >
-                {/* Icon Section */}
-                <div className="bg-[#FDEDD3] p-3 flex items-center justify-center border-r border-gray-300">
-                  <span className="text-orange-600 font-bold">PDF</span>
-                </div>
+              ))
+            : (subcategories[selectedCategory.categoryId] || []).map(
+                (subcategory) => (
+                  <div
+                    key={subcategory.subcategory_id}
+                    className="flex w-full rounded-lg shadow-[0px_2px_4px_rgba(0,0,0,0.4)] cursor-pointer transition-all duration-300 overflow-hidden"
+                    onClick={() =>
+                      handleSubcategorySelect(
+                        subcategory.subcategory_id,
+                        subcategory.subcategory_name
+                      )
+                    }
+                  >
+                    {/* Icon Section */}
+                    <div className="bg-[#FDEDD3] p-3 flex items-center justify-center border-r border-gray-300">
+                      <span className="text-orange-600 font-bold">PDF</span>
+                    </div>
 
-                {/* Subcategory Name Section */}
-                <div className="flex-1 bg-gray-100 hover:bg-orange-200 p-4 flex justify-between items-center">
-                  <h3 className="text-lg md:text-xl text-black">{subcategory.subcategory_name}</h3>
-                  <h3 className="text-lg md:text-2xl text-gray-700">
-                    {getSubcategoryCount(subcategory.subcategory_name)}
-                  </h3>
-                </div>
-              </div>
-            ))}
+                    {/* Subcategory Name Section */}
+                    <div className="flex-1 bg-gray-100 hover:bg-orange-200 p-4 flex justify-between items-center">
+                      <h3 className="text-lg md:text-xl text-black">
+                        {subcategory.subcategory_name}
+                      </h3>
+                      <h3 className="text-lg md:text-2xl text-gray-700">
+                        {getSubcategoryCount(subcategory.subcategory_name)}
+                      </h3>
+                    </div>
+                  </div>
+                )
+              )}
         </div>
 
         {/* Chart Section - Always visible with static structure */}
         <div className="mt-10">
           <h2 className="text-xl font-bold mb-4">Document Status</h2>
-          <div style={{ height: '300px' }}>
-            <Bar data={barChartData} options={{ responsive: true, maintainAspectRatio: false }} />
+          <div style={{ height: "300px" }}>
+            <Bar
+              data={barChartData}
+              options={{ responsive: true, maintainAspectRatio: false }}
+            />
           </div>
         </div>
       </div>

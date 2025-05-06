@@ -38,14 +38,14 @@ const DlistPage = () => {
     if (categoryId) {
       axios
         .get(`https://mazedakhale.in/api/categories/${categoryId}`)
-        .then(res => setCategoryName(res.data.category_name))
-        .catch(err => console.error("Error loading category:", err));
+        .then((res) => setCategoryName(res.data.category_name))
+        .catch((err) => console.error("Error loading category:", err));
     }
     if (subcategoryId) {
       axios
         .get(`https://mazedakhale.in/api/subcategories/${subcategoryId}`)
-        .then(res => setSubcategoryName(res.data.subcategory_name))
-        .catch(err => console.error("Error loading subcategory:", err));
+        .then((res) => setSubcategoryName(res.data.subcategory_name))
+        .catch((err) => console.error("Error loading subcategory:", err));
     }
   }, [categoryId, subcategoryId]);
 
@@ -56,35 +56,35 @@ const DlistPage = () => {
     const url = `https://mazedakhale.in/api/documents/${categoryId}/${subcategoryId}?distributorId=${distributorId}`;
     axios
       .get(url)
-      .then(resp => {
-        const sorted = resp.data.sort((a, b) =>
-          new Date(b.uploaded_at) - new Date(a.uploaded_at)
+      .then((resp) => {
+        const sorted = resp.data.sort(
+          (a, b) => new Date(b.uploaded_at) - new Date(a.uploaded_at)
         );
         setDocuments(sorted);
       })
-      .catch(err => console.error("Error fetching documents:", err));
+      .catch((err) => console.error("Error fetching documents:", err));
 
     axios
       .get("https://mazedakhale.in/api/certificates")
-      .then(resp => setCertificates(resp.data))
-      .catch(err => console.error("Error fetching certificates:", err));
+      .then((resp) => setCertificates(resp.data))
+      .catch((err) => console.error("Error fetching certificates:", err));
   }, [categoryId, subcategoryId, distributorId]);
 
   // Helpers
-  const getCertificateByDocumentId = id =>
-    certificates.find(c => c.document_id === id);
+  const getCertificateByDocumentId = (id) =>
+    certificates.find((c) => c.document_id === id);
 
-  const handleSearch = e => setSearchQuery(e.target.value);
-  const handleStatusFilterChange = e => setStatusFilter(e.target.value);
+  const handleSearch = (e) => setSearchQuery(e.target.value);
+  const handleStatusFilterChange = (e) => setStatusFilter(e.target.value);
 
   const filteredDocuments = documents
-    .filter(doc =>
+    .filter((doc) =>
       Object.values(doc)
         .join(" ")
         .toLowerCase()
         .includes(searchQuery.toLowerCase())
     )
-    .filter(doc =>
+    .filter((doc) =>
       statusFilter === "All" ? true : doc.status === statusFilter
     );
 
@@ -117,8 +117,8 @@ const DlistPage = () => {
     }
   };
 
-  const handleViewInvoice = id => navigate(`/Distributorinvoice/${id}`);
-  const handleView = id => navigate(`/Distributorview/${id}`);
+  const handleViewInvoice = (id) => navigate(`/Distributorinvoice/${id}`);
+  const handleView = (id) => navigate(`/Distributorview/${id}`);
 
   return (
     <div className="ml-[250px] flex flex-col items-center min-h-screen p-6 bg-gray-100">
@@ -126,8 +126,7 @@ const DlistPage = () => {
         {/* Header */}
         <div className="relative border-t-4 border-orange-400 bg-[#F4F4F4] p-4">
           <h2 className="text-2xl font-bold text-gray-800 text-center">
-            Documents for:
-            {" "}
+            Documents for:{" "}
             <span className="text-orange-600">{categoryName}</span>
             {" → "}
             <span className="text-orange-600">{subcategoryName}</span>
@@ -154,8 +153,18 @@ const DlistPage = () => {
             onChange={handleStatusFilterChange}
             className="p-2 border rounded focus:ring-2 focus:ring-orange-300"
           >
-            {["All", "Approved", "Uploaded", "Pending", "Rejected", "Received", "Sent"].map(status => (
-              <option key={status} value={status}>{status}</option>
+            {[
+              "All",
+              "Approved",
+              "Uploaded",
+              "Pending",
+              "Rejected",
+              "Received",
+              "Sent",
+            ].map((status) => (
+              <option key={status} value={status}>
+                {status}
+              </option>
             ))}
           </select>
         </div>
@@ -191,27 +200,42 @@ const DlistPage = () => {
                 filteredDocuments.map((doc, idx) => (
                   <tr
                     key={doc.document_id}
-                    className={`${idx % 2 === 0 ? "bg-white" : "bg-[#F58A3B14]"
-                      } hover:bg-orange-100`}
+                    className={`${
+                      idx % 2 === 0 ? "bg-white" : "bg-[#F58A3B14]"
+                    } hover:bg-orange-100`}
                   >
-                    <td className="px-4 py-2 border text-center">{doc.application_id}</td>
-                    <td className="px-4 py-2 border text-center">{categoryName}</td>
-                    <td className="px-4 py-2 border text-center">{subcategoryName}</td>
-                    <td className="px-4 py-2 border text-center">{doc.status}</td>
+                    <td className="px-4 py-2 border text-center">
+                      {doc.application_id}
+                    </td>
+                    <td className="px-4 py-2 border text-center">
+                      {categoryName}
+                    </td>
+                    <td className="px-4 py-2 border text-center">
+                      {subcategoryName}
+                    </td>
+                    <td className="px-4 py-2 border text-center">
+                      {doc.status}
+                    </td>
                     <td className="border p-2 text-center">
                       {(() => {
                         const date = new Date(doc.uploaded_at);
-                        const formattedDate = `${String(date.getDate()).padStart(2, '0')}-${String(date.getMonth() + 1).padStart(2, '0')}-${date.getFullYear()}`;
-                        const formattedTime = date.toLocaleTimeString('en-US', {
-                          hour: '2-digit',
-                          minute: '2-digit',
-                          second: '2-digit',
+                        const formattedDate = `${String(
+                          date.getDate()
+                        ).padStart(2, "0")}-${String(
+                          date.getMonth() + 1
+                        ).padStart(2, "0")}-${date.getFullYear()}`;
+                        const formattedTime = date.toLocaleTimeString("en-US", {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                          second: "2-digit",
                           hour12: true,
                         });
                         return (
                           <>
                             <div>{formattedDate}</div>
-                            <div className="text-sm text-gray-600">{formattedTime}</div>
+                            <div className="text-sm text-gray-600">
+                              {formattedTime}
+                            </div>
                           </>
                         );
                       })()}
@@ -236,7 +260,9 @@ const DlistPage = () => {
                     <td className="px-4 py-2 border text-center">
                       {doc.receipt_url ? (
                         <button
-                          onClick={() => handleDownloadReceipt(doc.receipt_url, doc.name)}
+                          onClick={() =>
+                            handleDownloadReceipt(doc.receipt_url, doc.name)
+                          }
                           className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 flex items-center justify-center"
                         >
                           <FaDownload className="mr-1" /> Receipt
@@ -263,7 +289,10 @@ const DlistPage = () => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="10" className="px-4 py-6 border text-center text-gray-500">
+                  <td
+                    colSpan="10"
+                    className="px-4 py-6 border text-center text-gray-500"
+                  >
                     No documents found.
                   </td>
                 </tr>

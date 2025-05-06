@@ -18,7 +18,8 @@ const VerifyDocuments = () => {
     if (token) {
       try {
         const decodedToken = jwtDecode(token);
-        const userId = decodedToken.user_id || decodedToken.id || decodedToken.user;
+        const userId =
+          decodedToken.user_id || decodedToken.id || decodedToken.user;
         if (userId) {
           setDistributorId(userId);
           fetchDocuments(userId);
@@ -44,7 +45,10 @@ const VerifyDocuments = () => {
       // Filter documents and sort by `uploaded_at` in descending order
       const filteredDocuments = response.data.documents
         .filter(
-          (doc) => doc.status === "Uploaded" || doc.status === "Completed" || doc.status === "Distributor Rejected"
+          (doc) =>
+            doc.status === "Uploaded" ||
+            doc.status === "Completed" ||
+            doc.status === "Distributor Rejected"
         )
         .sort((a, b) => new Date(b.uploaded_at) - new Date(a.uploaded_at)); // Sort by most recent
 
@@ -58,7 +62,9 @@ const VerifyDocuments = () => {
   const fetchCertificates = async () => {
     try {
       console.log("Fetching certificates...");
-      const response = await axios.get("https://mazedakhale.in/api/certificates"); // Adjust URL if needed
+      const response = await axios.get(
+        "https://mazedakhale.in/api/certificates"
+      ); // Adjust URL if needed
       console.log("Certificates API Response:", response.data);
       setCertificates(response.data);
     } catch (error) {
@@ -83,8 +89,12 @@ const VerifyDocuments = () => {
     const newTab = window.open("", "_blank");
 
     try {
-      console.log(`Fetching certificate for Certificate ID: ${certificate.certificate_id}`);
-      const response = await axios.get(`https://mazedakhale.in/api/certificates/${certificate.certificate_id}`);
+      console.log(
+        `Fetching certificate for Certificate ID: ${certificate.certificate_id}`
+      );
+      const response = await axios.get(
+        `https://mazedakhale.in/api/certificates/${certificate.certificate_id}`
+      );
       console.log("View Certificate API Response:", response.data);
 
       if (response.data && response.data.file_url) {
@@ -101,17 +111,21 @@ const VerifyDocuments = () => {
   };
 
   const handleViewInvoice = (documentId, categoryId, subcategoryId) => {
-    navigate(`/Distributorinvoice/${documentId}`, { state: { categoryId, subcategoryId } });
+    navigate(`/Distributorinvoice/${documentId}`, {
+      state: { categoryId, subcategoryId },
+    });
   };
 
   const handleView = (documentId, categoryId, subcategoryId) => {
-    navigate(`/Distributorview/${documentId}`, { state: { categoryId, subcategoryId } });
+    navigate(`/Distributorview/${documentId}`, {
+      state: { categoryId, subcategoryId },
+    });
   };
 
   const handleDownloadReceipt = (receiptUrl, documentName) => {
     try {
       // Extract the file extension from the URL (e.g., "pdf", "jpg", "png")
-      const fileExtension = receiptUrl.split('.').pop().toLowerCase();
+      const fileExtension = receiptUrl.split(".").pop().toLowerCase();
 
       // Generate the file name (e.g., "MyDocument_receipt.pdf")
       const fileName = `${documentName}_receipt.${fileExtension}`;
@@ -126,7 +140,11 @@ const VerifyDocuments = () => {
       document.body.removeChild(link); // Clean up by removing the link
     } catch (error) {
       console.error("Error downloading receipt:", error);
-      Swal.fire("Error", "Failed to download receipt. Please try again.", "error");
+      Swal.fire(
+        "Error",
+        "Failed to download receipt. Please try again.",
+        "error"
+      );
     }
   };
 
@@ -158,7 +176,7 @@ const VerifyDocuments = () => {
       <div className="w-[90%] max-w-6xl bg-white shadow-lg rounded-lg">
         <div className="relative border-t-4 border-orange-400 bg-[#F4F4F4] p-4 rounded-t-lg">
           <h2 className="text-2xl font-bold text-gray-800 text-center">
-            Manage Completed  Applications
+            Manage Completed Applications
           </h2>
           <button
             onClick={() => {
@@ -185,7 +203,6 @@ const VerifyDocuments = () => {
                   "View",
                   " Receipt",
                   "Certificate",
-
                 ].map((header, index) => (
                   <th
                     key={index}
@@ -200,26 +217,39 @@ const VerifyDocuments = () => {
               {documents.map((doc, index) => (
                 <tr
                   key={doc.document_id}
-                  className={`border border-gray-300 ${index % 2 === 0 ? "bg-white" : "bg-[#F58A3B14]"
-                    }`}
+                  className={`border border-gray-300 ${
+                    index % 2 === 0 ? "bg-white" : "bg-[#F58A3B14]"
+                  }`}
                 >
-                  <td className="border p-3 text-center">{doc.application_id}</td>
+                  <td className="border p-3 text-center">
+                    {doc.application_id}
+                  </td>
                   <td className="px-4 py-2 border text-sm">
                     {doc?.document_fields ? (
                       Array.isArray(doc.document_fields) ? (
                         // New format (array of objects)
-                        doc.document_fields.find(field => field.field_name === "APPLICANT NAME") ? (
-                          <p>{doc.document_fields.find(field => field.field_name === "APPLICANT NAME").field_value}</p>
+                        doc.document_fields.find(
+                          (field) => field.field_name === "APPLICANT NAME"
+                        ) ? (
+                          <p>
+                            {
+                              doc.document_fields.find(
+                                (field) => field.field_name === "APPLICANT NAME"
+                              ).field_value
+                            }
+                          </p>
                         ) : (
-                          <p className="text-gray-500">No applicant name available</p>
+                          <p className="text-gray-500">
+                            No applicant name available
+                          </p>
                         )
+                      ) : // Old format (object with key-value pairs)
+                      doc.document_fields["APPLICANT NAME"] ? (
+                        <p>{doc.document_fields["APPLICANT NAME"]}</p>
                       ) : (
-                        // Old format (object with key-value pairs)
-                        doc.document_fields["APPLICANT NAME"] ? (
-                          <p>{doc.document_fields["APPLICANT NAME"]}</p>
-                        ) : (
-                          <p className="text-gray-500">No applicant name available</p>
-                        )
+                        <p className="text-gray-500">
+                          No applicant name available
+                        </p>
                       )
                     ) : (
                       <p className="text-gray-500">No fields available</p>
@@ -228,55 +258,74 @@ const VerifyDocuments = () => {
                   <td className="border p-2 text-center">
                     {(() => {
                       const date = new Date(doc.uploaded_at);
-                      const formattedDate = `${String(date.getDate()).padStart(2, '0')}-${String(date.getMonth() + 1).padStart(2, '0')}-${date.getFullYear()}`;
-                      const formattedTime = date.toLocaleTimeString('en-US', {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        second: '2-digit',
+                      const formattedDate = `${String(date.getDate()).padStart(
+                        2,
+                        "0"
+                      )}-${String(date.getMonth() + 1).padStart(
+                        2,
+                        "0"
+                      )}-${date.getFullYear()}`;
+                      const formattedTime = date.toLocaleTimeString("en-US", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        second: "2-digit",
                         hour12: true,
                       });
                       return (
                         <>
                           <div>{formattedDate}</div>
-                          <div className="text-sm text-gray-600">{formattedTime}</div>
+                          <div className="text-sm text-gray-600">
+                            {formattedTime}
+                          </div>
                         </>
                       );
                     })()}
                   </td>
-                  <td className="border p-3 text-center">{doc.category_name}</td>
-                  <td className="border p-3 text-center">{doc.subcategory_name}</td>
+                  <td className="border p-3 text-center">
+                    {doc.category_name}
+                  </td>
+                  <td className="border p-3 text-center">
+                    {doc.subcategory_name}
+                  </td>
 
                   <td className="border p-2">
                     <div className="flex flex-col gap-1">
                       {/* Status Badge */}
                       <span
-                        className={`px-3 py-1 rounded-full text-white text-xs ${doc.status === "Approved"
-                          ? "bg-green-500"
-                          : doc.status === "Rejected"
+                        className={`px-3 py-1 rounded-full text-white text-xs ${
+                          doc.status === "Approved"
+                            ? "bg-green-500"
+                            : doc.status === "Rejected"
                             ? "bg-red-500"
                             : doc.status === "Completed"
-                              ? "bg-yellow-500" // Color for Completed
-                              : "bg-blue-500" // Default color
-                          }`}
+                            ? "bg-yellow-500" // Color for Completed
+                            : "bg-blue-500" // Default color
+                        }`}
                       >
                         {doc.status}
                       </span>
 
                       {/* Latest Status Date and Time */}
                       {doc.status_history
-                        ?.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at)) // Sort by latest date
+                        ?.sort(
+                          (a, b) =>
+                            new Date(b.updated_at) - new Date(a.updated_at)
+                        ) // Sort by latest date
                         .slice(0, 1) // Take the first entry (latest status)
                         .map((statusEntry, index) => (
                           <div key={index} className="text-xs text-gray-600">
-                            {new Date(statusEntry.updated_at).toLocaleString("en-US", {
-                              year: "numeric",
-                              month: "2-digit",
-                              day: "2-digit",
-                              hour: "2-digit",
-                              minute: "2-digit",
-                              second: "2-digit", // Added seconds
-                              hour12: true, // Use AM/PM
-                            })}
+                            {new Date(statusEntry.updated_at).toLocaleString(
+                              "en-US",
+                              {
+                                year: "numeric",
+                                month: "2-digit",
+                                day: "2-digit",
+                                hour: "2-digit",
+                                minute: "2-digit",
+                                second: "2-digit", // Added seconds
+                                hour12: true, // Use AM/PM
+                              }
+                            )}
                           </div>
                         ))}
                     </div>
@@ -302,18 +351,22 @@ const VerifyDocuments = () => {
                   <td className="border p-3 text-center">
                     {doc.receipt_url ? (
                       <button
-                        onClick={() => handleDownloadReceipt(doc.receipt_url, doc.name)}
+                        onClick={() =>
+                          handleDownloadReceipt(doc.receipt_url, doc.name)
+                        }
                         className="bg-blue-500 text-white px-3 py-1 rounded flex justify-center items-center hover:bg-blue-600 transition"
                       >
                         <FaDownload className="mr-1" /> Download Receipt
                       </button>
                     ) : (
-                      <span className="text-gray-500 text-center">Not Available</span>
+                      <span className="text-gray-500 text-center">
+                        Not Available
+                      </span>
                     )}
                   </td>
                   <td className="border px-4 py-2 text-center">
                     {["Uploaded", "Completed"].includes(doc.status) &&
-                      getCertificateByDocumentId(doc.document_id) ? (
+                    getCertificateByDocumentId(doc.document_id) ? (
                       <button
                         onClick={() => handleViewCertificate(doc.document_id)}
                         className="bg-[#F58A3B] text-white px-3 py-1 rounded hover:bg-green-600 transition"
@@ -324,8 +377,6 @@ const VerifyDocuments = () => {
                       <span className="text-gray-500">No Certificate</span>
                     )}
                   </td>
-
-
                 </tr>
               ))}
             </tbody>

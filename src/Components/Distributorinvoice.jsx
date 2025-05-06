@@ -1,11 +1,11 @@
-import React, { useEffect, useState, useCallback, useRef } from 'react';
-import axios from 'axios';
-import { useParams, useLocation, useNavigate } from 'react-router-dom';
-import jwtDecode from 'jwt-decode';
-import { FaUserCircle, FaDownload, FaTimes, FaFileAlt } from 'react-icons/fa';
-import Draggable from 'react-draggable';
-import Swal from 'sweetalert2';
-import logo1 from '../assets/logo.png';
+import React, { useEffect, useState, useCallback, useRef } from "react";
+import axios from "axios";
+import { useParams, useLocation, useNavigate } from "react-router-dom";
+import jwtDecode from "jwt-decode";
+import { FaUserCircle, FaDownload, FaTimes, FaFileAlt } from "react-icons/fa";
+import Draggable from "react-draggable";
+import Swal from "sweetalert2";
+import logo1 from "../assets/logo.png";
 
 const InvoicePage = () => {
   const { documentId } = useParams();
@@ -22,7 +22,7 @@ const InvoicePage = () => {
   const [checkedDocs, setCheckedDocs] = useState({});
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [openContainer, setOpenContainer] = useState(null);
-  const [rejectionReason, setRejectionReason] = useState('');
+  const [rejectionReason, setRejectionReason] = useState("");
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewFile, setPreviewFile] = useState(null);
   const [selectedReceiptFile, setSelectedReceiptFile] = useState(null);
@@ -30,13 +30,14 @@ const InvoicePage = () => {
   const [showPreview, setShowPreview] = useState(false);
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [userEmail, setUserEmail] = useState('');
+  const [userEmail, setUserEmail] = useState("");
 
   // pull category/subcategory from location.state if present
-  const { categoryId: stateCategoryId, subcategoryId: stateSubcategoryId } = location.state || {};
+  const { categoryId: stateCategoryId, subcategoryId: stateSubcategoryId } =
+    location.state || {};
 
   // --- Handlers for selecting & previewing files ---
-  const handleFileChange = e => {
+  const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
       setSelectedFile(file);
@@ -50,7 +51,7 @@ const InvoicePage = () => {
     setPreviewFile(null);
     setShowPreview(false);
   };
-  const handleReceiptFileChange = e => {
+  const handleReceiptFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
       setSelectedReceiptFile(file);
@@ -68,107 +69,123 @@ const InvoicePage = () => {
   // --- Upload receipt ---
   const handleUploadReceipt = async () => {
     if (!selectedReceiptFile) {
-      Swal.fire('Warning', 'Please select a receipt file first', 'warning');
+      Swal.fire("Warning", "Please select a receipt file first", "warning");
       return;
     }
-    const allowed = ['image/jpeg', 'image/png', 'application/pdf'];
+    const allowed = ["image/jpeg", "image/png", "application/pdf"];
     if (!allowed.includes(selectedReceiptFile.type)) {
-      Swal.fire('Error', 'Only JPEG, PNG, and PDF allowed', 'error');
+      Swal.fire("Error", "Only JPEG, PNG, and PDF allowed", "error");
       return;
     }
     if (selectedReceiptFile.size > 5 * 1024 * 1024) {
-      Swal.fire('Error', 'Max size is 5MB', 'error');
+      Swal.fire("Error", "Max size is 5MB", "error");
       return;
     }
 
     Swal.fire({
-      title: 'Uploading receipt...',
+      title: "Uploading receipt...",
       allowOutsideClick: false,
-      didOpen: () => Swal.showLoading()
+      didOpen: () => Swal.showLoading(),
     });
 
     const form = new FormData();
-    form.append('receipt', selectedReceiptFile);
-    form.append('document_id', documentId);
+    form.append("receipt", selectedReceiptFile);
+    form.append("document_id", documentId);
 
     try {
       await axios.post(
         `https://mazedakhale.in/api/documents/upload-receipt/${documentId}`,
         form,
-        { headers: { 'Content-Type': 'multipart/form-data' }, timeout: 30000 }
+        { headers: { "Content-Type": "multipart/form-data" }, timeout: 30000 }
       );
       await axios.put(
         `https://mazedakhale.in/api/documents/update-status/${documentId}`,
-        { status: 'Sent' },
+        { status: "Sent" },
         { timeout: 30000 }
       );
       Swal.close();
-      Swal.fire('Success', 'Receipt uploaded!', 'success')
-        .then(() => navigate('/Distributorverify'));
+      Swal.fire("Success", "Receipt uploaded!", "success").then(() =>
+        navigate("/Distributorverify")
+      );
       handleCancelReceiptFile();
     } catch (err) {
       Swal.close();
-      Swal.fire('Error', 'Failed to upload receipt. Please try again.', 'error');
+      Swal.fire(
+        "Error",
+        "Failed to upload receipt. Please try again.",
+        "error"
+      );
       console.error(err);
     }
   };
   const formatDateTime = (iso) => {
     const d = new Date(iso);
-    const dd = String(d.getDate()).padStart(2, '0');
-    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, "0");
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
     const yyyy = d.getFullYear();
-    const hh = String(d.getHours()).padStart(2, '0');
-    const min = String(d.getMinutes()).padStart(2, '0');
-    const ss = String(d.getSeconds()).padStart(2, '0');
+    const hh = String(d.getHours()).padStart(2, "0");
+    const min = String(d.getMinutes()).padStart(2, "0");
+    const ss = String(d.getSeconds()).padStart(2, "0");
     return `${dd}-${mm}-${yyyy} ${hh}:${min}:${ss}`;
   };
   // --- Upload certificate ---
   const handleUploadCertificate = async () => {
     if (!selectedFile) {
-      Swal.fire('Warning', 'Please select a file first', 'warning');
+      Swal.fire("Warning", "Please select a file first", "warning");
       return;
     }
-    if (!documentData?.user_id || !documentData.distributor_id || !documentData.application_id || !documentData.name) {
-      Swal.fire('Error', 'Required document info missing', 'error');
+    if (
+      !documentData?.user_id ||
+      !documentData.distributor_id ||
+      !documentData.application_id ||
+      !documentData.name
+    ) {
+      Swal.fire("Error", "Required document info missing", "error");
       return;
     }
 
     Swal.fire({
-      title: 'Uploading certificate...',
+      title: "Uploading certificate...",
       allowOutsideClick: false,
-      didOpen: () => Swal.showLoading()
+      didOpen: () => Swal.showLoading(),
     });
     const form = new FormData();
-    form.append('file', selectedFile);
-    form.append('document_id', documentId);
-    form.append('user_id', documentData.user_id);
-    form.append('distributor_id', documentData.distributor_id);
-    form.append('application_id', documentData.application_id);
-    form.append('name', documentData.name);
+    form.append("file", selectedFile);
+    form.append("document_id", documentId);
+    form.append("user_id", documentData.user_id);
+    form.append("distributor_id", documentData.distributor_id);
+    form.append("application_id", documentData.application_id);
+    form.append("name", documentData.name);
 
     try {
       // 1️⃣ Upload the cert file
-      await axios.post(
-        'https://mazedakhale.in/api/certificates/upload',
-        form,
-        { headers: { 'Content-Type': 'multipart/form-data' }, timeout: 30000 }
-      );
+      await axios.post("https://mazedakhale.in/api/certificates/upload", form, {
+        headers: { "Content-Type": "multipart/form-data" },
+        timeout: 30000,
+      });
 
       // 2️⃣ THEN update the document status
       await axios.put(
         `https://mazedakhale.in/api/documents/update-status/${documentId}`,
-        { status: 'Uploaded' },
+        { status: "Uploaded" },
         { timeout: 30000 }
       );
 
       Swal.close();
-      Swal.fire('Success', 'Certificate uploaded & status set to “Uploaded”!', 'success')
-        .then(() => navigate('/Distributorverify'));
+      Swal.fire(
+        "Success",
+        "Certificate uploaded & status set to “Uploaded”!",
+        "success"
+      ).then(() => navigate("/Distributorverify"));
 
       handleCancelFile();
     } catch (err) {
       Swal.close();
-      Swal.fire('Error', err.response?.data?.message || 'Failed to upload certificate', 'error');
+      Swal.fire(
+        "Error",
+        err.response?.data?.message || "Failed to upload certificate",
+        "error"
+      );
       console.error(err);
     }
   };
@@ -177,49 +194,51 @@ const InvoicePage = () => {
   const handleDownloadAllDocuments = async () => {
     setIsLoading(true);
     Swal.fire({
-      title: 'Preparing download...',
+      title: "Preparing download...",
       toast: true,
-      position: 'top-end',
+      position: "top-end",
       showConfirmButton: false,
-      didOpen: () => Swal.showLoading()
+      didOpen: () => Swal.showLoading(),
     });
 
     try {
       const response = await axios.get(
         `https://mazedakhale.in/api/download/all/${documentId}`,
         {
-          responseType: 'blob',
+          responseType: "blob",
           timeout: 120000,
-          onDownloadProgress: e => {
+          onDownloadProgress: (e) => {
             if (e.total) {
               const pct = Math.round((e.loaded * 100) / e.total);
               Swal.update({ text: `${pct}% complete` });
             }
-          }
+          },
         }
       );
       // close loading
       Swal.close();
 
       // determine filename
-      let filename = '';
-      const cd = response.headers['content-disposition'];
+      let filename = "";
+      const cd = response.headers["content-disposition"];
       if (cd) {
         const m = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/.exec(cd);
-        if (m && m[1]) filename = m[1].replace(/['"]/g, '');
+        if (m && m[1]) filename = m[1].replace(/['"]/g, "");
       }
       if (!filename) {
         const fld = Array.isArray(documentData.document_fields)
-          ? documentData.document_fields.find(f => f.field_name === 'APPLICANT NAME')
+          ? documentData.document_fields.find(
+              (f) => f.field_name === "APPLICANT NAME"
+            )
           : null;
         filename = fld?.field_value
-          ? `${fld.field_value.replace(/\s+/g, '_')}.zip`
+          ? `${fld.field_value.replace(/\s+/g, "_")}.zip`
           : `Document_${documentId}.zip`;
       }
 
       // trigger download
       const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement('a');
+      const link = document.createElement("a");
       link.href = url;
       link.download = filename;
       document.body.appendChild(link);
@@ -227,18 +246,18 @@ const InvoicePage = () => {
       link.remove();
       URL.revokeObjectURL(url);
 
-      Swal.fire('Success', 'Documents downloaded successfully!', 'success');
+      Swal.fire("Success", "Documents downloaded successfully!", "success");
     } catch (error) {
       Swal.close();
-      let msg = 'Download failed. Please try again.';
-      if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
-        msg = 'Download timed out. Please try later.';
+      let msg = "Download failed. Please try again.";
+      if (error.code === "ECONNABORTED" || error.message.includes("timeout")) {
+        msg = "Download timed out. Please try later.";
       } else if (error.response?.status === 404) {
-        msg = 'No files found for download.';
+        msg = "No files found for download.";
       } else if (error.response?.data?.message) {
         msg = error.response.data.message;
       }
-      Swal.fire('Error', msg, 'error');
+      Swal.fire("Error", msg, "error");
       console.error(error);
     } finally {
       setIsLoading(false);
@@ -246,15 +265,15 @@ const InvoicePage = () => {
   };
 
   // --- Status update handler ---
-  const handleUpdateStatus = async newStatus => {
-    if (newStatus === 'Rejected' && !rejectionReason.trim()) {
-      return alert('Please enter a reason for rejection.');
+  const handleUpdateStatus = async (newStatus) => {
+    if (newStatus === "Rejected" && !rejectionReason.trim()) {
+      return alert("Please enter a reason for rejection.");
     }
     setIsUpdatingStatus(true);
     Swal.fire({
-      title: 'Updating status...',
+      title: "Updating status...",
       allowOutsideClick: false,
-      didOpen: () => Swal.showLoading()
+      didOpen: () => Swal.showLoading(),
     });
 
     try {
@@ -263,7 +282,7 @@ const InvoicePage = () => {
         rejectionReason,
         selectedDocumentNames: documentData.documents
           .filter((_, i) => checkedDocs[i])
-          .map(doc => documentNames[doc.document_type] || doc.document_type)
+          .map((doc) => documentNames[doc.document_type] || doc.document_type),
       };
       await axios.put(
         `https://mazedakhale.in/api/documents/update-status/${documentId}`,
@@ -271,11 +290,16 @@ const InvoicePage = () => {
         { timeout: 30000 }
       );
       Swal.close();
-      Swal.fire('Success', 'Status updated!', 'success')
-        .then(() => navigate('/Distributorverify'));
+      Swal.fire("Success", "Status updated!", "success").then(() =>
+        navigate("/Distributorverify")
+      );
     } catch (err) {
       Swal.close();
-      Swal.fire('Error', err.response?.data?.message || 'Failed to update status', 'error');
+      Swal.fire(
+        "Error",
+        err.response?.data?.message || "Failed to update status",
+        "error"
+      );
       console.error(err);
     } finally {
       setIsUpdatingStatus(false);
@@ -285,10 +309,12 @@ const InvoicePage = () => {
   // --- Fetchers & effects ---
   const fetchCertificates = useCallback(async () => {
     try {
-      const res = await axios.get('https://mazedakhale.in/api/certificates', { timeout: 30000 });
+      const res = await axios.get("https://mazedakhale.in/api/certificates", {
+        timeout: 30000,
+      });
       setCertificates(res.data);
     } catch (err) {
-      console.error('Error fetching certificates:', err);
+      console.error("Error fetching certificates:", err);
     }
   }, []);
 
@@ -309,20 +335,21 @@ const InvoicePage = () => {
         setDocumentNames(fn.data);
       }
     } catch (err) {
-      console.error('Error fetching document data:', err);
+      console.error("Error fetching document data:", err);
     }
   }, [documentId, stateCategoryId, stateSubcategoryId]);
 
   useEffect(() => {
     // get user email from JWT
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     if (token) {
       try {
         setUserEmail(jwtDecode(token).email);
-      } catch { }
+      } catch {}
     }
-    axios.get('https://mazedakhale.in/api/users/distributors')
-      .then(r => setDistributors(r.data))
+    axios
+      .get("https://mazedakhale.in/api/users/distributors")
+      .then((r) => setDistributors(r.data))
       .catch(console.error);
 
     fetchCertificates();
@@ -342,11 +369,7 @@ const InvoicePage = () => {
           <span className="text-xl font-bold">Vendor Management System</span>
         </div>
         <div className="relative border-t-4 border-orange-400 bg-[#F4F4F4] p-4 rounded-t-lg">
-
-
-
           {/* Replace this block: */}
-
 
           {/* Cross button */}
           <button
@@ -359,8 +382,6 @@ const InvoicePage = () => {
             <FaTimes size={20} />
           </button>
         </div>
-
-
       </nav>
 
       <div className="flex space-x-6 mt-24">
@@ -369,7 +390,11 @@ const InvoicePage = () => {
           <div className="border rounded-lg shadow-lg p-6 bg-white">
             {/* Header with logo + title + date/app ID */}
             <div className="flex justify-between items-center mb-4">
-              <img src={logo1} alt="Logo" className="w-24 h-24 object-contain" />
+              <img
+                src={logo1}
+                alt="Logo"
+                className="w-24 h-24 object-contain"
+              />
               <h2 className="text-xl font-bold text-gray-800 text-center">
                 Manage Distributor List
               </h2>
@@ -382,7 +407,9 @@ const InvoicePage = () => {
                     </td>
                   </tr>
                   <tr>
-                    <td className="font-semibold pr-2 border-r p-2">Application ID:</td>
+                    <td className="font-semibold pr-2 border-r p-2">
+                      Application ID:
+                    </td>
                     <td className="p-2">{documentData.application_id}</td>
                   </tr>
                 </tbody>
@@ -400,29 +427,42 @@ const InvoicePage = () => {
             <table className="w-full border border-gray-300 mb-6">
               <tbody>
                 {[
-                  { label: 'Application ID', value: documentData.application_id },
-                  { label: 'Category', value: documentData.category_name },
-                  { label: 'Subcategory', value: documentData.subcategory_name },
-                  { label: 'Status', value: documentData.status }
+                  {
+                    label: "Application ID",
+                    value: documentData.application_id,
+                  },
+                  { label: "Category", value: documentData.category_name },
+                  {
+                    label: "Subcategory",
+                    value: documentData.subcategory_name,
+                  },
+                  { label: "Status", value: documentData.status },
                 ]
-                  .reduce((r, f, i, a) => { if (i % 2 === 0) r.push(a.slice(i, i + 2)); return r }, [])
+                  .reduce((r, f, i, a) => {
+                    if (i % 2 === 0) r.push(a.slice(i, i + 2));
+                    return r;
+                  }, [])
                   .map((pair, idx) => (
                     <tr key={idx} className="border-b border-gray-300">
                       {pair.map(({ label, value }, j) => (
                         <React.Fragment key={j}>
-                          <td className="p-3 font-semibold border-r w-1/6" style={{ backgroundColor: '#F58A3B14' }}>
+                          <td
+                            className="p-3 font-semibold border-r w-1/6"
+                            style={{ backgroundColor: "#F58A3B14" }}
+                          >
                             {label}
                           </td>
                           <td className="p-3 border-r">{value}</td>
                         </React.Fragment>
                       ))}
-                      {pair.length < 2 && <>
-                        <td className="p-3 border-r bg-white"></td>
-                        <td className="p-3 border-r"></td>
-                      </>}
+                      {pair.length < 2 && (
+                        <>
+                          <td className="p-3 border-r bg-white"></td>
+                          <td className="p-3 border-r"></td>
+                        </>
+                      )}
                     </tr>
-                  ))
-                }
+                  ))}
               </tbody>
             </table>
 
@@ -435,24 +475,37 @@ const InvoicePage = () => {
                 {(() => {
                   let arr = [];
                   if (Array.isArray(documentData.document_fields)) {
-                    arr = documentData.document_fields.map(f => [f.field_name, f.field_value]);
-                  } else if (documentData.document_fields && typeof documentData.document_fields === 'object') {
+                    arr = documentData.document_fields.map((f) => [
+                      f.field_name,
+                      f.field_value,
+                    ]);
+                  } else if (
+                    documentData.document_fields &&
+                    typeof documentData.document_fields === "object"
+                  ) {
                     arr = Object.entries(documentData.document_fields);
                   }
                   return arr
-                    .reduce((r, f, i, a) => { if (i % 2 === 0) r.push(a.slice(i, i + 2)); return r }, [])
+                    .reduce((r, f, i, a) => {
+                      if (i % 2 === 0) r.push(a.slice(i, i + 2));
+                      return r;
+                    }, [])
                     .map((pair, idx) => (
                       <tr key={idx} className="border-b border-gray-300">
                         {pair.map(([k, v], j) => (
                           <React.Fragment key={j}>
-                            <td className="w-1/5 p-3 font-semibold border-r bg-white">{k}</td>
-                            <td className="w-1/3 p-3 border-r">{v || 'N/A'}</td>
+                            <td className="w-1/5 p-3 font-semibold border-r bg-white">
+                              {k}
+                            </td>
+                            <td className="w-1/3 p-3 border-r">{v || "N/A"}</td>
                           </React.Fragment>
                         ))}
-                        {pair.length < 2 && <>
-                          <td className="w-1/5 p-3 bg-white border-r"></td>
-                          <td className="w-1/3 p-3 border-r"></td>
-                        </>}
+                        {pair.length < 2 && (
+                          <>
+                            <td className="w-1/5 p-3 bg-white border-r"></td>
+                            <td className="w-1/3 p-3 border-r"></td>
+                          </>
+                        )}
                       </tr>
                     ));
                 })()}
@@ -492,12 +545,16 @@ const InvoicePage = () => {
                       <input
                         type="checkbox"
                         checked={!!checkedDocs[i]}
-                        onChange={() => setCheckedDocs(c => ({ ...c, [i]: !c[i] }))}
+                        onChange={() =>
+                          setCheckedDocs((c) => ({ ...c, [i]: !c[i] }))
+                        }
                       />
                     </td>
                     <td
                       className="p-2 border border-gray-300 text-blue-600 cursor-pointer hover:underline"
-                      onClick={() => setPreviewFile(doc.file_path) || setShowPreview(true)}
+                      onClick={() =>
+                        setPreviewFile(doc.file_path) || setShowPreview(true)
+                      }
                     >
                       {documentNames[doc.document_type] || doc.document_type}
                     </td>
@@ -510,7 +567,11 @@ const InvoicePage = () => {
           {/* Reject + Download Buttons */}
           <div className="flex space-x-4 mb-6">
             <button
-              onClick={() => setOpenContainer(o => o === 'rejection' ? null : 'rejection')}
+              onClick={() =>
+                setOpenContainer((o) =>
+                  o === "rejection" ? null : "rejection"
+                )
+              }
               disabled={isUpdatingStatus}
               className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 flex items-center"
             >
@@ -522,7 +583,7 @@ const InvoicePage = () => {
               className="bg-green-500 text-white px-4 py-2 rounded hover:bg-purple-600 flex items-center"
             >
               <FaDownload className="mr-2" />
-              {isLoading ? 'Downloading...' : 'Download'}
+              {isLoading ? "Downloading..." : "Download"}
             </button>
           </div>
 
@@ -530,7 +591,9 @@ const InvoicePage = () => {
           <div className="flex space-x-4 mb-6">
             {/* Receipt */}
             <div className="flex-1">
-              <label className="text-sm font-medium text-gray-700">Upload Receipt</label>
+              <label className="text-sm font-medium text-gray-700">
+                Upload Receipt
+              </label>
               <input
                 type="file"
                 accept=".pdf,.jpg,.png"
@@ -554,9 +617,11 @@ const InvoicePage = () => {
               {documentData.receipt_url && (
                 <button
                   onClick={() => {
-                    const ext = documentData.receipt_url.split('.').pop();
-                    const name = `${documentData.name || 'document'}_receipt.${ext}`;
-                    const link = document.createElement('a');
+                    const ext = documentData.receipt_url.split(".").pop();
+                    const name = `${
+                      documentData.name || "document"
+                    }_receipt.${ext}`;
+                    const link = document.createElement("a");
                     link.href = documentData.receipt_url;
                     link.download = name;
                     document.body.appendChild(link);
@@ -572,7 +637,9 @@ const InvoicePage = () => {
 
             {/* Certificate */}
             <div className="flex-1">
-              <label className="text-sm font-medium text-gray-700">Upload Certificate</label>
+              <label className="text-sm font-medium text-gray-700">
+                Upload Certificate
+              </label>
               <input
                 type="file"
                 accept=".pdf,.jpg,.png"
@@ -593,11 +660,15 @@ const InvoicePage = () => {
               >
                 <FaFileAlt className="mr-2" /> Upload Certificate
               </button>
-              {certificates.some(c => String(c.document_id) === String(documentId)) && (
+              {certificates.some(
+                (c) => String(c.document_id) === String(documentId)
+              ) && (
                 <button
                   onClick={() => {
-                    const cert = certificates.find(c => String(c.document_id) === String(documentId));
-                    window.open(cert.file_url, '_blank');
+                    const cert = certificates.find(
+                      (c) => String(c.document_id) === String(documentId)
+                    );
+                    window.open(cert.file_url, "_blank");
                   }}
                   className="bg-[#F58A3B] text-white px-4 py-2 rounded flex items-center mt-2 w-full"
                 >
@@ -614,7 +685,7 @@ const InvoicePage = () => {
             className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 flex items-center"
           >
             <FaDownload className="mr-2" />
-            {isLoading ? 'Downloading...' : 'Download OC'}
+            {isLoading ? "Downloading..." : "Download OC"}
           </button>
 
           {/* Preview Modal */}
@@ -637,25 +708,28 @@ const InvoicePage = () => {
           )} */}
 
           {/* Rejection Reason */}
-          {openContainer === 'rejection' && (
+          {openContainer === "rejection" && (
             <div className="mt-4 space-y-2">
               <textarea
                 className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Enter reason for rejection"
                 value={rejectionReason}
-                onChange={e => setRejectionReason(e.target.value)}
+                onChange={(e) => setRejectionReason(e.target.value)}
                 rows={4}
               />
               <div className="flex justify-end space-x-4">
                 <button
-                  onClick={() => handleUpdateStatus('Rejected')}
+                  onClick={() => handleUpdateStatus("Rejected")}
                   disabled={!rejectionReason.trim()}
                   className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 disabled:bg-red-400"
                 >
                   Send
                 </button>
                 <button
-                  onClick={() => { setOpenContainer(null); setRejectionReason(''); }}
+                  onClick={() => {
+                    setOpenContainer(null);
+                    setRejectionReason("");
+                  }}
                   className="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500"
                 >
                   Cancel
@@ -679,7 +753,9 @@ const InvoicePage = () => {
               >
                 &times;
               </button>
-              <h3 className="text-xl font-medium mb-4 text-center">Document Preview</h3>
+              <h3 className="text-xl font-medium mb-4 text-center">
+                Document Preview
+              </h3>
               <iframe
                 src={previewFile}
                 title="Document Preview"

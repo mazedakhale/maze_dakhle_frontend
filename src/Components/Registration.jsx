@@ -5,7 +5,8 @@ import {
   isValidEmail,
   isValidPhone,
   isValidPassword,
-  validateRegistration
+  isValidName,
+  validateRegistration,
 } from "../utils/formValidators";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import "../index.css";
@@ -24,7 +25,7 @@ const Register = () => {
     aadharCard: null,
     panCard: null,
     agreeToTerms: false,
-    errors: {}
+    errors: {},
   });
 
   const [passwordVisible, setPasswordVisible] = useState(false);
@@ -34,7 +35,7 @@ const Register = () => {
 
   useEffect(() => {
     fetch("https://mazedakhale.in/api/categories")
-      .then(res => res.json())
+      .then((res) => res.json())
       .then(setCategories)
       .catch(console.error);
   }, []);
@@ -43,7 +44,9 @@ const Register = () => {
     const fetchSubcategories = async () => {
       const data = {};
       for (const category of categories) {
-        const res = await fetch(`https://mazedakhale.in/api/subcategories/category/${category.category_id}`);
+        const res = await fetch(
+          `https://mazedakhale.in/api/subcategories/category/${category.category_id}`
+        );
         data[category.category_id] = res.ok ? await res.json() : [];
       }
       setSubcategories(data);
@@ -56,23 +59,26 @@ const Register = () => {
     const newValue = type === "checkbox" ? checked : value;
 
     let error = "";
-    if (name === "email" && value && !isValidEmail(value)) {
+    if (name === "name" && value && !isValidName(value)) {
+      error = "Name must contain only letters and spaces.";
+    } else if (name === "email" && value && !isValidEmail(value)) {
       error = "Please enter a valid email address.";
     } else if (name === "password" && value && !isValidPassword(value)) {
-      error = "Password must include uppercase, lowercase, number, symbol (min 8 chars).";
+      error =
+        "Password must include uppercase, lowercase, number, symbol (min 8 chars).";
     } else if (name === "phone" && value && !isValidPhone(value)) {
-      error = "Phone must be exactly 10 digits.";
+      error = "Phone must be exactly 10 digits and no letters.";
     } else if (name === "agreeToTerms" && !checked) {
       error = "You must agree to the Terms & Conditions.";
     }
 
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       [name]: newValue,
       errors: {
         ...prev.errors,
-        [name]: error
-      }
+        [name]: error,
+      },
     }));
   };
 
@@ -88,13 +94,13 @@ const Register = () => {
       error = "File exceeds 5MB.";
     }
 
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       [field]: file,
       errors: {
         ...prev.errors,
-        [field]: error
-      }
+        [field]: error,
+      },
     }));
   };
 
@@ -104,7 +110,7 @@ const Register = () => {
 
     const errors = {
       ...formData.errors,
-      ...coreErrors
+      ...coreErrors,
     };
 
     if (!formData.aadharCard) {
@@ -120,7 +126,7 @@ const Register = () => {
       isValid = false;
     }
 
-    setFormData(prev => ({ ...prev, errors }));
+    setFormData((prev) => ({ ...prev, errors }));
     return isValid;
   };
 
@@ -144,20 +150,25 @@ const Register = () => {
     e.preventDefault();
 
     if (!validateForm()) {
-      Swal.fire("Validation Error", "Please fix errors before submitting.", "error");
+      Swal.fire(
+        "Validation Error",
+        "Please fix errors before submitting.",
+        "error"
+      );
       return;
     }
 
     Swal.fire({
       title: "Processing...",
       allowOutsideClick: false,
-      didOpen: () => Swal.showLoading()
+      didOpen: () => Swal.showLoading(),
     });
 
     try {
       const dataToSend = new FormData();
       Object.entries(formData).forEach(([k, v]) => {
-        if (["aadharCard", "panCard", "errors", "agreeToTerms"].includes(k)) return;
+        if (["aadharCard", "panCard", "errors", "agreeToTerms"].includes(k))
+          return;
         dataToSend.append(k, v);
       });
       dataToSend.append("files", formData.aadharCard);
@@ -167,14 +178,16 @@ const Register = () => {
 
       const res = await fetch("https://mazedakhale.in/api/users/register", {
         method: "POST",
-        body: dataToSend
+        body: dataToSend,
       });
 
       const data = await res.json();
       Swal.close();
 
       if (res.ok) {
-        Swal.fire("Success", "Registered successfully", "success").then(() => navigate("/login"));
+        Swal.fire("Success", "Registered successfully", "success").then(() =>
+          navigate("/login")
+        );
       } else {
         throw new Error(data.message || "Registration failed");
       }
@@ -184,76 +197,132 @@ const Register = () => {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-cover bg-center"
-      style={{ backgroundImage: "url('https://web.edcrib.com/updates/wp-content/uploads/2024/08/edcrib-blog1-1024x683.jpeg')" }}>
-      <div className="flex w-11/12 h-[100vh] bg-white bg-opacity-90 rounded-lg shadow-xl overflow-hidden gap-8 p-8">
+    <div
+      className="flex justify-center items-center min-h-screen bg-cover bg-center"
+      style={{
+        backgroundImage:
+          "url('https://web.edcrib.com/updates/wp-content/uploads/2024/08/edcrib-blog1-1024x683.jpeg')",
+      }}
+    >
+      <div className="flex w-11/12 min-h-screen bg-white bg-opacity-90 rounded-lg shadow-xl gap-8 p-8 flex-col lg:flex-row">
         <div className="w-2/5 p-8 flex flex-col justify-center bg-white shadow-lg rounded-lg">
-          <h2 className="text-xl text-[#F58A3B] font-bold mb-4 text-center">Register</h2>
+          <h2 className="text-xl text-[#F58A3B] font-bold mb-4 text-center">
+            Register
+          </h2>
           <form onSubmit={handleSubmit} className="space-y-3">
-
             {/* Name */}
-            <label className="block text-xs font-medium text-gray-700 mb-1">Name <span className="text-red-600">*</span></label>
+            <label className="block text-xs font-medium text-gray-700 mb-1">
+              Name <span className="text-red-600">*</span>
+            </label>
             <input
               type="text"
               name="name"
-              className={`w-full p-2 border rounded text-xs ${formData.errors.name ? "border-red-500" : isValidEmail(formData.email) ? "border-green-500" : ""}`}
+              className={`w-full p-2 border rounded text-xs ${
+                formData.errors.name
+                  ? "border-red-500"
+                  : isValidEmail(formData.email)
+                  ? "border-green-500"
+                  : ""
+              }`}
               onChange={handleChange}
               required
             />
-            {formData.errors.name && <p className="text-xs text-red-600">{formData.errors.name}</p>}
+            {formData.errors.name && (
+              <p className="text-xs text-red-600">{formData.errors.name}</p>
+            )}
 
             {/* Email */}
-            <label className="block text-xs font-medium text-gray-700 mb-1">Email <span className="text-red-600">*</span></label>
+            <label className="block text-xs font-medium text-gray-700 mb-1">
+              Email <span className="text-red-600">*</span>
+            </label>
             <input
               type="email"
               name="email"
-              className={`w-full p-2 border rounded text-xs ${formData.errors.email ? "border-red-500" : isValidEmail(formData.email) ? "border-green-500" : ""}`}
+              className={`w-full p-2 border rounded text-xs ${
+                formData.errors.email
+                  ? "border-red-500"
+                  : isValidEmail(formData.email)
+                  ? "border-green-500"
+                  : ""
+              }`}
               onChange={handleChange}
               required
             />
-            {formData.errors.email && <p className="text-xs text-red-600">{formData.errors.email}</p>}
+            {formData.errors.email && (
+              <p className="text-xs text-red-600">{formData.errors.email}</p>
+            )}
 
             {/* Password + Toggle */}
-            <label className="block text-xs font-medium text-gray-700 mb-1">Password <span className="text-red-600">*</span></label>
+            <label className="block text-xs font-medium text-gray-700 mb-1">
+              Password <span className="text-red-600">*</span>
+            </label>
             <div className="relative">
               <input
                 type={passwordVisible ? "text" : "password"}
                 name="password"
-                className={`w-full p-2 border rounded text-xs pr-10 ${formData.errors.password ? "border-red-500" : isValidPassword(formData.password) ? "border-green-500" : ""}`}
+                className={`w-full p-2 border rounded text-xs pr-10 ${
+                  formData.errors.password
+                    ? "border-red-500"
+                    : isValidPassword(formData.password)
+                    ? "border-green-500"
+                    : ""
+                }`}
                 onChange={handleChange}
                 required
               />
-              <button type="button" className="absolute top-2 right-2 text-gray-500" onClick={() => setPasswordVisible(p => !p)}>
+              <button
+                type="button"
+                className="absolute top-2 right-2 text-gray-500"
+                onClick={() => setPasswordVisible((p) => !p)}
+              >
                 {passwordVisible ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
               </button>
             </div>
-            {formData.errors.password && <p className="text-xs text-red-600">{formData.errors.password}</p>}
+            {formData.errors.password && (
+              <p className="text-xs text-red-600">{formData.errors.password}</p>
+            )}
 
             {/* Phone */}
-            <label className="block text-xs font-medium text-gray-700 mb-1">Phone <span className="text-red-600">*</span></label>
+            <label className="block text-xs font-medium text-gray-700 mb-1">
+              Phone <span className="text-red-600">*</span>
+            </label>
             <input
               type="text"
               name="phone"
-              className={`w-full p-2 border rounded text-xs ${formData.errors.phone ? "border-red-500" : isValidPhone(formData.phone) ? "border-green-500" : ""}`}
+              className={`w-full p-2 border rounded text-xs ${
+                formData.errors.phone
+                  ? "border-red-500"
+                  : isValidPhone(formData.phone)
+                  ? "border-green-500"
+                  : ""
+              }`}
               onChange={handleChange}
               required
             />
-            {formData.errors.phone && <p className="text-xs text-red-600">{formData.errors.phone}</p>}
+            {formData.errors.phone && (
+              <p className="text-xs text-red-600">{formData.errors.phone}</p>
+            )}
 
             {/* Address + Shop Address */}
             <div className="flex space-x-4">
               <div className="w-1/2">
-                <label className="block text-xs font-medium text-gray-700 mb-1">Address <span className="text-red-600">*</span></label>
+                <label className="block text-xs font-medium text-gray-700 mb-1">
+                  Address <span className="text-red-600">*</span>
+                </label>
                 <input
                   type="text"
                   name="address"
-                  className={`w-full p-2 border rounded text-xs ${formData.errors.address ? "border-red-500" : ""}`}
+                  className={`w-full p-2 border rounded text-xs ${
+                    formData.errors.address ? "border-red-500" : ""
+                  }`}
                   onChange={handleChange}
                   required
                 />
               </div>
               <div className="w-1/2">
-                <label className="block text-xs font-medium text-gray-700 mb-1">Shop Address</label>
+                <label className="block text-xs font-medium text-gray-700 mb-1">
+                  Shop Address
+                </label>
                 <input
                   type="text"
                   name="shopAddress"
@@ -266,21 +335,29 @@ const Register = () => {
             {/* District + Taluka */}
             <div className="flex space-x-4">
               <div className="w-1/2">
-                <label className="block text-xs font-medium text-gray-700 mb-1">District <span className="text-red-600">*</span></label>
+                <label className="block text-xs font-medium text-gray-700 mb-1">
+                  District <span className="text-red-600">*</span>
+                </label>
                 <input
                   type="text"
                   name="district"
-                  className={`w-full p-2 border rounded text-xs ${formData.errors.district ? "border-red-500" : ""}`}
+                  className={`w-full p-2 border rounded text-xs ${
+                    formData.errors.district ? "border-red-500" : ""
+                  }`}
                   onChange={handleChange}
                   required
                 />
               </div>
               <div className="w-1/2">
-                <label className="block text-xs font-medium text-gray-700 mb-1">Taluka <span className="text-red-600">*</span></label>
+                <label className="block text-xs font-medium text-gray-700 mb-1">
+                  Taluka <span className="text-red-600">*</span>
+                </label>
                 <input
                   type="text"
                   name="taluka"
-                  className={`w-full p-2 border rounded text-xs ${formData.errors.taluka ? "border-red-500" : ""}`}
+                  className={`w-full p-2 border rounded text-xs ${
+                    formData.errors.taluka ? "border-red-500" : ""
+                  }`}
                   onChange={handleChange}
                   required
                 />
@@ -291,19 +368,25 @@ const Register = () => {
             <div className="flex space-x-4">
               {[
                 { field: "aadharCard", label: "Aadhar Card (Max 5MB)" },
-                { field: "panCard", label: "PAN Card (Max 5MB)" }
+                { field: "panCard", label: "PAN Card (Max 5MB)" },
               ].map(({ field, label }) => (
                 <div key={field} className="w-1/2 space-y-1">
-                  <label className="block text-xs font-medium text-gray-700 mb-1">{label} <span className="text-red-600">*</span></label>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">
+                    {label} <span className="text-red-600">*</span>
+                  </label>
                   <input
                     type="file"
                     accept=".pdf,.jpg,.jpeg,.png"
                     onChange={(e) => handleFileChange(e, field)}
-                    className={`w-full p-2 border rounded text-xs ${formData.errors[field] ? "border-red-500" : ""}`}
+                    className={`w-full p-2 border rounded text-xs ${
+                      formData.errors[field] ? "border-red-500" : ""
+                    }`}
                     required
                   />
                   {formData.errors[field] && (
-                    <p className="text-xs text-red-600">{formData.errors[field]}</p>
+                    <p className="text-xs text-red-600">
+                      {formData.errors[field]}
+                    </p>
                   )}
                 </div>
               ))}
@@ -317,10 +400,13 @@ const Register = () => {
                 name="agreeToTerms"
                 checked={formData.agreeToTerms}
                 onChange={handleChange}
-                className={`h-4 w-4 mt-1 text-[#F58A3B] rounded ${formData.errors.agreeToTerms ? "border-red-500" : ""}`}
+                className={`h-4 w-4 mt-1 text-[#F58A3B] rounded ${
+                  formData.errors.agreeToTerms ? "border-red-500" : ""
+                }`}
               />
               <label className="ml-2 text-xs text-gray-700">
-                I agree to the <a
+                I agree to the{" "}
+                <a
                   href="/PrivacyPolicy"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -334,7 +420,11 @@ const Register = () => {
             {/* Submit */}
             <button
               type="submit"
-              className={`w-full bg-[#F58A3B] text-white py-2 rounded text-xs ${!isFormValid() ? "opacity-50 cursor-not-allowed" : "hover:bg-[#e07d35]"}`}
+              className={`w-full bg-[#F58A3B] text-white py-2 rounded text-xs ${
+                !isFormValid()
+                  ? "opacity-50 cursor-not-allowed"
+                  : "hover:bg-[#e07d35]"
+              }`}
               disabled={!isFormValid()}
             >
               Register
@@ -343,16 +433,23 @@ const Register = () => {
 
           <p className="mt-4 text-center text-xs">
             Already have an account?{" "}
-            <Link to="/" className="text-[#F58A3B] hover:underline">Login</Link>
+            <Link to="/" className="text-[#F58A3B] hover:underline">
+              Login
+            </Link>
           </p>
         </div>
 
         {/* Right Column - Category List */}
         <div className="w-3/5 p-8 bg-white shadow-lg border border-gray-200 overflow-y-auto max-h-[95vh] rounded-lg">
-          <h2 className="text-xl text-[#F58A3B] font-bold mb-4 text-center">Government Document Services</h2>
+          <h2 className="text-xl text-[#F58A3B] font-bold mb-4 text-center">
+            Government Document Services
+          </h2>
           <ul className="grid grid-cols-2 gap-4">
             {categories.map((category) => (
-              <li key={category.category_id} className="text-gray-700 border-b pb-2">
+              <li
+                key={category.category_id}
+                className="text-gray-700 border-b pb-2"
+              >
                 <div className="flex items-center space-x-2">
                   <span className="text-orange text-xs">⚫</span>
                   <span className="text-xs">{category.category_name}</span>
@@ -360,7 +457,10 @@ const Register = () => {
                 {subcategories[category.category_id]?.length > 0 && (
                   <ul className="ml-6 mt-2">
                     {subcategories[category.category_id]?.map((sub) => (
-                      <li key={sub.subcategory_id} className="flex items-center space-x-2 text-gray-600">
+                      <li
+                        key={sub.subcategory_id}
+                        className="flex items-center space-x-2 text-gray-600"
+                      >
                         <span className="text-gray-500 text-xs">●</span>
                         <span className="text-xs">{sub.subcategory_name}</span>
                       </li>

@@ -1,6 +1,11 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { FaFileAlt, FaDownload, FaExclamationTriangle, FaTimes } from "react-icons/fa";
+import {
+  FaFileAlt,
+  FaDownload,
+  FaExclamationTriangle,
+  FaTimes,
+} from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
 const CompletedApplicationsList = () => {
@@ -124,8 +129,20 @@ const CompletedApplicationsList = () => {
             {/* Table Header */}
             <thead className="bg-[#F58A3B14] border-b-2 border-[#776D6DA8]">
               <tr>
-                {["Document ID", "Category", "Subcategory", "Email", "Status", "Uploaded At", "Applicant name", "Certificate"].map((header, index) => (
-                  <th key={index} className="px-4 py-3 border border-[#776D6DA8] text-black font-semibold text-center">
+                {[
+                  "Document ID",
+                  "Category",
+                  "Subcategory",
+                  "Email",
+                  "Status",
+                  "Uploaded At",
+                  "Applicant name",
+                  "Certificate",
+                ].map((header, index) => (
+                  <th
+                    key={index}
+                    className="px-4 py-3 border border-[#776D6DA8] text-black font-semibold text-center"
+                  >
                     {header}
                   </th>
                 ))}
@@ -138,21 +155,31 @@ const CompletedApplicationsList = () => {
                 filteredDocuments.map((document, index) => (
                   <tr
                     key={document.document_id}
-                    className={`${index % 2 === 0 ? "bg-[#FFFFFF]" : "bg-[#F58A3B14]"
-                      } hover:bg-orange-100 transition duration-200`}
+                    className={`${
+                      index % 2 === 0 ? "bg-[#FFFFFF]" : "bg-[#F58A3B14]"
+                    } hover:bg-orange-100 transition duration-200`}
                   >
-                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">{document.document_id}</td>
-                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">{document.category_name}</td>
-                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">{document.subcategory_name}</td>
-                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">{document.email}</td>
+                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">
+                      {document.document_id}
+                    </td>
+                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">
+                      {document.category_name}
+                    </td>
+                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">
+                      {document.subcategory_name}
+                    </td>
+                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">
+                      {document.email}
+                    </td>
                     <td className="px-4 py-3 border border-[#776D6DA8] text-center">
                       <span
-                        className={`px-3 py-1 rounded-full text-white text-sm ${document.status === "Approved"
-                          ? "bg-green-500"
-                          : document.status === "Rejected"
+                        className={`px-3 py-1 rounded-full text-white text-sm ${
+                          document.status === "Approved"
+                            ? "bg-green-500"
+                            : document.status === "Rejected"
                             ? "bg-red-500"
                             : "bg-yellow-500"
-                          }`}
+                        }`}
                       >
                         {document.status}
                       </span>
@@ -163,17 +190,28 @@ const CompletedApplicationsList = () => {
                     <td className="px-4 py-3 border border-[#776D6DA8] text-center">
                       {document?.document_fields ? (
                         Array.isArray(document.document_fields) ? (
-                          document.document_fields.find((field) => field.field_name === "APPLICANT NAME") ? (
-                            <p>{document.document_fields.find((field) => field.field_name === "APPLICANT NAME").field_value}</p>
+                          document.document_fields.find(
+                            (field) => field.field_name === "APPLICANT NAME"
+                          ) ? (
+                            <p>
+                              {
+                                document.document_fields.find(
+                                  (field) =>
+                                    field.field_name === "APPLICANT NAME"
+                                ).field_value
+                              }
+                            </p>
                           ) : (
-                            <p className="text-gray-500">No applicant name available</p>
+                            <p className="text-gray-500">
+                              No applicant name available
+                            </p>
                           )
+                        ) : document.document_fields["APPLICANT NAME"] ? (
+                          <p>{document.document_fields["APPLICANT NAME"]}</p>
                         ) : (
-                          document.document_fields["APPLICANT NAME"] ? (
-                            <p>{document.document_fields["APPLICANT NAME"]}</p>
-                          ) : (
-                            <p className="text-gray-500">No applicant name available</p>
-                          )
+                          <p className="text-gray-500">
+                            No applicant name available
+                          </p>
                         )
                       ) : (
                         <p className="text-gray-500">No fields available</p>
@@ -183,7 +221,9 @@ const CompletedApplicationsList = () => {
                     <td className="px-4 py-3 border border-[#776D6DA8] text-center">
                       {getCertificateByDocumentId(document.document_id) ? (
                         <button
-                          onClick={() => handleViewCertificate(document.document_id)}
+                          onClick={() =>
+                            handleViewCertificate(document.document_id)
+                          }
                           className="bg-blue-500 text-white px-3 py-2 rounded flex items-center justify-center hover:bg-blue-600 transition"
                         >
                           <FaFileAlt className="mr-1" /> View
@@ -196,7 +236,10 @@ const CompletedApplicationsList = () => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="8" className="px-4 py-3 border border-[#776D6DA8] text-center">
+                  <td
+                    colSpan="8"
+                    className="px-4 py-3 border border-[#776D6DA8] text-center"
+                  >
                     No completed applications found.
                   </td>
                 </tr>
@@ -210,4 +253,3 @@ const CompletedApplicationsList = () => {
 };
 
 export default CompletedApplicationsList;
-

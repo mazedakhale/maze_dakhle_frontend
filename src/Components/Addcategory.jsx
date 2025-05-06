@@ -12,7 +12,6 @@ const AddCategory = () => {
   const [isAdding, setIsAdding] = useState(false);
   const navigate = useNavigate();
 
-
   const apiUrl = "https://mazedakhale.in/api/categories";
 
   useEffect(() => {
@@ -62,7 +61,9 @@ const AddCategory = () => {
 
       setCategories((prev) =>
         prev.map((category) =>
-          category.category_id === id ? { ...category, category_name: updatedName } : category
+          category.category_id === id
+            ? { ...category, category_name: updatedName }
+            : category
         )
       );
 
@@ -97,7 +98,9 @@ const AddCategory = () => {
     if (confirmDelete.isConfirmed) {
       try {
         await axios.delete(`${apiUrl}/${id}`);
-        setCategories((prev) => prev.filter((category) => category.category_id !== id));
+        setCategories((prev) =>
+          prev.filter((category) => category.category_id !== id)
+        );
         Swal.fire("Deleted!", "Category has been deleted.", "success");
       } catch (error) {
         console.error("Error deleting category:", error);
@@ -108,7 +111,6 @@ const AddCategory = () => {
 
   return (
     <div className="ml-[300px] mt-[80px] p-6 w-[calc(100%-260px)] overflow-x-hidden">
-
       <div className="relative bg-white shadow-lg rounded-lg border border-gray-300 overflow-hidden">
         {/* Header */}
         <div className="relative border-t-4 border-orange-400 bg-[#F4F4F4] p-4 rounded-t-lg">
@@ -126,9 +128,6 @@ const AddCategory = () => {
           </button>
         </div>
 
-
-
-
         {/* Add Button */}
         <div className="p-4 flex justify-end">
           <button
@@ -137,7 +136,6 @@ const AddCategory = () => {
           >
             <FaPlus /> Add Category
           </button>
-
         </div>
 
         {/* Table */}
@@ -146,7 +144,10 @@ const AddCategory = () => {
             <thead className="bg-[#F58A3B14] border-b-2 border-[#776D6DA8]">
               <tr>
                 {["ID", "Category Name", "Actions"].map((header, index) => (
-                  <th key={index} className="px-4 py-3 border border-[#776D6DA8] text-black font-semibold text-center">
+                  <th
+                    key={index}
+                    className="px-4 py-3 border border-[#776D6DA8] text-black font-semibold text-center"
+                  >
                     {header}
                   </th>
                 ))}
@@ -157,9 +158,13 @@ const AddCategory = () => {
                 categories.map((category, index) => (
                   <tr
                     key={category.category_id}
-                    className={`${index % 2 === 0 ? "bg-[#FFFFFF]" : "bg-[#F58A3B14]"} hover:bg-orange-100 transition duration-200`}
+                    className={`${
+                      index % 2 === 0 ? "bg-[#FFFFFF]" : "bg-[#F58A3B14]"
+                    } hover:bg-orange-100 transition duration-200`}
                   >
-                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">{category.category_id}</td>
+                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">
+                      {category.category_id}
+                    </td>
                     <td className="px-4 py-3 border border-[#776D6DA8] text-center">
                       {editingId === category.category_id ? (
                         <input
@@ -175,21 +180,30 @@ const AddCategory = () => {
                     <td className="px-4 py-3 border border-[#776D6DA8] text-center">
                       {editingId === category.category_id ? (
                         <button
-                          onClick={() => handleUpdateCategory(category.category_id)}
+                          onClick={() =>
+                            handleUpdateCategory(category.category_id)
+                          }
                           className="bg-orange-500 text-white px-3 py-1 rounded mr-2 hover:bg-orange-600"
                         >
                           Save
                         </button>
                       ) : (
                         <button
-                          onClick={() => handleEditCategory(category.category_id, category.category_name)}
+                          onClick={() =>
+                            handleEditCategory(
+                              category.category_id,
+                              category.category_name
+                            )
+                          }
                           className="bg-blue-500 text-white px-3 py-1 rounded mr-2 hover:bg-blue-600"
                         >
                           <FaEdit />
                         </button>
                       )}
                       <button
-                        onClick={() => handleDeleteCategory(category.category_id)}
+                        onClick={() =>
+                          handleDeleteCategory(category.category_id)
+                        }
                         className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
                       >
                         <FaTrash />
@@ -199,7 +213,10 @@ const AddCategory = () => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="3" className="px-4 py-3 border border-[#776D6DA8] text-center">
+                  <td
+                    colSpan="3"
+                    className="px-4 py-3 border border-[#776D6DA8] text-center"
+                  >
                     No categories found.
                   </td>
                 </tr>
@@ -212,7 +229,9 @@ const AddCategory = () => {
       {isAdding && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
           <div className="bg-white p-6 rounded-lg shadow-lg w-[400px]">
-            <h2 className="text-xl font-bold text-gray-800 mb-4">Add Category</h2>
+            <h2 className="text-xl font-bold text-gray-800 mb-4">
+              Add Category
+            </h2>
 
             <input
               type="text"
@@ -228,7 +247,10 @@ const AddCategory = () => {
             >
               Cancel
             </button>
-            <button onClick={handleAddCategory} className="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600">
+            <button
+              onClick={handleAddCategory}
+              className="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600"
+            >
               Save
             </button>
           </div>

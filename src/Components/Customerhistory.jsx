@@ -1,6 +1,11 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { FaFileAlt, FaDownload, FaExclamationTriangle, FaTimes } from "react-icons/fa";
+import {
+  FaFileAlt,
+  FaDownload,
+  FaExclamationTriangle,
+  FaTimes,
+} from "react-icons/fa";
 import jwtDecode from "jwt-decode";
 import { useNavigate } from "react-router-dom";
 
@@ -32,7 +37,9 @@ const CustomerHistory = () => {
           const allDocuments = response.data.documents;
           // Filter documents where status is "Completed"
           const filteredDocs = allDocuments
-            .filter((doc) => doc.user_id === userId && doc.status === "Completed")
+            .filter(
+              (doc) => doc.user_id === userId && doc.status === "Completed"
+            )
             .reverse(); // Show newest first
           setDocuments(filteredDocs);
         })
@@ -54,7 +61,7 @@ const CustomerHistory = () => {
   const handleDownloadReceipt = (receiptUrl, documentName) => {
     try {
       // Extract the file extension from the URL (e.g., "pdf", "jpg", "png")
-      const fileExtension = receiptUrl.split('.').pop().toLowerCase();
+      const fileExtension = receiptUrl.split(".").pop().toLowerCase();
 
       // Generate the file name (e.g., "MyDocument_receipt.pdf")
       const fileName = `${documentName}_receipt.${fileExtension}`;
@@ -69,7 +76,11 @@ const CustomerHistory = () => {
       document.body.removeChild(link); // Clean up by removing the link
     } catch (error) {
       console.error("Error downloading receipt:", error);
-      Swal.fire("Error", "Failed to download receipt. Please try again.", "error");
+      Swal.fire(
+        "Error",
+        "Failed to download receipt. Please try again.",
+        "error"
+      );
     }
   };
   const handleViewCertificate = async (documentId) => {
@@ -95,7 +106,6 @@ const CustomerHistory = () => {
     }
   };
 
-
   const handleDownloadCertificate = async (documentId, name) => {
     try {
       const response = await axios.get(
@@ -119,7 +129,16 @@ const CustomerHistory = () => {
     }
   };
 
-  const handleGenerateErrorRequest = (documentId, applicationId, distributorId, userId, categoryId, subcategoryId, name, email) => {
+  const handleGenerateErrorRequest = (
+    documentId,
+    applicationId,
+    distributorId,
+    userId,
+    categoryId,
+    subcategoryId,
+    name,
+    email
+  ) => {
     navigate(`/Adderrorrequest`, {
       state: {
         documentId,
@@ -133,7 +152,6 @@ const CustomerHistory = () => {
       },
     });
   };
-
 
   return (
     <div className="ml-[250px] flex flex-col items-center min-h-screen p-6 bg-gray-100">
@@ -200,8 +218,9 @@ const CustomerHistory = () => {
                 documents.map((doc, index) => (
                   <tr
                     key={doc.document_id}
-                    className={`${index % 2 === 0 ? "bg-[#FFFFFF]" : "bg-[#F58A3B14]"
-                      } hover:bg-orange-100 transition duration-200`}
+                    className={`${
+                      index % 2 === 0 ? "bg-[#FFFFFF]" : "bg-[#F58A3B14]"
+                    } hover:bg-orange-100 transition duration-200`}
                   >
                     <td className="px-4 py-4 border border-[#776D6DA8] text-center">
                       {index + 1}
@@ -212,18 +231,24 @@ const CustomerHistory = () => {
                     <td className="px-4 py-4 border border-[#776D6DA8] text-center">
                       {(() => {
                         const date = new Date(doc.uploaded_at);
-                        const formattedDate = `${String(date.getDate()).padStart(2, '0')}-${String(date.getMonth() + 1).padStart(2, '0')}-${date.getFullYear()}`;
-                        const formattedTime = date.toLocaleTimeString('en-US', {
-                          hour: '2-digit',
-                          minute: '2-digit',
-                          second: '2-digit',
+                        const formattedDate = `${String(
+                          date.getDate()
+                        ).padStart(2, "0")}-${String(
+                          date.getMonth() + 1
+                        ).padStart(2, "0")}-${date.getFullYear()}`;
+                        const formattedTime = date.toLocaleTimeString("en-US", {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                          second: "2-digit",
                           hour12: true,
                         });
 
                         return (
                           <>
                             <div>{formattedDate}</div>
-                            <div className="text-sm text-gray-600">{formattedTime}</div>
+                            <div className="text-sm text-gray-600">
+                              {formattedTime}
+                            </div>
                           </>
                         );
                       })()}
@@ -255,17 +280,22 @@ const CustomerHistory = () => {
                             <p>
                               {
                                 doc.document_fields.find(
-                                  (field) => field.field_name === "APPLICANT NAME"
+                                  (field) =>
+                                    field.field_name === "APPLICANT NAME"
                                 ).field_value
                               }
                             </p>
                           ) : (
-                            <p className="text-gray-500">No applicant name available</p>
+                            <p className="text-gray-500">
+                              No applicant name available
+                            </p>
                           )
                         ) : doc.document_fields["APPLICANT NAME"] ? (
                           <p>{doc.document_fields["APPLICANT NAME"]}</p>
                         ) : (
-                          <p className="text-gray-500">No applicant name available</p>
+                          <p className="text-gray-500">
+                            No applicant name available
+                          </p>
                         )
                       ) : (
                         <p className="text-gray-500">No fields available</p>
@@ -276,54 +306,73 @@ const CustomerHistory = () => {
                       <div className="flex flex-col gap-1">
                         {/* Status Badge */}
                         <span
-                          className={`px-3 py-1 rounded-full text-white text-xs ${doc.status === "Approved"
-                            ? "bg-green-500"
-                            : doc.status === "Rejected"
+                          className={`px-3 py-1 rounded-full text-white text-xs ${
+                            doc.status === "Approved"
+                              ? "bg-green-500"
+                              : doc.status === "Rejected"
                               ? "bg-red-500"
                               : doc.status === "Pending"
-                                ? "bg-yellow-500"
-                                : "bg-blue-500"
-                            }`}
+                              ? "bg-yellow-500"
+                              : "bg-blue-500"
+                          }`}
                         >
                           {doc.status}
                         </span>
 
                         {/* Latest Status Date and Time */}
                         {doc.status_history
-                          ?.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at)) // Sort by latest date
+                          ?.sort(
+                            (a, b) =>
+                              new Date(b.updated_at) - new Date(a.updated_at)
+                          ) // Sort by latest date
                           .slice(0, 1) // Take the first entry (latest status)
                           .map((statusEntry, index) => {
                             const date = new Date(statusEntry.updated_at);
-                            const formattedDate = `${String(date.getDate()).padStart(2, '0')}-${String(date.getMonth() + 1).padStart(2, '0')}-${date.getFullYear()}`;
-                            const formattedTime = date.toLocaleTimeString('en-US', {
-                              hour: '2-digit',
-                              minute: '2-digit',
-                              second: '2-digit',
-                              hour12: true,
-                            });
+                            const formattedDate = `${String(
+                              date.getDate()
+                            ).padStart(2, "0")}-${String(
+                              date.getMonth() + 1
+                            ).padStart(2, "0")}-${date.getFullYear()}`;
+                            const formattedTime = date.toLocaleTimeString(
+                              "en-US",
+                              {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                                second: "2-digit",
+                                hour12: true,
+                              }
+                            );
 
                             return (
-                              <div key={index} className="text-xs text-gray-600">
+                              <div
+                                key={index}
+                                className="text-xs text-gray-600"
+                              >
                                 <div>{formattedDate}</div>
-                                <div className="text-sm text-gray-600">{formattedTime}</div>
+                                <div className="text-sm text-gray-600">
+                                  {formattedTime}
+                                </div>
                               </div>
                             );
                           })}
                       </div>
                     </td>
 
-
                     {/* Download Receipt */}
                     <td className="px-4 py-4 border border-[#776D6DA8] text-center">
                       {doc.receipt_url ? (
                         <button
-                          onClick={() => handleDownloadReceipt(doc.receipt_url, doc.name)}
+                          onClick={() =>
+                            handleDownloadReceipt(doc.receipt_url, doc.name)
+                          }
                           className="bg-blue-500 text-white px-3 py-1 rounded flex justify-center items-center hover:bg-blue-600 transition"
                         >
                           <FaDownload className="mr-1" /> Receipt
                         </button>
                       ) : (
-                        <span className="text-gray-500 text-center">Not Available</span>
+                        <span className="text-gray-500 text-center">
+                          Not Available
+                        </span>
                       )}
                     </td>
 
@@ -337,7 +386,9 @@ const CustomerHistory = () => {
                           Certificate
                         </button>
                       ) : (
-                        <span className="text-gray-500 text-center">Not Available</span>
+                        <span className="text-gray-500 text-center">
+                          Not Available
+                        </span>
                       )}
                     </td>
 
@@ -359,7 +410,8 @@ const CustomerHistory = () => {
                         }
                         className="bg-yellow-500 text-white px-3 py-1 rounded flex justify-center items-center hover:bg-yellow-600 transition"
                       >
-                        <FaExclamationTriangle className="mr-1" />  send error request if wrong certificate
+                        <FaExclamationTriangle className="mr-1" /> send error
+                        request if wrong certificate
                       </button>
                     </td>
                   </tr>
@@ -380,6 +432,6 @@ const CustomerHistory = () => {
       </div>
     </div>
   );
-}
+};
 
 export default CustomerHistory;

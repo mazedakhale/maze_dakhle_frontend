@@ -35,7 +35,9 @@ const ErrorRequests = () => {
   // Fetch error requests for the distributor
   const fetchErrorRequests = async (distributorId) => {
     try {
-      console.log(`Fetching error requests for distributor ID: ${distributorId}`);
+      console.log(
+        `Fetching error requests for distributor ID: ${distributorId}`
+      );
       const response = await axios.get(
         `https://mazedakhale.in/apirequest-errors/distributor/${distributorId}`
       );
@@ -43,7 +45,9 @@ const ErrorRequests = () => {
 
       // Filter out rejected requests
       const filteredRequests = response.data.filter(
-        (request) => request.request_status === "Distributor Rejected" || request.request_status === "Completed"
+        (request) =>
+          request.request_status === "Distributor Rejected" ||
+          request.request_status === "Completed"
       );
 
       setErrorRequests(filteredRequests);
@@ -56,7 +60,9 @@ const ErrorRequests = () => {
   const fetchCertificates = async () => {
     try {
       console.log("Fetching certificates...");
-      const response = await axios.get("https://mazedakhale.in/apicertificates");
+      const response = await axios.get(
+        "https://mazedakhale.in/apicertificates"
+      );
       console.log("Certificates API Response:", response.data);
       setCertificates(response.data);
     } catch (error) {
@@ -69,7 +75,10 @@ const ErrorRequests = () => {
     const matchedCertificate = certificates.find(
       (cert) => cert.document_id === documentId
     );
-    console.log(`Certificate found for Document ID ${documentId}:`, matchedCertificate);
+    console.log(
+      `Certificate found for Document ID ${documentId}:`,
+      matchedCertificate
+    );
     return matchedCertificate ? matchedCertificate.certificate_id : null;
   };
 
@@ -82,7 +91,9 @@ const ErrorRequests = () => {
     }
     try {
       console.log(`Fetching certificate for Certificate ID: ${certificateId}`);
-      const response = await axios.get(`https://mazedakhale.in/apicertificates/${certificateId}`);
+      const response = await axios.get(
+        `https://mazedakhale.in/apicertificates/${certificateId}`
+      );
       console.log("View Certificate API Response:", response.data);
 
       if (response.data && response.data.file_url) {
@@ -104,8 +115,6 @@ const ErrorRequests = () => {
         value.toString().toLowerCase().includes(searchTerm.toLowerCase())
     )
   );
-
-
 
   const handleDownloadCertificate = async (documentId, requestName) => {
     try {
@@ -129,7 +138,6 @@ const ErrorRequests = () => {
       alert("Failed to download certificate.");
     }
   };
-
 
   // import { FaDownload, FaEye } from "react-icons/fa";
 
@@ -191,31 +199,49 @@ const ErrorRequests = () => {
                 filteredRequests.map((request, index) => (
                   <tr
                     key={request.request_id}
-                    className={`border border-gray-300 ${index % 2 === 0 ? "bg-[#ffffff]" : "bg-[#F58A3B14]"
-                      } hover:bg-gray-100`}
+                    className={`border border-gray-300 ${
+                      index % 2 === 0 ? "bg-[#ffffff]" : "bg-[#F58A3B14]"
+                    } hover:bg-gray-100`}
                   >
-                    <td className="border p-3 text-center">{request.request_id}</td>
-                    <td className="border p-3 text-center">{request.application_id}</td>
+                    <td className="border p-3 text-center">
+                      {request.request_id}
+                    </td>
+                    <td className="border p-3 text-center">
+                      {request.application_id}
+                    </td>
                     <td className="px-4 py-2 border">
                       {document?.document_fields ? ( // Use `document` instead of `doc`
                         Array.isArray(document.document_fields) ? (
-                          document.document_fields.find((field) => field.field_name === "APPLICANT NAME") ? (
-                            <p>{document.document_fields.find((field) => field.field_name === "APPLICANT NAME").field_value}</p>
+                          document.document_fields.find(
+                            (field) => field.field_name === "APPLICANT NAME"
+                          ) ? (
+                            <p>
+                              {
+                                document.document_fields.find(
+                                  (field) =>
+                                    field.field_name === "APPLICANT NAME"
+                                ).field_value
+                              }
+                            </p>
                           ) : (
-                            <p className="text-gray-500">No applicant name available</p>
+                            <p className="text-gray-500">
+                              No applicant name available
+                            </p>
                           )
+                        ) : document.document_fields["APPLICANT NAME"] ? (
+                          <p>{document.document_fields["APPLICANT NAME"]}</p>
                         ) : (
-                          document.document_fields["APPLICANT NAME"] ? (
-                            <p>{document.document_fields["APPLICANT NAME"]}</p>
-                          ) : (
-                            <p className="text-gray-500">No applicant name available</p>
-                          )
+                          <p className="text-gray-500">
+                            No applicant name available
+                          </p>
                         )
                       ) : (
                         <p className="text-gray-500">No fields available</p>
                       )}
                     </td>
-                    <td className="border p-3">{request.request_description}</td>
+                    <td className="border p-3">
+                      {request.request_description}
+                    </td>
                     <td className="border p-3 text-center">
                       <a
                         href={request.error_document}
@@ -230,16 +256,17 @@ const ErrorRequests = () => {
                     {/* Status Badge */}
                     <td className="border p-3 text-center">
                       <span
-                        className={`px-3 py-1 rounded-full text-white text-sm ${request.request_status === "Approved"
-                          ? "bg-green-500"
-                          : request.request_status === "Distributor Rejected"
+                        className={`px-3 py-1 rounded-full text-white text-sm ${
+                          request.request_status === "Approved"
+                            ? "bg-green-500"
+                            : request.request_status === "Distributor Rejected"
                             ? "bg-red-500"
                             : request.request_status === "Completed"
-                              ? "bg-blue-500"
-                              : request.request_status === "Uploaded"
-                                ? "bg-purple-500"
-                                : "bg-yellow-500"
-                          }`}
+                            ? "bg-blue-500"
+                            : request.request_status === "Uploaded"
+                            ? "bg-purple-500"
+                            : "bg-yellow-500"
+                        }`}
                       >
                         {request.request_status}
                       </span>
@@ -251,10 +278,13 @@ const ErrorRequests = () => {
 
                     {/* View Certificate */}
                     <td className="border p-3 text-center">
-                      {["Uploaded", "Completed"].includes(request.request_status) &&
-                        getCertificateByDocumentId(request.document_id) ? (
+                      {["Uploaded", "Completed"].includes(
+                        request.request_status
+                      ) && getCertificateByDocumentId(request.document_id) ? (
                         <button
-                          onClick={() => handleViewCertificate(request.document_id)}
+                          onClick={() =>
+                            handleViewCertificate(request.document_id)
+                          }
                           className="bg-orange-500 text-white px-3 py-1 rounded-md flex items-center gap-2 hover:bg-orange-600 transition"
                         >
                           <FaEye /> View Certificate
@@ -269,7 +299,10 @@ const ErrorRequests = () => {
                       {getCertificateByDocumentId(request.document_id) ? (
                         <button
                           onClick={() =>
-                            handleDownloadCertificate(request.document_id, request.request_name)
+                            handleDownloadCertificate(
+                              request.document_id,
+                              request.request_name
+                            )
                           }
                           className="bg-green-500 text-white px-3 py-1 rounded-md flex items-center gap-2 hover:bg-green-600 transition"
                         >
@@ -294,7 +327,6 @@ const ErrorRequests = () => {
       </div>
     </div>
   );
-
 };
 
 export default ErrorRequests;

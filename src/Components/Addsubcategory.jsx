@@ -4,11 +4,13 @@ import { FaEdit, FaTrash, FaPlus, FaTimes } from "react-icons/fa";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 
-
 const Addsubcategory = () => {
   const [subcategories, setSubcategories] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [newSubcategory, setNewSubcategory] = useState({ subcategory_name: "", category_id: "" });
+  const [newSubcategory, setNewSubcategory] = useState({
+    subcategory_name: "",
+    category_id: "",
+  });
   const [editingId, setEditingId] = useState(null);
   const [updatedName, setUpdatedName] = useState("");
   const [isAdding, setIsAdding] = useState(false);
@@ -40,7 +42,10 @@ const Addsubcategory = () => {
   };
 
   const addSubcategory = async () => {
-    if (!newSubcategory.subcategory_name.trim() || !newSubcategory.category_id) {
+    if (
+      !newSubcategory.subcategory_name.trim() ||
+      !newSubcategory.category_id
+    ) {
       Swal.fire("Error", "Please fill all fields!", "error");
       return;
     }
@@ -68,10 +73,16 @@ const Addsubcategory = () => {
     }
 
     try {
-      await axios.patch(`${API_BASE_URL}/subcategories/${id}`, { subcategory_name: updatedName });
+      await axios.patch(`${API_BASE_URL}/subcategories/${id}`, {
+        subcategory_name: updatedName,
+      });
 
       setSubcategories((prev) =>
-        prev.map((sub) => (sub.subcategory_id === id ? { ...sub, subcategory_name: updatedName } : sub))
+        prev.map((sub) =>
+          sub.subcategory_id === id
+            ? { ...sub, subcategory_name: updatedName }
+            : sub
+        )
       );
 
       setEditingId(null);
@@ -107,7 +118,9 @@ const Addsubcategory = () => {
 
       try {
         await axios.delete(`${API_BASE_URL}/subcategories/${id}`);
-        setSubcategories((prev) => prev.filter((sub) => sub.subcategory_id !== id));
+        setSubcategories((prev) =>
+          prev.filter((sub) => sub.subcategory_id !== id)
+        );
       } catch (error) {
         console.error("Error deleting subcategory:", error);
         Swal.fire("Error", "Failed to delete subcategory", "error");
@@ -118,7 +131,6 @@ const Addsubcategory = () => {
   return (
     <div className="ml-[300px] mt-[80px] p-6 w-[calc(100%-260px)] overflow-x-hidden">
       <div className="relative bg-white shadow-lg rounded-lg border border-gray-300 overflow-hidden">
-
         <div className="relative border-t-4 border-orange-400 bg-[#F4F4F4] p-4 rounded-t-lg">
           <h2 className="text-2xl font-bold text-gray-800 text-center">
             SubCategory List
@@ -143,15 +155,16 @@ const Addsubcategory = () => {
           </button>
         </div>
 
-
-
         {/* Table */}
         <div className="p-6 overflow-x-auto">
           <table className="w-full border border-[#776D6DA8] text-sm bg-white shadow-md rounded-md">
             <thead className="bg-[#F58A3B14] border-b-2 border-[#776D6DA8]">
               <tr>
                 {["ID", "Subcategory Name", "Actions"].map((header, index) => (
-                  <th key={index} className="px-4 py-3 border border-[#776D6DA8] text-black font-semibold text-center">
+                  <th
+                    key={index}
+                    className="px-4 py-3 border border-[#776D6DA8] text-black font-semibold text-center"
+                  >
                     {header}
                   </th>
                 ))}
@@ -162,9 +175,13 @@ const Addsubcategory = () => {
                 subcategories.map((sub, index) => (
                   <tr
                     key={sub.subcategory_id}
-                    className={`${index % 2 === 0 ? "bg-[#FFFF]" : "bg-[#F58A3B14]"} hover:bg-orange-100 transition duration-200`}
+                    className={`${
+                      index % 2 === 0 ? "bg-[#FFFF]" : "bg-[#F58A3B14]"
+                    } hover:bg-orange-100 transition duration-200`}
                   >
-                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">{sub.subcategory_id}</td>
+                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">
+                      {sub.subcategory_id}
+                    </td>
                     <td className="px-4 py-3 border border-[#776D6DA8] text-center">
                       {editingId === sub.subcategory_id ? (
                         <input
@@ -187,7 +204,12 @@ const Addsubcategory = () => {
                         </button>
                       ) : (
                         <button
-                          onClick={() => handleEditSubcategory(sub.subcategory_id, sub.subcategory_name)}
+                          onClick={() =>
+                            handleEditSubcategory(
+                              sub.subcategory_id,
+                              sub.subcategory_name
+                            )
+                          }
                           className="bg-blue-500 text-white px-3 py-1 rounded mr-2 hover:bg-blue-600"
                         >
                           <FaEdit />
@@ -204,7 +226,10 @@ const Addsubcategory = () => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="3" className="px-4 py-3 border border-[#776D6DA8] text-center">
+                  <td
+                    colSpan="3"
+                    className="px-4 py-3 border border-[#776D6DA8] text-center"
+                  >
                     No subcategories found.
                   </td>
                 </tr>
@@ -214,55 +239,65 @@ const Addsubcategory = () => {
         </div>
       </div>
 
-      {
-        isAdding && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-            <div className="bg-white p-6 rounded-lg shadow-lg w-[400px]">
-              <h2 className="text-xl font-bold text-gray-800 mb-4">Add Subcategory</h2>
+      {isAdding && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-[400px]">
+            <h2 className="text-xl font-bold text-gray-800 mb-4">
+              Add Subcategory
+            </h2>
 
-              {/* Category Dropdown */}
-              <select
-                value={newSubcategory.category_id}
-                onChange={(e) => setNewSubcategory({ ...newSubcategory, category_id: e.target.value })}
-                className="w-full p-2 border border-gray-300 rounded mb-4"
+            {/* Category Dropdown */}
+            <select
+              value={newSubcategory.category_id}
+              onChange={(e) =>
+                setNewSubcategory({
+                  ...newSubcategory,
+                  category_id: e.target.value,
+                })
+              }
+              className="w-full p-2 border border-gray-300 rounded mb-4"
+            >
+              <option value="">Select Category</option>
+              {categories.map((cat) => (
+                <option key={cat.category_id} value={cat.category_id}>
+                  {cat.category_name}
+                </option>
+              ))}
+            </select>
+
+            {/* Subcategory Input */}
+            <input
+              type="text"
+              placeholder="Enter Subcategory Name"
+              value={newSubcategory.subcategory_name}
+              onChange={(e) =>
+                setNewSubcategory({
+                  ...newSubcategory,
+                  subcategory_name: e.target.value,
+                })
+              }
+              className="w-full p-2 border border-gray-300 rounded mb-4"
+            />
+
+            {/* Buttons */}
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setIsAdding(false)}
+                className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
               >
-                <option value="">Select Category</option>
-                {categories.map((cat) => (
-                  <option key={cat.category_id} value={cat.category_id}>
-                    {cat.category_name}
-                  </option>
-                ))}
-              </select>
-
-              {/* Subcategory Input */}
-              <input
-                type="text"
-                placeholder="Enter Subcategory Name"
-                value={newSubcategory.subcategory_name}
-                onChange={(e) => setNewSubcategory({ ...newSubcategory, subcategory_name: e.target.value })}
-                className="w-full p-2 border border-gray-300 rounded mb-4"
-              />
-
-              {/* Buttons */}
-              <div className="flex justify-end gap-3">
-                <button
-                  onClick={() => setIsAdding(false)}
-                  className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={addSubcategory}
-                  className="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600"
-                >
-                  Save
-                </button>
-              </div>
+                Cancel
+              </button>
+              <button
+                onClick={addSubcategory}
+                className="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600"
+              >
+                Save
+              </button>
             </div>
           </div>
-        )
-      }
-    </div >
+        </div>
+      )}
+    </div>
   );
 };
 

@@ -54,7 +54,7 @@ const VerifyDocuments = () => {
   const handleDownloadReceipt = (receiptUrl, documentName) => {
     try {
       // Extract the file extension from the URL (e.g., "pdf", "jpg", "png")
-      const fileExtension = receiptUrl.split('.').pop().toLowerCase();
+      const fileExtension = receiptUrl.split(".").pop().toLowerCase();
 
       // Generate the file name (e.g., "MyDocument_receipt.pdf")
       const fileName = `${documentName}_receipt.${fileExtension}`;
@@ -69,7 +69,11 @@ const VerifyDocuments = () => {
       document.body.removeChild(link); // Clean up by removing the link
     } catch (error) {
       console.error("Error downloading receipt:", error);
-      Swal.fire("Error", "Failed to download receipt. Please try again.", "error");
+      Swal.fire(
+        "Error",
+        "Failed to download receipt. Please try again.",
+        "error"
+      );
     }
   };
 
@@ -138,7 +142,9 @@ const VerifyDocuments = () => {
       await axios.post(
         "https://mazedakhale.in/api/certificates/upload",
         formData,
-        { headers: { "Content-Type": "multipart/form-data" } }
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
       );
       // re-fetch certificates and update document status
       await fetchCertificates();
@@ -165,7 +171,8 @@ const VerifyDocuments = () => {
 
   const handleViewCertificate = async (documentId) => {
     const certificateId = getCertificateByDocumentId(documentId);
-    if (!certificateId) return Swal.fire("Error", "Certificate not found", "error");
+    if (!certificateId)
+      return Swal.fire("Error", "Certificate not found", "error");
     try {
       const res = await axios.get(
         `https://mazedakhale.in/api/certificates/${certificateId}`
@@ -183,7 +190,7 @@ const VerifyDocuments = () => {
       <div className="w-[90%] max-w-6xl bg-white shadow-lg rounded-lg">
         <div className="relative border-t-4 border-orange-400 bg-[#F4F4F4] p-4 rounded-t-lg">
           <h2 className="text-2xl font-bold text-gray-800 text-center">
-            Manage  Applications  List
+            Manage Applications List
           </h2>
           <button
             onClick={() => {
@@ -208,7 +215,7 @@ const VerifyDocuments = () => {
                   "Actions",
                   "View",
                   "Receipt",
-                  "Certificate"
+                  "Certificate",
                 ].map((h, i) => (
                   <th key={i} className="border p-3 text-center font-semibold">
                     {h}
@@ -222,55 +229,89 @@ const VerifyDocuments = () => {
                   key={doc.document_id}
                   className={idx % 2 === 0 ? "bg-white" : "bg-[#F58A3B14]"}
                 >
-                  <td className="border p-3 text-center">{doc.application_id}</td>
+                  <td className="border p-3 text-center">
+                    {doc.application_id}
+                  </td>
                   <td className="border px-4 py-2 text-sm">
                     {Array.isArray(doc.document_fields)
-                      ? doc.document_fields.find(f => f.field_name === "APPLICANT NAME")?.field_value || "-"
+                      ? doc.document_fields.find(
+                          (f) => f.field_name === "APPLICANT NAME"
+                        )?.field_value || "-"
                       : doc.document_fields["APPLICANT NAME"] || "-"}
                   </td>
                   <td className="border p-2 text-center">
                     {(() => {
                       const date = new Date(doc.uploaded_at);
-                      const formattedDate = `${String(date.getDate()).padStart(2, '0')}-${String(date.getMonth() + 1).padStart(2, '0')}-${date.getFullYear()}`;
-                      const formattedTime = date.toLocaleTimeString('en-US', {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        second: '2-digit',
+                      const formattedDate = `${String(date.getDate()).padStart(
+                        2,
+                        "0"
+                      )}-${String(date.getMonth() + 1).padStart(
+                        2,
+                        "0"
+                      )}-${date.getFullYear()}`;
+                      const formattedTime = date.toLocaleTimeString("en-US", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        second: "2-digit",
                         hour12: true,
                       });
                       return (
                         <>
                           <div>{formattedDate}</div>
-                          <div className="text-sm text-gray-600">{formattedTime}</div>
+                          <div className="text-sm text-gray-600">
+                            {formattedTime}
+                          </div>
                         </>
                       );
                     })()}
                   </td>
-                  <td className="border p-3 text-center">{doc.category_name}</td>
-                  <td className="border p-3 text-center">{doc.subcategory_name}</td>
                   <td className="border p-3 text-center">
-                    <button onClick={() => handleViewInvoice(doc.document_id)} className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition">
+                    {doc.category_name}
+                  </td>
+                  <td className="border p-3 text-center">
+                    {doc.subcategory_name}
+                  </td>
+                  <td className="border p-3 text-center">
+                    <button
+                      onClick={() => handleViewInvoice(doc.document_id)}
+                      className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition"
+                    >
                       Action
                     </button>
                   </td>
                   <td className="border p-3 text-center">
-                    <button onClick={() => handleView(doc.document_id)} className="bg-indigo-500 text-white px-3 py-1 rounded hover:bg-indigo-600 transition">
+                    <button
+                      onClick={() => handleView(doc.document_id)}
+                      className="bg-indigo-500 text-white px-3 py-1 rounded hover:bg-indigo-600 transition"
+                    >
                       View
                     </button>
                   </td>
                   <td className="border p-3 text-center">
                     {doc.receipt_url ? (
-                      <button onClick={() => handleDownloadReceipt(doc.receipt_url, doc.name)} className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 transition flex items-center justify-center">
+                      <button
+                        onClick={() =>
+                          handleDownloadReceipt(doc.receipt_url, doc.name)
+                        }
+                        className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 transition flex items-center justify-center"
+                      >
                         <FaDownload className="mr-1" /> Receipt
                       </button>
-                    ) : <span className="text-gray-500">Not Available</span>}
+                    ) : (
+                      <span className="text-gray-500">Not Available</span>
+                    )}
                   </td>
                   <td className="border p-3 text-center">
                     {getCertificateByDocumentId(doc.document_id) ? (
-                      <button onClick={() => handleViewCertificate(doc.document_id)} className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 transition flex items-center justify-center">
+                      <button
+                        onClick={() => handleViewCertificate(doc.document_id)}
+                        className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 transition flex items-center justify-center"
+                      >
                         <FaCheck className="mr-1" /> Certificate
                       </button>
-                    ) : <span className="text-gray-500">Not Available</span>}
+                    ) : (
+                      <span className="text-gray-500">Not Available</span>
+                    )}
                   </td>
                 </tr>
               ))}
@@ -282,7 +323,10 @@ const VerifyDocuments = () => {
       {showPreview && (
         <div className="fixed inset-0 bg-black bg-opacity-80 flex justify-center items-center">
           <div className="relative w-3/4 h-3/4 bg-white shadow-lg rounded-lg">
-            <button onClick={() => setShowPreview(false)} className="absolute top-3 right-3 bg-red-500 text-white px-3 py-2 rounded">
+            <button
+              onClick={() => setShowPreview(false)}
+              className="absolute top-3 right-3 bg-red-500 text-white px-3 py-2 rounded"
+            >
               Close
             </button>
             <iframe src={previewFile} className="w-full h-full border-none" />

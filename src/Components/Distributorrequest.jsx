@@ -10,7 +10,7 @@ import { FaDownload, FaTimes, FaCheck } from "react-icons/fa";
 const ErrorRequests = () => {
   const [errorRequests, setErrorRequests] = useState([]);
   const [certificates, setCertificates] = useState([]);
-  const [assignedDocs, setAssignedDocs] = useState([]);      // ← new
+  const [assignedDocs, setAssignedDocs] = useState([]); // ← new
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -24,7 +24,7 @@ const ErrorRequests = () => {
     if (!distributorId) return;
     fetchErrorRequests();
     fetchCertificates();
-    fetchAssignedDocuments();   // ← new
+    fetchAssignedDocuments(); // ← new
   }, [distributorId]);
 
   const fetchErrorRequests = async () => {
@@ -69,11 +69,11 @@ const ErrorRequests = () => {
 
   // ← new helper to pull “APPLICANT NAME” out of that document’s fields
   const getApplicantName = (req) => {
-    const doc = assignedDocs.find(d => d.document_id === req.document_id);
+    const doc = assignedDocs.find((d) => d.document_id === req.document_id);
     if (!doc) return "-";
     const f = doc.document_fields;
     if (Array.isArray(f)) {
-      const entry = f.find(x => x.field_name === "APPLICANT NAME");
+      const entry = f.find((x) => x.field_name === "APPLICANT NAME");
       return entry?.field_value ?? "-";
     }
     return f?.["APPLICANT NAME"] ?? "-";
@@ -169,7 +169,10 @@ const ErrorRequests = () => {
       await axios[method](url, formData);
       await axios.patch(
         `https://mazedakhale.in/api/request-errors/update-status/${req.request_id}`,
-        { request_status: type === "certificate" ? "Uploaded" : "Receipt Uploaded" }
+        {
+          request_status:
+            type === "certificate" ? "Uploaded" : "Receipt Uploaded",
+        }
       );
       await fetchErrorRequests();
       Swal.fire("Uploaded!", "", "success");
@@ -272,7 +275,7 @@ const ErrorRequests = () => {
                       {r.application_id}
                     </td>
                     <td className="border p-2 text-center">
-                      {getApplicantName(r)}       {/* ← your new column */}
+                      {getApplicantName(r)} {/* ← your new column */}
                     </td>
                     <td className="border p-2 text-center">{r.error_type}</td>
                     <td className="border p-2 text-center">
@@ -290,36 +293,41 @@ const ErrorRequests = () => {
                     </td>
                     <td className="border p-2 text-center">
                       <span
-                        className={`px-2 py-1 rounded-full text-white text-sm ${r.request_status === "Approved"
-                          ? "bg-green-500"
-                          : r.request_status === "Rejected"
+                        className={`px-2 py-1 rounded-full text-white text-sm ${
+                          r.request_status === "Approved"
+                            ? "bg-green-500"
+                            : r.request_status === "Rejected"
                             ? "bg-red-500"
                             : r.request_status === "Uploaded"
-                              ? "bg-purple-500"
-                              : r.request_status === "Completed"
-                                ? "bg-gray-500"
-                                : "bg-yellow-500"
-                          }`}
+                            ? "bg-purple-500"
+                            : r.request_status === "Completed"
+                            ? "bg-gray-500"
+                            : "bg-yellow-500"
+                        }`}
                       >
                         {r.request_status}
                       </span>
                     </td>
                     <td className="border p-2 text-center">
                       {(() => {
-                        const date = new Date(r.request_date
-
-                        );
-                        const formattedDate = `${String(date.getDate()).padStart(2, '0')}-${String(date.getMonth() + 1).padStart(2, '0')}-${date.getFullYear()}`;
-                        const formattedTime = date.toLocaleTimeString('en-US', {
-                          hour: '2-digit',
-                          minute: '2-digit',
-                          second: '2-digit',
+                        const date = new Date(r.request_date);
+                        const formattedDate = `${String(
+                          date.getDate()
+                        ).padStart(2, "0")}-${String(
+                          date.getMonth() + 1
+                        ).padStart(2, "0")}-${date.getFullYear()}`;
+                        const formattedTime = date.toLocaleTimeString("en-US", {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                          second: "2-digit",
                           hour12: true,
                         });
                         return (
                           <>
                             <div>{formattedDate}</div>
-                            <div className="text-sm text-gray-600">{formattedTime}</div>
+                            <div className="text-sm text-gray-600">
+                              {formattedTime}
+                            </div>
                           </>
                         );
                       })()}

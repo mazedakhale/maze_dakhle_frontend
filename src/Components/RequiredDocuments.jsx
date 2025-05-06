@@ -29,12 +29,17 @@ const RequiredDocuments = () => {
 
   const fetchDocuments = async () => {
     try {
-      const response = await axios.get("https://mazedakhale.in/api/required-documents");
+      const response = await axios.get(
+        "https://mazedakhale.in/api/required-documents"
+      );
       // Add default values for category and subcategory if they are null
       const documentsWithDefaults = response.data.map((doc) => ({
         ...doc,
         category: doc.category || { category_id: "", category_name: "N/A" },
-        subcategory: doc.subcategory || { subcategory_id: "", subcategory_name: "N/A" },
+        subcategory: doc.subcategory || {
+          subcategory_id: "",
+          subcategory_name: "N/A",
+        },
       }));
       setDocuments(documentsWithDefaults);
     } catch (error) {
@@ -54,7 +59,9 @@ const RequiredDocuments = () => {
   const fetchSubcategories = async (categoryId) => {
     if (!categoryId) return;
     try {
-      const response = await axios.get(`https://mazedakhale.in/api/subcategories/category/${categoryId}`);
+      const response = await axios.get(
+        `https://mazedakhale.in/api/subcategories/category/${categoryId}`
+      );
       setSubcategories(response.data);
     } catch (error) {
       console.error("Error fetching subcategories:", error);
@@ -64,7 +71,11 @@ const RequiredDocuments = () => {
 
   const handleCategoryChange = (e) => {
     const selectedCategoryId = e.target.value;
-    setFormData({ ...formData, category_id: selectedCategoryId, subcategory_id: "" });
+    setFormData({
+      ...formData,
+      category_id: selectedCategoryId,
+      subcategory_id: "",
+    });
     fetchSubcategories(selectedCategoryId);
   };
 
@@ -92,7 +103,9 @@ const RequiredDocuments = () => {
 
     if (confirmDelete.isConfirmed) {
       try {
-        await axios.delete(`https://mazedakhale.in/api/required-documents/${id}`);
+        await axios.delete(
+          `https://mazedakhale.in/api/required-documents/${id}`
+        );
         setDocuments((prevDocuments) =>
           prevDocuments.filter((document) => document.id !== id)
         );
@@ -156,7 +169,11 @@ const RequiredDocuments = () => {
         timeout: 30000, // Increase timeout to 30 seconds
       });
 
-      Swal.fire("Success!", `Document ${editId ? "updated" : "added"} successfully`, "success");
+      Swal.fire(
+        "Success!",
+        `Document ${editId ? "updated" : "added"} successfully`,
+        "success"
+      );
       setModalOpen(false);
       setFormData({
         category_id: "",
@@ -171,14 +188,17 @@ const RequiredDocuments = () => {
       if (error.code === "ECONNABORTED") {
         Swal.fire("Error!", "Request timed out. Please try again.", "error");
       } else {
-        Swal.fire("Error!", `Failed to ${editId ? "update" : "add"} document`, "error");
+        Swal.fire(
+          "Error!",
+          `Failed to ${editId ? "update" : "add"} document`,
+          "error"
+        );
       }
     }
   };
 
   return (
     <div className="ml-[300px] mt-[80px] p-6 w-[calc(100%-260px)] overflow-x-hidden">
-
       <div className="relative bg-white shadow-lg rounded-lg border border-gray-300 overflow-hidden">
         {/* Header */}
         <div className="relative border-t-4 border-orange-400 bg-[#F4F4F4] p-4 rounded-t-lg">
@@ -211,8 +231,17 @@ const RequiredDocuments = () => {
           <table className="w-full border border-[#776D6DA8] text-sm bg-white shadow-md rounded-md">
             <thead className="bg-[#F58A3B14] border-b-2 border-[#776D6DA8]">
               <tr>
-                {["Document Names", "Category", "Subcategory", "File URL", "Actions"].map((header, index) => (
-                  <th key={index} className="px-4 py-3 border border-[#776D6DA8] text-black font-semibold text-center">
+                {[
+                  "Document Names",
+                  "Category",
+                  "Subcategory",
+                  "File URL",
+                  "Actions",
+                ].map((header, index) => (
+                  <th
+                    key={index}
+                    className="px-4 py-3 border border-[#776D6DA8] text-black font-semibold text-center"
+                  >
                     {header}
                   </th>
                 ))}
@@ -223,7 +252,9 @@ const RequiredDocuments = () => {
                 documents.map((doc, index) => (
                   <tr
                     key={doc.id}
-                    className={`${index % 2 === 0 ? "bg-[#FFFFFF]" : "bg-[#F58A3B14]"} hover:bg-orange-100 transition duration-200`}
+                    className={`${
+                      index % 2 === 0 ? "bg-[#FFFFFF]" : "bg-[#F58A3B14]"
+                    } hover:bg-orange-100 transition duration-200`}
                   >
                     <td className="px-4 py-3 border border-[#776D6DA8] text-center">
                       {editId === doc.id ? (
@@ -241,7 +272,9 @@ const RequiredDocuments = () => {
                       {doc.category ? doc.category.category_name : "N/A"}
                     </td>
                     <td className="px-4 py-3 border border-[#776D6DA8] text-center">
-                      {doc.subcategory ? doc.subcategory.subcategory_name : "N/A"}
+                      {doc.subcategory
+                        ? doc.subcategory.subcategory_name
+                        : "N/A"}
                     </td>
                     <td className="px-4 py-3 border border-[#776D6DA8] text-center">
                       {doc.file_url ? (
@@ -284,7 +317,10 @@ const RequiredDocuments = () => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="5" className="px-4 py-3 border border-[#776D6DA8] text-center">
+                  <td
+                    colSpan="5"
+                    className="px-4 py-3 border border-[#776D6DA8] text-center"
+                  >
                     No documents found.
                   </td>
                 </tr>
@@ -298,7 +334,9 @@ const RequiredDocuments = () => {
       {modalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
           <div className="p-6 bg-white rounded-lg shadow-lg w-[400px]">
-            <h3 className="text-xl font-semibold mb-4">{editId ? "Edit Document" : "Add Document"}</h3>
+            <h3 className="text-xl font-semibold mb-4">
+              {editId ? "Edit Document" : "Add Document"}
+            </h3>
             <form onSubmit={handleSubmit}>
               <select
                 className="border border-gray-300 p-2 rounded w-full mb-4"
@@ -307,7 +345,10 @@ const RequiredDocuments = () => {
               >
                 <option value="">Select Category</option>
                 {categories.map((category) => (
-                  <option key={category.category_id} value={category.category_id}>
+                  <option
+                    key={category.category_id}
+                    value={category.category_id}
+                  >
                     {category.category_name}
                   </option>
                 ))}
@@ -315,11 +356,16 @@ const RequiredDocuments = () => {
               <select
                 className="border border-gray-300 p-2 rounded w-full mb-4"
                 value={formData.subcategory_id}
-                onChange={(e) => setFormData({ ...formData, subcategory_id: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, subcategory_id: e.target.value })
+                }
               >
                 <option value="">Select Subcategory</option>
                 {subcategories.map((subcategory) => (
-                  <option key={subcategory.subcategory_id} value={subcategory.subcategory_id}>
+                  <option
+                    key={subcategory.subcategory_id}
+                    value={subcategory.subcategory_id}
+                  >
                     {subcategory.subcategory_name}
                   </option>
                 ))}
@@ -329,14 +375,18 @@ const RequiredDocuments = () => {
                 className="border border-gray-300 p-2 rounded w-full mb-4"
                 placeholder="Enter document name"
                 value={formData.document_names}
-                onChange={(e) => setFormData({ ...formData, document_names: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, document_names: e.target.value })
+                }
               />
               {/* Show File Upload Only for Adding New Documents */}
               {!editId && (
                 <input
                   type="file"
                   className="border border-gray-300 p-2 rounded w-full mb-4"
-                  onChange={(e) => setFormData({ ...formData, file: e.target.files[0] })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, file: e.target.files[0] })
+                  }
                   required
                 />
               )}

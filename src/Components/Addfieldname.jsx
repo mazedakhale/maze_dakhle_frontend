@@ -5,7 +5,6 @@ import Swal from "sweetalert2";
 import { FaPlus, FaEdit, FaTrash, FaSave, FaTimes } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
-
 const FieldNames = () => {
   const [fields, setFields] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -28,7 +27,9 @@ const FieldNames = () => {
 
   const fetchFields = async () => {
     try {
-      const response = await axios.get("https://mazedakhale.in/api/field-names");
+      const response = await axios.get(
+        "https://mazedakhale.in/api/field-names"
+      );
       setFields(response.data);
     } catch (error) {
       console.error("Error fetching field names:", error);
@@ -47,7 +48,9 @@ const FieldNames = () => {
   const fetchSubcategories = async (categoryId) => {
     if (!categoryId) return;
     try {
-      const response = await axios.get(`https://mazedakhale.in/api/subcategories/category/${categoryId}`);
+      const response = await axios.get(
+        `https://mazedakhale.in/api/subcategories/category/${categoryId}`
+      );
       setSubcategories(response.data);
     } catch (error) {
       console.error("Error fetching subcategories:", error);
@@ -57,7 +60,11 @@ const FieldNames = () => {
 
   const handleCategoryChange = (e) => {
     const selectedCategoryId = e.target.value;
-    setFormData({ ...formData, category_id: selectedCategoryId, subcategory_id: "" });
+    setFormData({
+      ...formData,
+      category_id: selectedCategoryId,
+      subcategory_id: "",
+    });
     fetchSubcategories(selectedCategoryId);
   };
 
@@ -80,14 +87,12 @@ const FieldNames = () => {
         }
         return true;
       },
-      allowOutsideClick: () => !Swal.isLoading()
+      allowOutsideClick: () => !Swal.isLoading(),
     });
 
     if (confirmDelete.isConfirmed) {
       // **Remove the field from UI immediately**
-      setFields((prevFields) =>
-        prevFields.filter((field) => field.id !== id)
-      );
+      setFields((prevFields) => prevFields.filter((field) => field.id !== id));
 
       // **Show success message instantly**
       Swal.fire("Deleted!", "Field Name deleted successfully", "success");
@@ -112,7 +117,9 @@ const FieldNames = () => {
 
   const handleSave = async (id) => {
     try {
-      await axios.patch(`https://mazedakhale.in/api/field-names/${id}`, { document_fields: editableField });
+      await axios.patch(`https://mazedakhale.in/api/field-names/${id}`, {
+        document_fields: editableField,
+      });
       Swal.fire("Updated!", "Field Name updated successfully", "success");
       setEditId(null);
       setEditableField("");
@@ -138,12 +145,11 @@ const FieldNames = () => {
 
   return (
     <div className="ml-[300px] mt-[80px] p-6 w-[calc(100%-260px)] overflow-x-hidden">
-
       <div className="relative bg-white shadow-lg rounded-lg border border-gray-300 overflow-hidden">
         {/* Header */}
         <div className="relative border-t-4 border-orange-400 bg-[#F4F4F4] p-4 rounded-t-lg">
           <h2 className="text-2xl font-bold text-gray-800 text-center">
-            Fields  List
+            Fields List
           </h2>
           <button
             onClick={() => {
@@ -171,11 +177,16 @@ const FieldNames = () => {
           <table className="w-full border border-[#776D6DA8] text-sm bg-white shadow-md rounded-md">
             <thead className="bg-[#F58A3B14] border-b-2 border-[#776D6DA8]">
               <tr>
-                {["Field Name", "Category", "Subcategory", "Actions"].map((header, index) => (
-                  <th key={index} className="px-4 py-3 border border-[#776D6DA8] text-black font-semibold text-center">
-                    {header}
-                  </th>
-                ))}
+                {["Field Name", "Category", "Subcategory", "Actions"].map(
+                  (header, index) => (
+                    <th
+                      key={index}
+                      className="px-4 py-3 border border-[#776D6DA8] text-black font-semibold text-center"
+                    >
+                      {header}
+                    </th>
+                  )
+                )}
               </tr>
             </thead>
             <tbody>
@@ -183,7 +194,9 @@ const FieldNames = () => {
                 fields.map((field, index) => (
                   <tr
                     key={field.id}
-                    className={`${index % 2 === 0 ? "bg-[#FFFFFF]" : "bg-[#F58A3B14]"} hover:bg-orange-100 transition duration-200`}
+                    className={`${
+                      index % 2 === 0 ? "bg-[#FFFFFF]" : "bg-[#F58A3B14]"
+                    } hover:bg-orange-100 transition duration-200`}
                   >
                     <td className="px-4 py-3 border border-[#776D6DA8] text-center">
                       {editId === field.id ? (
@@ -230,7 +243,10 @@ const FieldNames = () => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="4" className="px-4 py-3 border border-[#776D6DA8] text-center">
+                  <td
+                    colSpan="4"
+                    className="px-4 py-3 border border-[#776D6DA8] text-center"
+                  >
                     No field names found.
                   </td>
                 </tr>
@@ -253,7 +269,10 @@ const FieldNames = () => {
               >
                 <option value="">Select Category</option>
                 {categories.map((category) => (
-                  <option key={category.category_id} value={category.category_id}>
+                  <option
+                    key={category.category_id}
+                    value={category.category_id}
+                  >
                     {category.category_name}
                   </option>
                 ))}
@@ -261,12 +280,17 @@ const FieldNames = () => {
               <select
                 className="border border-gray-300 p-2 rounded w-full mb-4"
                 value={formData.subcategory_id}
-                onChange={(e) => setFormData({ ...formData, subcategory_id: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, subcategory_id: e.target.value })
+                }
                 disabled={!formData.category_id}
               >
                 <option value="">Select Subcategory</option>
                 {subcategories.map((subcategory) => (
-                  <option key={subcategory.subcategory_id} value={subcategory.subcategory_id}>
+                  <option
+                    key={subcategory.subcategory_id}
+                    value={subcategory.subcategory_id}
+                  >
                     {subcategory.subcategory_name}
                   </option>
                 ))}
@@ -276,7 +300,9 @@ const FieldNames = () => {
                 className="border border-gray-300 p-2 rounded w-full mb-4"
                 placeholder="Field Name"
                 value={formData.document_fields}
-                onChange={(e) => setFormData({ ...formData, document_fields: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, document_fields: e.target.value })
+                }
               />
               <div className="flex justify-end space-x-3">
                 <button
@@ -299,7 +325,6 @@ const FieldNames = () => {
       )}
     </div>
   );
-
 };
 
 export default FieldNames;

@@ -7,7 +7,10 @@ import { useNavigate } from "react-router-dom";
 const DocumentTable = () => {
   const [documents, setDocuments] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [formData, setFormData] = useState({ doc_type_name: "", description: "" });
+  const [formData, setFormData] = useState({
+    doc_type_name: "",
+    description: "",
+  });
   const [editingDoc, setEditingDoc] = useState(null);
   const [isAdding, setIsAdding] = useState(false);
 
@@ -19,17 +22,19 @@ const DocumentTable = () => {
 
   const fetchDocuments = async () => {
     try {
-      const { data } = await axios.get("https://mazedakhale.in/api/document-types");
+      const { data } = await axios.get(
+        "https://mazedakhale.in/api/document-types"
+      );
       setDocuments(data);
     } catch (error) {
       console.error("Error fetching documents:", error);
     }
   };
 
-  const handleChange = e =>
-    setFormData(fd => ({ ...fd, [e.target.name]: e.target.value }));
+  const handleChange = (e) =>
+    setFormData((fd) => ({ ...fd, [e.target.name]: e.target.value }));
 
-  const handleSubmit = async e => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       if (editingDoc) {
@@ -38,7 +43,10 @@ const DocumentTable = () => {
           formData
         );
       } else {
-        await axios.post("https://mazedakhale.in/api/document-types/", formData);
+        await axios.post(
+          "https://mazedakhale.in/api/document-types/",
+          formData
+        );
       }
       setIsModalOpen(false);
       setEditingDoc(null);
@@ -51,7 +59,7 @@ const DocumentTable = () => {
     }
   };
 
-  const handleDelete = async id => {
+  const handleDelete = async (id) => {
     const res = await Swal.fire({
       title: "Are you sure?",
       text: "This document will be deleted permanently!",
@@ -72,19 +80,20 @@ const DocumentTable = () => {
     }
   };
 
-  const handleEdit = doc => {
-    setFormData({ doc_type_name: doc.doc_type_name, description: doc.description });
+  const handleEdit = (doc) => {
+    setFormData({
+      doc_type_name: doc.doc_type_name,
+      description: doc.description,
+    });
     setEditingDoc(doc);
     setIsModalOpen(true);
   };
 
   return (
     <div className="ml-[300px] mt-[80px] p-6 w-[calc(100%-260px)] overflow-x-hidden">
-
       <div className="relative bg-white shadow-lg rounded-lg border border-gray-300 overflow-hidden">
         {/* Header */}
         <div className="relative border-t-4 border-orange-400 bg-[#F4F4F4] p-4 rounded-t-lg">
-
           <h2 className="text-2xl font-bold text-gray-800 text-center">
             Services List
           </h2>
@@ -99,8 +108,6 @@ const DocumentTable = () => {
           </button>
         </div>
 
-
-
         {/* Add Button */}
         <div className="p-4 flex justify-end">
           <button
@@ -111,21 +118,22 @@ const DocumentTable = () => {
           </button>
         </div>
 
-
         {/* TABLE */}
         <div className="p-6 overflow-x-auto">
           <div className="overflow-x-auto max-h-[600px] overflow-y-auto">
             <table className="w-full border-collapse">
               <thead className="bg-gray-300 sticky top-0">
                 <tr>
-                  {["ID", "Document Name", "Description", "Actions"].map((h, i) => (
-                    <th
-                      key={i}
-                      className="p-3 border border-gray-400 text-left font-semibold"
-                    >
-                      {h}
-                    </th>
-                  ))}
+                  {["ID", "Document Name", "Description", "Actions"].map(
+                    (h, i) => (
+                      <th
+                        key={i}
+                        className="p-3 border border-gray-400 text-left font-semibold"
+                      >
+                        {h}
+                      </th>
+                    )
+                  )}
                 </tr>
               </thead>
               <tbody>
@@ -133,12 +141,19 @@ const DocumentTable = () => {
                   documents.map((doc, idx) => (
                     <tr
                       key={doc.doc_type_id}
-                      className={`${idx % 2 === 0 ? "bg-white" : "bg-gray-50"
-                        } hover:bg-gray-100 transition-colors`}
+                      className={`${
+                        idx % 2 === 0 ? "bg-white" : "bg-gray-50"
+                      } hover:bg-gray-100 transition-colors`}
                     >
-                      <td className="p-3 border border-gray-300">{doc.doc_type_id}</td>
-                      <td className="p-3 border border-gray-300">{doc.doc_type_name}</td>
-                      <td className="p-3 border border-gray-300">{doc.description}</td>
+                      <td className="p-3 border border-gray-300">
+                        {doc.doc_type_id}
+                      </td>
+                      <td className="p-3 border border-gray-300">
+                        {doc.doc_type_name}
+                      </td>
+                      <td className="p-3 border border-gray-300">
+                        {doc.description}
+                      </td>
                       <td className="p-3 border border-gray-300 flex gap-4">
                         <button
                           onClick={() => handleEdit(doc)}
@@ -231,8 +246,7 @@ const DocumentTable = () => {
           </div>
         )}
       </div>
-    </div >
-
+    </div>
   );
 };
 

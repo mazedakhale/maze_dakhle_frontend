@@ -1,6 +1,12 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { FaRegFileAlt, FaDownload, FaFileInvoice, FaCheck, FaTimes } from "react-icons/fa";
+import {
+  FaRegFileAlt,
+  FaDownload,
+  FaFileInvoice,
+  FaCheck,
+  FaTimes,
+} from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
 import "../styles/style.css"; // Import the CSS file
@@ -27,7 +33,6 @@ const Verifydocumentshistory = () => {
       })
       .catch((error) => console.error("Error fetching documents:", error));
 
-
     // Fetch distributors
     axios
       .get(`https://mazedakhale.in/api/users/distributors`)
@@ -36,13 +41,13 @@ const Verifydocumentshistory = () => {
 
     // Fetch certificates
     axios
-      .get('https://mazedakhale.in/api/certificates')
+      .get("https://mazedakhale.in/api/certificates")
       .then((response) => setCertificates(response.data))
       .catch((error) => console.error("Error fetching certificates:", error));
 
     // Fetch users
     axios
-      .get('https://mazedakhale.in/api/users/register')
+      .get("https://mazedakhale.in/api/users/register")
       .then((response) => setUsers(response.data))
       .catch((error) => console.error("Error fetching users:", error));
   }, []);
@@ -57,7 +62,7 @@ const Verifydocumentshistory = () => {
   const handleDownloadReceipt = (receiptUrl, documentName) => {
     try {
       // Extract the file extension from the URL (e.g., "pdf", "jpg", "png")
-      const fileExtension = receiptUrl.split('.').pop().toLowerCase();
+      const fileExtension = receiptUrl.split(".").pop().toLowerCase();
 
       // Generate the file name (e.g., "MyDocument_receipt.pdf")
       const fileName = `${documentName}_receipt.${fileExtension}`;
@@ -72,15 +77,22 @@ const Verifydocumentshistory = () => {
       document.body.removeChild(link); // Clean up by removing the link
     } catch (error) {
       console.error("Error downloading receipt:", error);
-      Swal.fire("Error", "Failed to download receipt. Please try again.", "error");
+      Swal.fire(
+        "Error",
+        "Failed to download receipt. Please try again.",
+        "error"
+      );
     }
   };
   // Update document status
   const handleUpdateStatus = async (documentId, newStatus) => {
     try {
-      await axios.put(`https://mazedakhale.in/api/documents/update-status/${documentId}`, {
-        status: newStatus,
-      });
+      await axios.put(
+        `https://mazedakhale.in/api/documents/update-status/${documentId}`,
+        {
+          status: newStatus,
+        }
+      );
       setDocuments((prev) =>
         prev.map((doc) =>
           doc.document_id === documentId ? { ...doc, status: newStatus } : doc
@@ -95,7 +107,9 @@ const Verifydocumentshistory = () => {
   const filteredDocuments = documents
     .filter((doc) => doc.status === "Completed") // Only include documents with status "Uploaded"
     .filter((doc) =>
-      statusFilter ? doc.status?.toLowerCase() === statusFilter.toLowerCase() : true
+      statusFilter
+        ? doc.status?.toLowerCase() === statusFilter.toLowerCase()
+        : true
     )
     .filter((doc) => {
       if (!searchQuery) return true;
@@ -114,12 +128,16 @@ const Verifydocumentshistory = () => {
     });
 
   const getDistributorName = (distributorId) => {
-    const distributor = users.find((user) => Number(user.user_id) === Number(distributorId));
+    const distributor = users.find(
+      (user) => Number(user.user_id) === Number(distributorId)
+    );
     return distributor ? distributor.name : "";
   };
 
   const handleViewInvoice = (documentId, categoryId, subcategoryId) => {
-    navigate(`/Invoice/${documentId}`, { state: { categoryId, subcategoryId } });
+    navigate(`/Invoice/${documentId}`, {
+      state: { categoryId, subcategoryId },
+    });
   };
 
   const handleView = (documentId, categoryId, subcategoryId) => {
@@ -127,7 +145,9 @@ const Verifydocumentshistory = () => {
   };
 
   const getCertificateByDocumentId = (documentId) => {
-    const matchedCertificate = certificates.find((cert) => cert.document_id === documentId);
+    const matchedCertificate = certificates.find(
+      (cert) => cert.document_id === documentId
+    );
     return matchedCertificate ? matchedCertificate.certificate_id : null;
   };
 
@@ -138,7 +158,9 @@ const Verifydocumentshistory = () => {
       return;
     }
     try {
-      const response = await axios.get(`https://mazedakhale.in/api/certificates/${certificateId}`);
+      const response = await axios.get(
+        `https://mazedakhale.in/api/certificates/${certificateId}`
+      );
       if (response.data && response.data.file_url) {
         window.open(response.data.file_url, "_blank");
       } else {
@@ -152,7 +174,12 @@ const Verifydocumentshistory = () => {
 
   const handleDownloadCertificate = async (documentId, name) => {
     try {
-      console.log("Downloading file for documentId:", documentId, "with name:", name); // Debugging
+      console.log(
+        "Downloading file for documentId:",
+        documentId,
+        "with name:",
+        name
+      ); // Debugging
 
       // Make the API call to download the file
       const response = await axios.get(
@@ -215,7 +242,9 @@ const Verifydocumentshistory = () => {
         {/* Filters */}
         <div className="p-4 flex justify-between items-center bg-gray-100 border-b border-gray-300">
           <div className="flex items-center space-x-4">
-            <label htmlFor="statusFilter" className="text-sm font-medium">Filter by Status:</label>
+            <label htmlFor="statusFilter" className="text-sm font-medium">
+              Filter by Status:
+            </label>
             <select
               id="statusFilter"
               value={statusFilter}
@@ -244,9 +273,13 @@ const Verifydocumentshistory = () => {
             <thead className="bg-gray-300">
               <tr>
                 <th className="border p-2 text-center font-bold">Sr No.</th>
-                <th className="border p-2 text-center font-bold">Application Id</th>
+                <th className="border p-2 text-center font-bold">
+                  Application Id
+                </th>
                 <th className="border p-2 text-center font-bold">Datetime</th>
-                <th className="border p-2 text-center font-bold">Applicant Name</th>
+                <th className="border p-2 text-center font-bold">
+                  Applicant Name
+                </th>
 
                 <th className="border p-2 font-bold">Category</th>
                 <th className="border p-2 font-bold">Subcategory</th>
@@ -268,34 +301,53 @@ const Verifydocumentshistory = () => {
               {filteredDocuments.map((doc, index) => (
                 <tr
                   key={doc.document_id}
-                  className={`border-t ${index % 2 === 0 ? "bg-white" : "bg-white"} hover:bg-gray-100`}
+                  className={`border-t ${
+                    index % 2 === 0 ? "bg-white" : "bg-white"
+                  } hover:bg-gray-100`}
                 >
                   <td className="border p-2 text-center">{index + 1}</td>
-                  <td className="border p-2 text-center">{doc.application_id}</td>
+                  <td className="border p-2 text-center">
+                    {doc.application_id}
+                  </td>
                   <td className="border p-2 text-center">
                     {(() => {
                       const date = new Date(doc.uploaded_at);
-                      const formattedDate = `${String(date.getDate()).padStart(2, '0')}-${String(date.getMonth() + 1).padStart(2, '0')}-${date.getFullYear()}`;
-                      const formattedTime = date.toLocaleTimeString('en-US', {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        second: '2-digit',
+                      const formattedDate = `${String(date.getDate()).padStart(
+                        2,
+                        "0"
+                      )}-${String(date.getMonth() + 1).padStart(
+                        2,
+                        "0"
+                      )}-${date.getFullYear()}`;
+                      const formattedTime = date.toLocaleTimeString("en-US", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        second: "2-digit",
                         hour12: true,
                       });
                       return (
                         <>
                           <div>{formattedDate}</div>
-                          <div className="text-sm text-gray-600">{formattedTime}</div>
+                          <div className="text-sm text-gray-600">
+                            {formattedTime}
+                          </div>
                         </>
                       );
                     })()}
                   </td>
                   <td className="px-4 py-2 border text-sm">
-                    {doc?.document_fields && typeof doc.document_fields === "object"
-                      ? (doc.document_fields["APPLICANT NAME"]
-                        ? <p>{doc.document_fields["APPLICANT NAME"]}</p>
-                        : <p className="text-gray-500">No applicant name available</p>)
-                      : <p className="text-gray-500">No fields available</p>}
+                    {doc?.document_fields &&
+                    typeof doc.document_fields === "object" ? (
+                      doc.document_fields["APPLICANT NAME"] ? (
+                        <p>{doc.document_fields["APPLICANT NAME"]}</p>
+                      ) : (
+                        <p className="text-gray-500">
+                          No applicant name available
+                        </p>
+                      )
+                    ) : (
+                      <p className="text-gray-500">No fields available</p>
+                    )}
                   </td>
 
                   <td className="border p-2">{doc.category_name}</td>
@@ -304,31 +356,43 @@ const Verifydocumentshistory = () => {
                   <td className="border p-2 break-words">{doc.email}</td>
                   <td className="border p-2 break-words">{doc.phone}</td>
 
-                  <td className="border p-2">{getDistributorName(doc.distributor_id)}</td>
+                  <td className="border p-2">
+                    {getDistributorName(doc.distributor_id)}
+                  </td>
                   <td className="border p-2">
                     <div className="flex flex-col gap-1">
                       {/* Status Badge */}
                       <span
-                        className={`px-3 py-1 rounded-full text-white text-xs ${doc.status === "Approved"
-                          ? "bg-green-500"
-                          : doc.status === "Rejected"
+                        className={`px-3 py-1 rounded-full text-white text-xs ${
+                          doc.status === "Approved"
+                            ? "bg-green-500"
+                            : doc.status === "Rejected"
                             ? "bg-red-500"
                             : doc.status === "Pending"
-                              ? "bg-yellow-500"
-                              : "bg-blue-500"
-                          }`}
+                            ? "bg-yellow-500"
+                            : "bg-blue-500"
+                        }`}
                       >
                         {doc.status}
                       </span>
 
                       {/* Latest Status Date and Time */}
                       {doc.status_history
-                        ?.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at))
+                        ?.sort(
+                          (a, b) =>
+                            new Date(b.updated_at) - new Date(a.updated_at)
+                        )
                         .slice(0, 1)
                         .map((statusEntry, index) => {
                           const dateObj = new Date(statusEntry.updated_at);
-                          const day = String(dateObj.getDate()).padStart(2, "0");
-                          const month = String(dateObj.getMonth() + 1).padStart(2, "0");
+                          const day = String(dateObj.getDate()).padStart(
+                            2,
+                            "0"
+                          );
+                          const month = String(dateObj.getMonth() + 1).padStart(
+                            2,
+                            "0"
+                          );
                           const year = dateObj.getFullYear();
                           const time = dateObj.toLocaleTimeString("en-US", {
                             hour: "2-digit",
@@ -355,20 +419,33 @@ const Verifydocumentshistory = () => {
                                         </button>
                                     </td> */}
                   <td className="border p-2 text-center">
-                    <button onClick={() => handleView(doc.document_id, doc.category_id, doc.subcategory_id)} className="bg-indigo-500 text-white px-3 py-1 rounded hover:bg-indigo-600 transition text-xs">
+                    <button
+                      onClick={() =>
+                        handleView(
+                          doc.document_id,
+                          doc.category_id,
+                          doc.subcategory_id
+                        )
+                      }
+                      className="bg-indigo-500 text-white px-3 py-1 rounded hover:bg-indigo-600 transition text-xs"
+                    >
                       <FaRegFileAlt className="mr-1" /> View
                     </button>
                   </td>
                   <td className="border p-3 text-center">
                     {doc.receipt_url ? ( // Check if receipt_url exists
                       <button
-                        onClick={() => handleDownloadReceipt(doc.receipt_url, doc.name)}
+                        onClick={() =>
+                          handleDownloadReceipt(doc.receipt_url, doc.name)
+                        }
                         className="bg-blue-500 text-white px-3 py-1 rounded flex justify-center items-center hover:bg-blue-600 transition"
                       >
-                        <FaDownload className="mr-1" />  Receipt
+                        <FaDownload className="mr-1" /> Receipt
                       </button>
                     ) : (
-                      <span className="text-gray-500 text-center">Not Available</span>
+                      <span className="text-gray-500 text-center">
+                        Not Available
+                      </span>
                     )}
                   </td>
                   <td className="border p-2 text-center">
@@ -383,7 +460,6 @@ const Verifydocumentshistory = () => {
                       <span className="text-gray-500">Not Available</span>
                     )}
                   </td>
-
                 </tr>
               ))}
             </tbody>

@@ -52,7 +52,7 @@ export default function AddCertificateRequestPage() {
     formData.append("subcategory_id", String(subcategoryId));
     formData.append("request_name", String(name));
     formData.append("request_email", String(email));
-    formData.append("error_type", errorType);  // now dynamic!
+    formData.append("error_type", errorType); // now dynamic!
 
     try {
       const resp = await axios.post(
@@ -82,11 +82,8 @@ export default function AddCertificateRequestPage() {
         >
           <FaTimes size={20} />
         </button>
-        <h2 className="text-2xl font-bold mb-4 text-center">
-          Report an Error
-        </h2>
+        <h2 className="text-2xl font-bold mb-4 text-center">Report an Error</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
-
           {/* Error Type Selector */}
           <div>
             <label className="block font-semibold mb-1">
@@ -105,9 +102,7 @@ export default function AddCertificateRequestPage() {
 
           {/* Description */}
           <div>
-            <label className="block font-semibold mb-1">
-              What’s wrong?
-            </label>
+            <label className="block font-semibold mb-1">What’s wrong?</label>
             <textarea
               className="w-full p-2 border rounded"
               rows={4}
@@ -136,8 +131,9 @@ export default function AddCertificateRequestPage() {
           <button
             type="submit"
             disabled={submitting}
-            className={`w-full py-2 text-white rounded ${submitting ? "bg-gray-500" : "bg-blue-600 hover:bg-blue-700"
-              }`}
+            className={`w-full py-2 text-white rounded ${
+              submitting ? "bg-gray-500" : "bg-blue-600 hover:bg-blue-700"
+            }`}
           >
             {submitting ? "Submitting…" : "Submit Error Request"}
           </button>

@@ -95,16 +95,23 @@ const Login = () => {
   const handleForgot = async (e) => {
     e.preventDefault();
     try {
-      const resp = await fetch("https://mazedakhale.in/api/users/forgot-password", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: formData.email }),
-      });
+      const resp = await fetch(
+        "https://mazedakhale.in/api/users/forgot-password",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: formData.email }),
+        }
+      );
       if (!resp.ok) {
         const { message } = await resp.json();
         throw new Error(message || "Request failed");
       }
-      Swal.fire("Email Sent", "Check your inbox for the reset link.", "success");
+      Swal.fire(
+        "Email Sent",
+        "Check your inbox for the reset link.",
+        "success"
+      );
       setMode("login");
       setFormData({ email: "", password: "" });
     } catch (error) {
@@ -175,7 +182,10 @@ const Login = () => {
               </p>
               <p className="mt-2 text-center">
                 Don’t have an account?{" "}
-                <Link to="/Registration" className="text-[#F58A3B] hover:underline">
+                <Link
+                  to="/Registration"
+                  className="text-[#F58A3B] hover:underline"
+                >
                   Register
                 </Link>
               </p>

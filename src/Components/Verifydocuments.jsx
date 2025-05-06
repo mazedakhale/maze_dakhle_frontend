@@ -56,9 +56,12 @@ const VerifyDocuments = () => {
   };
   const handleUpdateStatus = async (documentId, newStatus) => {
     try {
-      await axios.put(`https://mazedakhale.in/api/documents/update-status/${documentId}`, {
-        status: newStatus,
-      });
+      await axios.put(
+        `https://mazedakhale.in/api/documents/update-status/${documentId}`,
+        {
+          status: newStatus,
+        }
+      );
       setDocuments((prev) =>
         prev.map((doc) =>
           doc.document_id === documentId ? { ...doc, status: newStatus } : doc
@@ -74,7 +77,9 @@ const VerifyDocuments = () => {
   const filteredDocuments = documents
     .filter((doc) => doc.status !== "Completed" && doc.status !== "Rejected")
     .filter((doc) =>
-      statusFilter ? doc.status?.toLowerCase() === statusFilter.toLowerCase() : true
+      statusFilter
+        ? doc.status?.toLowerCase() === statusFilter.toLowerCase()
+        : true
     )
     .filter((doc) => {
       if (!searchQuery) return true;
@@ -92,8 +97,6 @@ const VerifyDocuments = () => {
       );
     });
 
-
-
   const getDistributorName = (distributorId) => {
     const distributor = users.find(
       (user) => Number(user.user_id) === Number(distributorId)
@@ -102,10 +105,11 @@ const VerifyDocuments = () => {
     return distributor ? distributor.name : "";
   };
 
-
   // Navigate to invoice view
   const handleViewInvoice = (documentId, categoryId, subcategoryId) => {
-    navigate(`/Invoice/${documentId}`, { state: { categoryId, subcategoryId } });
+    navigate(`/Invoice/${documentId}`, {
+      state: { categoryId, subcategoryId },
+    });
   };
 
   // Navigate to document view
@@ -129,7 +133,9 @@ const VerifyDocuments = () => {
       return;
     }
     try {
-      const response = await axios.get(`https://mazedakhale.in/api/certificates/${certificateId}`);
+      const response = await axios.get(
+        `https://mazedakhale.in/api/certificates/${certificateId}`
+      );
       if (response.data && response.data.file_url) {
         window.open(response.data.file_url, "_blank");
       } else {
@@ -146,7 +152,7 @@ const VerifyDocuments = () => {
       <div className="w-[90%] max-w-6xl bg-white shadow-lg rounded-lg">
         <div className="relative border-t-4 border-orange-400 bg-[#F4F4F4] p-4 rounded-t-lg">
           <h2 className="text-2xl font-bold text-gray-800 text-center">
-            Pending Applications  List
+            Pending Applications List
           </h2>
           <button
             onClick={() => {
@@ -161,7 +167,9 @@ const VerifyDocuments = () => {
         {/* Filters */}
         <div className="p-4 flex justify-between items-center bg-gray-100 border-b border-gray-300">
           <div className="flex items-center space-x-4">
-            <label htmlFor="statusFilter" className="text-sm font-medium">Filter by Status:</label>
+            <label htmlFor="statusFilter" className="text-sm font-medium">
+              Filter by Status:
+            </label>
             <select
               id="statusFilter"
               value={statusFilter}
@@ -191,8 +199,12 @@ const VerifyDocuments = () => {
             <thead className="bg-gray-300">
               <tr>
                 <th className="border p-2 text-center font-bold">Sr No.</th>
-                <th className="border p-2 text-center font-bold">Application Id</th>
-                <th className="border p-2 text-center font-bold">Applicant Name</th>
+                <th className="border p-2 text-center font-bold">
+                  Application Id
+                </th>
+                <th className="border p-2 text-center font-bold">
+                  Applicant Name
+                </th>
 
                 <th className="border p-2 text-center font-bold">Date</th>
 
@@ -212,26 +224,40 @@ const VerifyDocuments = () => {
               {filteredDocuments.map((doc, index) => (
                 <tr
                   key={doc.document_id}
-                  className={`border-t ${index % 2 === 0 ? "bg-white" : "bg-white"} hover:bg-gray-100`}
+                  className={`border-t ${
+                    index % 2 === 0 ? "bg-white" : "bg-white"
+                  } hover:bg-gray-100`}
                 >
                   <td className="border p-2 text-center">{index + 1}</td>
-                  <td className="border p-2 text-center">{doc.application_id}</td>
+                  <td className="border p-2 text-center">
+                    {doc.application_id}
+                  </td>
                   <td className="px-4 py-2 border text-sm">
                     {doc?.document_fields ? (
                       Array.isArray(doc.document_fields) ? (
                         // New format (array of objects)
-                        doc.document_fields.find(field => field.field_name === "APPLICANT NAME") ? (
-                          <p>{doc.document_fields.find(field => field.field_name === "APPLICANT NAME").field_value}</p>
+                        doc.document_fields.find(
+                          (field) => field.field_name === "APPLICANT NAME"
+                        ) ? (
+                          <p>
+                            {
+                              doc.document_fields.find(
+                                (field) => field.field_name === "APPLICANT NAME"
+                              ).field_value
+                            }
+                          </p>
                         ) : (
-                          <p className="text-gray-500">No applicant name available</p>
+                          <p className="text-gray-500">
+                            No applicant name available
+                          </p>
                         )
+                      ) : // Old format (object with key-value pairs)
+                      doc.document_fields["APPLICANT NAME"] ? (
+                        <p>{doc.document_fields["APPLICANT NAME"]}</p>
                       ) : (
-                        // Old format (object with key-value pairs)
-                        doc.document_fields["APPLICANT NAME"] ? (
-                          <p>{doc.document_fields["APPLICANT NAME"]}</p>
-                        ) : (
-                          <p className="text-gray-500">No applicant name available</p>
-                        )
+                        <p className="text-gray-500">
+                          No applicant name available
+                        </p>
                       )
                     ) : (
                       <p className="text-gray-500">No fields available</p>
@@ -240,17 +266,25 @@ const VerifyDocuments = () => {
                   <td className="border p-2 text-center">
                     {(() => {
                       const date = new Date(doc.uploaded_at);
-                      const formattedDate = `${String(date.getDate()).padStart(2, '0')}-${String(date.getMonth() + 1).padStart(2, '0')}-${date.getFullYear()}`;
-                      const formattedTime = date.toLocaleTimeString('en-US', {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        second: '2-digit',
+                      const formattedDate = `${String(date.getDate()).padStart(
+                        2,
+                        "0"
+                      )}-${String(date.getMonth() + 1).padStart(
+                        2,
+                        "0"
+                      )}-${date.getFullYear()}`;
+                      const formattedTime = date.toLocaleTimeString("en-US", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        second: "2-digit",
                         hour12: true,
                       });
                       return (
                         <>
                           <div>{formattedDate}</div>
-                          <div className="text-sm text-gray-600">{formattedTime}</div>
+                          <div className="text-sm text-gray-600">
+                            {formattedTime}
+                          </div>
                         </>
                       );
                     })()}
@@ -261,38 +295,47 @@ const VerifyDocuments = () => {
                   <td className="border p-2 break-words">{doc.email}</td>
                   <td className="border p-2 break-words">{doc.phone}</td>
 
-                  <td className="border p-2">{getDistributorName(doc.distributor_id)}</td>
+                  <td className="border p-2">
+                    {getDistributorName(doc.distributor_id)}
+                  </td>
                   <td className="border p-2">
                     <div className="flex flex-col gap-1">
                       {/* Status Badge */}
                       <span
-                        className={`px-3 py-1 rounded-full text-white text-xs ${doc.status === "Approved"
-                          ? "bg-green-500"
-                          : doc.status === "Rejected"
+                        className={`px-3 py-1 rounded-full text-white text-xs ${
+                          doc.status === "Approved"
+                            ? "bg-green-500"
+                            : doc.status === "Rejected"
                             ? "bg-red-500"
                             : doc.status === "Completed"
-                              ? "bg-yellow-500" // Color for Completed
-                              : "bg-blue-500" // Default color
-                          }`}
+                            ? "bg-yellow-500" // Color for Completed
+                            : "bg-blue-500" // Default color
+                        }`}
                       >
                         {doc.status}
                       </span>
 
                       {/* Latest Status Date and Time */}
                       {doc.status_history
-                        ?.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at)) // Sort by latest date
+                        ?.sort(
+                          (a, b) =>
+                            new Date(b.updated_at) - new Date(a.updated_at)
+                        ) // Sort by latest date
                         .slice(0, 1) // Take the first entry (latest status)
                         .map((statusEntry, index) => (
                           <div key={index} className="text-xs text-gray-600">
-                            {new Date(statusEntry.updated_at).toLocaleString("en-US", {
-                              year: "numeric",
-                              month: "2-digit",
-                              day: "2-digit",
-                              hour: "2-digit",
-                              minute: "2-digit",
-                              second: "2-digit", // Added seconds
-                              hour12: true, // Use AM/PM
-                            })}
+                            {new Date(statusEntry.updated_at).toLocaleString(
+                              "en-US",
+                              {
+                                year: "numeric",
+                                month: "2-digit",
+                                day: "2-digit",
+                                hour: "2-digit",
+                                minute: "2-digit",
+                                second: "2-digit", // Added seconds
+                                hour12: true, // Use AM/PM
+                              }
+                            )}
                           </div>
                         ))}
                     </div>

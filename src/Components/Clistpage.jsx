@@ -44,14 +44,14 @@ const ClistPage = () => {
     if (categoryId) {
       axios
         .get(`https://mazedakhale.in/api/categories/${categoryId}`)
-        .then(res => setCategoryName(res.data.category_name))
-        .catch(err => console.error("Error loading category:", err));
+        .then((res) => setCategoryName(res.data.category_name))
+        .catch((err) => console.error("Error loading category:", err));
     }
     if (subcategoryId) {
       axios
         .get(`https://mazedakhale.in/api/subcategories/${subcategoryId}`)
-        .then(res => setSubcategoryName(res.data.subcategory_name))
-        .catch(err => console.error("Error loading subcategory:", err));
+        .then((res) => setSubcategoryName(res.data.subcategory_name))
+        .catch((err) => console.error("Error loading subcategory:", err));
     }
   }, [categoryId, subcategoryId]);
 
@@ -59,26 +59,33 @@ const ClistPage = () => {
   useEffect(() => {
     if (!userId) return;
     const allowedStatuses = [
-      "Received", "Pending", "Approved",
-      "Rejected", "Uploaded", "Completed", "Sent"
+      "Received",
+      "Pending",
+      "Approved",
+      "Rejected",
+      "Uploaded",
+      "Completed",
+      "Sent",
     ];
 
     // Fetch all documents for this user
     axios
       .get("https://mazedakhale.in/api/documents/list")
-      .then(resp => {
+      .then((resp) => {
         const filtered = resp.data.documents
-          .filter(d => d.user_id === userId && allowedStatuses.includes(d.status))
+          .filter(
+            (d) => d.user_id === userId && allowedStatuses.includes(d.status)
+          )
           .reverse();
         setDocuments(filtered);
       })
-      .catch(err => console.error("Error fetching documents:", err));
+      .catch((err) => console.error("Error fetching documents:", err));
 
     // Fetch certificates
     axios
       .get("https://mazedakhale.in/api/certificates")
-      .then(resp => setCertificates(resp.data))
-      .catch(err => console.error("Error fetching certificates:", err));
+      .then((resp) => setCertificates(resp.data))
+      .catch((err) => console.error("Error fetching certificates:", err));
   }, [userId]);
 
   // 4️⃣ If categoryId & subcategoryId are provided, fetch that subset
@@ -87,8 +94,8 @@ const ClistPage = () => {
       const url = `https://mazedakhale.in/api/documents/doc/${categoryId}/${subcategoryId}/${userId}`;
       axios
         .get(url)
-        .then(resp => setDocuments(resp.data))
-        .catch(err => console.error("Error fetching category docs:", err));
+        .then((resp) => setDocuments(resp.data))
+        .catch((err) => console.error("Error fetching category docs:", err));
     }
   }, [userId, categoryId, subcategoryId]);
 
@@ -97,7 +104,7 @@ const ClistPage = () => {
     const input = document.createElement("input");
     input.type = "file";
     input.accept = ".pdf,.doc,.docx,.png,.jpg,.jpeg";
-    input.onchange = async e => {
+    input.onchange = async (e) => {
       const file = e.target.files[0];
       if (!file) return;
       const fd = new FormData();
@@ -111,8 +118,10 @@ const ClistPage = () => {
           { headers: { "Content-Type": "multipart/form-data" } }
         );
         alert("Reupload successful");
-        setDocuments(docs =>
-          docs.map(d => d.document_id === documentId ? resp.data.document : d)
+        setDocuments((docs) =>
+          docs.map((d) =>
+            d.document_id === documentId ? resp.data.document : d
+          )
         );
       } catch (err) {
         console.error("Reupload failed:", err);
@@ -134,8 +143,8 @@ const ClistPage = () => {
   };
 
   // Handler: view certificate
-  const handleViewCertificate = async docId => {
-    const cert = certificates.find(c => c.document_id === docId);
+  const handleViewCertificate = async (docId) => {
+    const cert = certificates.find((c) => c.document_id === docId);
     if (!cert) return alert("Certificate not found");
     try {
       const resp = await axios.get(
@@ -149,36 +158,42 @@ const ClistPage = () => {
   };
 
   // Helper: find cert by doc ID
-  const getCertificateByDocumentId = docId =>
-    certificates.find(c => c.document_id === docId);
+  const getCertificateByDocumentId = (docId) =>
+    certificates.find((c) => c.document_id === docId);
 
   // Handler: navigate to invoice view
   const handleViewInvoice = (docId) => {
-    navigate(`/Customerinvoice/${docId}`, { state: { categoryId, subcategoryId } });
+    navigate(`/Customerinvoice/${docId}`, {
+      state: { categoryId, subcategoryId },
+    });
   };
 
   // Handler: navigate to view details
-  const handleView = docId => {
+  const handleView = (docId) => {
     navigate(`/View/${docId}`, { state: { categoryId, subcategoryId } });
   };
 
   // Search filter
-  const handleSearch = e => setSearchQuery(e.target.value);
-  const filteredDocuments = documents.filter(doc => {
-    const matchesSearch = Object.values(doc)
-      .some(v => String(v).toLowerCase().includes(searchQuery.toLowerCase()));
+  const handleSearch = (e) => setSearchQuery(e.target.value);
+  const filteredDocuments = documents.filter((doc) => {
+    const matchesSearch = Object.values(doc).some((v) =>
+      String(v).toLowerCase().includes(searchQuery.toLowerCase())
+    );
     const matchesStatus = !statusFilter || doc.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
 
   // Date formatting
-  const formatDateTime = iso => {
+  const formatDateTime = (iso) => {
     const d = new Date(iso);
     const dd = String(d.getDate()).padStart(2, "0");
     const mm = String(d.getMonth() + 1).padStart(2, "0");
     const yyyy = d.getFullYear();
     const time = d.toLocaleTimeString("en-US", {
-      hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: true
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: true,
     });
     return `${dd}-${mm}-${yyyy} ${time}`;
   };
@@ -193,7 +208,8 @@ const ClistPage = () => {
           </h2>
           {categoryName && subcategoryName && (
             <p className="mt-1 text-center text-gray-600">
-              Documents for: <span className="font-semibold">{categoryName}</span> →{" "}
+              Documents for:{" "}
+              <span className="font-semibold">{categoryName}</span> →{" "}
               <span className="font-semibold">{subcategoryName}</span>
             </p>
           )}
@@ -207,7 +223,6 @@ const ClistPage = () => {
 
         {/* Search & Filter */}
         <div className="p-4 flex justify-end items-center gap-4 bg-white">
-
           <input
             type="text"
             placeholder="Search documents..."
@@ -217,7 +232,7 @@ const ClistPage = () => {
           />
           <select
             value={statusFilter}
-            onChange={e => setStatusFilter(e.target.value)}
+            onChange={(e) => setStatusFilter(e.target.value)}
             className="border-gray-300 p-2 rounded focus:ring-2 focus:ring-orange-400 text-sm"
           >
             <option value="">All Status</option>
@@ -267,41 +282,68 @@ const ClistPage = () => {
                 filteredDocuments.map((doc, idx) => (
                   <tr
                     key={doc.document_id}
-                    className={`${idx % 2 === 0 ? "bg-white" : "bg-[#F58A3B14]"} hover:bg-orange-100`}
+                    className={`${
+                      idx % 2 === 0 ? "bg-white" : "bg-[#F58A3B14]"
+                    } hover:bg-orange-100`}
                   >
                     <td className="px-4 py-2 border text-center">{idx + 1}</td>
-                    <td className="px-4 py-2 border text-center">{doc.application_id}</td>
+                    <td className="px-4 py-2 border text-center">
+                      {doc.application_id}
+                    </td>
                     <td className="px-4 py-2 border">
                       {(() => {
                         const fld = Array.isArray(doc.document_fields)
-                          ? doc.document_fields.find(f => f.field_name === "APPLICANT NAME")
-                          : { field_value: doc.document_fields?.["APPLICANT NAME"] };
-                        return fld?.field_value || <span className="text-gray-500">—</span>;
+                          ? doc.document_fields.find(
+                              (f) => f.field_name === "APPLICANT NAME"
+                            )
+                          : {
+                              field_value:
+                                doc.document_fields?.["APPLICANT NAME"],
+                            };
+                        return (
+                          fld?.field_value || (
+                            <span className="text-gray-500">—</span>
+                          )
+                        );
                       })()}
                     </td>
                     <td className="border p-2 text-center">
                       {(() => {
                         const date = new Date(doc.uploaded_at);
-                        const formattedDate = `${String(date.getDate()).padStart(2, '0')}-${String(date.getMonth() + 1).padStart(2, '0')}-${date.getFullYear()}`;
-                        const formattedTime = date.toLocaleTimeString('en-US', {
-                          hour: '2-digit',
-                          minute: '2-digit',
-                          second: '2-digit',
+                        const formattedDate = `${String(
+                          date.getDate()
+                        ).padStart(2, "0")}-${String(
+                          date.getMonth() + 1
+                        ).padStart(2, "0")}-${date.getFullYear()}`;
+                        const formattedTime = date.toLocaleTimeString("en-US", {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                          second: "2-digit",
                           hour12: true,
                         });
                         return (
                           <>
                             <div>{formattedDate}</div>
-                            <div className="text-sm text-gray-600">{formattedTime}</div>
+                            <div className="text-sm text-gray-600">
+                              {formattedTime}
+                            </div>
                           </>
                         );
                       })()}
                     </td>
-                    <td className="px-4 py-2 border text-center">{doc.category_name}</td>
-                    <td className="px-4 py-2 border text-center">{doc.subcategory_name}</td>
+                    <td className="px-4 py-2 border text-center">
+                      {doc.category_name}
+                    </td>
+                    <td className="px-4 py-2 border text-center">
+                      {doc.subcategory_name}
+                    </td>
                     <td className="px-4 py-2 border text-center">{doc.name}</td>
-                    <td className="px-4 py-2 border text-center">{doc.email}</td>
-                    <td className="px-4 py-2 border text-center">{doc.phone}</td>
+                    <td className="px-4 py-2 border text-center">
+                      {doc.email}
+                    </td>
+                    <td className="px-4 py-2 border text-center">
+                      {doc.phone}
+                    </td>
 
                     {/* Action */}
                     <td className="px-4 py-2 border text-center">
@@ -327,7 +369,12 @@ const ClistPage = () => {
                     <td className="px-4 py-2 border text-center">
                       <div className="flex justify-center space-x-2">
                         {doc.documents?.map((f, i) => (
-                          <a key={i} href={f.file_path} target="_blank" rel="noopener noreferrer">
+                          <a
+                            key={i}
+                            href={f.file_path}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
                             <FaFileAlt className="text-blue-500 text-xl" />
                           </a>
                         ))}
@@ -337,12 +384,13 @@ const ClistPage = () => {
                     {/* Verification status */}
                     <td className="px-4 py-2 border text-center">
                       <span
-                        className={`px-2 py-1 rounded-full text-xs text-white ${doc.status === "Approved"
-                          ? "bg-green-500"
-                          : doc.status === "Rejected"
+                        className={`px-2 py-1 rounded-full text-xs text-white ${
+                          doc.status === "Approved"
+                            ? "bg-green-500"
+                            : doc.status === "Rejected"
                             ? "bg-red-500"
                             : "bg-yellow-500"
-                          }`}
+                        }`}
                       >
                         {doc.status}
                       </span>
@@ -350,9 +398,12 @@ const ClistPage = () => {
 
                     {/* Download Receipt */}
                     <td className="px-4 py-2 border text-center">
-                      {["Received", "Uploaded"].includes(doc.status) && doc.receipt_url ? (
+                      {["Received", "Uploaded"].includes(doc.status) &&
+                      doc.receipt_url ? (
                         <button
-                          onClick={() => handleDownloadReceipt(doc.receipt_url, doc.name)}
+                          onClick={() =>
+                            handleDownloadReceipt(doc.receipt_url, doc.name)
+                          }
                           className="bg-orange-500 text-white px-2 py-1 rounded hover:bg-orange-600 flex items-center justify-center"
                         >
                           <FaDownload className="mr-1" /> Receipt
@@ -364,7 +415,8 @@ const ClistPage = () => {
 
                     {/* Certificate */}
                     <td className="px-4 py-2 border text-center">
-                      {doc.status === "Completed" && getCertificateByDocumentId(doc.document_id) ? (
+                      {doc.status === "Completed" &&
+                      getCertificateByDocumentId(doc.document_id) ? (
                         <button
                           onClick={() => handleViewCertificate(doc.document_id)}
                           className="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600 flex items-center justify-center text-xs"
@@ -379,7 +431,10 @@ const ClistPage = () => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="15" className="px-4 py-6 border text-center text-gray-500">
+                  <td
+                    colSpan="15"
+                    className="px-4 py-6 border text-center text-gray-500"
+                  >
                     No documents found.
                   </td>
                 </tr>

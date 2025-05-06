@@ -19,7 +19,9 @@ const ErrorRequests = () => {
 
   const fetchErrorRequests = async () => {
     try {
-      const response = await axios.get("https://mazedakhale.in/api/request-errors");
+      const response = await axios.get(
+        "https://mazedakhale.in/api/request-errors"
+      );
       setErrorRequests(response.data);
     } catch (error) {
       console.error("Error fetching error requests:", error);
@@ -28,7 +30,9 @@ const ErrorRequests = () => {
 
   const fetchCertificates = async () => {
     try {
-      const response = await axios.get("https://mazedakhale.in/api/certificates");
+      const response = await axios.get(
+        "https://mazedakhale.in/api/certificates"
+      );
       setCertificates(response.data);
     } catch (error) {
       console.error("Error fetching certificates:", error);
@@ -49,7 +53,9 @@ const ErrorRequests = () => {
       return;
     }
     try {
-      const response = await axios.get(`https://mazedakhale.in/api/certificates/${certificateId}`);
+      const response = await axios.get(
+        `https://mazedakhale.in/api/certificates/${certificateId}`
+      );
       if (response.data && response.data.file_url) {
         window.open(response.data.file_url, "_blank");
       } else {
@@ -89,7 +95,9 @@ const ErrorRequests = () => {
     // ✅ Instantly update UI before API response
     setErrorRequests((prevRequests) =>
       prevRequests.map((req) =>
-        req.request_id === requestId ? { ...req, request_status: newStatus } : req
+        req.request_id === requestId
+          ? { ...req, request_status: newStatus }
+          : req
       )
     );
 
@@ -102,10 +110,13 @@ const ErrorRequests = () => {
     });
 
     try {
-      await axios.patch(`https://mazedakhale.in/api/request-errors/update-status/${requestId}`, {
-        request_status: newStatus,
-        rejectionReason,
-      });
+      await axios.patch(
+        `https://mazedakhale.in/api/request-errors/update-status/${requestId}`,
+        {
+          request_status: newStatus,
+          rejectionReason,
+        }
+      );
     } catch (error) {
       console.error("Error updating request status:", error);
       Swal.fire("Error", "Failed to update status.", "error");
@@ -127,7 +138,6 @@ const ErrorRequests = () => {
 
   return (
     <div className="ml-[300px] mt-[80px] p-6 w-[calc(100%-260px)] overflow-x-hidden">
-
       <div className="relative bg-white shadow-lg rounded-lg border border-gray-300 overflow-hidden">
         {/* Header */}
         <div className="relative border-t-4 border-orange-400 bg-[#F4F4F4] p-4 rounded-t-lg">
@@ -161,8 +171,23 @@ const ErrorRequests = () => {
           <table className="w-full border border-[#776D6DA8] text-sm bg-white shadow-md rounded-md">
             <thead className="bg-[#F58A3B14] border-b-2 border-[#776D6DA8]">
               <tr>
-                {["Request ID", "Application ID", "Description", "Error Document", "Document ID", "User ID", "Distributor ID", "Request Status", "Request Date", "Certificate", "Actions"].map((header, index) => (
-                  <th key={index} className="px-4 py-3 border border-[#776D6DA8] text-black font-semibold text-center">
+                {[
+                  "Request ID",
+                  "Application ID",
+                  "Description",
+                  "Error Document",
+                  "Document ID",
+                  "User ID",
+                  "Distributor ID",
+                  "Request Status",
+                  "Request Date",
+                  "Certificate",
+                  "Actions",
+                ].map((header, index) => (
+                  <th
+                    key={index}
+                    className="px-4 py-3 border border-[#776D6DA8] text-black font-semibold text-center"
+                  >
                     {header}
                   </th>
                 ))}
@@ -173,11 +198,19 @@ const ErrorRequests = () => {
                 filteredRequests.map((request, index) => (
                   <tr
                     key={request.request_id}
-                    className={`${index % 2 === 0 ? "bg-[#FFFFFF]" : "bg-[#F58A3B14]"} hover:bg-orange-100 transition duration-200`}
+                    className={`${
+                      index % 2 === 0 ? "bg-[#FFFFFF]" : "bg-[#F58A3B14]"
+                    } hover:bg-orange-100 transition duration-200`}
                   >
-                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">{request.request_id}</td>
-                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">{request.application_id}</td>
-                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">{request.request_description}</td>
+                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">
+                      {request.request_id}
+                    </td>
+                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">
+                      {request.application_id}
+                    </td>
+                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">
+                      {request.request_description}
+                    </td>
                     <td className="px-4 py-3 border border-[#776D6DA8] text-center">
                       <a
                         href={request.error_document}
@@ -188,19 +221,26 @@ const ErrorRequests = () => {
                         View Document
                       </a>
                     </td>
-                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">{request.document_id}</td>
-                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">{request.user_id}</td>
-                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">{request.distributor_id}</td>
+                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">
+                      {request.document_id}
+                    </td>
+                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">
+                      {request.user_id}
+                    </td>
+                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">
+                      {request.distributor_id}
+                    </td>
                     <td className="px-4 py-3 border border-[#776D6DA8] text-center">
                       <span
-                        className={`px-3 py-1 rounded-full text-white text-sm ${request.request_status === "Approved"
-                          ? "bg-green-500"
-                          : request.request_status === "Rejected"
+                        className={`px-3 py-1 rounded-full text-white text-sm ${
+                          request.request_status === "Approved"
+                            ? "bg-green-500"
+                            : request.request_status === "Rejected"
                             ? "bg-red-500"
                             : request.request_status === "Uploaded"
-                              ? "bg-purple-500"
-                              : "bg-yellow-500"
-                          }`}
+                            ? "bg-purple-500"
+                            : "bg-yellow-500"
+                        }`}
                       >
                         {request.request_status}
                       </span>
@@ -209,10 +249,13 @@ const ErrorRequests = () => {
                       {new Date(request.request_date).toLocaleString()}
                     </td>
                     <td className="px-4 py-3 border border-[#776D6DA8] text-center">
-                      {["Uploaded", "Completed"].includes(request.request_status) &&
-                        getCertificateByDocumentId(request.document_id) ? (
+                      {["Uploaded", "Completed"].includes(
+                        request.request_status
+                      ) && getCertificateByDocumentId(request.document_id) ? (
                         <button
-                          onClick={() => handleViewCertificate(request.document_id)}
+                          onClick={() =>
+                            handleViewCertificate(request.document_id)
+                          }
                           className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 transition"
                         >
                           View Certificate
@@ -225,7 +268,9 @@ const ErrorRequests = () => {
                       <select
                         className="border p-1 rounded"
                         value={request.request_status}
-                        onChange={(e) => handleUpdateStatus(request.request_id, e.target.value)}
+                        onChange={(e) =>
+                          handleUpdateStatus(request.request_id, e.target.value)
+                        }
                       >
                         <option value="Pending">Pending</option>
                         <option value="Approved">Approved</option>
@@ -237,7 +282,10 @@ const ErrorRequests = () => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="11" className="px-4 py-3 border border-[#776D6DA8] text-center">
+                  <td
+                    colSpan="11"
+                    className="px-4 py-3 border border-[#776D6DA8] text-center"
+                  >
                     No error requests found.
                   </td>
                 </tr>

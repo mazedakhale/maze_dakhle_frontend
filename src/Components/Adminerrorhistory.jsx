@@ -6,7 +6,6 @@ import Swal from "sweetalert2";
 import { FaDownload } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
-
 const ErrorRequests = () => {
   const [errorRequests, setErrorRequests] = useState([]);
   const [certificates, setCertificates] = useState([]);
@@ -22,7 +21,9 @@ const ErrorRequests = () => {
   // Fetch error requests
   const fetchErrorRequests = async () => {
     try {
-      const response = await axios.get("https://mazedakhale.in/api/request-errors");
+      const response = await axios.get(
+        "https://mazedakhale.in/api/request-errors"
+      );
       setErrorRequests(response.data);
     } catch (error) {
       console.error("Error fetching error requests:", error);
@@ -32,7 +33,9 @@ const ErrorRequests = () => {
   // Fetch certificates
   const fetchCertificates = async () => {
     try {
-      const response = await axios.get("https://mazedakhale.in/api/certificates");
+      const response = await axios.get(
+        "https://mazedakhale.in/api/certificates"
+      );
       setCertificates(response.data);
     } catch (error) {
       console.error("Error fetching certificates:", error);
@@ -55,7 +58,9 @@ const ErrorRequests = () => {
       return;
     }
     try {
-      const response = await axios.get(`https://mazedakhale.in/api/certificates/${certificateId}`);
+      const response = await axios.get(
+        `https://mazedakhale.in/api/certificates/${certificateId}`
+      );
       if (response.data && response.data.file_url) {
         window.open(response.data.file_url, "_blank");
       } else {
@@ -66,8 +71,6 @@ const ErrorRequests = () => {
       Swal.fire("Error", "Failed to fetch certificate.", "error");
     }
   };
-
-
 
   const handleDownloadCertificate = async (documentId, requestName) => {
     try {
@@ -92,7 +95,6 @@ const ErrorRequests = () => {
     }
   };
 
-
   // Filter requests based on search term and include only "Completed" status
   const filteredRequests = errorRequests
     .filter((request) => request.request_status === "Completed")
@@ -106,7 +108,6 @@ const ErrorRequests = () => {
 
   return (
     <div className="ml-[300px] mt-[80px] p-6 w-[calc(100%-260px)] overflow-x-hidden">
-
       <div className="relative bg-white shadow-lg rounded-lg border border-gray-300 overflow-hidden">
         {/* Header */}
         <div className="relative border-t-4 border-orange-400 bg-[#F4F4F4] p-4 rounded-t-lg">
@@ -138,7 +139,18 @@ const ErrorRequests = () => {
           <table className="min-w-full border border-gray-200 bg-white shadow-md rounded-lg">
             <thead className="bg-[#F58A3B14] text-gray-700 text-sm uppercase">
               <tr>
-                {["Request ID", "Application ID", "Description", "Error Document", "Document ID", "User ID", "Distributor ID", "Request Status", "Request Date", "Download Certificate"].map((header) => (
+                {[
+                  "Request ID",
+                  "Application ID",
+                  "Description",
+                  "Error Document",
+                  "Document ID",
+                  "User ID",
+                  "Distributor ID",
+                  "Request Status",
+                  "Request Date",
+                  "Download Certificate",
+                ].map((header) => (
                   <th key={header} className="border px-4 py-3 text-center">
                     {header}
                   </th>
@@ -150,28 +162,54 @@ const ErrorRequests = () => {
                 filteredRequests.map((request, index) => (
                   <tr
                     key={request.request_id}
-                    className={`hover:bg-orange-50 transition ${index % 2 === 0 ? "bg-[#FFFFFF]" : "bg-[#F58A3B14]"}`}
+                    className={`hover:bg-orange-50 transition ${
+                      index % 2 === 0 ? "bg-[#FFFFFF]" : "bg-[#F58A3B14]"
+                    }`}
                   >
-                    <td className="border px-4 py-3 text-center">{request.request_id}</td>
-                    <td className="border px-4 py-3 text-center">{request.application_id}</td>
-                    <td className="border px-4 py-3">{request.request_description}</td>
                     <td className="border px-4 py-3 text-center">
-                      <a href={request.error_document} target="_blank" rel="noopener noreferrer" className="text-blue-600 font-medium hover:underline">
+                      {request.request_id}
+                    </td>
+                    <td className="border px-4 py-3 text-center">
+                      {request.application_id}
+                    </td>
+                    <td className="border px-4 py-3">
+                      {request.request_description}
+                    </td>
+                    <td className="border px-4 py-3 text-center">
+                      <a
+                        href={request.error_document}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 font-medium hover:underline"
+                      >
                         View Document
                       </a>
                     </td>
-                    <td className="border px-4 py-3 text-center">{request.document_id}</td>
-                    <td className="border px-4 py-3 text-center">{request.user_id}</td>
-                    <td className="border px-4 py-3 text-center">{request.distributor_id}</td>
+                    <td className="border px-4 py-3 text-center">
+                      {request.document_id}
+                    </td>
+                    <td className="border px-4 py-3 text-center">
+                      {request.user_id}
+                    </td>
+                    <td className="border px-4 py-3 text-center">
+                      {request.distributor_id}
+                    </td>
                     <td className="border px-4 py-3 text-center">
                       <span className="px-3 py-1 rounded-full text-white text-sm bg-blue-500">
                         {request.request_status}
                       </span>
                     </td>
-                    <td className="border px-4 py-3 text-center">{new Date(request.request_date).toLocaleString()}</td>
+                    <td className="border px-4 py-3 text-center">
+                      {new Date(request.request_date).toLocaleString()}
+                    </td>
                     <td className="border px-4 py-3 text-center">
                       {getCertificateByDocumentId(request.document_id) ? (
-                        <button onClick={() => handleViewCertificate(request.document_id)} className="bg-green-600 text-white px-3 py-2 rounded-md hover:bg-green-700 transition">
+                        <button
+                          onClick={() =>
+                            handleViewCertificate(request.document_id)
+                          }
+                          className="bg-green-600 text-white px-3 py-2 rounded-md hover:bg-green-700 transition"
+                        >
                           View Certificate
                         </button>
                       ) : (

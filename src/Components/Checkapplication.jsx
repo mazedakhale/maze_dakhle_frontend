@@ -7,11 +7,13 @@ import { useNavigate } from "react-router-dom";
 // Function to format date to dd-mm-yyyy hh:mm:ss AM/PM
 const formatDate = (dateStr) => {
   const date = new Date(dateStr);
-  const formattedDate = `${String(date.getDate()).padStart(2, '0')}-${String(date.getMonth() + 1).padStart(2, '0')}-${date.getFullYear()}`;
-  const formattedTime = date.toLocaleTimeString('en-US', {
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
+  const formattedDate = `${String(date.getDate()).padStart(2, "0")}-${String(
+    date.getMonth() + 1
+  ).padStart(2, "0")}-${date.getFullYear()}`;
+  const formattedTime = date.toLocaleTimeString("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
     hour12: true,
   });
 
@@ -89,10 +91,8 @@ const SearchApplication = () => {
       <h2 className="mb-5 text-2xl font-bold">Search Application</h2>
 
       <div className="w-full max-w-2xl bg-white p-5 rounded-xl shadow-md border border-gray-200">
-
         <div className="relative border-t-4 border-orange-400 bg-[#F4F4F4] p-4 rounded-t-lg">
           <div className="flex items-center bg-gray-100 rounded-full p-1">
-
             <input
               type="text"
               placeholder="Enter Application ID"
@@ -127,20 +127,40 @@ const SearchApplication = () => {
 
       {document && (
         <div className="mt-6 w-full max-w-4xl bg-white p-6 rounded-lg shadow-lg border border-gray-200">
-          <h2 className="text-3xl font-bold mb-4 text-center">Application Details</h2>
+          <h2 className="text-3xl font-bold mb-4 text-center">
+            Application Details
+          </h2>
           <div className="grid grid-cols-2 gap-5">
-            <div className="p-2 border-b"><strong>Application ID:</strong> {document.application_id}</div>
-            <div className="p-2 border-b"><strong>User ID:</strong> {document.user_id}</div>
-            <div className="p-2 border-b"><strong>Name:</strong> {document.name}</div>
-            <div className="p-2 border-b"><strong>Email:</strong> {document.email}</div>
-            <div className="p-2 border-b"><strong>Phone:</strong> {document.phone}</div>
-            <div className="p-2 border-b"><strong>Address:</strong> {document.address}</div>
-            <div className="p-2 border-b"><strong>Category:</strong> {document.category_name}</div>
-            <div className="p-2 border-b"><strong>Subcategory:</strong> {document.subcategory_name}</div>
+            <div className="p-2 border-b">
+              <strong>Application ID:</strong> {document.application_id}
+            </div>
+            <div className="p-2 border-b">
+              <strong>User ID:</strong> {document.user_id}
+            </div>
+            <div className="p-2 border-b">
+              <strong>Name:</strong> {document.name}
+            </div>
+            <div className="p-2 border-b">
+              <strong>Email:</strong> {document.email}
+            </div>
+            <div className="p-2 border-b">
+              <strong>Phone:</strong> {document.phone}
+            </div>
+            <div className="p-2 border-b">
+              <strong>Address:</strong> {document.address}
+            </div>
+            <div className="p-2 border-b">
+              <strong>Category:</strong> {document.category_name}
+            </div>
+            <div className="p-2 border-b">
+              <strong>Subcategory:</strong> {document.subcategory_name}
+            </div>
             <div className="p-2 border-b">
               <strong>Status:</strong> {document.status}
               {document.status_history
-                ?.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at))
+                ?.sort(
+                  (a, b) => new Date(b.updated_at) - new Date(a.updated_at)
+                )
                 .slice(0, 1)
                 .map((entry, idx) => (
                   <div key={idx} className="text-xs text-gray-600">
@@ -148,7 +168,9 @@ const SearchApplication = () => {
                   </div>
                 ))}
             </div>
-            <div className="p-2 border-b"><strong>Uploaded At:</strong> {formatDate(document.uploaded_at)}</div>
+            <div className="p-2 border-b">
+              <strong>Uploaded At:</strong> {formatDate(document.uploaded_at)}
+            </div>
           </div>
 
           <h3 className="mt-4 text-lg font-bold">Document Fields</h3>

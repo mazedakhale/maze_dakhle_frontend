@@ -8,7 +8,7 @@ const Categories = () => {
   const [categories, setCategories] = useState([]);
   const [subcategories, setSubcategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
-  const [isAdding, setIsAdding] = useState(false)
+  const [isAdding, setIsAdding] = useState(false);
   const API_BASE_URL = "https://mazedakhale.in/api/categories";
   const SUBCATEGORIES_API_URL = "https://mazedakhale.in/api/subcategories";
 
@@ -37,7 +37,12 @@ const Categories = () => {
     }
   };
 
-  const handleSubcategorySelect = (subcategoryId, subcategoryName, categoryId, categoryName) => {
+  const handleSubcategorySelect = (
+    subcategoryId,
+    subcategoryName,
+    categoryId,
+    categoryName
+  ) => {
     navigate("/Apply", {
       state: { categoryId, categoryName, subcategoryId, subcategoryName },
     });
@@ -65,8 +70,10 @@ const Categories = () => {
               className="absolute top-1/2 right-4 transform -translate-y-1/2 text-gray-600 hover:text-gray-800"
             >
               <FaTimes size={20} />
-            </button>            <p className="text-lg -mb-10 text-black">
-              Apply for various government documents quickly and hassle-free. Select a category below to proceed with your application.
+            </button>{" "}
+            <p className="text-lg -mb-10 text-black">
+              Apply for various government documents quickly and hassle-free.
+              Select a category below to proceed with your application.
             </p>
           </div>
         </section>
@@ -85,7 +92,12 @@ const Categories = () => {
               <div
                 key={category.category_id}
                 className="flex w-full rounded-lg shadow-[0px_2px_4px_rgba(0,0,0,0.4)] cursor-pointer transition-all duration-300 overflow-hidden"
-                onClick={() => fetchSubcategories(category.category_id, category.category_name)}
+                onClick={() =>
+                  fetchSubcategories(
+                    category.category_id,
+                    category.category_name
+                  )
+                }
               >
                 {/* ✅ PDF/Icon Section with Separate BG */}
                 <div className="bg-[#FDEDD3] p-3 flex items-center justify-center">
@@ -98,7 +110,9 @@ const Categories = () => {
 
                 {/* ✅ Category Name Section */}
                 <div className="flex-1 bg-gray-100 hover:bg-orange-200 p-4">
-                  <span className="text-lg font-medium">{category.category_name}</span>
+                  <span className="text-lg font-medium">
+                    {category.category_name}
+                  </span>
                 </div>
               </div>
             ))
@@ -110,7 +124,14 @@ const Categories = () => {
                   <div
                     key={sub.subcategory_id}
                     className="flex w-full rounded-lg shadow-[0px_2px_4px_rgba(0,0,0,0.4)] cursor-pointer transition-all duration-300 overflow-hidden"
-                    onClick={() => handleSubcategorySelect(sub.subcategory_id, sub.subcategory_name, selectedCategory.categoryId, selectedCategory.categoryName)}
+                    onClick={() =>
+                      handleSubcategorySelect(
+                        sub.subcategory_id,
+                        sub.subcategory_name,
+                        selectedCategory.categoryId,
+                        selectedCategory.categoryName
+                      )
+                    }
                   >
                     {/* ✅ PDF/Icon Section with Separate BG */}
                     <div className="bg-[#FDEDD3] p-3 flex items-center justify-center">
@@ -123,22 +144,23 @@ const Categories = () => {
 
                     {/* ✅ Subcategory Name Section */}
                     <div className="flex-1 bg-gray-100 hover:bg-orange-200 p-4">
-                      <span className="text-lg font-medium">{sub.subcategory_name}</span>
+                      <span className="text-lg font-medium">
+                        {sub.subcategory_name}
+                      </span>
                     </div>
                   </div>
                 ))
               ) : (
-                <p className="text-lg text-gray-600 text-center w-full">No subcategories found.</p>
+                <p className="text-lg text-gray-600 text-center w-full">
+                  No subcategories found.
+                </p>
               )}
             </>
           )}
         </div>
-
       </div>
     </div>
   );
-
-
 };
 
 export default Categories;

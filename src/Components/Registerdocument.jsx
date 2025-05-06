@@ -45,7 +45,11 @@ const RegisterDocument = () => {
     e.preventDefault();
 
     if (!formData.phone || !formData.address || formData.files.includes(null)) {
-      Swal.fire("Error", "Please fill all fields and upload both documents.", "error");
+      Swal.fire(
+        "Error",
+        "Please fill all fields and upload both documents.",
+        "error"
+      );
       return;
     }
 
@@ -61,10 +65,13 @@ const RegisterDocument = () => {
     });
 
     try {
-      const response = await fetch(`https://mazedakhale.in/api/users/update/${id}`, {
-        method: "PUT",
-        body: formDataObj,
-      });
+      const response = await fetch(
+        `https://mazedakhale.in/api/users/update/${id}`,
+        {
+          method: "PUT",
+          body: formDataObj,
+        }
+      );
 
       const data = await response.json();
 
@@ -76,7 +83,7 @@ const RegisterDocument = () => {
         title: "Success",
         text: "Documents uploaded successfully! You have to wait for Admin verification.",
         icon: "success",
-        confirmButtonText: "OK"
+        confirmButtonText: "OK",
       }).then(() => {
         navigate("/"); // Redirect to login page after success
       });
@@ -88,7 +95,9 @@ const RegisterDocument = () => {
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100">
       <div className="w-full max-w-lg p-8 bg-white shadow-md rounded-lg">
-        <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">Upload Documents</h2>
+        <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">
+          Upload Documents
+        </h2>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Phone Input */}
@@ -125,7 +134,9 @@ const RegisterDocument = () => {
 
           {/* File Upload - Aadhar Card */}
           <div className="space-y-1">
-            <label className="block font-medium text-gray-700">Upload Aadhar Card</label>
+            <label className="block font-medium text-gray-700">
+              Upload Aadhar Card
+            </label>
             <input
               type="file"
               accept=".pdf,.jpg,.jpeg,.png"
@@ -133,12 +144,16 @@ const RegisterDocument = () => {
               className="w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
             />
-            {formData.errors[0] && <p className="text-red-500 text-sm">{formData.errors[0]}</p>}
+            {formData.errors[0] && (
+              <p className="text-red-500 text-sm">{formData.errors[0]}</p>
+            )}
           </div>
 
           {/* File Upload - PAN Card */}
           <div className="space-y-1">
-            <label className="block font-medium text-gray-700">Upload PAN Card</label>
+            <label className="block font-medium text-gray-700">
+              Upload PAN Card
+            </label>
             <input
               type="file"
               accept=".pdf,.jpg,.jpeg,.png"
@@ -146,7 +161,9 @@ const RegisterDocument = () => {
               className="w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
             />
-            {formData.errors[1] && <p className="text-red-500 text-sm">{formData.errors[1]}</p>}
+            {formData.errors[1] && (
+              <p className="text-red-500 text-sm">{formData.errors[1]}</p>
+            )}
           </div>
 
           {/* Submit Button */}

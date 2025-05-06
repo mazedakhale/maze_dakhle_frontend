@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { FaRegFileAlt, FaDownload, FaCheck, FaTimes } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
@@ -10,7 +10,7 @@ const RecentApplications = () => {
   const [error, setError] = useState(null);
 
   const [sortOrder, setSortOrder] = useState(true); // for future use
-  const [statusFilter, setStatusFilter] = useState('');
+  const [statusFilter, setStatusFilter] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
 
   const [distributors, setDistributors] = useState([]);
@@ -21,10 +21,12 @@ const RecentApplications = () => {
 
   useEffect(() => {
     // Fetch all data in parallel
-    const docsReq = axios.get('https://mazedakhale.in/api/documents/recent', { timeout: 120000 });
-    const distReq = axios.get('https://mazedakhale.in/api/users/distributors');
-    const certReq = axios.get('https://mazedakhale.in/api/certificates');
-    const usersReq = axios.get('https://mazedakhale.in/api/users/register');
+    const docsReq = axios.get("https://mazedakhale.in/api/documents/recent", {
+      timeout: 120000,
+    });
+    const distReq = axios.get("https://mazedakhale.in/api/users/distributors");
+    const certReq = axios.get("https://mazedakhale.in/api/certificates");
+    const usersReq = axios.get("https://mazedakhale.in/api/users/register");
 
     Promise.all([docsReq, distReq, certReq, usersReq])
       .then(([docsResp, distResp, certResp, usersResp]) => {
@@ -33,7 +35,7 @@ const RecentApplications = () => {
         setCertificates(certResp.data);
         setUsers(usersResp.data);
       })
-      .catch(err => {
+      .catch((err) => {
         console.error(err);
         setError("Failed to load data");
       })
@@ -42,10 +44,10 @@ const RecentApplications = () => {
       });
   }, []);
 
-  const handleStatusFilterChange = e => {
+  const handleStatusFilterChange = (e) => {
     setStatusFilter(e.target.value);
   };
-  const handleSearchQueryChange = e => {
+  const handleSearchQueryChange = (e) => {
     setSearchQuery(e.target.value);
   };
 
@@ -70,7 +72,7 @@ const RecentApplications = () => {
     Swal.fire({
       title: "Updating...",
       didOpen: () => Swal.showLoading(),
-      allowOutsideClick: false
+      allowOutsideClick: false,
     });
     try {
       await axios.put(
@@ -78,11 +80,9 @@ const RecentApplications = () => {
         { status: newStatus },
         { timeout: 30000 }
       );
-      setApplications(apps =>
-        apps.map(doc =>
-          doc.document_id === documentId
-            ? { ...doc, status: newStatus }
-            : doc
+      setApplications((apps) =>
+        apps.map((doc) =>
+          doc.document_id === documentId ? { ...doc, status: newStatus } : doc
         )
       );
       Swal.fire("Success", `Status set to ${newStatus}`, "success");
@@ -91,13 +91,13 @@ const RecentApplications = () => {
     }
   };
 
-  const handleRejectWithReason = async documentId => {
+  const handleRejectWithReason = async (documentId) => {
     const { value: reason } = await Swal.fire({
       title: "Rejection Reason",
       input: "text",
       inputPlaceholder: "Why reject?",
       showCancelButton: true,
-      inputValidator: v => !v && "Reason required"
+      inputValidator: (v) => !v && "Reason required",
     });
     if (reason) {
       try {
@@ -105,8 +105,8 @@ const RecentApplications = () => {
           `https://mazedakhale.in/api/documents/update-status/${documentId}`,
           { status: "Rejected", rejectionReason: reason }
         );
-        setApplications(apps =>
-          apps.map(d =>
+        setApplications((apps) =>
+          apps.map((d) =>
             d.document_id === documentId
               ? { ...d, status: "Rejected", rejection_reason: reason }
               : d
@@ -119,18 +119,18 @@ const RecentApplications = () => {
     }
   };
 
-  const getCertificateByDocumentId = documentId => {
-    const cert = certificates.find(c => c.document_id === documentId);
+  const getCertificateByDocumentId = (documentId) => {
+    const cert = certificates.find((c) => c.document_id === documentId);
     return cert ? cert.certificate_id : null;
   };
-  const getDistributorName = distributorId => {
-    const u = users.find(u => Number(u.user_id) === Number(distributorId));
+  const getDistributorName = (distributorId) => {
+    const u = users.find((u) => Number(u.user_id) === Number(distributorId));
     return u ? u.name : "";
   };
 
   // Combined status + search filtering
   const filteredDocs = applications
-    .filter(doc => {
+    .filter((doc) => {
       if (!statusFilter) return true;
       switch (statusFilter) {
         case "Received":
@@ -143,7 +143,7 @@ const RecentApplications = () => {
           return doc.status === statusFilter;
       }
     })
-    .filter(doc => {
+    .filter((doc) => {
       if (!searchQuery) return true;
       const q = searchQuery.toLowerCase();
       return (
@@ -224,8 +224,11 @@ const RecentApplications = () => {
                   "View",
                   "Receipt",
                   "Certificate",
-                ].map(h => (
-                  <th key={h} className="border p-2 text-center font-bold text-sm">
+                ].map((h) => (
+                  <th
+                    key={h}
+                    className="border p-2 text-center font-bold text-sm"
+                  >
                     {h}
                   </th>
                 ))}
@@ -238,16 +241,23 @@ const RecentApplications = () => {
                 const mon = String(date.getMonth() + 1).padStart(2, "0");
                 const ym = `${day}-${mon}-${date.getFullYear()}`;
                 const tm = date.toLocaleTimeString("en-US", {
-                  hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: true
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  second: "2-digit",
+                  hour12: true,
                 });
 
                 return (
                   <tr
                     key={doc.document_id}
-                    className={`border-t ${i % 2 ? "bg-white" : "bg-white"} hover:bg-gray-100`}
+                    className={`border-t ${
+                      i % 2 ? "bg-white" : "bg-white"
+                    } hover:bg-gray-100`}
                   >
                     <td className="border p-2 text-center">{i + 1}</td>
-                    <td className="border p-2 text-center">{doc.application_id}</td>
+                    <td className="border p-2 text-center">
+                      {doc.application_id}
+                    </td>
                     <td className="border p-2 text-center">
                       <div>{ym}</div>
                       <div className="text-xs text-gray-600">{tm}</div>
@@ -256,23 +266,28 @@ const RecentApplications = () => {
                     <td className="border p-2">{doc.subcategory_name}</td>
                     <td className="border px-4 py-2 text-sm">
                       {Array.isArray(doc.document_fields)
-                        ? doc.document_fields.find(f => f.field_name === "APPLICANT NAME")?.field_value || "—"
+                        ? doc.document_fields.find(
+                            (f) => f.field_name === "APPLICANT NAME"
+                          )?.field_value || "—"
                         : doc.document_fields?.["APPLICANT NAME"] || "—"}
                     </td>
                     <td className="border p-2 break-words">{doc.name}</td>
                     <td className="border p-2 break-words">{doc.email}</td>
                     <td className="border p-2 break-words">{doc.phone}</td>
-                    <td className="border p-2">{getDistributorName(doc.distributor_id)}</td>
+                    <td className="border p-2">
+                      {getDistributorName(doc.distributor_id)}
+                    </td>
                     <td className="border p-2 text-center">
                       <span
-                        className={`px-3 py-1 rounded-full text-white text-xs ${doc.status === "Approved"
-                          ? "bg-green-500"
-                          : doc.status === "Rejected"
+                        className={`px-3 py-1 rounded-full text-white text-xs ${
+                          doc.status === "Approved"
+                            ? "bg-green-500"
+                            : doc.status === "Rejected"
                             ? "bg-red-500"
                             : doc.status === "Pending"
-                              ? "bg-yellow-500"
-                              : "bg-blue-500"
-                          }`}
+                            ? "bg-yellow-500"
+                            : "bg-blue-500"
+                        }`}
                       >
                         {doc.status}
                       </span>
@@ -280,13 +295,17 @@ const RecentApplications = () => {
                     <td className="border p-2">
                       <div className="flex gap-2">
                         <button
-                          onClick={() => handleUpdateStatus(doc.document_id, "Completed")}
+                          onClick={() =>
+                            handleUpdateStatus(doc.document_id, "Completed")
+                          }
                           className="bg-green-500 px-3 py-1 rounded hover:bg-green-600 text-white text-xs flex items-center"
                         >
                           <FaCheck className="mr-1" /> Complete
                         </button>
                         <button
-                          onClick={() => handleRejectWithReason(doc.document_id)}
+                          onClick={() =>
+                            handleRejectWithReason(doc.document_id)
+                          }
                           className="bg-red-500 px-3 py-1 rounded hover:bg-red-600 text-white text-xs flex items-center"
                         >
                           <FaTimes className="mr-1" /> Reject
@@ -297,7 +316,10 @@ const RecentApplications = () => {
                       <button
                         onClick={() =>
                           navigate(`/View/${doc.document_id}`, {
-                            state: { categoryId: doc.category_id, subcategoryId: doc.subcategory_id }
+                            state: {
+                              categoryId: doc.category_id,
+                              subcategoryId: doc.subcategory_id,
+                            },
                           })
                         }
                         className="bg-indigo-500 px-3 py-1 rounded hover:bg-indigo-600 text-white text-xs flex items-center"
@@ -308,28 +330,39 @@ const RecentApplications = () => {
                     <td className="border p-3 text-center">
                       {doc.receipt_url ? (
                         <button
-                          onClick={() => handleDownloadReceipt(doc.receipt_url, doc.name)}
+                          onClick={() =>
+                            handleDownloadReceipt(doc.receipt_url, doc.name)
+                          }
                           className="bg-orange-500 px-3 py-1 rounded hover:bg-blue-600 text-white flex items-center"
                         >
                           <FaDownload className="mr-1" /> Receipt
                         </button>
                       ) : (
-                        <span className="text-gray-500 text-xs">Not Available</span>
+                        <span className="text-gray-500 text-xs">
+                          Not Available
+                        </span>
                       )}
                     </td>
                     <td className="border p-2 text-center">
                       {getCertificateByDocumentId(doc.document_id) ? (
                         <button
                           onClick={() => {
-                            const certId = getCertificateByDocumentId(doc.document_id);
-                            window.open(`https://mazedakhale.in/api/certificates/${certId}`, "_blank");
+                            const certId = getCertificateByDocumentId(
+                              doc.document_id
+                            );
+                            window.open(
+                              `https://mazedakhale.in/api/certificates/${certId}`,
+                              "_blank"
+                            );
                           }}
                           className="bg-green-500 px-3 py-1 rounded hover:bg-blue-600 text-white text-xs flex items-center"
                         >
                           <FaCheck className="mr-1" /> Certificate
                         </button>
                       ) : (
-                        <span className="text-gray-500 text-xs">Not Available</span>
+                        <span className="text-gray-500 text-xs">
+                          Not Available
+                        </span>
                       )}
                     </td>
                   </tr>
