@@ -10,6 +10,9 @@ import {
 } from "../utils/formValidators";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import "../index.css";
+const SMS_URL = "https://mazedakhale.in/api/sms/send";
+const SMS_SENDER = "918308178738";  // your LiveOne-registered “from” number
+
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -148,53 +151,55 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!validateForm()) {
-      Swal.fire(
-        "Validation Error",
-        "Please fix errors before submitting.",
-        "error"
-      );
-      return;
+      return Swal.fire("Validation Error", "Please fix errors.", "error");
     }
 
-    Swal.fire({
-      title: "Processing...",
-      allowOutsideClick: false,
-      didOpen: () => Swal.showLoading(),
-    });
-
+    Swal.fire({ title: "Processing…", allowOutsideClick: false, didOpen: () => Swal.showLoading() });
     try {
-      const dataToSend = new FormData();
+      // 1️⃣ Register user
+      const payload = new FormData();
       Object.entries(formData).forEach(([k, v]) => {
-        if (["aadharCard", "panCard", "errors", "agreeToTerms"].includes(k))
-          return;
-        dataToSend.append(k, v);
+        if (["aadharCard", "panCard", "errors", "agreeToTerms"].includes(k)) return;
+        payload.append(k, v);
       });
-      dataToSend.append("files", formData.aadharCard);
-      dataToSend.append("files", formData.panCard);
-      dataToSend.append("documentTypes", "Aadhar Card");
-      dataToSend.append("documentTypes", "PAN Card");
+      payload.append("files", formData.aadharCard);
+      payload.append("files", formData.panCard);
+      payload.append("documentTypes", "Aadhar Card");
+      payload.append("documentTypes", "PAN Card");
 
-      const res = await fetch("https://mazedakhale.in/api/users/register", {
-        method: "POST",
-        body: dataToSend,
-      });
-
+      const res = await fetch("https://mazedakhale.in/api/users/register", { method: "POST", body: payload });
       const data = await res.json();
       Swal.close();
+      if (!res.ok) throw new Error(data.message || "Registration failed");
 
-      if (res.ok) {
-        Swal.fire("Success", "Registered successfully", "success").then(() =>
-          navigate("/login")
-        );
-      } else {
-        throw new Error(data.message || "Registration failed");
-      }
+      // 2️⃣ Build E.164 phone
+      const phoneE164 = formData.phone.startsWith("91") ? formData.phone : "91" + formData.phone;
+      const message =
+        `Welcome to Mazedakhale! Your registration was successful.\n\n` +
+        `Here are your login credentials:\n` +
+        `Email: ${formData.email}\n` +
+        `Password: ${formData.password}\n\n` +
+
+        `Thank you for joining us!`;
+
+      // 3️⃣ Send SMS in background
+      fetch(SMS_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sender: SMS_SENDER, number: phoneE164, message }),
+      }).catch(console.error);
+
+      // 4️⃣ Immediately notify the user & redirect
+      Swal.fire("Success", "Registered successfully and Sms sent !", "success")
+        .then(() => navigate("/login"));
     } catch (err) {
+      Swal.close();
       Swal.fire("Error", err.message, "error");
     }
   };
+
+
 
   return (
     <div
@@ -217,13 +222,12 @@ const Register = () => {
             <input
               type="text"
               name="name"
-              className={`w-full p-2 border rounded text-xs ${
-                formData.errors.name
-                  ? "border-red-500"
-                  : isValidEmail(formData.email)
+              className={`w-full p-2 border rounded text-xs ${formData.errors.name
+                ? "border-red-500"
+                : isValidEmail(formData.email)
                   ? "border-green-500"
                   : ""
-              }`}
+                }`}
               onChange={handleChange}
               required
             />
@@ -238,13 +242,12 @@ const Register = () => {
             <input
               type="email"
               name="email"
-              className={`w-full p-2 border rounded text-xs ${
-                formData.errors.email
-                  ? "border-red-500"
-                  : isValidEmail(formData.email)
+              className={`w-full p-2 border rounded text-xs ${formData.errors.email
+                ? "border-red-500"
+                : isValidEmail(formData.email)
                   ? "border-green-500"
                   : ""
-              }`}
+                }`}
               onChange={handleChange}
               required
             />
@@ -260,13 +263,12 @@ const Register = () => {
               <input
                 type={passwordVisible ? "text" : "password"}
                 name="password"
-                className={`w-full p-2 border rounded text-xs pr-10 ${
-                  formData.errors.password
-                    ? "border-red-500"
-                    : isValidPassword(formData.password)
+                className={`w-full p-2 border rounded text-xs pr-10 ${formData.errors.password
+                  ? "border-red-500"
+                  : isValidPassword(formData.password)
                     ? "border-green-500"
                     : ""
-                }`}
+                  }`}
                 onChange={handleChange}
                 required
               />
@@ -289,13 +291,12 @@ const Register = () => {
             <input
               type="text"
               name="phone"
-              className={`w-full p-2 border rounded text-xs ${
-                formData.errors.phone
-                  ? "border-red-500"
-                  : isValidPhone(formData.phone)
+              className={`w-full p-2 border rounded text-xs ${formData.errors.phone
+                ? "border-red-500"
+                : isValidPhone(formData.phone)
                   ? "border-green-500"
                   : ""
-              }`}
+                }`}
               onChange={handleChange}
               required
             />
@@ -312,9 +313,8 @@ const Register = () => {
                 <input
                   type="text"
                   name="address"
-                  className={`w-full p-2 border rounded text-xs ${
-                    formData.errors.address ? "border-red-500" : ""
-                  }`}
+                  className={`w-full p-2 border rounded text-xs ${formData.errors.address ? "border-red-500" : ""
+                    }`}
                   onChange={handleChange}
                   required
                 />
@@ -341,9 +341,8 @@ const Register = () => {
                 <input
                   type="text"
                   name="district"
-                  className={`w-full p-2 border rounded text-xs ${
-                    formData.errors.district ? "border-red-500" : ""
-                  }`}
+                  className={`w-full p-2 border rounded text-xs ${formData.errors.district ? "border-red-500" : ""
+                    }`}
                   onChange={handleChange}
                   required
                 />
@@ -355,9 +354,8 @@ const Register = () => {
                 <input
                   type="text"
                   name="taluka"
-                  className={`w-full p-2 border rounded text-xs ${
-                    formData.errors.taluka ? "border-red-500" : ""
-                  }`}
+                  className={`w-full p-2 border rounded text-xs ${formData.errors.taluka ? "border-red-500" : ""
+                    }`}
                   onChange={handleChange}
                   required
                 />
@@ -378,9 +376,8 @@ const Register = () => {
                     type="file"
                     accept=".pdf,.jpg,.jpeg,.png"
                     onChange={(e) => handleFileChange(e, field)}
-                    className={`w-full p-2 border rounded text-xs ${
-                      formData.errors[field] ? "border-red-500" : ""
-                    }`}
+                    className={`w-full p-2 border rounded text-xs ${formData.errors[field] ? "border-red-500" : ""
+                      }`}
                     required
                   />
                   {formData.errors[field] && (
@@ -400,9 +397,8 @@ const Register = () => {
                 name="agreeToTerms"
                 checked={formData.agreeToTerms}
                 onChange={handleChange}
-                className={`h-4 w-4 mt-1 text-[#F58A3B] rounded ${
-                  formData.errors.agreeToTerms ? "border-red-500" : ""
-                }`}
+                className={`h-4 w-4 mt-1 text-[#F58A3B] rounded ${formData.errors.agreeToTerms ? "border-red-500" : ""
+                  }`}
               />
               <label className="ml-2 text-xs text-gray-700">
                 I agree to the{" "}
@@ -420,11 +416,10 @@ const Register = () => {
             {/* Submit */}
             <button
               type="submit"
-              className={`w-full bg-[#F58A3B] text-white py-2 rounded text-xs ${
-                !isFormValid()
-                  ? "opacity-50 cursor-not-allowed"
-                  : "hover:bg-[#e07d35]"
-              }`}
+              className={`w-full bg-[#F58A3B] text-white py-2 rounded text-xs ${!isFormValid()
+                ? "opacity-50 cursor-not-allowed"
+                : "hover:bg-[#e07d35]"
+                }`}
               disabled={!isFormValid()}
             >
               Register

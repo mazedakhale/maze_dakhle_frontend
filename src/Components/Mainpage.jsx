@@ -23,7 +23,7 @@ import {
 import { BsStopCircle } from "react-icons/bs";
 
 import Logo from "../assets/logo.png";
-import MainBanner from "../assets/Mainpage.jpg";
+import MainBanner from "../assets/mainp.jpg";
 
 // Footer nav labels
 const navLabels = [
@@ -227,8 +227,8 @@ const Mainpage = () => {
           Array.isArray(data)
             ? data
             : Array.isArray(data.documentTypes)
-            ? data.documentTypes
-            : []
+              ? data.documentTypes
+              : []
         )
       )
       .catch(() => setError("Failed to load documents"));
