@@ -2,6 +2,7 @@
   0% {
     transform: rotate(0deg);
   }
+
   100% {
     transform: rotate(360deg);
   }
@@ -16,6 +17,7 @@
 .rotating-image {
   position: absolute;
 }
+
 /* html, body {
   overflow: hidden;
   height: 100%;
