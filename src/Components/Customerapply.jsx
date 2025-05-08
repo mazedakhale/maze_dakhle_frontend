@@ -239,8 +239,8 @@ const CustomerApply = () => {
                     <td className="border px-4 py-2">
                       {Array.isArray(doc.document_fields)
                         ? doc.document_fields.find(
-                            (f) => f.field_name === "APPLICANT NAME"
-                          )?.field_value || "-"
+                          (f) => f.field_name === "APPLICANT NAME"
+                        )?.field_value || "-"
                         : doc.document_fields["APPLICANT NAME"] || "-"}
                     </td>
                     <td className="border px-4 py-2 text-center">
@@ -294,13 +294,12 @@ const CustomerApply = () => {
                     <td className="border px-4 py-3 text-center">
                       <div className="flex flex-col items-center gap-1">
                         <span
-                          className={`px-3 py-1 rounded-full text-white text-xs ${
-                            doc.status === "Approved"
-                              ? "bg-green-500"
-                              : doc.status === "Rejected"
+                          className={`px-3 py-1 rounded-full text-white text-xs ${doc.status === "Approved"
+                            ? "bg-green-500"
+                            : doc.status === "Rejected"
                               ? "bg-red-500"
                               : "bg-yellow-500"
-                          }`}
+                            }`}
                         >
                           {doc.status}
                         </span>
@@ -309,7 +308,7 @@ const CustomerApply = () => {
                     <td className="border px-4 py-3 text-center">
                       {(doc.status === "Received" ||
                         doc.status === "Uploaded") &&
-                      doc.receipt_url ? (
+                        doc.receipt_url ? (
                         <button
                           onClick={() =>
                             handleDownloadReceipt(doc.receipt_url, doc.name)
@@ -325,7 +324,7 @@ const CustomerApply = () => {
                     </td>
                     <td className="border px-4 py-3 text-center">
                       {doc.status === "Completed" &&
-                      getCertificateByDocumentId(doc.document_id) ? (
+                        getCertificateByDocumentId(doc.document_id) ? (
                         <button
                           onClick={() => handleViewCertificate(doc.document_id)}
                           className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"

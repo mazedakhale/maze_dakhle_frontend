@@ -32,6 +32,7 @@ const DistributorList = () => {
     shopAddress: "",
     aadharCard: null,
     panCard: null,
+    profilePhoto: null, // ✅ Add this
     errors: {
       name: "",
       email: "",
@@ -40,8 +41,10 @@ const DistributorList = () => {
       address: "",
       aadharCard: "",
       panCard: "",
+      profilePhoto: "", // ✅ Optional: For validation messages
     },
   });
+
   const navigate = useNavigate();
 
   const apiUrl = "https://mazedakhale.in/api/users/distributors";
@@ -290,10 +293,15 @@ const DistributorList = () => {
     formDataToSend.append("user_login_status", "Active");
 
     // Append files and document types
+
+
+
     formDataToSend.append("files", formData.aadharCard);
     formDataToSend.append("files", formData.panCard);
     formDataToSend.append("documentTypes", "Aadhar Card");
     formDataToSend.append("documentTypes", "PAN Card");
+    formDataToSend.append("profilePhoto", formData.profilePhoto);  // ✅ Add this line
+
 
     try {
       const response = await axios.post(
@@ -529,6 +537,7 @@ const DistributorList = () => {
                     "Address",
                     "ShopAddress",
                     "Documents",
+                    "Profile Photo",
                     "Status",
                     "Update",
                     "Request",
@@ -548,9 +557,8 @@ const DistributorList = () => {
                   distributors.map((distributor, index) => (
                     <tr
                       key={distributor.user_id}
-                      className={`${
-                        index % 2 === 0 ? "bg-[#FFFFFF]" : "bg-[#F58A3B14]"
-                      } hover:bg-orange-100 transition duration-200`}
+                      className={`${index % 2 === 0 ? "bg-[#FFFFFF]" : "bg-[#F58A3B14]"
+                        } hover:bg-orange-100 transition duration-200`}
                     >
                       <td className="px-4 py-3 border border-[#776D6DA8] text-center">
                         {distributor.user_id}
@@ -599,6 +607,18 @@ const DistributorList = () => {
                           </span>
                         )}
                       </td>
+                      <td className="px-4 py-3 border border-[#776D6DA8] text-center">
+                        {distributor.profile_picture ? (
+                          <img
+                            src={distributor.profile_picture}
+                            alt="Profile"
+                            className="h-10 w-10 rounded-full object-cover mx-auto"
+                          />
+                        ) : (
+                          <span className="text-gray-400 italic">No Image</span>
+                        )}
+                      </td>
+
                       <td className="px-4 py-3 border border-[#776D6DA8] text-center whitespace-nowrap truncate max-w-[160px]">
                         {distributor.user_login_status}
                       </td>
@@ -607,11 +627,10 @@ const DistributorList = () => {
                           onClick={() =>
                             handleStatusChange(distributor.user_id, "Active")
                           }
-                          className={`px-3 py-1 rounded text-white mr-2 ${
-                            distributor.user_login_status === "Active"
-                              ? "bg-green-500 cursor-default"
-                              : "bg-gray-500 hover:bg-green-600"
-                          }`}
+                          className={`px-3 py-1 rounded text-white mr-2 ${distributor.user_login_status === "Active"
+                            ? "bg-green-500 cursor-default"
+                            : "bg-gray-500 hover:bg-green-600"
+                            }`}
                           disabled={distributor.user_login_status === "Active"}
                         >
                           Active
@@ -620,11 +639,10 @@ const DistributorList = () => {
                           onClick={() =>
                             handleStatusChange(distributor.user_id, "InActive")
                           }
-                          className={`px-3 py-1 rounded text-white ${
-                            distributor.user_login_status === "InActive"
-                              ? "bg-red-500 cursor-default"
-                              : "bg-gray-500 hover:bg-red-600"
-                          }`}
+                          className={`px-3 py-1 rounded text-white ${distributor.user_login_status === "InActive"
+                            ? "bg-red-500 cursor-default"
+                            : "bg-gray-500 hover:bg-red-600"
+                            }`}
                           disabled={
                             distributor.user_login_status === "InActive"
                           }
@@ -721,9 +739,8 @@ const DistributorList = () => {
                   placeholder="Name"
                   value={formData.name}
                   onChange={handleInputChange}
-                  className={`w-full p-2 border rounded text-xs ${
-                    formData.errors.name ? "border-red-500" : ""
-                  }`}
+                  className={`w-full p-2 border rounded text-xs ${formData.errors.name ? "border-red-500" : ""
+                    }`}
                   required
                 />
                 {formData.errors.name && (
@@ -740,9 +757,8 @@ const DistributorList = () => {
                   placeholder="Email"
                   value={formData.email}
                   onChange={handleInputChange}
-                  className={`w-full p-2 border rounded text-xs ${
-                    formData.errors.email ? "border-red-500" : ""
-                  }`}
+                  className={`w-full p-2 border rounded text-xs ${formData.errors.email ? "border-red-500" : ""
+                    }`}
                   required
                 />
                 {formData.errors.email && (
@@ -759,9 +775,8 @@ const DistributorList = () => {
                   placeholder="Password"
                   value={formData.password}
                   onChange={handleInputChange}
-                  className={`w-full p-2 border rounded text-xs ${
-                    formData.errors.password ? "border-red-500" : ""
-                  }`}
+                  className={`w-full p-2 border rounded text-xs ${formData.errors.password ? "border-red-500" : ""
+                    }`}
                   required
                 />
                 {formData.errors.password && (
@@ -778,9 +793,8 @@ const DistributorList = () => {
                   placeholder="Phone"
                   value={formData.phone}
                   onChange={handleInputChange}
-                  className={`w-full p-2 border rounded text-xs ${
-                    formData.errors.phone ? "border-red-500" : ""
-                  }`}
+                  className={`w-full p-2 border rounded text-xs ${formData.errors.phone ? "border-red-500" : ""
+                    }`}
                   required
                 />
                 {formData.errors.phone && (
@@ -797,9 +811,8 @@ const DistributorList = () => {
                   placeholder="Address"
                   value={formData.address}
                   onChange={handleInputChange}
-                  className={`w-full p-2 border rounded text-xs ${
-                    formData.errors.address ? "border-red-500" : ""
-                  }`}
+                  className={`w-full p-2 border rounded text-xs ${formData.errors.address ? "border-red-500" : ""
+                    }`}
                   required
                 />
                 {formData.errors.address && (
@@ -830,9 +843,8 @@ const DistributorList = () => {
                 <input
                   type="file"
                   onChange={(e) => handleFileChange(e, "aadharCard")}
-                  className={`w-full text-xs ${
-                    formData.errors.aadharCard ? "border-red-500" : ""
-                  }`}
+                  className={`w-full text-xs ${formData.errors.aadharCard ? "border-red-500" : ""
+                    }`}
                   accept=".pdf,.jpg,.jpeg,.png"
                 />
                 {formData.errors.aadharCard && (
@@ -850,9 +862,8 @@ const DistributorList = () => {
                 <input
                   type="file"
                   onChange={(e) => handleFileChange(e, "panCard")}
-                  className={`w-full text-xs ${
-                    formData.errors.panCard ? "border-red-500" : ""
-                  }`}
+                  className={`w-full text-xs ${formData.errors.panCard ? "border-red-500" : ""
+                    }`}
                   accept=".pdf,.jpg,.jpeg,.png"
                 />
                 {formData.errors.panCard && (
@@ -861,6 +872,24 @@ const DistributorList = () => {
                   </p>
                 )}
               </div>
+              {/* Profile Photo Upload */}
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-1">
+                  Profile Photo (Max: 500KB)
+                </label>
+                <input
+                  type="file"
+                  onChange={(e) => handleFileChange(e, "profilePhoto")}
+                  className={`w-full text-xs ${formData.errors.profilePhoto ? "border-red-500" : ""}`}
+                  accept=".jpg,.jpeg,.png"
+                />
+                {formData.errors.profilePhoto && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {formData.errors.profilePhoto}
+                  </p>
+                )}
+              </div>
+
 
               <div className="mt-4 flex justify-end space-x-3">
                 <button

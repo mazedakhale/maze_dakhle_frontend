@@ -278,8 +278,8 @@ const Ddashinner = () => {
           >
             {notifications.length > 0
               ? notifications.map(
-                  (notif, index) => `📢 ${notif.distributor_notification} `
-                )
+                (notif, index) => `📢 ${notif.distributor_notification} `
+              )
               : DEFAULT_NOTIFICATION}
           </marquee>
         </div>
@@ -442,13 +442,41 @@ const Ddashinner = () => {
         <div className="grid grid-cols-3 gap-6 w-full max-w-7xl mx-auto mt-6">
           {!selectedCategory
             ? categories.map((category) => (
+              <div
+                key={category.category_id}
+                className="flex w-full rounded-lg shadow-[0px_2px_4px_rgba(0,0,0,0.4)] cursor-pointer transition-all duration-300 overflow-hidden"
+                onClick={() =>
+                  handleCategorySelect(
+                    category.category_id,
+                    category.category_name
+                  )
+                }
+              >
+                {/* Icon Section */}
+                <div className="bg-[#FDEDD3] p-3 flex items-center justify-center border-r border-gray-300">
+                  <span className="text-orange-600 font-bold">PDF</span>
+                </div>
+
+                {/* Category Name Section */}
+                <div className="flex-1 bg-gray-100 hover:bg-orange-200 p-4 flex justify-between items-center">
+                  <h3 className="text-lg md:text-xl text-black">
+                    {category.category_name}
+                  </h3>
+                  <h3 className="text-lg md:text-2xl text-gray-700">
+                    {getCategoryCount(category.category_name)}
+                  </h3>
+                </div>
+              </div>
+            ))
+            : (subcategories[selectedCategory.categoryId] || []).map(
+              (subcategory) => (
                 <div
-                  key={category.category_id}
+                  key={subcategory.subcategory_id}
                   className="flex w-full rounded-lg shadow-[0px_2px_4px_rgba(0,0,0,0.4)] cursor-pointer transition-all duration-300 overflow-hidden"
                   onClick={() =>
-                    handleCategorySelect(
-                      category.category_id,
-                      category.category_name
+                    handleSubcategorySelect(
+                      subcategory.subcategory_id,
+                      subcategory.subcategory_name
                     )
                   }
                 >
@@ -457,46 +485,18 @@ const Ddashinner = () => {
                     <span className="text-orange-600 font-bold">PDF</span>
                   </div>
 
-                  {/* Category Name Section */}
+                  {/* Subcategory Name Section */}
                   <div className="flex-1 bg-gray-100 hover:bg-orange-200 p-4 flex justify-between items-center">
                     <h3 className="text-lg md:text-xl text-black">
-                      {category.category_name}
+                      {subcategory.subcategory_name}
                     </h3>
                     <h3 className="text-lg md:text-2xl text-gray-700">
-                      {getCategoryCount(category.category_name)}
+                      {getSubcategoryCount(subcategory.subcategory_name)}
                     </h3>
                   </div>
                 </div>
-              ))
-            : (subcategories[selectedCategory.categoryId] || []).map(
-                (subcategory) => (
-                  <div
-                    key={subcategory.subcategory_id}
-                    className="flex w-full rounded-lg shadow-[0px_2px_4px_rgba(0,0,0,0.4)] cursor-pointer transition-all duration-300 overflow-hidden"
-                    onClick={() =>
-                      handleSubcategorySelect(
-                        subcategory.subcategory_id,
-                        subcategory.subcategory_name
-                      )
-                    }
-                  >
-                    {/* Icon Section */}
-                    <div className="bg-[#FDEDD3] p-3 flex items-center justify-center border-r border-gray-300">
-                      <span className="text-orange-600 font-bold">PDF</span>
-                    </div>
-
-                    {/* Subcategory Name Section */}
-                    <div className="flex-1 bg-gray-100 hover:bg-orange-200 p-4 flex justify-between items-center">
-                      <h3 className="text-lg md:text-xl text-black">
-                        {subcategory.subcategory_name}
-                      </h3>
-                      <h3 className="text-lg md:text-2xl text-gray-700">
-                        {getSubcategoryCount(subcategory.subcategory_name)}
-                      </h3>
-                    </div>
-                  </div>
-                )
-              )}
+              )
+            )}
         </div>
 
         {/* Chart Section - Always visible with static structure */}

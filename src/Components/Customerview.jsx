@@ -187,13 +187,12 @@ const ApplicationView = () => {
                     <div className="flex flex-col gap-1">
                       {/* Status */}
                       <span
-                        className={`px-3 py-1 rounded-full text-white text-xs ${
-                          documentData.status === "Approved"
-                            ? "bg-green-500"
-                            : documentData.status === "Rejected"
+                        className={`px-3 py-1 rounded-full text-white text-xs ${documentData.status === "Approved"
+                          ? "bg-green-500"
+                          : documentData.status === "Rejected"
                             ? "bg-red-500"
                             : "bg-yellow-500" // Default color for other statuses
-                        }`}
+                          }`}
                       >
                         {documentData.status}
                       </span>

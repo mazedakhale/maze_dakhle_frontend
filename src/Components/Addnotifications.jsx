@@ -209,9 +209,8 @@ const NotificationManager = () => {
                 notifications.map((notification, index) => (
                   <tr
                     key={notification.notification_id}
-                    className={`${
-                      index % 2 === 0 ? "bg-[#FFFFFF]" : "bg-[#F58A3B14]"
-                    } hover:bg-orange-100 transition duration-200`}
+                    className={`${index % 2 === 0 ? "bg-[#FFFFFF]" : "bg-[#F58A3B14]"
+                      } hover:bg-orange-100 transition duration-200`}
                   >
                     <td className="px-4 py-3 border border-[#776D6DA8] text-center">
                       {notification.notification_id}
@@ -266,11 +265,10 @@ const NotificationManager = () => {
 
                     <td className="px-4 py-3 border border-[#776D6DA8] text-center">
                       <button
-                        className={`px-3 py-1 rounded text-white ${
-                          notification.notification_status === "Active"
-                            ? "bg-green-500 cursor-default"
-                            : "bg-gray-500 hover:bg-green-600"
-                        }`}
+                        className={`px-3 py-1 rounded text-white ${notification.notification_status === "Active"
+                          ? "bg-green-500 cursor-default"
+                          : "bg-gray-500 hover:bg-green-600"
+                          }`}
                         disabled={notification.notification_status === "Active"}
                         onClick={() =>
                           handleToggleStatus(

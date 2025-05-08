@@ -58,9 +58,8 @@ const FeedbackList = () => {
         toast: true,
         position: "top-end",
         icon: "success",
-        title: `Feedback will ${
-          newStatus === 1 ? "be shown" : "no longer be shown"
-        }`,
+        title: `Feedback will ${newStatus === 1 ? "be shown" : "no longer be shown"
+          }`,
         showConfirmButton: false,
         timer: 1200,
       });
@@ -159,9 +158,8 @@ const FeedbackList = () => {
                 feedbackList.map((fb, idx) => (
                   <tr
                     key={fb.feedback_feedback_id}
-                    className={`${
-                      idx % 2 === 0 ? "bg-white" : "bg-[#F58A3B14]"
-                    } hover:bg-orange-100`}
+                    className={`${idx % 2 === 0 ? "bg-white" : "bg-[#F58A3B14]"
+                      } hover:bg-orange-100`}
                   >
                     <td className="px-4 py-3 border text-center">
                       {fb.users_name}
@@ -179,11 +177,10 @@ const FeedbackList = () => {
                     </td>
                     <td className="px-4 py-3 border text-center">
                       <button
-                        className={`px-2 py-1 rounded ${
-                          fb.status === 1
-                            ? "bg-green-500 text-white"
-                            : "bg-gray-200"
-                        }`}
+                        className={`px-2 py-1 rounded ${fb.status === 1
+                          ? "bg-green-500 text-white"
+                          : "bg-gray-200"
+                          }`}
                         onClick={() => handleStatusClick(fb)}
                       >
                         {fb.status === 1 ? "Hide" : "Show"}

@@ -706,11 +706,10 @@ const InvoicePage = () => {
                   {filteredDistributors.map((dist) => (
                     <li
                       key={dist.user_id}
-                      className={`flex items-center border-b last:border-b-0 p-1 rounded ${
-                        selectedDistributor === dist.user_id
-                          ? "bg-blue-200"
-                          : ""
-                      }`}
+                      className={`flex items-center border-b last:border-b-0 p-1 rounded ${selectedDistributor === dist.user_id
+                        ? "bg-blue-200"
+                        : ""
+                        }`}
                     >
                       <input
                         type="checkbox"

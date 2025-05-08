@@ -141,9 +141,8 @@ const DocumentTable = () => {
                   documents.map((doc, idx) => (
                     <tr
                       key={doc.doc_type_id}
-                      className={`${
-                        idx % 2 === 0 ? "bg-white" : "bg-gray-50"
-                      } hover:bg-gray-100 transition-colors`}
+                      className={`${idx % 2 === 0 ? "bg-white" : "bg-gray-50"
+                        } hover:bg-gray-100 transition-colors`}
                     >
                       <td className="p-3 border border-gray-300">
                         {doc.doc_type_id}

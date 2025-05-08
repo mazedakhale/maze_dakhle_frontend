@@ -84,6 +84,7 @@ import Pricing from "./Components/Pricing";
 import Newstable from "./Components/Newstable"
 import News from "./Components/News"
 import ResetPassword from "./Components/ResetPassword";
+import HeaderTable from "./Components/HeaderTable"
 function App() {
   return (
     <Router>
@@ -117,6 +118,7 @@ function App() {
 
         <Route path="/Documenttable" element={<Admindashboard><DocumentTable /></Admindashboard>} />
         <Route path="/Newstable" element={<Admindashboard><Newstable /></Admindashboard>} />
+        <Route path="/HeaderTable" element={<Admindashboard><HeaderTable /></Admindashboard>} />
 
         <Route path="/Addfieldname" element={<Admindashboard><Addfieldname /></Admindashboard>} />
         <Route path="/Verifydocuments" element={<Admindashboard><Verifydocuments /></Admindashboard>} />

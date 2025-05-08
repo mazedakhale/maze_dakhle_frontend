@@ -470,9 +470,8 @@ const Employee = () => {
                   ).map((groupedDoc, index) => (
                     <tr
                       key={`group-${groupedDoc.category_id}-${groupedDoc.user_id}`}
-                      className={`${
-                        index % 2 === 0 ? "bg-[#FFFFFF]" : "bg-[#F58A3B14]"
-                      } hover:bg-orange-100 transition duration-200`}
+                      className={`${index % 2 === 0 ? "bg-[#FFFFFF]" : "bg-[#F58A3B14]"
+                        } hover:bg-orange-100 transition duration-200`}
                     >
                       <td className="px-4 py-3 border border-[#776D6DA8] text-center">
                         {categories.find(

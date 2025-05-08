@@ -199,9 +199,8 @@ const ErrorRequests = () => {
                 filteredRequests.map((request, index) => (
                   <tr
                     key={request.request_id}
-                    className={`border border-gray-300 ${
-                      index % 2 === 0 ? "bg-[#ffffff]" : "bg-[#F58A3B14]"
-                    } hover:bg-gray-100`}
+                    className={`border border-gray-300 ${index % 2 === 0 ? "bg-[#ffffff]" : "bg-[#F58A3B14]"
+                      } hover:bg-gray-100`}
                   >
                     <td className="border p-3 text-center">
                       {request.request_id}
@@ -256,17 +255,16 @@ const ErrorRequests = () => {
                     {/* Status Badge */}
                     <td className="border p-3 text-center">
                       <span
-                        className={`px-3 py-1 rounded-full text-white text-sm ${
-                          request.request_status === "Approved"
-                            ? "bg-green-500"
-                            : request.request_status === "Distributor Rejected"
+                        className={`px-3 py-1 rounded-full text-white text-sm ${request.request_status === "Approved"
+                          ? "bg-green-500"
+                          : request.request_status === "Distributor Rejected"
                             ? "bg-red-500"
                             : request.request_status === "Completed"
-                            ? "bg-blue-500"
-                            : request.request_status === "Uploaded"
-                            ? "bg-purple-500"
-                            : "bg-yellow-500"
-                        }`}
+                              ? "bg-blue-500"
+                              : request.request_status === "Uploaded"
+                                ? "bg-purple-500"
+                                : "bg-yellow-500"
+                          }`}
                       >
                         {request.request_status}
                       </span>

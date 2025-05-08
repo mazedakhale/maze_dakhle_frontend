@@ -79,12 +79,12 @@ const CustomerDashboard = () => {
     axios
       .get(`https://mazedakhale.in/api/userdashboard/total-applied/${userId}`)
       .then((res) => setAppliedCount(res.data.totalCount))
-      .catch(() => {});
+      .catch(() => { });
 
     axios
       .get(`https://mazedakhale.in/api/userdashboard/total-completed/${userId}`)
       .then((res) => setCompletedCount(res.data.totalCompleted))
-      .catch(() => {});
+      .catch(() => { });
 
     axios
       .get(`https://mazedakhale.in/api/userdashboard/category-counts/${userId}`)
@@ -99,7 +99,7 @@ const CustomerDashboard = () => {
         setCategoryCounts(res.data.categories);
         setSubcategoryCounts(res.data.subcategories);
       })
-      .catch(() => {});
+      .catch(() => { });
 
     axios
       .get(`https://mazedakhale.in/api/userdashboard/status-count/${userId}`)
@@ -111,12 +111,12 @@ const CustomerDashboard = () => {
           }))
         );
       })
-      .catch(() => {});
+      .catch(() => { });
 
     axios
       .get("https://mazedakhale.in/api/notifications/active")
       .then((res) => setNotifications(res.data))
-      .catch(() => {});
+      .catch(() => { });
 
     fetchCategories();
     fetchSubcategories();
@@ -127,21 +127,21 @@ const CustomerDashboard = () => {
     try {
       const { data } = await axios.get(API_BASE_URL);
       setCategories(data);
-    } catch {}
+    } catch { }
   };
 
   const fetchSubcategories = async () => {
     try {
       const { data } = await axios.get(SUBCATEGORIES_API_URL);
       setSubcategories(data);
-    } catch {}
+    } catch { }
   };
 
   const fetchPrices = async () => {
     try {
       const { data } = await axios.get("https://mazedakhale.in/api/prices");
       setPrices(data.map((p) => ({ ...p, amount: Number(p.amount) })));
-    } catch {}
+    } catch { }
   };
 
   const fetchRequiredDocuments = async (catId, subId) => {
@@ -156,7 +156,7 @@ const CustomerDashboard = () => {
       });
       setSelectedFiles(files);
       setIsModalOpen(true);
-    } catch {}
+    } catch { }
   };
 
   const handleSubcategorySelect = (catId, catName, subId, subName, action) => {
@@ -344,10 +344,10 @@ const CustomerDashboard = () => {
                       <h3 className="text-lg font-semibold">
                         {sub.subcategory_name}
                       </h3>
-                      <p className="text-sm text-gray-800 mt-1">
-                        Price:{" "}
-                        {priceRec ? `₹${priceRec.amount.toFixed(2)}` : "N/A"}
+                      <p className="text-lg font-semibold text-orange-500 mt-1">
+                        Price: {priceRec ? `₹${priceRec.amount.toFixed(2)}` : "N/A"}
                       </p>
+
                       <p className="text-sm text-gray-800 mt-1">
                         Pending: {pendingSub}
                       </p>

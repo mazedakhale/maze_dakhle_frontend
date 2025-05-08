@@ -70,6 +70,8 @@ const Sidebar = ({ onNavigate }) => {
 const Customerdashboard = ({ children }) => {
   const [userEmail, setUserEmail] = useState("");
   const [showEmail, setShowEmail] = useState(false); // State to toggle email visibility
+  const [userName, setUserName] = useState("");
+  const [profilePicture, setProfilePicture] = useState(null); // Add state
 
   const navigate = useNavigate();
 
@@ -79,11 +81,14 @@ const Customerdashboard = ({ children }) => {
       try {
         const decodedToken = jwtDecode(token);
         setUserEmail(decodedToken.email);
+        setUserName(decodedToken.name);
+        setProfilePicture(decodedToken.profile_picture); // ✅ Extract from token
       } catch (error) {
         console.error("Invalid token:", error);
       }
     }
   }, []);
+
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -99,15 +104,21 @@ const Customerdashboard = ({ children }) => {
       <div className="flex-1 p-6 ml-1/5 pt-[70px]">
         {/* Top Navbar */}
         <div className="flex items-center justify-between bg-white text-gray px-4 py-2 shadow-[0_3px_2px_rgba(0,0,0,0.15)] fixed top-0 left-[20%] w-[80%] z-10 h-[73px]">
-          <span className="text-lg font-bold">Customer Dashboard</span>
+          <span className="text-lg font-bold text-orange-500">
+            VLE Dashboard{" "}
+            {userName && (
+              <span className="text-sm text-gray-600 font-medium">({userName})</span>
+            )}
+          </span>
+
 
           {/* Right‑side controls */}
           <div className="flex items-center space-x-4">
             {/* Profile icon */}
             <img
-              src="https://t4.ftcdn.net/jpg/04/83/90/95/360_F_483909569_OI4LKNeFgHwvvVju60fejLd9gj43dIcd.jpg"
+              src={profilePicture || "https://via.placeholder.com/40x40?text=User"}
               alt="Profile"
-              className="h-10 w-10 rounded-full cursor-pointer"
+              className="h-10 w-10 rounded-full cursor-pointer object-cover"
               onClick={() => navigate("/ProfilePage")}
             />
 

@@ -155,9 +155,8 @@ const CompletedApplicationsList = () => {
                 filteredDocuments.map((document, index) => (
                   <tr
                     key={document.document_id}
-                    className={`${
-                      index % 2 === 0 ? "bg-[#FFFFFF]" : "bg-[#F58A3B14]"
-                    } hover:bg-orange-100 transition duration-200`}
+                    className={`${index % 2 === 0 ? "bg-[#FFFFFF]" : "bg-[#F58A3B14]"
+                      } hover:bg-orange-100 transition duration-200`}
                   >
                     <td className="px-4 py-3 border border-[#776D6DA8] text-center">
                       {document.document_id}
@@ -173,13 +172,12 @@ const CompletedApplicationsList = () => {
                     </td>
                     <td className="px-4 py-3 border border-[#776D6DA8] text-center">
                       <span
-                        className={`px-3 py-1 rounded-full text-white text-sm ${
-                          document.status === "Approved"
-                            ? "bg-green-500"
-                            : document.status === "Rejected"
+                        className={`px-3 py-1 rounded-full text-white text-sm ${document.status === "Approved"
+                          ? "bg-green-500"
+                          : document.status === "Rejected"
                             ? "bg-red-500"
                             : "bg-yellow-500"
-                        }`}
+                          }`}
                       >
                         {document.status}
                       </span>

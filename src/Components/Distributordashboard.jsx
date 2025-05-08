@@ -58,7 +58,10 @@ const Sidebar = ({ onNavigate }) => {
 // Distributor Dashboard Component
 const Distributordashboard = ({ children }) => {
   const [userEmail, setUserEmail] = useState("");
-  const [showEmail, setShowEmail] = useState(false); // State to toggle email visibility
+  const [showEmail, setShowEmail] = useState(false);
+  const [userName, setUserName] = useState("");
+  const [profilePicture, setProfilePicture] = useState(null); // Add state
+  // State to toggle email visibility
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -67,6 +70,8 @@ const Distributordashboard = ({ children }) => {
       try {
         const decodedToken = jwtDecode(token);
         setUserEmail(decodedToken.email);
+        setUserName(decodedToken.name);
+        setProfilePicture(decodedToken.profile_picture); // ✅ Extract from token
       } catch (error) {
         console.error("Invalid token:", error);
       }
@@ -89,15 +94,20 @@ const Distributordashboard = ({ children }) => {
         <div className="flex items-center justify-between bg-white text-gray px-4 py-2 shadow-[0_3px_2px_rgba(0,0,0,0.15)] fixed top-0 left-[20%] w-[80%] z-10 h-[73px]">
 
           {/* Dashboard Title */}
-          <span className="text-lg font-bold">Distributor Dashboard</span>
+          <span className="text-lg font-bold text-orange-500">
+            Distributor Dashboard{" "}
+            {userName && (
+              <span className="text-sm text-gray-600 font-medium">({userName})</span>
+            )}
+          </span>
 
           {/* Right‑side controls */}
           <div className="flex items-center space-x-4">
             {/* Profile icon */}
             <img
-              src="https://t4.ftcdn.net/jpg/04/83/90/95/360_F_483909569_OI4LKNeFgHwvvVju60fejLd9gj43dIcd.jpg"
+              src={profilePicture || "https://via.placeholder.com/40x40?text=User"}
               alt="Profile"
-              className="h-10 w-10 rounded-full cursor-pointer"
+              className="h-10 w-10 rounded-full cursor-pointer object-cover"
               onClick={() => navigate("/ProfilePage")}
             />
 
@@ -105,13 +115,12 @@ const Distributordashboard = ({ children }) => {
             <button
               onClick={handleLogout}
               className="bg-orange-500 hover:bg-orange-600 text-white
-                 p-2 rounded-md transition flex items-center justify-center"
+                          p-2 rounded-md transition flex items-center justify-center"
             >
               <FaSignOutAlt className="h-6 w-6 text-white" />
             </button>
           </div>
         </div>
-
         {/* Main Content Area */}
         <div className="mt-6">{children}</div>
       </div>

@@ -25,6 +25,8 @@ const Register = () => {
     district: "",
     taluka: "",
     role: "Customer",
+    profilePhoto: null, // ✅ new field
+
     aadharCard: null,
     panCard: null,
     agreeToTerms: false,
@@ -144,6 +146,8 @@ const Register = () => {
       formData.taluka &&
       formData.aadharCard &&
       formData.panCard &&
+      formData.profilePhoto
+      &&
       formData.agreeToTerms &&
       Object.values(formData.errors).every((err) => !err)
     );
@@ -156,24 +160,42 @@ const Register = () => {
     }
 
     Swal.fire({ title: "Processing…", allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
     try {
-      // 1️⃣ Register user
       const payload = new FormData();
-      Object.entries(formData).forEach(([k, v]) => {
-        if (["aadharCard", "panCard", "errors", "agreeToTerms"].includes(k)) return;
-        payload.append(k, v);
+
+      // Append all text fields
+      Object.entries(formData).forEach(([key, value]) => {
+        if (
+          ["aadharCard", "panCard", "profilePhoto", "errors", "agreeToTerms"].includes(key)
+        )
+          return;
+        if (value !== null && value !== undefined) {
+          payload.append(key, value.toString());
+        }
       });
+
+      // Append documents
       payload.append("files", formData.aadharCard);
       payload.append("files", formData.panCard);
       payload.append("documentTypes", "Aadhar Card");
       payload.append("documentTypes", "PAN Card");
 
-      const res = await fetch("https://mazedakhale.in/api/users/register", { method: "POST", body: payload });
+      // Append profile photo
+      if (formData.profilePhoto) {
+        payload.append("profilePhoto", formData.profilePhoto);
+      }
+
+      const res = await fetch("https://mazedakhale.in/api/users/register", {
+        method: "POST",
+        body: payload,
+      });
+
       const data = await res.json();
       Swal.close();
       if (!res.ok) throw new Error(data.message || "Registration failed");
 
-      // 2️⃣ Build E.164 phone
+      // SMS Logic
       const phoneE164 = formData.phone.startsWith("91") ? formData.phone : "91" + formData.phone;
       const message =
         `Welcome to Mazedakhale! Your registration was successful.\n\n` +
@@ -182,22 +204,20 @@ const Register = () => {
         `Password: ${formData.password}\n\n` +
 
         `Thank you for joining us!`;
-
-      // 3️⃣ Send SMS in background
       fetch(SMS_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ sender: SMS_SENDER, number: phoneE164, message }),
       }).catch(console.error);
 
-      // 4️⃣ Immediately notify the user & redirect
-      Swal.fire("Success", "Registered successfully and Sms sent !", "success")
+      Swal.fire("Success", "Registered successfully and SMS sent!", "success")
         .then(() => navigate("/login"));
     } catch (err) {
       Swal.close();
       Swal.fire("Error", err.message, "error");
     }
   };
+
 
 
 
@@ -255,54 +275,80 @@ const Register = () => {
               <p className="text-xs text-red-600">{formData.errors.email}</p>
             )}
 
-            {/* Password + Toggle */}
-            <label className="block text-xs font-medium text-gray-700 mb-1">
-              Password <span className="text-red-600">*</span>
-            </label>
-            <div className="relative">
-              <input
-                type={passwordVisible ? "text" : "password"}
-                name="password"
-                className={`w-full p-2 border rounded text-xs pr-10 ${formData.errors.password
-                  ? "border-red-500"
-                  : isValidPassword(formData.password)
-                    ? "border-green-500"
-                    : ""
-                  }`}
-                onChange={handleChange}
-                required
-              />
-              <button
-                type="button"
-                className="absolute top-2 right-2 text-gray-500"
-                onClick={() => setPasswordVisible((p) => !p)}
-              >
-                {passwordVisible ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
-              </button>
-            </div>
-            {formData.errors.password && (
-              <p className="text-xs text-red-600">{formData.errors.password}</p>
-            )}
+            {/* Phone + Password in one line */}
+            <div className="flex space-x-4">
 
-            {/* Phone */}
-            <label className="block text-xs font-medium text-gray-700 mb-1">
-              Phone <span className="text-red-600">*</span>
-            </label>
-            <input
-              type="text"
-              name="phone"
-              className={`w-full p-2 border rounded text-xs ${formData.errors.phone
-                ? "border-red-500"
-                : isValidPhone(formData.phone)
-                  ? "border-green-500"
-                  : ""
-                }`}
-              onChange={handleChange}
-              required
-            />
-            {formData.errors.phone && (
-              <p className="text-xs text-red-600">{formData.errors.phone}</p>
-            )}
+              {/* Password */}
+              <div className="w-1/2">
+                <label className="block text-xs font-medium text-gray-700 mb-1">
+                  Password <span className="text-red-600">*</span>
+                </label>
+                <div className="relative">
+                  <input
+                    type={passwordVisible ? "text" : "password"}
+                    name="password"
+                    className={`w-full p-2 border rounded text-xs pr-10 ${formData.errors.password
+                      ? "border-red-500"
+                      : isValidPassword(formData.password)
+                        ? "border-green-500"
+                        : ""
+                      }`}
+                    onChange={handleChange}
+                    required
+                  />
+                  <button
+                    type="button"
+                    className="absolute top-2 right-2 text-gray-500"
+                    onClick={() => setPasswordVisible((p) => !p)}
+                  >
+                    {passwordVisible ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
+                  </button>
+                </div>
+                {formData.errors.password && (
+                  <p className="text-xs text-red-600">{formData.errors.password}</p>
+                )}
+              </div>
+              {/* Phone */}
+              <div className="w-1/2">
+                <label className="block text-xs font-medium text-gray-700 mb-1">
+                  Phone <span className="text-red-600">*</span>
+                </label>
+                <input
+                  type="text"
+                  name="phone"
+                  className={`w-full p-2 border rounded text-xs ${formData.errors.phone
+                    ? "border-red-500"
+                    : isValidPhone(formData.phone)
+                      ? "border-green-500"
+                      : ""
+                    }`}
+                  onChange={handleChange}
+                  required
+                />
+                {formData.errors.phone && (
+                  <p className="text-xs text-red-600">{formData.errors.phone}</p>
+                )}
+              </div>
+
+
+            </div>
+
+            {/* Profile Photo */}
+            <div className="space-y-1 mt-3">
+              <label className="block text-xs font-medium text-gray-700 mb-1">
+                Profile Photo (Max 5MB)
+              </label>
+              <input
+                type="file"
+                accept=".jpg,.jpeg,.png"
+                onChange={(e) => handleFileChange(e, "profilePhoto")}
+                className={`w-full p-2 border rounded text-xs ${formData.errors.profilePhoto ? "border-red-500" : ""}`}
+              />
+              {formData.errors.profilePhoto && (
+                <p className="text-xs text-red-600">{formData.errors.profilePhoto}</p>
+              )}
+            </div>
+
 
             {/* Address + Shop Address */}
             <div className="flex space-x-4">
