@@ -261,7 +261,7 @@ const Ddashinner = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-100 p-6 ml-[300px]">
+    <div className="flex flex-col min-h-screen bg-white p-6 ml-[300px]">
       <div className="w-full max-w-7xl bg-white p-6 shadow-xl rounded-lg">
         {/* Notification Marquee - Always visible */}
         <div
