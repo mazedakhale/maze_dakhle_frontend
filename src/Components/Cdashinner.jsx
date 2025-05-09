@@ -254,7 +254,7 @@ export default function CustomerDashboard() {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={item.onClick}
-            style={{ width: 250, height: 80 }}
+            style={{ width: '100%', height: 70 }}
           >
             <div
               className={`${item.color} flex items-center justify-center w-1/4 h-full`}
