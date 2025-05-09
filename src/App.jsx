@@ -85,6 +85,13 @@ import Newstable from "./Components/Newstable"
 import News from "./Components/News"
 import ResetPassword from "./Components/ResetPassword";
 import HeaderTable from "./Components/HeaderTable"
+import ContactinfoTable from "./Components/ContactinfoTable"
+import PaymentButton from "./Components/PaymentButton";
+import PaymentStatus from "./Components/PaymentStatus";
+import PaymentTest from "./Components/PaymentTest";
+import Wallet from "./Components/Wallet";
+import TransactionTable from "./Components/TransactionTable";
+import api from "./utils/api";
 function App() {
   return (
     <Router>
@@ -119,6 +126,7 @@ function App() {
         <Route path="/Documenttable" element={<Admindashboard><DocumentTable /></Admindashboard>} />
         <Route path="/Newstable" element={<Admindashboard><Newstable /></Admindashboard>} />
         <Route path="/HeaderTable" element={<Admindashboard><HeaderTable /></Admindashboard>} />
+        <Route path="/ContactinfoTable" element={<Admindashboard><ContactinfoTable /></Admindashboard>} />
 
         <Route path="/Addfieldname" element={<Admindashboard><Addfieldname /></Admindashboard>} />
         <Route path="/Verifydocuments" element={<Admindashboard><Verifydocuments /></Admindashboard>} />
@@ -168,6 +176,19 @@ function App() {
         <Route path="/Customerapply" element={<Customerdashboard><Customerapply /></Customerdashboard>} />
         <Route path="/Feedback" element={<Customerdashboard><Feedback /></Customerdashboard>} />
         <Route path="/Guide" element={<Customerdashboard><Guide /></Customerdashboard>} />
+        <Route path="/payment-status" element={<Customerdashboard><PaymentStatus /></Customerdashboard>} />
+        <Route path="/payment-test" element={<Customerdashboard><PaymentTest /></Customerdashboard>} />
+        <Route path="/PaymentButton" element={<Customerdashboard><PaymentButton /></Customerdashboard>} />
+        <Route path="/TransactionTable" element={<Customerdashboard><TransactionTable /></Customerdashboard>} />
+
+        <Route
+          path="/wallet"
+          element={
+            <Customerdashboard>
+              <Wallet />
+            </Customerdashboard>
+          }
+        />
 
         <Route path="/Checkapplication" element={<Customerdashboard><Checkapplication /></Customerdashboard>} />
         <Route path="/Adderrorrequest" element={<Customerdashboard><Adderrorrequest /></Customerdashboard>} />

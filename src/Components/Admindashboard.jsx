@@ -71,7 +71,7 @@ const Sidebar = ({ onNavigate }) => {
                 path: "/DocumentTable",
               },
               { icon: <FaNewspaper />, label: "Add News", path: "/Newstable" },
-              { icon: <FaNewspaper />, label: "Add Scrollable Text", path: "/HeaderTable" },
+              { icon: <FaNewspaper />, label: "Add Contact Info ", path: "/ContactinfoTable" },
 
               {
                 icon: <FaShieldAlt />,

@@ -29,6 +29,7 @@ const Sidebar = ({ onNavigate }) => {
           <img src={logo} alt="Logo" className="h-12 w-auto mb-2" />
         </div>
 
+<<<<<<< HEAD
         <nav className="mt-4 px-4">
           <ul>
             {[
@@ -62,6 +63,37 @@ const Sidebar = ({ onNavigate }) => {
                   activePath === item.path
                     ? "bg-orange-500 text-white"
                     : "bg-white text-black hover:bg-orange-100"
+=======
+      {/* Navigation Menu */}
+      <nav className="mt-6">
+        <ul>
+          {[
+            { icon: <FaTachometerAlt />, label: "Dashboard", path: "/Cdashinner" },
+            { icon: <FaClipboardList />, label: "Check Application", path: "/Checkapplication" },
+            { icon: <FaFileAlt />, label: "Fill Form", path: "/Category" },
+            { icon: <FaClipboardList />, label: " Applications History", path: "/Customerhistory" },
+            // { icon: <FaClipboardList />, label: "Submit error", path: "/Adderrorrequest" },
+            { icon: <FaClipboardList />, label: "Applications", path: "/Customerapply" },
+            { icon: <FaCommentDots />, label: "Feedback", path: "/Feedback" },
+            { icon: <FaCommentDots />, label: "Guide", path: "/Guide" },
+            { icon: <FaCommentDots />, label: "Wallet Manage", path: "/Wallet" },
+            { icon: <FaCommentDots />, label: "Transactions", path: "/TransactionTable" },
+
+            // { icon: <FaCommentDots />, label: "Pay status", path: "/PaymentStatus" },
+            // { icon: <FaCommentDots />, label: " test Pay", path: "/PaymentTest" },
+
+            // { icon: <FaCommentDots />, label: "Pay button", path: "/PaymentButton" },
+
+
+          ].map((item, index) => (
+
+            <li
+              key={index}
+              className={`flex items-center p-4 rounded-lg cursor-pointer transition duration-300 ease-in-out mb-4 
+            shadow-lg border border-[#111] ${activePath === item.path
+                  ? "bg-orange-500 text-white"
+                  : "bg-[#494E53] hover:bg-orange-400"
+>>>>>>> 69eacb0 (Initial commit)
                 }`}
                 onClick={() => handleNavigation(item.path)}
               >

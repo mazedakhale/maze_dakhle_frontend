@@ -1,17 +1,9 @@
+// src/components/CustomerDashboard.jsx
 import React, { useEffect, useState } from "react";
 import {
-  PieChart,
-  Pie,
-  Cell,
-  Tooltip,
-  Legend,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  ResponsiveContainer,
-  LabelList,
+  PieChart, Pie, Cell, Tooltip, Legend,
+  BarChart, Bar, XAxis, YAxis, CartesianGrid,
+  ResponsiveContainer, LabelList,
 } from "recharts";
 import { motion } from "framer-motion";
 import { Card, CardContent } from "@mui/material";
@@ -22,161 +14,164 @@ import {
   FaCheckCircle,
   FaRupeeSign,
   FaClock,
-  FaFolderOpen,
   FaFilePdf,
   FaFileAlt,
-  FaEdit,
-  FaTrash,
-  FaPlus,
   FaTimes,
+  FaWallet,
 } from "react-icons/fa";
 
-const CustomerDashboard = () => {
+export default function CustomerDashboard() {
   const navigate = useNavigate();
+
+  // ─── State ─────────────────────────────────────────
   const [userId, setUserId] = useState(null);
 
-  // counts & data
   const [appliedCount, setAppliedCount] = useState(0);
   const [completedCount, setCompletedCount] = useState(0);
-  const [categoryData, setCategoryData] = useState([]);
   const [statusData, setStatusData] = useState([]);
-  const [notifications, setNotifications] = useState([]);
+  const [categoryData, setCategoryData] = useState([]);
   const [categoryCounts, setCategoryCounts] = useState([]);
   const [subcategoryCounts, setSubcategoryCounts] = useState([]);
+  const [notifications, setNotifications] = useState([]);
 
-  // categories/subcategories
+  const [walletBalance, setWalletBalance] = useState(0);
+
   const [categories, setCategories] = useState([]);
   const [subcategories, setSubcategories] = useState([]);
-
-  // prices
   const [prices, setPrices] = useState([]);
 
-  // required docs modal
   const [requiredDocuments, setRequiredDocuments] = useState([]);
   const [selectedFiles, setSelectedFiles] = useState({});
-  const [isAgreed, setIsAgreed] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isAgreed, setIsAgreed] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedSubcategory, setSelectedSubcategory] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
 
-  const API_BASE_URL = "https://mazedakhale.in/api/categories";
-  const SUBCATEGORIES_API_URL = "https://mazedakhale.in/api/subcategories";
+  const token = localStorage.getItem("token");
+  const authHeaders = token ? { Authorization: `Bearer ${token}` } : {};
 
-  // decode token
+  // ─── Decode JWT → userId ───────────────────────────
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
+    if (!token) return;
+    try {
       const decoded = JSON.parse(atob(token.split(".")[1]));
       setUserId(decoded.user_id);
+    } catch (err) {
+      console.error("JWT decode failed:", err);
     }
-  }, []);
+  }, [token]);
 
-  // fetch dashboard data + prices
+  // ─── Fetch Dashboard + Wallet ──────────────────────
   useEffect(() => {
     if (!userId) return;
 
+    // 1. Applied / Completed
     axios
       .get(`https://mazedakhale.in/api/userdashboard/total-applied/${userId}`)
-      .then((res) => setAppliedCount(res.data.totalCount))
-      .catch(() => { });
+      .then(res => setAppliedCount(res.data.totalCount))
+      .catch(console.error);
 
     axios
       .get(`https://mazedakhale.in/api/userdashboard/total-completed/${userId}`)
-      .then((res) => setCompletedCount(res.data.totalCompleted))
-      .catch(() => { });
+      .then(res => setCompletedCount(res.data.totalCompleted))
+      .catch(console.error);
 
+    // 2. Wallet balance
+    axios
+      .get(`https://mazedakhale.in/api/wallet`, { headers: authHeaders })
+      .then(res => {
+        const num = parseFloat(res.data.balance);
+        setWalletBalance(isNaN(num) ? 0 : num);
+      })
+      .catch(console.error);
+
+    // 3. Status distribution
+    axios
+      .get(`https://mazedakhale.in/api/userdashboard/status-count/${userId}`)
+      .then(res =>
+        setStatusData(
+          res.data.map(item => ({
+            status: item.status,
+            count: +item.count,
+          }))
+        )
+      )
+      .catch(console.error);
+
+    // 4. Category / Subcategory counts
     axios
       .get(`https://mazedakhale.in/api/userdashboard/category-counts/${userId}`)
-      .then((res) => {
-        const withColors = res.data.categories.map((item, i) => ({
-          name: item.category,
-          value: item.totalApplications,
-          pending: item.pendingApplications,
+      .then(res => {
+        const withColors = res.data.categories.map((c, i) => ({
+          name: c.category,
+          value: c.totalApplications,
+          pending: c.pendingApplications,
           color: `hsl(${(i * 137.508) % 360},70%,50%)`,
         }));
         setCategoryData(withColors);
         setCategoryCounts(res.data.categories);
         setSubcategoryCounts(res.data.subcategories);
       })
-      .catch(() => { });
+      .catch(console.error);
 
-    axios
-      .get(`https://mazedakhale.in/api/userdashboard/status-count/${userId}`)
-      .then((res) => {
-        setStatusData(
-          res.data.map((item) => ({
-            status: item.status,
-            count: +item.count,
-          }))
-        );
-      })
-      .catch(() => { });
-
+    // 5. Notifications
     axios
       .get("https://mazedakhale.in/api/notifications/active")
-      .then((res) => setNotifications(res.data))
-      .catch(() => { });
+      .then(res => setNotifications(res.data))
+      .catch(console.error);
 
+    // 6. Lists & Prices
     fetchCategories();
     fetchSubcategories();
     fetchPrices();
   }, [userId]);
 
+  // ─── Helper Fetchers ────────────────────────────────
   const fetchCategories = async () => {
     try {
-      const { data } = await axios.get(API_BASE_URL);
+      const { data } = await axios.get("https://mazedakhale.in/api/categories");
       setCategories(data);
     } catch { }
   };
-
   const fetchSubcategories = async () => {
     try {
-      const { data } = await axios.get(SUBCATEGORIES_API_URL);
+      const { data } = await axios.get("https://mazedakhale.in/api/subcategories");
       setSubcategories(data);
     } catch { }
   };
-
   const fetchPrices = async () => {
     try {
       const { data } = await axios.get("https://mazedakhale.in/api/prices");
-      setPrices(data.map((p) => ({ ...p, amount: Number(p.amount) })));
+      setPrices(data.map(p => ({ ...p, amount: Number(p.amount) })));
     } catch { }
   };
 
-  const fetchRequiredDocuments = async (catId, subId) => {
+  // ─── Required Documents Modal ──────────────────────
+  const openDocsModal = async (catId, subId) => {
     try {
       const { data } = await axios.get(
         `https://mazedakhale.in/api/required-documents/${catId}/${subId}`
       );
       setRequiredDocuments(data);
       const files = {};
-      data.forEach((doc) => {
-        if (doc.file_url) files[doc.id] = doc.file_url;
-      });
+      data.forEach(d => d.file_url && (files[d.id] = d.file_url));
       setSelectedFiles(files);
       setIsModalOpen(true);
     } catch { }
   };
-
-  const handleSubcategorySelect = (catId, catName, subId, subName, action) => {
+  const handleSubcat = (catId, catName, subId, subName, action) => {
     setSelectedCategory({ categoryId: catId, categoryName: catName });
     setSelectedSubcategory({ subcategoryId: subId, subcategoryName: subName });
-
-    if (action === "apply") {
-      fetchRequiredDocuments(catId, subId);
-    } else {
+    if (action === "apply") openDocsModal(catId, subId);
+    else
       navigate("/Clistpage", {
         state: { catId, catName, subId, subName },
       });
-    }
   };
-
-  const handleAgreementChange = (e) => setIsAgreed(e.target.checked);
-
   const handleApply = () => {
     if (!isAgreed) {
-      alert("Please agree to the terms.");
+      alert("Please agree to terms.");
       return;
     }
     navigate("/Apply", {
@@ -188,31 +183,28 @@ const CustomerDashboard = () => {
     });
   };
 
-  const generateColor = (index) => `hsl(${(index * 137.508) % 360},70%,50%)`;
-
+  // ─── JSX ───────────────────────────────────────────
   return (
     <div className="ml-80 mt-14 p-6 bg-gray-100 min-h-screen">
       {/* Notifications */}
       <div className="mb-6">
         {notifications.length ? (
-          notifications.map((n, i) =>
-            n.customer_notification ? (
-              <marquee
-                key={i}
-                className="text-lg font-semibold text-blue-600 mb-2"
-              >
-                📢 {n.customer_notification}
-              </marquee>
-            ) : null
-          )
+          notifications.map((n, i) => (
+            <marquee
+              key={i}
+              className="text-lg font-semibold text-blue-600 mb-2"
+            >
+              📢 {n.customer_notification}
+            </marquee>
+          ))
         ) : (
-          <p className="text-gray-500 text-center">No active notifications</p>
+          <p className="text-gray-500 text-center">No notifications</p>
         )}
       </div>
 
-      {/* Top Cards */}
+      {/* Top Cards (5 across) */}
       <motion.div
-        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8"
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8"
         initial={{ opacity: 0, y: -50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8 }}
@@ -234,7 +226,7 @@ const CustomerDashboard = () => {
           },
           {
             icon: <FaRupeeSign size={30} />,
-            count: `₹${appliedCount * 150}`,
+            count: `₹${(appliedCount * 150).toLocaleString()}`,
             label: "Total Transaction",
             color: "bg-[#7C00FF]",
           },
@@ -244,6 +236,16 @@ const CustomerDashboard = () => {
             label: "Pending Application",
             color: "bg-[#FFC510]",
             onClick: () => navigate("/Userpendinglist"),
+          },
+          {
+            icon: <FaWallet size={30} />,
+            count:
+              typeof walletBalance === "number"
+                ? `₹${walletBalance.toFixed(2)}`
+                : `₹${walletBalance}`,
+            label: "Wallet Balance",
+            color: "bg-[#2563EB]",
+            onClick: () => navigate("/wallet"),
           },
         ].map((item, i) => (
           <motion.div
@@ -257,7 +259,7 @@ const CustomerDashboard = () => {
             <div
               className={`${item.color} flex items-center justify-center w-1/4 h-full`}
             >
-              {React.cloneElement(item.icon, { className: "text-white" })}
+              {item.icon}
             </div>
             <div className="w-[2px] h-3/4 bg-white opacity-70"></div>
             <div className="w-3/4 flex flex-col justify-center pl-3">
@@ -268,7 +270,7 @@ const CustomerDashboard = () => {
         ))}
       </motion.div>
 
-      {/* Categories Header */}
+      {/* Category Header */}
       <Card style={{ backgroundColor: "#374151", marginTop: 50 }}>
         <CardContent
           style={{
@@ -279,25 +281,22 @@ const CustomerDashboard = () => {
             alignItems: "center",
           }}
         >
-          <span className="mr-2">📂</span>
-          Application For Categories and Subcategories
+          📂 Application For Categories & Subcategories
         </CardContent>
       </Card>
 
-      {/* Category & Subcategory Cards */}
+      {/* Categories & Subcategories Grid */}
       <div className="w-full max-w-7xl mx-auto mt-6">
-        {categories.map((cat) => {
-          const catCount = categoryCounts.find(
-            (c) => c.category === cat.category_name
-          );
+        {categories.map(cat => {
+          const catCount = categoryCounts.find(c => c.category === cat.category_name);
           const pendingCat = catCount?.pendingApplications || 0;
           const children = subcategories.filter(
-            (s) => s.category.category_id === cat.category_id
+            s => s.category.category_id === cat.category_id
           );
 
           return (
             <div key={cat.category_id} className="mb-8">
-              {/* Category Card */}
+              {/* Category */}
               <div
                 className="flex w-1/2 rounded-lg shadow-md cursor-pointer overflow-hidden"
                 onClick={() => fetchSubcategories(cat.category_id)}
@@ -319,19 +318,17 @@ const CustomerDashboard = () => {
                 </div>
               </div>
 
-              {/* Subcategory Cards */}
+              {/* Subcategories */}
               <div className="grid grid-cols-3 gap-4 mt-4">
-                {children.map((sub) => {
+                {children.map(sub => {
                   const subCount = subcategoryCounts.find(
-                    (c) =>
+                    c =>
                       c.subcategory === sub.subcategory_name &&
                       c.category === cat.category_name
                   );
                   const pendingSub = subCount?.pendingApplications || 0;
-
-                  // find price for this cat+sub
                   const priceRec = prices.find(
-                    (p) =>
+                    p =>
                       p.category_id === cat.category_id &&
                       p.subcategory_id === sub.subcategory_id
                   );
@@ -347,7 +344,6 @@ const CustomerDashboard = () => {
                       <p className="text-lg font-semibold text-orange-500 mt-1">
                         Price: {priceRec ? `₹${priceRec.amount.toFixed(2)}` : "N/A"}
                       </p>
-
                       <p className="text-sm text-gray-800 mt-1">
                         Pending: {pendingSub}
                       </p>
@@ -355,7 +351,7 @@ const CustomerDashboard = () => {
                         <button
                           className="bg-blue-600 text-white px-4 py-1 rounded-md"
                           onClick={() =>
-                            handleSubcategorySelect(
+                            handleSubcat(
                               cat.category_id,
                               cat.category_name,
                               sub.subcategory_id,
@@ -369,7 +365,7 @@ const CustomerDashboard = () => {
                         <button
                           className="bg-green-600 text-white px-4 py-1 rounded-md"
                           onClick={() =>
-                            handleSubcategorySelect(
+                            handleSubcat(
                               cat.category_id,
                               cat.category_name,
                               sub.subcategory_id,
@@ -392,6 +388,7 @@ const CustomerDashboard = () => {
 
       {/* Charts */}
       <div className="flex gap-6 mt-8">
+        {/* Status Bar */}
         <div className="w-1/2 bg-white shadow-md p-6 rounded-xl">
           <h2 className="text-xl font-bold mb-4">
             Application Status Overview
@@ -408,8 +405,12 @@ const CustomerDashboard = () => {
             </BarChart>
           </ResponsiveContainer>
         </div>
+
+        {/* Category Pie */}
         <div className="w-1/2 bg-white shadow-md p-6 rounded-xl">
-          <h2 className="text-xl font-bold mb-4">Category Distribution</h2>
+          <h2 className="text-xl font-bold mb-4">
+            Category Distribution
+          </h2>
           {categoryData.length ? (
             <PieChart width={350} height={300}>
               <Pie
@@ -450,9 +451,11 @@ const CustomerDashboard = () => {
               Required Documents
             </h2>
             <ul className="mb-4">
-              {requiredDocuments.map((doc) => (
+              {requiredDocuments.map(doc => (
                 <li key={doc.id} className="mb-4">
-                  <span className="font-semibold">{doc.document_names}</span>
+                  <span className="font-semibold">
+                    {doc.document_names}
+                  </span>
                   {selectedFiles[doc.id] && (
                     <img
                       src={selectedFiles[doc.id]}
@@ -467,7 +470,7 @@ const CustomerDashboard = () => {
               <input
                 type="checkbox"
                 checked={isAgreed}
-                onChange={handleAgreementChange}
+                onChange={e => setIsAgreed(e.target.checked)}
                 className="mr-2"
               />
               <span>I agree to the terms and conditions</span>
@@ -481,8 +484,8 @@ const CustomerDashboard = () => {
               </button>
               <button
                 onClick={handleApply}
-                className="bg-blue-500 text-white px-5 py-2 rounded"
                 disabled={!isAgreed || isUploading}
+                className="bg-blue-500 text-white px-5 py-2 rounded"
               >
                 {isUploading ? "Uploading..." : "Apply"}
               </button>
@@ -492,6 +495,4 @@ const CustomerDashboard = () => {
       )}
     </div>
   );
-};
-
-export default CustomerDashboard;
+}
