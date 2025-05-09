@@ -58,11 +58,10 @@ const Sidebar = ({ onNavigate }) => {
             ].map((item, index) => (
               <li
                 key={index}
-                className={`flex items-center p-2 rounded-md cursor-pointer mb-3 transition-colors duration-200 ${
-                  activePath === item.path
-                    ? "bg-orange-500 text-white"
-                    : "bg-white text-black hover:bg-orange-100"
-                }`}
+                className={`flex items-center p-2 rounded-md cursor-pointer mb-3 transition-colors duration-200 ${activePath === item.path
+                  ? "bg-orange-500 text-white"
+                  : "bg-white text-black hover:bg-orange-100"
+                  }`}
                 onClick={() => handleNavigation(item.path)}
               >
                 <span className="mr-3 text-lg">{item.icon}</span>
