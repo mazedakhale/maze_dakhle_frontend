@@ -2,18 +2,14 @@ import React, { useState, useEffect } from "react";
 import { FaEdit, FaTrash, FaPlus, FaTimes } from "react-icons/fa";
 import Swal from "sweetalert2";
 import axios from "axios";
-import { validateRegistration } from "../utils/formValidators.js";
+import { validateRegistration } from "../utils/formValidators";
 import { useNavigate } from "react-router-dom";
-
-axios.defaults.timeout = 30000; // 30 seconds
 
 const EmployeeList = () => {
   const [employees, setEmployees] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [updatedPassword, setUpdatedPassword] = useState("");
-  const [isAdding, setIsAdding] = useState(false);
-
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -21,10 +17,12 @@ const EmployeeList = () => {
     phone: "",
     address: "",
     role: "Employee",
+    profilePhoto: null,
+    errors: {},
   });
 
   const navigate = useNavigate();
-  const apiUrl = "https://mazedakhale.in/api/users/employee";
+  const apiUrl = "https://mazedakhale.in/api/users";
 
   useEffect(() => {
     fetchEmployees();
@@ -32,10 +30,9 @@ const EmployeeList = () => {
 
   const fetchEmployees = async () => {
     try {
-      const resp = await axios.get(apiUrl);
-      setEmployees(resp.data);
+      const res = await axios.get(`${apiUrl}/employee`);
+      setEmployees(res.data);
     } catch (err) {
-      console.error("Error fetching employees:", err);
       Swal.fire("Error", "Failed to fetch employees.", "error");
     }
   };
@@ -48,48 +45,47 @@ const EmployeeList = () => {
       phone: "",
       address: "",
       role: "Employee",
+      profilePhoto: null,
+      errors: {},
     });
     setIsModalOpen(true);
     setEditingId(null);
   };
 
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    const allowedTypes = ["image/jpeg", "image/png"];
+    if (file && allowedTypes.includes(file.type)) {
+      setFormData((prev) => ({ ...prev, profilePhoto: file }));
+    } else {
+      Swal.fire("Invalid File", "Only JPG/PNG allowed", "warning");
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (employees.some((emp) => emp.email === formData.email)) {
-      return Swal.fire("Oops", "That email is already registered", "warning");
-    }
-
     const { ok, errors } = validateRegistration(formData);
-    if (!ok) {
-      return Swal.fire("Validation Error", Object.values(errors)[0], "warning");
+    if (!ok) return Swal.fire("Validation", Object.values(errors)[0], "warning");
+
+    const payload = new FormData();
+    for (let key of ["name", "email", "password", "phone", "address", "role"]) {
+      payload.append(key, formData[key]);
+    }
+    payload.append("user_login_status", "InActive");
+    if (formData.profilePhoto) {
+      payload.append("profilePhoto", formData.profilePhoto);
     }
 
-    Swal.fire({
-      title: "Processing",
-      text: "Please wait…",
-      icon: "info",
-      allowOutsideClick: false,
-      didOpen: () => Swal.showLoading(),
-    });
-
-    const payload = { ...formData, user_login_status: "InActive" };
+    Swal.fire({ title: "Saving", text: "Please wait...", didOpen: () => Swal.showLoading() });
 
     try {
-      await axios.post(apiUrl, payload);
-      Swal.fire("Success", "Employee added successfully!", "success");
-      fetchEmployees();
+      await axios.post(`${apiUrl}/register`, payload);
+      Swal.fire("Success", "Employee added!", "success");
       setIsModalOpen(false);
-    } catch (error) {
-      Swal.close();
-      if (error.response?.status === 409) {
-        return Swal.fire(
-          "Oops",
-          error.response.data?.message || "That email is already registered.",
-          "warning"
-        );
-      }
-      Swal.fire("Error", "Failed to add employee. Please try again.", "error");
+      fetchEmployees();
+    } catch {
+      Swal.fire("Error", "Unable to add employee", "error");
     }
   };
 
@@ -99,100 +95,71 @@ const EmployeeList = () => {
   };
 
   const handleUpdateEmployee = async (id) => {
-    if (!updatedPassword) return;
     try {
-      await axios.patch(`https://mazedakhale.in/api/users/password/${id}`, {
-        newPassword: updatedPassword,
-      });
+      await axios.patch(`${apiUrl}/password/${id}`, { newPassword: updatedPassword });
       setEmployees((prev) =>
-        prev.map((e) =>
-          e.user_id === id ? { ...e, password: updatedPassword } : e
-        )
+        prev.map((e) => (e.user_id === id ? { ...e, password: updatedPassword } : e))
       );
+      Swal.fire("Updated", "Password updated", "success");
       setEditingId(null);
       setUpdatedPassword("");
-      Swal.fire("Updated", "Password updated successfully!", "success");
     } catch {
-      Swal.fire("Error", "Failed to update password.", "error");
+      Swal.fire("Error", "Update failed", "error");
     }
   };
 
   const handleDeleteEmployee = async (id) => {
-    const { isConfirmed } = await Swal.fire({
+    const result = await Swal.fire({
       title: "Enter Deletion Code",
       input: "text",
-      inputPlaceholder: "Enter code here…",
+      inputPlaceholder: "Enter code…",
       showCancelButton: true,
       confirmButtonText: "Delete",
-      preConfirm: (v) => {
-        if (v !== "0000") Swal.showValidationMessage("Incorrect code");
-        return v;
-      },
+      preConfirm: (val) => val !== "0000" && Swal.showValidationMessage("Wrong code"),
     });
-    if (!isConfirmed) return;
+
+    if (!result.isConfirmed) return;
 
     try {
-      await axios.delete(`${apiUrl}/${id}`);
+      await axios.delete(`${apiUrl}/employee/${id}`);
       setEmployees((prev) => prev.filter((e) => e.user_id !== id));
-      Swal.fire("Deleted", "Employee has been deleted.", "success");
+      Swal.fire("Deleted", "Employee removed", "success");
     } catch {
-      Swal.fire("Error", "Failed to delete employee.", "error");
+      Swal.fire("Error", "Delete failed", "error");
     }
   };
 
-  const handleStatusChange = async (id, newStatus) => {
+  const handleStatusChange = async (id, status) => {
     try {
+      await axios.patch(`${apiUrl}/status/${id}`, { status });
       setEmployees((prev) =>
-        prev.map((e) =>
-          e.user_id === id ? { ...e, user_login_status: newStatus } : e
-        )
+        prev.map((e) => (e.user_id === id ? { ...e, user_login_status: status } : e))
       );
-      await axios.patch(`https://mazedakhale.in/api/users/status/${id}`, {
-        status: newStatus,
-      });
-      Swal.fire("Updated", `Status changed to ${newStatus}`, "success");
+      Swal.fire("Updated", `Status changed to ${status}`, "success");
     } catch {
-      fetchEmployees();
-      Swal.fire("Error", "Failed to update status", "error");
+      Swal.fire("Error", "Status update failed", "error");
     }
   };
 
-  const updateEditRequestStatus = async (id, newStatus) => {
+  const updateEditRequestStatus = async (id, status) => {
     try {
-      await axios.patch(`https://mazedakhale.in/api/users/request-edit/${id}`, {
-        status: newStatus,
-      });
+      await axios.patch(`${apiUrl}/request-edit/${id}`, { status });
       setEmployees((prev) =>
-        prev.map((d) =>
-          d.user_id === id ? { ...d, edit_request_status: newStatus } : d
-        )
+        prev.map((e) => (e.user_id === id ? { ...e, edit_request_status: status } : e))
       );
-      Swal.fire(
-        "Success",
-        `Edit request ${newStatus.toLowerCase()}!`,
-        "success"
-      );
+      Swal.fire("Success", `Request ${status}`, "success");
     } catch {
-      Swal.fire("Error", "Failed to update edit request", "error");
+      Swal.fire("Error", "Edit request update failed", "error");
     }
   };
 
   return (
-    <div className="ml-[300px] mt-[80px] p-6 w-[calc(100%-260px)] overflow-x-hidden">
-      <div className="relative bg-white shadow-lg rounded-lg border border-gray-300 overflow-hidden">
-        {/* Header */}
-        <div className="relative border-t-4 border-orange-400 bg-[#F4F4F4] p-4 rounded-t-lg">
-          <h2 className="text-2xl font-bold text-gray-800 text-center">
-            Employee List
-          </h2>
-          <button
-            onClick={() => {
-              setIsAdding(false);
-              navigate("/Adashinner");
-            }}
-            className="absolute top-1/2 right-4 transform -translate-y-1/2 text-gray-600 hover:text-gray-800"
-          >
-            <FaTimes size={20} />
+    <div className="ml-[300px] mt-[80px] p-6 w-[calc(100%-260px)]">
+      <div className="bg-white shadow-lg border rounded-lg">
+        <div className="border-t-4 border-orange-400 bg-gray-100 p-4 rounded-t-lg flex justify-between items-center">
+          <h2 className="text-xl font-bold">Employee List</h2>
+          <button onClick={() => navigate("/Adashinner")}>
+            <FaTimes className="text-gray-600 hover:text-gray-800" />
           </button>
         </div>
 
@@ -204,9 +171,9 @@ const EmployeeList = () => {
             <FaPlus /> Add Employee
           </button>
         </div>
-        {/* TABLE */}
+
         <div className="overflow-x-auto p-4">
-          <table className="w-full text-sm border border-gray-300 bg-white">
+          <table className="w-full text-sm border border-gray-300">
             <thead className="bg-orange-100">
               <tr>
                 {[
@@ -216,8 +183,8 @@ const EmployeeList = () => {
                   "Password",
                   "Phone",
                   "Address",
+                  "Photo",
                   "Status",
-                  "Update",
                   "Request",
                   "Actions",
                 ].map((h) => (
@@ -229,10 +196,7 @@ const EmployeeList = () => {
             </thead>
             <tbody>
               {employees.map((emp, i) => (
-                <tr
-                  key={emp.user_id}
-                  className={i % 2 === 0 ? "bg-white" : "bg-gray-50"}
-                >
+                <tr key={emp.user_id} className={i % 2 === 0 ? "bg-white" : "bg-gray-50"}>
                   <td className="border px-4 py-2">{emp.user_id}</td>
                   <td className="border px-4 py-2">{emp.name}</td>
                   <td className="border px-4 py-2">{emp.email}</td>
@@ -249,50 +213,46 @@ const EmployeeList = () => {
                   </td>
                   <td className="border px-4 py-2">{emp.phone}</td>
                   <td className="border px-4 py-2">{emp.address}</td>
-                  <td className="border px-4 py-2">{emp.user_login_status}</td>
+                  <td className="border px-4 py-2 text-center">
+                    {emp.profile_picture ? (
+                      <img
+                        src={emp.profile_picture}
+                        alt="Profile"
+                        className="w-10 h-10 rounded-full object-cover mx-auto"
+                      />
+                    ) : (
+                      "-"
+                    )}
+                  </td>
                   <td className="border px-4 py-2">
                     <button
                       onClick={() => handleStatusChange(emp.user_id, "Active")}
-                      className={`px-2 py-1 mr-2 rounded text-white ${
-                        emp.user_login_status === "Active"
-                          ? "bg-green-500"
-                          : "bg-gray-400"
-                      }`}
+                      className={`px-2 py-1 mr-2 rounded text-white ${emp.user_login_status === "Active" ? "bg-green-500" : "bg-gray-400"
+                        }`}
                       disabled={emp.user_login_status === "Active"}
                     >
                       Active
                     </button>
                     <button
-                      onClick={() =>
-                        handleStatusChange(emp.user_id, "InActive")
-                      }
-                      className={`px-2 py-1 rounded text-white ${
-                        emp.user_login_status === "InActive"
-                          ? "bg-red-500"
-                          : "bg-gray-400"
-                      }`}
+                      onClick={() => handleStatusChange(emp.user_id, "InActive")}
+                      className={`px-2 py-1 rounded text-white ${emp.user_login_status === "InActive" ? "bg-red-500" : "bg-gray-400"
+                        }`}
                       disabled={emp.user_login_status === "InActive"}
                     >
                       Inactive
                     </button>
                   </td>
                   <td className="border px-4 py-2 text-center">
-                    <div className="text-sm font-semibold">
-                      {emp.edit_request_status}
-                    </div>
+                    <div className="text-sm font-semibold">{emp.edit_request_status}</div>
                     <div className="flex gap-1 justify-center mt-1">
                       <button
-                        onClick={() =>
-                          updateEditRequestStatus(emp.user_id, "Approved")
-                        }
+                        onClick={() => updateEditRequestStatus(emp.user_id, "Approved")}
                         className="bg-green-500 text-white px-2 py-1 rounded text-xs hover:bg-green-600"
                       >
                         Approve
                       </button>
                       <button
-                        onClick={() =>
-                          updateEditRequestStatus(emp.user_id, "Rejected")
-                        }
+                        onClick={() => updateEditRequestStatus(emp.user_id, "Rejected")}
                         className="bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600"
                       >
                         Reject
@@ -309,9 +269,7 @@ const EmployeeList = () => {
                       </button>
                     ) : (
                       <button
-                        onClick={() =>
-                          handleEditEmployee(emp.user_id, emp.password)
-                        }
+                        onClick={() => handleEditEmployee(emp.user_id, emp.password)}
                         className="text-blue-500"
                       >
                         <FaEdit />
@@ -339,22 +297,27 @@ const EmployeeList = () => {
                 {["name", "email", "password", "phone", "address"].map((f) => (
                   <input
                     key={f}
-                    type={
-                      f === "password"
-                        ? "password"
-                        : f === "email"
-                        ? "email"
-                        : "text"
-                    }
+                    type={f === "password" ? "password" : "text"}
                     placeholder={f.charAt(0).toUpperCase() + f.slice(1)}
                     value={formData[f]}
-                    onChange={(e) =>
-                      setFormData({ ...formData, [f]: e.target.value })
-                    }
+                    onChange={(e) => setFormData({ ...formData, [f]: e.target.value })}
                     className="w-full p-2 border rounded"
                     required
                   />
                 ))}
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Profile Photo (jpg/png)
+                  </label>
+                  <input
+                    type="file"
+                    accept=".jpg,.jpeg,.png"
+                    onChange={handleFileChange}
+                    className="w-full text-sm"
+                  />
+                </div>
+
                 <div className="flex justify-end gap-2">
                   <button
                     type="button"

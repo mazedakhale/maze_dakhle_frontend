@@ -362,7 +362,7 @@ const Adashinner = () => {
             <div
               key={card.id}
               className={`${card.color} text-white flex items-center rounded-lg shadow-md transition-transform transform hover:scale-105 cursor-pointer`}
-              onClick={card.onClick || (() => {})}
+              onClick={card.onClick || (() => { })}
               style={{ width: "320px", height: "120px" }} // Increased Size
             >
               {/* Icon Section with Same Background Color */}

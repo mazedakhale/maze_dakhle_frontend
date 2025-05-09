@@ -162,9 +162,8 @@ const ErrorRequests = () => {
                 filteredRequests.map((request, index) => (
                   <tr
                     key={request.request_id}
-                    className={`hover:bg-orange-50 transition ${
-                      index % 2 === 0 ? "bg-[#FFFFFF]" : "bg-[#F58A3B14]"
-                    }`}
+                    className={`hover:bg-orange-50 transition ${index % 2 === 0 ? "bg-[#FFFFFF]" : "bg-[#F58A3B14]"
+                      }`}
                   >
                     <td className="border px-4 py-3 text-center">
                       {request.request_id}

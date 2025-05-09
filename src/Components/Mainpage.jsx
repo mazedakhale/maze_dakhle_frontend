@@ -23,7 +23,7 @@ import {
 import { BsStopCircle } from "react-icons/bs";
 
 import Logo from "../assets/logo.png";
-import MainBanner from "../assets/Mainpage.jpg";
+import MainBanner from "../assets/mainp.jpg";
 
 // Footer nav labels
 const navLabels = [
@@ -110,21 +110,41 @@ const Header = () => (
 );
 
 // Purple marquee
-const PurpleBanner = () => (
-  <div className="bg-[#673DE6] text-white py-3 overflow-hidden mt-4">
-    <div className="container mx-auto px-6">
-      <marquee
-        behavior="scroll"
-        direction="left"
-        scrollamount="4"
-        className="whitespace-nowrap text-sm"
-      >
-        <FaBullhorn className="inline-block mr-2 text-xl" />
-        हमारी वेबसाइट पर आप सभी यूज़र्स का स्वागत है… 📞 0998766534 …
-      </marquee>
+const PurpleBanner = () => {
+  const [description, setDescription] = useState("");
+
+  useEffect(() => {
+    axios
+      .get("https://mazedakhale.in/api/header") // ✅ fixed URL
+      .then((res) => {
+        if (Array.isArray(res.data) && res.data.length > 0) {
+          setDescription(res.data[0].description);
+        } else {
+          setDescription("Welcome to our website! 📞 0998766534");
+        }
+      })
+      .catch(() => {
+        setDescription("Welcome to our website! 📞 0998766534");
+      });
+  }, []);
+
+  return (
+    <div className="bg-[#673DE6] text-white py-3 overflow-hidden mt-4">
+      <div className="container mx-auto px-6">
+        <marquee
+          behavior="scroll"
+          direction="left"
+          scrollamount="4"
+          className="whitespace-nowrap text-sm"
+        >
+          <FaBullhorn className="inline-block mr-2 text-xl" />
+          {description}
+        </marquee>
+      </div>
     </div>
-  </div>
-);
+  );
+};
+
 
 const Footer = () => (
   <footer className="bg-[#FDF6EC] pt-12 pb-8">
@@ -227,8 +247,8 @@ const Mainpage = () => {
           Array.isArray(data)
             ? data
             : Array.isArray(data.documentTypes)
-            ? data.documentTypes
-            : []
+              ? data.documentTypes
+              : []
         )
       )
       .catch(() => setError("Failed to load documents"));

@@ -340,9 +340,8 @@ const InvoicePage = () => {
         .split(".")
         .pop()
         .toLowerCase();
-      const fileName = `${
-        documentData.name || "document"
-      }_receipt.${fileExtension}`;
+      const fileName = `${documentData.name || "document"
+        }_receipt.${fileExtension}`;
 
       const link = document.createElement("a");
       link.href = documentData.receipt_url;
@@ -523,15 +522,14 @@ const InvoicePage = () => {
                         <div className="flex flex-col ">
                           {/* Status */}
                           <span
-                            className={`px-8 py-2 rounded-full text-white text-xs w-[150px] ${
-                              documentData.status === "Approved"
-                                ? "bg-green-500"
-                                : documentData.status === "Rejected"
+                            className={`px-8 py-2 rounded-full text-white text-xs w-[150px] ${documentData.status === "Approved"
+                              ? "bg-green-500"
+                              : documentData.status === "Rejected"
                                 ? "bg-red-500"
                                 : documentData.status === "Completed"
-                                ? "bg-yellow-500" // Color for Completed
-                                : "bg-blue-500" // Default color
-                            }`}
+                                  ? "bg-yellow-500" // Color for Completed
+                                  : "bg-blue-500" // Default color
+                              }`}
                           >
                             {documentData.status}
                           </span>
@@ -739,27 +737,27 @@ const InvoicePage = () => {
             </button>
 
             {documentData.status === "Rejected" &&
-            documentData.selected_document_names
+              documentData.selected_document_names
               ? documentData.selected_document_names.map(
-                  (documentType, idx) => (
-                    <div
-                      key={idx}
-                      className="flex items-center justify-between mb-2"
+                (documentType, idx) => (
+                  <div
+                    key={idx}
+                    className="flex items-center justify-between mb-2"
+                  >
+                    <span className="text-sm ml-[270px]">
+                      {documentType}{" "}
+                    </span>
+                    <button
+                      onClick={() =>
+                        handleReupload(documentData.document_id, documentType)
+                      }
+                      className="bg-blue-500 text-white px-6 py-3 rounded hover:bg-blue-600 text-xs"
                     >
-                      <span className="text-sm ml-[270px]">
-                        {documentType}{" "}
-                      </span>
-                      <button
-                        onClick={() =>
-                          handleReupload(documentData.document_id, documentType)
-                        }
-                        className="bg-blue-500 text-white px-6 py-3 rounded hover:bg-blue-600 text-xs"
-                      >
-                        add Document
-                      </button>
-                    </div>
-                  )
+                      add Document
+                    </button>
+                  </div>
                 )
+              )
               : "N/A"}
           </div>
           <td className="px-4 mt-[20px] py-3 border border-[#776D6DA8] text-center">

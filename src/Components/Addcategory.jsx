@@ -158,9 +158,8 @@ const AddCategory = () => {
                 categories.map((category, index) => (
                   <tr
                     key={category.category_id}
-                    className={`${
-                      index % 2 === 0 ? "bg-[#FFFFFF]" : "bg-[#F58A3B14]"
-                    } hover:bg-orange-100 transition duration-200`}
+                    className={`${index % 2 === 0 ? "bg-[#FFFFFF]" : "bg-[#F58A3B14]"
+                      } hover:bg-orange-100 transition duration-200`}
                   >
                     <td className="px-4 py-3 border border-[#776D6DA8] text-center">
                       {category.category_id}

@@ -11,7 +11,7 @@ const TermsAndConditions = () => {
       try {
         const response = await axios.get(
           "https://mazedakhale.in/api/privacy-policy/type/" +
-            encodeURIComponent("Terms and Conditions")
+          encodeURIComponent("Terms and Conditions")
         );
         const data = response.data;
         if (Array.isArray(data) && data.length > 0) {

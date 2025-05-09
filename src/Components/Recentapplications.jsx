@@ -250,9 +250,8 @@ const RecentApplications = () => {
                 return (
                   <tr
                     key={doc.document_id}
-                    className={`border-t ${
-                      i % 2 ? "bg-white" : "bg-white"
-                    } hover:bg-gray-100`}
+                    className={`border-t ${i % 2 ? "bg-white" : "bg-white"
+                      } hover:bg-gray-100`}
                   >
                     <td className="border p-2 text-center">{i + 1}</td>
                     <td className="border p-2 text-center">
@@ -267,8 +266,8 @@ const RecentApplications = () => {
                     <td className="border px-4 py-2 text-sm">
                       {Array.isArray(doc.document_fields)
                         ? doc.document_fields.find(
-                            (f) => f.field_name === "APPLICANT NAME"
-                          )?.field_value || "—"
+                          (f) => f.field_name === "APPLICANT NAME"
+                        )?.field_value || "—"
                         : doc.document_fields?.["APPLICANT NAME"] || "—"}
                     </td>
                     <td className="border p-2 break-words">{doc.name}</td>
@@ -279,15 +278,14 @@ const RecentApplications = () => {
                     </td>
                     <td className="border p-2 text-center">
                       <span
-                        className={`px-3 py-1 rounded-full text-white text-xs ${
-                          doc.status === "Approved"
-                            ? "bg-green-500"
-                            : doc.status === "Rejected"
+                        className={`px-3 py-1 rounded-full text-white text-xs ${doc.status === "Approved"
+                          ? "bg-green-500"
+                          : doc.status === "Rejected"
                             ? "bg-red-500"
                             : doc.status === "Pending"
-                            ? "bg-yellow-500"
-                            : "bg-blue-500"
-                        }`}
+                              ? "bg-yellow-500"
+                              : "bg-blue-500"
+                          }`}
                       >
                         {doc.status}
                       </span>

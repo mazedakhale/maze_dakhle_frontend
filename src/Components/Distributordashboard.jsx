@@ -143,8 +143,7 @@ const Distributordashboard = ({ children }) => {
             </button>
           </div>
         </div>
-
-        {/* Content */}
+        {/* Main Content Area */}
         <div className="mt-6">{children}</div>
       </div>
     </div>

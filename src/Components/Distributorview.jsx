@@ -186,15 +186,14 @@ const ApplicationView = () => {
                     <div className="flex flex-col ">
                       {/* Status */}
                       <span
-                        className={`px-8 py-1 rounded-full text-white text-xs ${
-                          documentData.status === "Approved"
-                            ? "bg-green-500"
-                            : documentData.status === "Rejected"
+                        className={`px-8 py-1 rounded-full text-white text-xs ${documentData.status === "Approved"
+                          ? "bg-green-500"
+                          : documentData.status === "Rejected"
                             ? "bg-red-500"
                             : documentData.status === "Completed"
-                            ? "bg-yellow-500" // Color for Completed
-                            : "bg-blue-500" // Default color
-                        }`}
+                              ? "bg-yellow-500" // Color for Completed
+                              : "bg-blue-500" // Default color
+                          }`}
                       >
                         {documentData.status}
                       </span>

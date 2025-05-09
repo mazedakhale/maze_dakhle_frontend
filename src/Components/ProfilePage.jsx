@@ -279,7 +279,7 @@ export default function ProfilePage() {
       Swal.fire(
         "Error",
         err.response?.data?.message ||
-          JSON.stringify(err.response?.data, null, 2),
+        JSON.stringify(err.response?.data, null, 2),
         "error"
       );
     }
@@ -301,9 +301,8 @@ export default function ProfilePage() {
                 <div className="flex items-center">
                   <input
                     type={showPass ? "text" : "password"}
-                    className={`border p-1 rounded w-48 ${
-                      passError ? "border-red-500" : ""
-                    }`}
+                    className={`border p-1 rounded w-48 ${passError ? "border-red-500" : ""
+                      }`}
                     value={newPass}
                     onChange={handlePasswordChange}
                   />
@@ -359,8 +358,8 @@ export default function ProfilePage() {
                 user.edit_request_status === "Approved"
                   ? "text-green-600"
                   : user.edit_request_status === "Rejected"
-                  ? "text-red-500"
-                  : "text-yellow-500"
+                    ? "text-red-500"
+                    : "text-yellow-500"
               }
             >
               {user.edit_request_status}
@@ -408,9 +407,8 @@ export default function ProfilePage() {
             {editMode ? (
               <div className="flex flex-col flex-1">
                 <input
-                  className={`border p-1 rounded ${
-                    formValues.errors.phone ? "border-red-500" : ""
-                  }`}
+                  className={`border p-1 rounded ${formValues.errors.phone ? "border-red-500" : ""
+                    }`}
                   value={formValues.phone}
                   onChange={handlePhoneChange}
                 />
@@ -524,13 +522,12 @@ export default function ProfilePage() {
                   !!formValues.errors.aadharCard ||
                   !!formValues.errors.panCard
                 }
-                className={`px-4 py-2 text-white rounded ${
-                  !!formValues.errors.phone ||
+                className={`px-4 py-2 text-white rounded ${!!formValues.errors.phone ||
                   !!formValues.errors.aadharCard ||
                   !!formValues.errors.panCard
-                    ? "bg-gray-400 cursor-not-allowed"
-                    : "bg-green-500"
-                }`}
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-green-500"
+                  }`}
               >
                 <FaSave /> Save Profile
               </button>

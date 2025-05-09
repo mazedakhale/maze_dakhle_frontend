@@ -175,9 +175,8 @@ const Addsubcategory = () => {
                 subcategories.map((sub, index) => (
                   <tr
                     key={sub.subcategory_id}
-                    className={`${
-                      index % 2 === 0 ? "bg-[#FFFF]" : "bg-[#F58A3B14]"
-                    } hover:bg-orange-100 transition duration-200`}
+                    className={`${index % 2 === 0 ? "bg-[#FFFF]" : "bg-[#F58A3B14]"
+                      } hover:bg-orange-100 transition duration-200`}
                   >
                     <td className="px-4 py-3 border border-[#776D6DA8] text-center">
                       {sub.subcategory_id}

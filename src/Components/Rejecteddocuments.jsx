@@ -324,9 +324,8 @@ const Rejecteddocuments = () => {
               {filteredDocuments.map((doc, index) => (
                 <tr
                   key={doc.document_id}
-                  className={`border-t ${
-                    index % 2 === 0 ? "bg-white" : "bg-white"
-                  } hover:bg-gray-100`}
+                  className={`border-t ${index % 2 === 0 ? "bg-white" : "bg-white"
+                    } hover:bg-gray-100`}
                 >
                   <td className="border p-2 text-center">{index + 1}</td>
                   <td className="border p-2 text-center">
@@ -397,15 +396,14 @@ const Rejecteddocuments = () => {
                     <div className="flex flex-col gap-1">
                       {/* Status Badge */}
                       <span
-                        className={`px-3 py-1 rounded-full text-white text-xs ${
-                          doc.status === "Approved"
-                            ? "bg-green-500"
-                            : doc.status === "Rejected"
+                        className={`px-3 py-1 rounded-full text-white text-xs ${doc.status === "Approved"
+                          ? "bg-green-500"
+                          : doc.status === "Rejected"
                             ? "bg-red-500"
                             : doc.status === "Pending"
-                            ? "bg-yellow-500"
-                            : "bg-blue-500"
-                        }`}
+                              ? "bg-yellow-500"
+                              : "bg-blue-500"
+                          }`}
                       >
                         {doc.status}
                       </span>

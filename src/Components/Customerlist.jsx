@@ -134,13 +134,13 @@ const CustomerList = () => {
           <thead className="bg-[#F58A3B14]">
             <tr>
               {[
-                "ID",
                 "Name",
                 "Email",
                 "Password",
                 "District",
                 "Taluka",
                 "Documents",
+                "Profile Photo",
                 "Status",
                 "Edit Request",
                 "Update",
@@ -155,9 +155,7 @@ const CustomerList = () => {
           <tbody>
             {customers.map((customer) => (
               <tr key={customer.user_id} className="border hover:bg-orange-100">
-                <td className="text-center border px-2 py-2">
-                  {customer.user_id}
-                </td>
+
                 <td className="text-center border">{customer.name}</td>
                 <td className="text-center border">{customer.email}</td>
                 <td className="text-center border">
@@ -191,16 +189,26 @@ const CustomerList = () => {
                     <span className="italic text-gray-400">No docs</span>
                   )}
                 </td>
+                <td className="px-4 py-3 border border-[#776D6DA8] text-center">
+                  {customer.profile_picture ? (
+                    <img
+                      src={customer.profile_picture}
+                      alt="Profile"
+                      className="h-10 w-10 rounded-full object-cover mx-auto"
+                    />
+                  ) : (
+                    <span className="text-gray-400 italic">No Image</span>
+                  )}
+                </td>
                 <td className="text-center border">
                   <button
                     onClick={() =>
                       handleStatusChange(customer.user_id, "Active")
                     }
-                    className={`px-2 py-1 rounded text-white mr-2 ${
-                      customer.user_login_status === "Active"
-                        ? "bg-green-500"
-                        : "bg-gray-500 hover:bg-green-600"
-                    }`}
+                    className={`px-2 py-1 rounded text-white mr-2 ${customer.user_login_status === "Active"
+                      ? "bg-green-500"
+                      : "bg-gray-500 hover:bg-green-600"
+                      }`}
                   >
                     Active
                   </button>
@@ -208,11 +216,10 @@ const CustomerList = () => {
                     onClick={() =>
                       handleStatusChange(customer.user_id, "Inactive")
                     }
-                    className={`px-2 py-1 rounded text-white ${
-                      customer.user_login_status === "Inactive"
-                        ? "bg-red-500"
-                        : "bg-gray-500 hover:bg-red-600"
-                    }`}
+                    className={`px-2 py-1 rounded text-white ${customer.user_login_status === "Inactive"
+                      ? "bg-red-500"
+                      : "bg-gray-500 hover:bg-red-600"
+                      }`}
                   >
                     Inactive
                   </button>

@@ -547,9 +547,8 @@ const UserTable = () => {
                 distributors.map((distributor, index) => (
                   <tr
                     key={distributor.user_id}
-                    className={`${
-                      index % 2 === 0 ? "bg-[#FFFFFF]" : "bg-[#F58A3B14]"
-                    } hover:bg-orange-100 transition duration-200`}
+                    className={`${index % 2 === 0 ? "bg-[#FFFFFF]" : "bg-[#F58A3B14]"
+                      } hover:bg-orange-100 transition duration-200`}
                   >
                     <td className="px-4 py-3 border border-[#776D6DA8] text-center">
                       {distributor.user_id}
@@ -606,11 +605,10 @@ const UserTable = () => {
                         onClick={() =>
                           handleStatusChange(distributor.user_id, "Active")
                         }
-                        className={`px-3 py-1 rounded text-white mr-2 ${
-                          distributor.user_login_status === "Active"
-                            ? "bg-green-500 cursor-default"
-                            : "bg-gray-500 hover:bg-green-600"
-                        }`}
+                        className={`px-3 py-1 rounded text-white mr-2 ${distributor.user_login_status === "Active"
+                          ? "bg-green-500 cursor-default"
+                          : "bg-gray-500 hover:bg-green-600"
+                          }`}
                         disabled={distributor.user_login_status === "Active"}
                       >
                         Active
@@ -619,11 +617,10 @@ const UserTable = () => {
                         onClick={() =>
                           handleStatusChange(distributor.user_id, "InActive")
                         }
-                        className={`px-3 py-1 rounded text-white ${
-                          distributor.user_login_status === "InActive"
-                            ? "bg-red-500 cursor-default"
-                            : "bg-gray-500 hover:bg-red-600"
-                        }`}
+                        className={`px-3 py-1 rounded text-white ${distributor.user_login_status === "InActive"
+                          ? "bg-red-500 cursor-default"
+                          : "bg-gray-500 hover:bg-red-600"
+                          }`}
                         disabled={distributor.user_login_status === "InActive"}
                       >
                         Inactive
@@ -717,9 +714,8 @@ const UserTable = () => {
                   placeholder="Name"
                   value={formData.name}
                   onChange={handleInputChange}
-                  className={`w-full p-2 border rounded text-xs ${
-                    formData.errors.name ? "border-red-500" : ""
-                  }`}
+                  className={`w-full p-2 border rounded text-xs ${formData.errors.name ? "border-red-500" : ""
+                    }`}
                   required
                 />
                 {formData.errors.name && (
@@ -736,9 +732,8 @@ const UserTable = () => {
                   placeholder="Email"
                   value={formData.email}
                   onChange={handleInputChange}
-                  className={`w-full p-2 border rounded text-xs ${
-                    formData.errors.email ? "border-red-500" : ""
-                  }`}
+                  className={`w-full p-2 border rounded text-xs ${formData.errors.email ? "border-red-500" : ""
+                    }`}
                   required
                 />
                 {formData.errors.email && (
@@ -755,9 +750,8 @@ const UserTable = () => {
                   placeholder="Password"
                   value={formData.password}
                   onChange={handleInputChange}
-                  className={`w-full p-2 border rounded text-xs ${
-                    formData.errors.password ? "border-red-500" : ""
-                  }`}
+                  className={`w-full p-2 border rounded text-xs ${formData.errors.password ? "border-red-500" : ""
+                    }`}
                   required
                 />
                 {formData.errors.password && (
@@ -774,9 +768,8 @@ const UserTable = () => {
                   placeholder="Phone"
                   value={formData.phone}
                   onChange={handleInputChange}
-                  className={`w-full p-2 border rounded text-xs ${
-                    formData.errors.phone ? "border-red-500" : ""
-                  }`}
+                  className={`w-full p-2 border rounded text-xs ${formData.errors.phone ? "border-red-500" : ""
+                    }`}
                   required
                 />
                 {formData.errors.phone && (
@@ -793,9 +786,8 @@ const UserTable = () => {
                   placeholder="Address"
                   value={formData.address}
                   onChange={handleInputChange}
-                  className={`w-full p-2 border rounded text-xs ${
-                    formData.errors.address ? "border-red-500" : ""
-                  }`}
+                  className={`w-full p-2 border rounded text-xs ${formData.errors.address ? "border-red-500" : ""
+                    }`}
                   required
                 />
                 {formData.errors.address && (
@@ -826,9 +818,8 @@ const UserTable = () => {
                 <input
                   type="file"
                   onChange={(e) => handleFileChange(e, "aadharCard")}
-                  className={`w-full text-xs ${
-                    formData.errors.aadharCard ? "border-red-500" : ""
-                  }`}
+                  className={`w-full text-xs ${formData.errors.aadharCard ? "border-red-500" : ""
+                    }`}
                   accept=".pdf,.jpg,.jpeg,.png"
                 />
                 {formData.errors.aadharCard && (
@@ -846,9 +837,8 @@ const UserTable = () => {
                 <input
                   type="file"
                   onChange={(e) => handleFileChange(e, "panCard")}
-                  className={`w-full text-xs ${
-                    formData.errors.panCard ? "border-red-500" : ""
-                  }`}
+                  className={`w-full text-xs ${formData.errors.panCard ? "border-red-500" : ""
+                    }`}
                   accept=".pdf,.jpg,.jpeg,.png"
                 />
                 {formData.errors.panCard && (

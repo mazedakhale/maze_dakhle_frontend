@@ -101,9 +101,8 @@ const UserTable = () => {
                 filteredUsers.map((user, index) => (
                   <tr
                     key={user?.user_id}
-                    className={`${
-                      index % 2 === 0 ? "bg-[#FFFF]" : "bg-[#F58A3B14]"
-                    } hover:bg-orange-100 transition duration-200`}
+                    className={`${index % 2 === 0 ? "bg-[#FFFF]" : "bg-[#F58A3B14]"
+                      } hover:bg-orange-100 transition duration-200`}
                   >
                     <td className="px-4 py-3 border border-[#776D6DA8] text-center">
                       {user?.user_id}
@@ -121,11 +120,10 @@ const UserTable = () => {
                       {user?.role}
                     </td>
                     <td
-                      className={`px-4 py-3 border border-[#776D6DA8] text-center ${
-                        user?.user_login_status === "Approve"
-                          ? "text-green-600"
-                          : "text-red-600"
-                      }`}
+                      className={`px-4 py-3 border border-[#776D6DA8] text-center ${user?.user_login_status === "Approve"
+                        ? "text-green-600"
+                        : "text-red-600"
+                        }`}
                     >
                       {user?.user_login_status}
                     </td>

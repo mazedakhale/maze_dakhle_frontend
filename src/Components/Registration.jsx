@@ -10,6 +10,9 @@ import {
 } from "../utils/formValidators";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import "../index.css";
+const SMS_URL = "https://mazedakhale.in/api/sms/send";
+const SMS_SENDER = "918308178738";  // your LiveOne-registered “from” number
+
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -22,6 +25,8 @@ const Register = () => {
     district: "",
     taluka: "",
     role: "Customer",
+    profilePhoto: null, // ✅ new field
+
     aadharCard: null,
     panCard: null,
     agreeToTerms: false,
@@ -141,6 +146,8 @@ const Register = () => {
       formData.taluka &&
       formData.aadharCard &&
       formData.panCard &&
+      formData.profilePhoto
+      &&
       formData.agreeToTerms &&
       Object.values(formData.errors).every((err) => !err)
     );
@@ -148,53 +155,71 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!validateForm()) {
-      Swal.fire(
-        "Validation Error",
-        "Please fix errors before submitting.",
-        "error"
-      );
-      return;
+      return Swal.fire("Validation Error", "Please fix errors.", "error");
     }
 
-    Swal.fire({
-      title: "Processing...",
-      allowOutsideClick: false,
-      didOpen: () => Swal.showLoading(),
-    });
+    Swal.fire({ title: "Processing…", allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
     try {
-      const dataToSend = new FormData();
-      Object.entries(formData).forEach(([k, v]) => {
-        if (["aadharCard", "panCard", "errors", "agreeToTerms"].includes(k))
+      const payload = new FormData();
+
+      // Append all text fields
+      Object.entries(formData).forEach(([key, value]) => {
+        if (
+          ["aadharCard", "panCard", "profilePhoto", "errors", "agreeToTerms"].includes(key)
+        )
           return;
-        dataToSend.append(k, v);
+        if (value !== null && value !== undefined) {
+          payload.append(key, value.toString());
+        }
       });
-      dataToSend.append("files", formData.aadharCard);
-      dataToSend.append("files", formData.panCard);
-      dataToSend.append("documentTypes", "Aadhar Card");
-      dataToSend.append("documentTypes", "PAN Card");
+
+      // Append documents
+      payload.append("files", formData.aadharCard);
+      payload.append("files", formData.panCard);
+      payload.append("documentTypes", "Aadhar Card");
+      payload.append("documentTypes", "PAN Card");
+
+      // Append profile photo
+      if (formData.profilePhoto) {
+        payload.append("profilePhoto", formData.profilePhoto);
+      }
 
       const res = await fetch("https://mazedakhale.in/api/users/register", {
         method: "POST",
-        body: dataToSend,
+        body: payload,
       });
 
       const data = await res.json();
       Swal.close();
+      if (!res.ok) throw new Error(data.message || "Registration failed");
 
-      if (res.ok) {
-        Swal.fire("Success", "Registered successfully", "success").then(() =>
-          navigate("/login")
-        );
-      } else {
-        throw new Error(data.message || "Registration failed");
-      }
+      // SMS Logic
+      const phoneE164 = formData.phone.startsWith("91") ? formData.phone : "91" + formData.phone;
+      const message =
+        `Welcome to Mazedakhale! Your registration was successful.\n\n` +
+        `Here are your login credentials:\n` +
+        `Email: ${formData.email}\n` +
+        `Password: ${formData.password}\n\n` +
+
+        `Thank you for joining us!`;
+      fetch(SMS_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sender: SMS_SENDER, number: phoneE164, message }),
+      }).catch(console.error);
+
+      Swal.fire("Success", "Registered successfully and SMS sent!", "success")
+        .then(() => navigate("/login"));
     } catch (err) {
+      Swal.close();
       Swal.fire("Error", err.message, "error");
     }
   };
+
+
+
 
   return (
     <div
@@ -217,13 +242,12 @@ const Register = () => {
             <input
               type="text"
               name="name"
-              className={`w-full p-2 border rounded text-xs ${
-                formData.errors.name
-                  ? "border-red-500"
-                  : isValidEmail(formData.email)
+              className={`w-full p-2 border rounded text-xs ${formData.errors.name
+                ? "border-red-500"
+                : isValidEmail(formData.email)
                   ? "border-green-500"
                   : ""
-              }`}
+                }`}
               onChange={handleChange}
               required
             />
@@ -238,13 +262,12 @@ const Register = () => {
             <input
               type="email"
               name="email"
-              className={`w-full p-2 border rounded text-xs ${
-                formData.errors.email
-                  ? "border-red-500"
-                  : isValidEmail(formData.email)
+              className={`w-full p-2 border rounded text-xs ${formData.errors.email
+                ? "border-red-500"
+                : isValidEmail(formData.email)
                   ? "border-green-500"
                   : ""
-              }`}
+                }`}
               onChange={handleChange}
               required
             />
@@ -252,56 +275,80 @@ const Register = () => {
               <p className="text-xs text-red-600">{formData.errors.email}</p>
             )}
 
-            {/* Password + Toggle */}
-            <label className="block text-xs font-medium text-gray-700 mb-1">
-              Password <span className="text-red-600">*</span>
-            </label>
-            <div className="relative">
-              <input
-                type={passwordVisible ? "text" : "password"}
-                name="password"
-                className={`w-full p-2 border rounded text-xs pr-10 ${
-                  formData.errors.password
-                    ? "border-red-500"
-                    : isValidPassword(formData.password)
-                    ? "border-green-500"
-                    : ""
-                }`}
-                onChange={handleChange}
-                required
-              />
-              <button
-                type="button"
-                className="absolute top-2 right-2 text-gray-500"
-                onClick={() => setPasswordVisible((p) => !p)}
-              >
-                {passwordVisible ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
-              </button>
-            </div>
-            {formData.errors.password && (
-              <p className="text-xs text-red-600">{formData.errors.password}</p>
-            )}
+            {/* Phone + Password in one line */}
+            <div className="flex space-x-4">
 
-            {/* Phone */}
-            <label className="block text-xs font-medium text-gray-700 mb-1">
-              Phone <span className="text-red-600">*</span>
-            </label>
-            <input
-              type="text"
-              name="phone"
-              className={`w-full p-2 border rounded text-xs ${
-                formData.errors.phone
-                  ? "border-red-500"
-                  : isValidPhone(formData.phone)
-                  ? "border-green-500"
-                  : ""
-              }`}
-              onChange={handleChange}
-              required
-            />
-            {formData.errors.phone && (
-              <p className="text-xs text-red-600">{formData.errors.phone}</p>
-            )}
+              {/* Password */}
+              <div className="w-1/2">
+                <label className="block text-xs font-medium text-gray-700 mb-1">
+                  Password <span className="text-red-600">*</span>
+                </label>
+                <div className="relative">
+                  <input
+                    type={passwordVisible ? "text" : "password"}
+                    name="password"
+                    className={`w-full p-2 border rounded text-xs pr-10 ${formData.errors.password
+                      ? "border-red-500"
+                      : isValidPassword(formData.password)
+                        ? "border-green-500"
+                        : ""
+                      }`}
+                    onChange={handleChange}
+                    required
+                  />
+                  <button
+                    type="button"
+                    className="absolute top-2 right-2 text-gray-500"
+                    onClick={() => setPasswordVisible((p) => !p)}
+                  >
+                    {passwordVisible ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
+                  </button>
+                </div>
+                {formData.errors.password && (
+                  <p className="text-xs text-red-600">{formData.errors.password}</p>
+                )}
+              </div>
+              {/* Phone */}
+              <div className="w-1/2">
+                <label className="block text-xs font-medium text-gray-700 mb-1">
+                  Phone <span className="text-red-600">*</span>
+                </label>
+                <input
+                  type="text"
+                  name="phone"
+                  className={`w-full p-2 border rounded text-xs ${formData.errors.phone
+                    ? "border-red-500"
+                    : isValidPhone(formData.phone)
+                      ? "border-green-500"
+                      : ""
+                    }`}
+                  onChange={handleChange}
+                  required
+                />
+                {formData.errors.phone && (
+                  <p className="text-xs text-red-600">{formData.errors.phone}</p>
+                )}
+              </div>
+
+
+            </div>
+
+            {/* Profile Photo */}
+            <div className="space-y-1 mt-3">
+              <label className="block text-xs font-medium text-gray-700 mb-1">
+                Profile Photo (Max 5MB)
+              </label>
+              <input
+                type="file"
+                accept=".jpg,.jpeg,.png"
+                onChange={(e) => handleFileChange(e, "profilePhoto")}
+                className={`w-full p-2 border rounded text-xs ${formData.errors.profilePhoto ? "border-red-500" : ""}`}
+              />
+              {formData.errors.profilePhoto && (
+                <p className="text-xs text-red-600">{formData.errors.profilePhoto}</p>
+              )}
+            </div>
+
 
             {/* Address + Shop Address */}
             <div className="flex space-x-4">
@@ -312,9 +359,8 @@ const Register = () => {
                 <input
                   type="text"
                   name="address"
-                  className={`w-full p-2 border rounded text-xs ${
-                    formData.errors.address ? "border-red-500" : ""
-                  }`}
+                  className={`w-full p-2 border rounded text-xs ${formData.errors.address ? "border-red-500" : ""
+                    }`}
                   onChange={handleChange}
                   required
                 />
@@ -341,9 +387,8 @@ const Register = () => {
                 <input
                   type="text"
                   name="district"
-                  className={`w-full p-2 border rounded text-xs ${
-                    formData.errors.district ? "border-red-500" : ""
-                  }`}
+                  className={`w-full p-2 border rounded text-xs ${formData.errors.district ? "border-red-500" : ""
+                    }`}
                   onChange={handleChange}
                   required
                 />
@@ -355,9 +400,8 @@ const Register = () => {
                 <input
                   type="text"
                   name="taluka"
-                  className={`w-full p-2 border rounded text-xs ${
-                    formData.errors.taluka ? "border-red-500" : ""
-                  }`}
+                  className={`w-full p-2 border rounded text-xs ${formData.errors.taluka ? "border-red-500" : ""
+                    }`}
                   onChange={handleChange}
                   required
                 />
@@ -378,9 +422,8 @@ const Register = () => {
                     type="file"
                     accept=".pdf,.jpg,.jpeg,.png"
                     onChange={(e) => handleFileChange(e, field)}
-                    className={`w-full p-2 border rounded text-xs ${
-                      formData.errors[field] ? "border-red-500" : ""
-                    }`}
+                    className={`w-full p-2 border rounded text-xs ${formData.errors[field] ? "border-red-500" : ""
+                      }`}
                     required
                   />
                   {formData.errors[field] && (
@@ -400,9 +443,8 @@ const Register = () => {
                 name="agreeToTerms"
                 checked={formData.agreeToTerms}
                 onChange={handleChange}
-                className={`h-4 w-4 mt-1 text-[#F58A3B] rounded ${
-                  formData.errors.agreeToTerms ? "border-red-500" : ""
-                }`}
+                className={`h-4 w-4 mt-1 text-[#F58A3B] rounded ${formData.errors.agreeToTerms ? "border-red-500" : ""
+                  }`}
               />
               <label className="ml-2 text-xs text-gray-700">
                 I agree to the{" "}
@@ -420,11 +462,10 @@ const Register = () => {
             {/* Submit */}
             <button
               type="submit"
-              className={`w-full bg-[#F58A3B] text-white py-2 rounded text-xs ${
-                !isFormValid()
-                  ? "opacity-50 cursor-not-allowed"
-                  : "hover:bg-[#e07d35]"
-              }`}
+              className={`w-full bg-[#F58A3B] text-white py-2 rounded text-xs ${!isFormValid()
+                ? "opacity-50 cursor-not-allowed"
+                : "hover:bg-[#e07d35]"
+                }`}
               disabled={!isFormValid()}
             >
               Register

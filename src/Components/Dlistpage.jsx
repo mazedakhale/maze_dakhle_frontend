@@ -200,9 +200,8 @@ const DlistPage = () => {
                 filteredDocuments.map((doc, idx) => (
                   <tr
                     key={doc.document_id}
-                    className={`${
-                      idx % 2 === 0 ? "bg-white" : "bg-[#F58A3B14]"
-                    } hover:bg-orange-100`}
+                    className={`${idx % 2 === 0 ? "bg-white" : "bg-[#F58A3B14]"
+                      } hover:bg-orange-100`}
                   >
                     <td className="px-4 py-2 border text-center">
                       {doc.application_id}

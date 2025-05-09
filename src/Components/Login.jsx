@@ -11,6 +11,9 @@ const Login = () => {
   const [categories, setCategories] = useState([]);
   const [subcategories, setSubcategories] = useState({});
   const navigate = useNavigate();
+  // src/pages/Login.jsx
+  const SMS_URL = "https://mazedakhale.in/api/sms/send";
+  const SMS_SENDER = "918308178738";  // your LiveOne “from” number
 
   // Fetch categories
   useEffect(() => {
@@ -58,6 +61,7 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
+      // ① Authenticate
       const resp = await fetch("https://mazedakhale.in/api/users/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -66,9 +70,32 @@ const Login = () => {
       const data = await resp.json();
       if (!resp.ok) throw new Error(data.message || "Login failed");
 
+      // ② Persist token and decode both role + phone
       localStorage.setItem("token", data.token);
-      const { role } = jwtDecode(data.token);
+      const { role, phone } = jwtDecode(data.token);
 
+      // ③ Normalize to E.164
+      let raw = phone.replace(/^0+/, "");           // strip leading zeros
+      const phoneE164 = raw.startsWith("91")
+        ? raw
+        : "91" + raw;
+
+      // ④ Fire-and-forget SMS (same shape as registration)
+      const message =
+        `Welcome back to Mazedakhale!\n` +
+        `You’ve successfully logged in.\n\n`
+
+      fetch(SMS_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          sender: SMS_SENDER,
+          number: phoneE164,
+          message: message,
+        }),
+      }).catch(err => console.error("SMS send error:", err));
+
+      // ⑤ Notify + redirect
       Swal.fire({
         title: "Login Successful!",
         text: "Redirecting to your dashboard…",
@@ -90,8 +117,6 @@ const Login = () => {
       });
     }
   };
-
-  // FORGOT PASSWORD
   const handleForgot = async (e) => {
     e.preventDefault();
     try {

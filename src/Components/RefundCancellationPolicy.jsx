@@ -11,7 +11,7 @@ const RefundCancellationPolicy = () => {
       try {
         const response = await axios.get(
           "https://mazedakhale.in/api/privacy-policy/type/" +
-            encodeURIComponent("Return Policy")
+          encodeURIComponent("Return Policy")
         );
         const data = response.data;
         if (Array.isArray(data) && data.length > 0) {

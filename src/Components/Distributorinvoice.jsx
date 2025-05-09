@@ -228,8 +228,8 @@ const InvoicePage = () => {
       if (!filename) {
         const fld = Array.isArray(documentData.document_fields)
           ? documentData.document_fields.find(
-              (f) => f.field_name === "APPLICANT NAME"
-            )
+            (f) => f.field_name === "APPLICANT NAME"
+          )
           : null;
         filename = fld?.field_value
           ? `${fld.field_value.replace(/\s+/g, "_")}.zip`
@@ -345,7 +345,7 @@ const InvoicePage = () => {
     if (token) {
       try {
         setUserEmail(jwtDecode(token).email);
-      } catch {}
+      } catch { }
     }
     axios
       .get("https://mazedakhale.in/api/users/distributors")
@@ -618,9 +618,8 @@ const InvoicePage = () => {
                 <button
                   onClick={() => {
                     const ext = documentData.receipt_url.split(".").pop();
-                    const name = `${
-                      documentData.name || "document"
-                    }_receipt.${ext}`;
+                    const name = `${documentData.name || "document"
+                      }_receipt.${ext}`;
                     const link = document.createElement("a");
                     link.href = documentData.receipt_url;
                     link.download = name;
@@ -663,18 +662,18 @@ const InvoicePage = () => {
               {certificates.some(
                 (c) => String(c.document_id) === String(documentId)
               ) && (
-                <button
-                  onClick={() => {
-                    const cert = certificates.find(
-                      (c) => String(c.document_id) === String(documentId)
-                    );
-                    window.open(cert.file_url, "_blank");
-                  }}
-                  className="bg-[#F58A3B] text-white px-4 py-2 rounded flex items-center mt-2 w-full"
-                >
-                  <FaFileAlt className="mr-2" /> View Certificate
-                </button>
-              )}
+                  <button
+                    onClick={() => {
+                      const cert = certificates.find(
+                        (c) => String(c.document_id) === String(documentId)
+                      );
+                      window.open(cert.file_url, "_blank");
+                    }}
+                    className="bg-[#F58A3B] text-white px-4 py-2 rounded flex items-center mt-2 w-full"
+                  >
+                    <FaFileAlt className="mr-2" /> View Certificate
+                  </button>
+                )}
             </div>
           </div>
 
