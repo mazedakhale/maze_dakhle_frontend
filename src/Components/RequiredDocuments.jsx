@@ -252,8 +252,9 @@ const RequiredDocuments = () => {
                 documents.map((doc, index) => (
                   <tr
                     key={doc.id}
-                    className={`${index % 2 === 0 ? "bg-[#FFFFFF]" : "bg-[#F58A3B14]"
-                      } hover:bg-orange-100 transition duration-200`}
+                    className={`${
+                      index % 2 === 0 ? "bg-[#FFFFFF]" : "bg-[#F58A3B14]"
+                    } hover:bg-orange-100 transition duration-200`}
                   >
                     <td className="px-4 py-3 border border-[#776D6DA8] text-center">
                       {editId === doc.id ? (
@@ -411,5 +412,4 @@ const RequiredDocuments = () => {
     </div>
   );
 };
-
 export default RequiredDocuments;

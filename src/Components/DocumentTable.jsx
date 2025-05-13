@@ -3,7 +3,6 @@ import axios from "axios";
 import { FaEdit, FaTrash, FaPlus, FaTimes } from "react-icons/fa";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
-
 const DocumentTable = () => {
   const [documents, setDocuments] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -141,8 +140,9 @@ const DocumentTable = () => {
                   documents.map((doc, idx) => (
                     <tr
                       key={doc.doc_type_id}
-                      className={`${idx % 2 === 0 ? "bg-white" : "bg-gray-50"
-                        } hover:bg-gray-100 transition-colors`}
+                      className={`${
+                        idx % 2 === 0 ? "bg-white" : "bg-gray-50"
+                      } hover:bg-gray-100 transition-colors`}
                     >
                       <td className="p-3 border border-gray-300">
                         {doc.doc_type_id}

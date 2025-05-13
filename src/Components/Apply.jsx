@@ -318,8 +318,9 @@ const Apply = () => {
                 onChange={handleChange}
                 value={formData.name || ""}
                 readOnly
-                className={`w-full mt-1 p-2 border ${errors.name ? "border-red-500" : "border-gray-300"
-                  } rounded-md bg-gray-100 shadow-sm cursor-not-allowed text-sm`}
+                className={`w-full mt-1 p-2 border ${
+                  errors.name ? "border-red-500" : "border-gray-300"
+                } rounded-md bg-gray-100 shadow-sm cursor-not-allowed text-sm`}
                 placeholder="Enter Full Name"
               />
               {errors.name && (
@@ -339,8 +340,9 @@ const Apply = () => {
                 onChange={handleChange}
                 value={formData.email || ""}
                 readOnly
-                className={`w-full mt-1 p-2 border ${errors.email ? "border-red-500" : "border-gray-300"
-                  } rounded-md bg-gray-100 shadow-sm cursor-not-allowed text-sm`}
+                className={`w-full mt-1 p-2 border ${
+                  errors.email ? "border-red-500" : "border-gray-300"
+                } rounded-md bg-gray-100 shadow-sm cursor-not-allowed text-sm`}
                 placeholder="Enter Email"
               />
               {errors.email && (
@@ -358,8 +360,9 @@ const Apply = () => {
                 onChange={handleChange}
                 value={formData.phone || ""}
                 readOnly
-                className={`w-full mt-1 p-2 border ${errors.phone ? "border-red-500" : "border-gray-300"
-                  } rounded-md bg-gray-100 shadow-sm cursor-not-allowed text-sm`}
+                className={`w-full mt-1 p-2 border ${
+                  errors.phone ? "border-red-500" : "border-gray-300"
+                } rounded-md bg-gray-100 shadow-sm cursor-not-allowed text-sm`}
                 placeholder="Enter Phone Number"
               />
               {errors.phone && (
@@ -382,8 +385,9 @@ const Apply = () => {
                     type="text"
                     value={formData.document_fields[field] || ""}
                     onChange={(e) => handleFieldChange(e, field)}
-                    className={`w-full p-3 border ${errors[field] ? "border-red-500" : "border-gray-300"
-                      } rounded-lg shadow-md`}
+                    className={`w-full p-3 border ${
+                      errors[field] ? "border-red-500" : "border-gray-300"
+                    } rounded-lg shadow-md`}
                     placeholder={`Enter ${field}`}
                   />
                   {errors[field] && (
@@ -412,8 +416,9 @@ const Apply = () => {
                   <input
                     type="file"
                     onChange={(e) => handleFileUpload(e, docName)}
-                    className={`w-full mt-2 p-3 border ${errors[docName] ? "border-red-500" : "border-gray-300"
-                      } rounded-lg bg-gray-100 shadow-md`}
+                    className={`w-full mt-2 p-3 border ${
+                      errors[docName] ? "border-red-500" : "border-gray-300"
+                    } rounded-lg bg-gray-100 shadow-md`}
                     accept=".pdf,.doc,.docx,.png,.jpg,.jpeg"
                   />
                   {errors[docName] && (
@@ -423,7 +428,6 @@ const Apply = () => {
               ))}
             </div>
           </div>
-
           <div className="mt-5 flex justify-center">
             <button
               type="submit"

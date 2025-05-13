@@ -4,7 +4,6 @@ import Swal from "sweetalert2";
 import axios from "axios";
 import { validateRegistration } from "../utils/formValidators";
 import { useNavigate } from "react-router-dom";
-
 const EmployeeList = () => {
   const [employees, setEmployees] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -66,7 +65,8 @@ const EmployeeList = () => {
     e.preventDefault();
 
     const { ok, errors } = validateRegistration(formData);
-    if (!ok) return Swal.fire("Validation", Object.values(errors)[0], "warning");
+    if (!ok)
+      return Swal.fire("Validation", Object.values(errors)[0], "warning");
 
     const payload = new FormData();
     for (let key of ["name", "email", "password", "phone", "address", "role"]) {
@@ -77,7 +77,11 @@ const EmployeeList = () => {
       payload.append("profilePhoto", formData.profilePhoto);
     }
 
-    Swal.fire({ title: "Saving", text: "Please wait...", didOpen: () => Swal.showLoading() });
+    Swal.fire({
+      title: "Saving",
+      text: "Please wait...",
+      didOpen: () => Swal.showLoading(),
+    });
 
     try {
       await axios.post(`${apiUrl}/register`, payload);
@@ -96,9 +100,13 @@ const EmployeeList = () => {
 
   const handleUpdateEmployee = async (id) => {
     try {
-      await axios.patch(`${apiUrl}/password/${id}`, { newPassword: updatedPassword });
+      await axios.patch(`${apiUrl}/password/${id}`, {
+        newPassword: updatedPassword,
+      });
       setEmployees((prev) =>
-        prev.map((e) => (e.user_id === id ? { ...e, password: updatedPassword } : e))
+        prev.map((e) =>
+          e.user_id === id ? { ...e, password: updatedPassword } : e
+        )
       );
       Swal.fire("Updated", "Password updated", "success");
       setEditingId(null);
@@ -115,7 +123,8 @@ const EmployeeList = () => {
       inputPlaceholder: "Enter code…",
       showCancelButton: true,
       confirmButtonText: "Delete",
-      preConfirm: (val) => val !== "0000" && Swal.showValidationMessage("Wrong code"),
+      preConfirm: (val) =>
+        val !== "0000" && Swal.showValidationMessage("Wrong code"),
     });
 
     if (!result.isConfirmed) return;
@@ -133,7 +142,9 @@ const EmployeeList = () => {
     try {
       await axios.patch(`${apiUrl}/status/${id}`, { status });
       setEmployees((prev) =>
-        prev.map((e) => (e.user_id === id ? { ...e, user_login_status: status } : e))
+        prev.map((e) =>
+          e.user_id === id ? { ...e, user_login_status: status } : e
+        )
       );
       Swal.fire("Updated", `Status changed to ${status}`, "success");
     } catch {
@@ -145,7 +156,9 @@ const EmployeeList = () => {
     try {
       await axios.patch(`${apiUrl}/request-edit/${id}`, { status });
       setEmployees((prev) =>
-        prev.map((e) => (e.user_id === id ? { ...e, edit_request_status: status } : e))
+        prev.map((e) =>
+          e.user_id === id ? { ...e, edit_request_status: status } : e
+        )
       );
       Swal.fire("Success", `Request ${status}`, "success");
     } catch {
@@ -196,7 +209,10 @@ const EmployeeList = () => {
             </thead>
             <tbody>
               {employees.map((emp, i) => (
-                <tr key={emp.user_id} className={i % 2 === 0 ? "bg-white" : "bg-gray-50"}>
+                <tr
+                  key={emp.user_id}
+                  className={i % 2 === 0 ? "bg-white" : "bg-gray-50"}
+                >
                   <td className="border px-4 py-2">{emp.user_id}</td>
                   <td className="border px-4 py-2">{emp.name}</td>
                   <td className="border px-4 py-2">{emp.email}</td>
@@ -227,32 +243,46 @@ const EmployeeList = () => {
                   <td className="border px-4 py-2">
                     <button
                       onClick={() => handleStatusChange(emp.user_id, "Active")}
-                      className={`px-2 py-1 mr-2 rounded text-white ${emp.user_login_status === "Active" ? "bg-green-500" : "bg-gray-400"
-                        }`}
+                      className={`px-2 py-1 mr-2 rounded text-white ${
+                        emp.user_login_status === "Active"
+                          ? "bg-green-500"
+                          : "bg-gray-400"
+                      }`}
                       disabled={emp.user_login_status === "Active"}
                     >
                       Active
                     </button>
                     <button
-                      onClick={() => handleStatusChange(emp.user_id, "InActive")}
-                      className={`px-2 py-1 rounded text-white ${emp.user_login_status === "InActive" ? "bg-red-500" : "bg-gray-400"
-                        }`}
+                      onClick={() =>
+                        handleStatusChange(emp.user_id, "InActive")
+                      }
+                      className={`px-2 py-1 rounded text-white ${
+                        emp.user_login_status === "InActive"
+                          ? "bg-red-500"
+                          : "bg-gray-400"
+                      }`}
                       disabled={emp.user_login_status === "InActive"}
                     >
                       Inactive
                     </button>
                   </td>
                   <td className="border px-4 py-2 text-center">
-                    <div className="text-sm font-semibold">{emp.edit_request_status}</div>
+                    <div className="text-sm font-semibold">
+                      {emp.edit_request_status}
+                    </div>
                     <div className="flex gap-1 justify-center mt-1">
                       <button
-                        onClick={() => updateEditRequestStatus(emp.user_id, "Approved")}
+                        onClick={() =>
+                          updateEditRequestStatus(emp.user_id, "Approved")
+                        }
                         className="bg-green-500 text-white px-2 py-1 rounded text-xs hover:bg-green-600"
                       >
                         Approve
                       </button>
                       <button
-                        onClick={() => updateEditRequestStatus(emp.user_id, "Rejected")}
+                        onClick={() =>
+                          updateEditRequestStatus(emp.user_id, "Rejected")
+                        }
                         className="bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600"
                       >
                         Reject
@@ -269,7 +299,9 @@ const EmployeeList = () => {
                       </button>
                     ) : (
                       <button
-                        onClick={() => handleEditEmployee(emp.user_id, emp.password)}
+                        onClick={() =>
+                          handleEditEmployee(emp.user_id, emp.password)
+                        }
                         className="text-blue-500"
                       >
                         <FaEdit />
@@ -300,7 +332,9 @@ const EmployeeList = () => {
                     type={f === "password" ? "password" : "text"}
                     placeholder={f.charAt(0).toUpperCase() + f.slice(1)}
                     value={formData[f]}
-                    onChange={(e) => setFormData({ ...formData, [f]: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, [f]: e.target.value })
+                    }
                     className="w-full p-2 border rounded"
                     required
                   />

@@ -24,6 +24,7 @@ import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import { Card, CardContent } from "@mui/material";
 
+
 // Register the chart.js components
 ChartJS.register(
   ArcElement,

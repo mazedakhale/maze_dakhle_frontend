@@ -49,7 +49,6 @@ const Categories = () => {
   };
 
   //import { FaFileAlt, FaFilePdf } from "react-icons/fa"; // Import PDF icon
-
   return (
     <div className="flex">
       {/* Sidebar Placeholder to Avoid Overlapping */}

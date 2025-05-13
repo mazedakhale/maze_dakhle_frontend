@@ -15,7 +15,6 @@ import {
 } from "react-icons/fa";
 import { BsStopCircle } from "react-icons/bs";
 import Logo from "../assets/logo.png";
-
 const navLabels = [
   "Home",
   "Login",

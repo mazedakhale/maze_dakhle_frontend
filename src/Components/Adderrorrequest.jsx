@@ -131,8 +131,9 @@ export default function AddCertificateRequestPage() {
           <button
             type="submit"
             disabled={submitting}
-            className={`w-full py-2 text-white rounded ${submitting ? "bg-gray-500" : "bg-blue-600 hover:bg-blue-700"
-              }`}
+            className={`w-full py-2 text-white rounded ${
+              submitting ? "bg-gray-500" : "bg-blue-600 hover:bg-blue-700"
+            }`}
           >
             {submitting ? "Submitting…" : "Submit Error Request"}
           </button>

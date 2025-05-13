@@ -14,7 +14,6 @@ const ClistPage = () => {
   const { state } = useLocation();
   const { categoryId, subcategoryId } = state || {};
   const navigate = useNavigate();
-
   // Core state
   const [documents, setDocuments] = useState([]);
   const [certificates, setCertificates] = useState([]);
@@ -282,8 +281,9 @@ const ClistPage = () => {
                 filteredDocuments.map((doc, idx) => (
                   <tr
                     key={doc.document_id}
-                    className={`${idx % 2 === 0 ? "bg-white" : "bg-[#F58A3B14]"
-                      } hover:bg-orange-100`}
+                    className={`${
+                      idx % 2 === 0 ? "bg-white" : "bg-[#F58A3B14]"
+                    } hover:bg-orange-100`}
                   >
                     <td className="px-4 py-2 border text-center">{idx + 1}</td>
                     <td className="px-4 py-2 border text-center">
@@ -293,12 +293,12 @@ const ClistPage = () => {
                       {(() => {
                         const fld = Array.isArray(doc.document_fields)
                           ? doc.document_fields.find(
-                            (f) => f.field_name === "APPLICANT NAME"
-                          )
+                              (f) => f.field_name === "APPLICANT NAME"
+                            )
                           : {
-                            field_value:
-                              doc.document_fields?.["APPLICANT NAME"],
-                          };
+                              field_value:
+                                doc.document_fields?.["APPLICANT NAME"],
+                            };
                         return (
                           fld?.field_value || (
                             <span className="text-gray-500">—</span>
@@ -383,12 +383,13 @@ const ClistPage = () => {
                     {/* Verification status */}
                     <td className="px-4 py-2 border text-center">
                       <span
-                        className={`px-2 py-1 rounded-full text-xs text-white ${doc.status === "Approved"
-                          ? "bg-green-500"
-                          : doc.status === "Rejected"
+                        className={`px-2 py-1 rounded-full text-xs text-white ${
+                          doc.status === "Approved"
+                            ? "bg-green-500"
+                            : doc.status === "Rejected"
                             ? "bg-red-500"
                             : "bg-yellow-500"
-                          }`}
+                        }`}
                       >
                         {doc.status}
                       </span>
@@ -397,7 +398,7 @@ const ClistPage = () => {
                     {/* Download Receipt */}
                     <td className="px-4 py-2 border text-center">
                       {["Received", "Uploaded"].includes(doc.status) &&
-                        doc.receipt_url ? (
+                      doc.receipt_url ? (
                         <button
                           onClick={() =>
                             handleDownloadReceipt(doc.receipt_url, doc.name)
@@ -414,7 +415,7 @@ const ClistPage = () => {
                     {/* Certificate */}
                     <td className="px-4 py-2 border text-center">
                       {doc.status === "Completed" &&
-                        getCertificateByDocumentId(doc.document_id) ? (
+                      getCertificateByDocumentId(doc.document_id) ? (
                         <button
                           onClick={() => handleViewCertificate(doc.document_id)}
                           className="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600 flex items-center justify-center text-xs"

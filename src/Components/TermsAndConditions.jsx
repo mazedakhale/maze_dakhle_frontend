@@ -5,13 +5,12 @@ const TermsAndConditions = () => {
   const [fileUrl, setFileUrl] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
   useEffect(() => {
     const fetchTnC = async () => {
       try {
         const response = await axios.get(
           "https://mazedakhale.in/api/privacy-policy/type/" +
-          encodeURIComponent("Terms and Conditions")
+            encodeURIComponent("Terms and Conditions")
         );
         const data = response.data;
         if (Array.isArray(data) && data.length > 0) {

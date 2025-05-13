@@ -404,7 +404,6 @@ const Edashinner = () => {
                     <div className="bg-orange-500 text-white p-4 flex items-center justify-center">
                       <FaCogs className="text-2xl" />
                     </div>
-
                     {/* Category Name Section */}
                     <div className="flex-1 bg-white p-4 flex justify-between items-center">
                       <div>

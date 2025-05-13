@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../index.css"; // Ensure Tailwind & CSS are imported
-
 const Register = () => {
   const [formData, setFormData] = useState({
     name: "",

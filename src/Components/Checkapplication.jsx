@@ -16,7 +16,6 @@ const formatDate = (dateStr) => {
     second: "2-digit",
     hour12: true,
   });
-
   return `${formattedDate} ${formattedTime}`;
 };
 

@@ -8,7 +8,6 @@ import {
   FaTimes,
 } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-
 import StarIcon from "@mui/icons-material/Star";
 import jwtDecode from "jwt-decode"; // To decode token
 

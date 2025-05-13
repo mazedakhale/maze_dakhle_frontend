@@ -6,7 +6,6 @@ import { useNavigate } from "react-router-dom";
 
 // Set default timeout for all axios requests
 axios.defaults.timeout = 30000; // 30 seconds
-
 // Import form validators
 import {
   isValidEmail,
@@ -294,14 +293,11 @@ const DistributorList = () => {
 
     // Append files and document types
 
-
-
     formDataToSend.append("files", formData.aadharCard);
     formDataToSend.append("files", formData.panCard);
     formDataToSend.append("documentTypes", "Aadhar Card");
     formDataToSend.append("documentTypes", "PAN Card");
-    formDataToSend.append("profilePhoto", formData.profilePhoto);  // ✅ Add this line
-
+    formDataToSend.append("profilePhoto", formData.profilePhoto); // ✅ Add this line
 
     try {
       const response = await axios.post(
@@ -557,8 +553,9 @@ const DistributorList = () => {
                   distributors.map((distributor, index) => (
                     <tr
                       key={distributor.user_id}
-                      className={`${index % 2 === 0 ? "bg-[#FFFFFF]" : "bg-[#F58A3B14]"
-                        } hover:bg-orange-100 transition duration-200`}
+                      className={`${
+                        index % 2 === 0 ? "bg-[#FFFFFF]" : "bg-[#F58A3B14]"
+                      } hover:bg-orange-100 transition duration-200`}
                     >
                       <td className="px-4 py-3 border border-[#776D6DA8] text-center">
                         {distributor.user_id}
@@ -627,10 +624,11 @@ const DistributorList = () => {
                           onClick={() =>
                             handleStatusChange(distributor.user_id, "Active")
                           }
-                          className={`px-3 py-1 rounded text-white mr-2 ${distributor.user_login_status === "Active"
-                            ? "bg-green-500 cursor-default"
-                            : "bg-gray-500 hover:bg-green-600"
-                            }`}
+                          className={`px-3 py-1 rounded text-white mr-2 ${
+                            distributor.user_login_status === "Active"
+                              ? "bg-green-500 cursor-default"
+                              : "bg-gray-500 hover:bg-green-600"
+                          }`}
                           disabled={distributor.user_login_status === "Active"}
                         >
                           Active
@@ -639,10 +637,11 @@ const DistributorList = () => {
                           onClick={() =>
                             handleStatusChange(distributor.user_id, "InActive")
                           }
-                          className={`px-3 py-1 rounded text-white ${distributor.user_login_status === "InActive"
-                            ? "bg-red-500 cursor-default"
-                            : "bg-gray-500 hover:bg-red-600"
-                            }`}
+                          className={`px-3 py-1 rounded text-white ${
+                            distributor.user_login_status === "InActive"
+                              ? "bg-red-500 cursor-default"
+                              : "bg-gray-500 hover:bg-red-600"
+                          }`}
                           disabled={
                             distributor.user_login_status === "InActive"
                           }
@@ -739,8 +738,9 @@ const DistributorList = () => {
                   placeholder="Name"
                   value={formData.name}
                   onChange={handleInputChange}
-                  className={`w-full p-2 border rounded text-xs ${formData.errors.name ? "border-red-500" : ""
-                    }`}
+                  className={`w-full p-2 border rounded text-xs ${
+                    formData.errors.name ? "border-red-500" : ""
+                  }`}
                   required
                 />
                 {formData.errors.name && (
@@ -757,8 +757,9 @@ const DistributorList = () => {
                   placeholder="Email"
                   value={formData.email}
                   onChange={handleInputChange}
-                  className={`w-full p-2 border rounded text-xs ${formData.errors.email ? "border-red-500" : ""
-                    }`}
+                  className={`w-full p-2 border rounded text-xs ${
+                    formData.errors.email ? "border-red-500" : ""
+                  }`}
                   required
                 />
                 {formData.errors.email && (
@@ -775,8 +776,9 @@ const DistributorList = () => {
                   placeholder="Password"
                   value={formData.password}
                   onChange={handleInputChange}
-                  className={`w-full p-2 border rounded text-xs ${formData.errors.password ? "border-red-500" : ""
-                    }`}
+                  className={`w-full p-2 border rounded text-xs ${
+                    formData.errors.password ? "border-red-500" : ""
+                  }`}
                   required
                 />
                 {formData.errors.password && (
@@ -793,8 +795,9 @@ const DistributorList = () => {
                   placeholder="Phone"
                   value={formData.phone}
                   onChange={handleInputChange}
-                  className={`w-full p-2 border rounded text-xs ${formData.errors.phone ? "border-red-500" : ""
-                    }`}
+                  className={`w-full p-2 border rounded text-xs ${
+                    formData.errors.phone ? "border-red-500" : ""
+                  }`}
                   required
                 />
                 {formData.errors.phone && (
@@ -811,8 +814,9 @@ const DistributorList = () => {
                   placeholder="Address"
                   value={formData.address}
                   onChange={handleInputChange}
-                  className={`w-full p-2 border rounded text-xs ${formData.errors.address ? "border-red-500" : ""
-                    }`}
+                  className={`w-full p-2 border rounded text-xs ${
+                    formData.errors.address ? "border-red-500" : ""
+                  }`}
                   required
                 />
                 {formData.errors.address && (
@@ -843,8 +847,9 @@ const DistributorList = () => {
                 <input
                   type="file"
                   onChange={(e) => handleFileChange(e, "aadharCard")}
-                  className={`w-full text-xs ${formData.errors.aadharCard ? "border-red-500" : ""
-                    }`}
+                  className={`w-full text-xs ${
+                    formData.errors.aadharCard ? "border-red-500" : ""
+                  }`}
                   accept=".pdf,.jpg,.jpeg,.png"
                 />
                 {formData.errors.aadharCard && (
@@ -862,8 +867,9 @@ const DistributorList = () => {
                 <input
                   type="file"
                   onChange={(e) => handleFileChange(e, "panCard")}
-                  className={`w-full text-xs ${formData.errors.panCard ? "border-red-500" : ""
-                    }`}
+                  className={`w-full text-xs ${
+                    formData.errors.panCard ? "border-red-500" : ""
+                  }`}
                   accept=".pdf,.jpg,.jpeg,.png"
                 />
                 {formData.errors.panCard && (
@@ -880,7 +886,9 @@ const DistributorList = () => {
                 <input
                   type="file"
                   onChange={(e) => handleFileChange(e, "profilePhoto")}
-                  className={`w-full text-xs ${formData.errors.profilePhoto ? "border-red-500" : ""}`}
+                  className={`w-full text-xs ${
+                    formData.errors.profilePhoto ? "border-red-500" : ""
+                  }`}
                   accept=".jpg,.jpeg,.png"
                 />
                 {formData.errors.profilePhoto && (
@@ -889,7 +897,6 @@ const DistributorList = () => {
                   </p>
                 )}
               </div>
-
 
               <div className="mt-4 flex justify-end space-x-3">
                 <button

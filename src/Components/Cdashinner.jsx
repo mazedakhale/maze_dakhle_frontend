@@ -1,9 +1,18 @@
 // src/components/CustomerDashboard.jsx
 import React, { useEffect, useState } from "react";
 import {
-  PieChart, Pie, Cell, Tooltip, Legend,
-  BarChart, Bar, XAxis, YAxis, CartesianGrid,
-  ResponsiveContainer, LabelList,
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip,
+  Legend,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  ResponsiveContainer,
+  LabelList,
 } from "recharts";
 import { motion } from "framer-motion";
 import { Card, CardContent } from "@mui/material";
@@ -69,18 +78,18 @@ export default function CustomerDashboard() {
     // 1. Applied / Completed
     axios
       .get(`https://mazedakhale.in/api/userdashboard/total-applied/${userId}`)
-      .then(res => setAppliedCount(res.data.totalCount))
+      .then((res) => setAppliedCount(res.data.totalCount))
       .catch(console.error);
 
     axios
       .get(`https://mazedakhale.in/api/userdashboard/total-completed/${userId}`)
-      .then(res => setCompletedCount(res.data.totalCompleted))
+      .then((res) => setCompletedCount(res.data.totalCompleted))
       .catch(console.error);
 
     // 2. Wallet balance
     axios
       .get(`https://mazedakhale.in/api/wallet`, { headers: authHeaders })
-      .then(res => {
+      .then((res) => {
         const num = parseFloat(res.data.balance);
         setWalletBalance(isNaN(num) ? 0 : num);
       })
@@ -89,9 +98,9 @@ export default function CustomerDashboard() {
     // 3. Status distribution
     axios
       .get(`https://mazedakhale.in/api/userdashboard/status-count/${userId}`)
-      .then(res =>
+      .then((res) =>
         setStatusData(
-          res.data.map(item => ({
+          res.data.map((item) => ({
             status: item.status,
             count: +item.count,
           }))
@@ -102,7 +111,7 @@ export default function CustomerDashboard() {
     // 4. Category / Subcategory counts
     axios
       .get(`https://mazedakhale.in/api/userdashboard/category-counts/${userId}`)
-      .then(res => {
+      .then((res) => {
         const withColors = res.data.categories.map((c, i) => ({
           name: c.category,
           value: c.totalApplications,
@@ -118,7 +127,7 @@ export default function CustomerDashboard() {
     // 5. Notifications
     axios
       .get("https://mazedakhale.in/api/notifications/active")
-      .then(res => setNotifications(res.data))
+      .then((res) => setNotifications(res.data))
       .catch(console.error);
 
     // 6. Lists & Prices
@@ -132,19 +141,21 @@ export default function CustomerDashboard() {
     try {
       const { data } = await axios.get("https://mazedakhale.in/api/categories");
       setCategories(data);
-    } catch { }
+    } catch {}
   };
   const fetchSubcategories = async () => {
     try {
-      const { data } = await axios.get("https://mazedakhale.in/api/subcategories");
+      const { data } = await axios.get(
+        "https://mazedakhale.in/api/subcategories"
+      );
       setSubcategories(data);
-    } catch { }
+    } catch {}
   };
   const fetchPrices = async () => {
     try {
       const { data } = await axios.get("https://mazedakhale.in/api/prices");
-      setPrices(data.map(p => ({ ...p, amount: Number(p.amount) })));
-    } catch { }
+      setPrices(data.map((p) => ({ ...p, amount: Number(p.amount) })));
+    } catch {}
   };
 
   // ─── Required Documents Modal ──────────────────────
@@ -155,10 +166,10 @@ export default function CustomerDashboard() {
       );
       setRequiredDocuments(data);
       const files = {};
-      data.forEach(d => d.file_url && (files[d.id] = d.file_url));
+      data.forEach((d) => d.file_url && (files[d.id] = d.file_url));
       setSelectedFiles(files);
       setIsModalOpen(true);
-    } catch { }
+    } catch {}
   };
   const handleSubcat = (catId, catName, subId, subName, action) => {
     setSelectedCategory({ categoryId: catId, categoryName: catName });
@@ -254,7 +265,7 @@ export default function CustomerDashboard() {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={item.onClick}
-            style={{ width: '100%', height: 70 }}
+            style={{ width: "100%", height: 70 }}
           >
             <div
               className={`${item.color} flex items-center justify-center w-1/4 h-full`}
@@ -287,11 +298,13 @@ export default function CustomerDashboard() {
 
       {/* Categories & Subcategories Grid */}
       <div className="w-full max-w-7xl mx-auto mt-6">
-        {categories.map(cat => {
-          const catCount = categoryCounts.find(c => c.category === cat.category_name);
+        {categories.map((cat) => {
+          const catCount = categoryCounts.find(
+            (c) => c.category === cat.category_name
+          );
           const pendingCat = catCount?.pendingApplications || 0;
           const children = subcategories.filter(
-            s => s.category.category_id === cat.category_id
+            (s) => s.category.category_id === cat.category_id
           );
 
           return (
@@ -320,15 +333,15 @@ export default function CustomerDashboard() {
 
               {/* Subcategories */}
               <div className="grid grid-cols-3 gap-4 mt-4">
-                {children.map(sub => {
+                {children.map((sub) => {
                   const subCount = subcategoryCounts.find(
-                    c =>
+                    (c) =>
                       c.subcategory === sub.subcategory_name &&
                       c.category === cat.category_name
                   );
                   const pendingSub = subCount?.pendingApplications || 0;
                   const priceRec = prices.find(
-                    p =>
+                    (p) =>
                       p.category_id === cat.category_id &&
                       p.subcategory_id === sub.subcategory_id
                   );
@@ -342,7 +355,8 @@ export default function CustomerDashboard() {
                         {sub.subcategory_name}
                       </h3>
                       <p className="text-lg font-semibold text-orange-500 mt-1">
-                        Price: {priceRec ? `₹${priceRec.amount.toFixed(2)}` : "N/A"}
+                        Price:{" "}
+                        {priceRec ? `₹${priceRec.amount.toFixed(2)}` : "N/A"}
                       </p>
                       <p className="text-sm text-gray-800 mt-1">
                         Pending: {pendingSub}
@@ -408,9 +422,7 @@ export default function CustomerDashboard() {
 
         {/* Category Pie */}
         <div className="w-1/2 bg-white shadow-md p-6 rounded-xl">
-          <h2 className="text-xl font-bold mb-4">
-            Category Distribution
-          </h2>
+          <h2 className="text-xl font-bold mb-4">Category Distribution</h2>
           {categoryData.length ? (
             <PieChart width={350} height={300}>
               <Pie
@@ -436,7 +448,6 @@ export default function CustomerDashboard() {
           )}
         </div>
       </div>
-
       {/* Required Documents Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -451,11 +462,9 @@ export default function CustomerDashboard() {
               Required Documents
             </h2>
             <ul className="mb-4">
-              {requiredDocuments.map(doc => (
+              {requiredDocuments.map((doc) => (
                 <li key={doc.id} className="mb-4">
-                  <span className="font-semibold">
-                    {doc.document_names}
-                  </span>
+                  <span className="font-semibold">{doc.document_names}</span>
                   {selectedFiles[doc.id] && (
                     <img
                       src={selectedFiles[doc.id]}
@@ -470,7 +479,7 @@ export default function CustomerDashboard() {
               <input
                 type="checkbox"
                 checked={isAgreed}
-                onChange={e => setIsAgreed(e.target.checked)}
+                onChange={(e) => setIsAgreed(e.target.checked)}
                 className="mr-2"
               />
               <span>I agree to the terms and conditions</span>

@@ -19,7 +19,6 @@ import { IoMdLogOut } from "react-icons/io";
 import { FaRegCircleUser } from "react-icons/fa6";
 import jwtDecode from "jwt-decode";
 import logo from "../assets/logo.png";
-
 // Sidebar Component
 const Sidebar = ({ onNavigate }) => {
   const [activePath, setActivePath] = useState("/");

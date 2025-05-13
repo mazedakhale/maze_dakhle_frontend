@@ -10,7 +10,6 @@ import {
 import jwtDecode from "jwt-decode";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
-
 const Userpendinglist = () => {
   const [documents, setDocuments] = useState([]);
   const [userId, setUserId] = useState(null);
@@ -281,8 +280,9 @@ const Userpendinglist = () => {
                 filteredDocuments.map((doc, index) => (
                   <tr
                     key={doc.document_id}
-                    className={`${index % 2 === 0 ? "bg-[#FFFFFF]" : "bg-[#F58A3B14]"
-                      } hover:bg-orange-100 transition duration-200`}
+                    className={`${
+                      index % 2 === 0 ? "bg-[#FFFFFF]" : "bg-[#F58A3B14]"
+                    } hover:bg-orange-100 transition duration-200`}
                   >
                     <td className="px-4 py-3 border border-[#776D6DA8] text-center">
                       {index + 1}
@@ -393,12 +393,13 @@ const Userpendinglist = () => {
                     <td className="px-4 py-3 border border-[#776D6DA8] text-center">
                       <div className="flex flex-col gap-1">
                         <span
-                          className={`px-3 py-1 rounded-full text-white text-xs ${doc.status === "Approved"
-                            ? "bg-green-500"
-                            : doc.status === "Rejected"
+                          className={`px-3 py-1 rounded-full text-white text-xs ${
+                            doc.status === "Approved"
+                              ? "bg-green-500"
+                              : doc.status === "Rejected"
                               ? "bg-red-500"
                               : "bg-yellow-500"
-                            }`}
+                          }`}
                         >
                           {doc.status}
                         </span>
@@ -444,7 +445,7 @@ const Userpendinglist = () => {
                     <td className="border p-3 text-center">
                       {(doc.status === "Received" ||
                         doc.status === "Uploaded") &&
-                        doc.receipt_url ? (
+                      doc.receipt_url ? (
                         <button
                           onClick={() =>
                             handleDownloadReceipt(doc.receipt_url, doc.name)
@@ -460,7 +461,7 @@ const Userpendinglist = () => {
 
                     <td className="border p-2 text-center">
                       {doc.status === "Completed" &&
-                        getCertificateByDocumentId(doc.document_id) ? (
+                      getCertificateByDocumentId(doc.document_id) ? (
                         <button
                           onClick={() => handleViewCertificate(doc.document_id)}
                           className="bg-green-500 text-white px-3 py-1 rounded hover:bg-blue-600 transition text-xs"

@@ -9,7 +9,6 @@ const ContactInfoTable = () => {
     const [newContact, setNewContact] = useState({ phone: "", email: "", address: "" });
     const [editingId, setEditingId] = useState(null);
     const [updatedContact, setUpdatedContact] = useState({ phone: "", email: "", address: "" });
-
     const apiUrl = "https://mazedakhale.in/api/contact-info"; // Replace with your actual backend API
 
     useEffect(() => {

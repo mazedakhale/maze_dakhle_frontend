@@ -110,7 +110,6 @@ const CustomerList = () => {
       Swal.fire("Error", "Failed to update edit request", "error");
     }
   };
-
   return (
     <div className="ml-[300px] mt-[80px] p-6 w-[calc(100%-260px)] overflow-x-hidden">
       <div className="relative bg-white shadow-lg rounded-lg border border-gray-300 overflow-hidden">
@@ -155,7 +154,6 @@ const CustomerList = () => {
           <tbody>
             {customers.map((customer) => (
               <tr key={customer.user_id} className="border hover:bg-orange-100">
-
                 <td className="text-center border">{customer.name}</td>
                 <td className="text-center border">{customer.email}</td>
                 <td className="text-center border">
@@ -205,10 +203,11 @@ const CustomerList = () => {
                     onClick={() =>
                       handleStatusChange(customer.user_id, "Active")
                     }
-                    className={`px-2 py-1 rounded text-white mr-2 ${customer.user_login_status === "Active"
-                      ? "bg-green-500"
-                      : "bg-gray-500 hover:bg-green-600"
-                      }`}
+                    className={`px-2 py-1 rounded text-white mr-2 ${
+                      customer.user_login_status === "Active"
+                        ? "bg-green-500"
+                        : "bg-gray-500 hover:bg-green-600"
+                    }`}
                   >
                     Active
                   </button>
@@ -216,10 +215,11 @@ const CustomerList = () => {
                     onClick={() =>
                       handleStatusChange(customer.user_id, "Inactive")
                     }
-                    className={`px-2 py-1 rounded text-white ${customer.user_login_status === "Inactive"
-                      ? "bg-red-500"
-                      : "bg-gray-500 hover:bg-red-600"
-                      }`}
+                    className={`px-2 py-1 rounded text-white ${
+                      customer.user_login_status === "Inactive"
+                        ? "bg-red-500"
+                        : "bg-gray-500 hover:bg-red-600"
+                    }`}
                   >
                     Inactive
                   </button>

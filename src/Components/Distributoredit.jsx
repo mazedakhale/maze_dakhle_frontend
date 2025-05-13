@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
-
 const DistributorEdit = () => {
   const { user_id } = useParams(); // Get user ID from URL
   const navigate = useNavigate(); // For navigation

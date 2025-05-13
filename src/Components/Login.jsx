@@ -3,7 +3,6 @@ import { Link, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import jwtDecode from "jwt-decode";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-
 const Login = () => {
   const [mode, setMode] = useState("login");
   const [formData, setFormData] = useState({ email: "", password: "" });
@@ -13,7 +12,7 @@ const Login = () => {
   const navigate = useNavigate();
   // src/pages/Login.jsx
   const SMS_URL = "https://mazedakhale.in/api/sms/send";
-  const SMS_SENDER = "918308178738";  // your LiveOne “from” number
+  const SMS_SENDER = "918308178738"; // your LiveOne “from” number
 
   // Fetch categories
   useEffect(() => {
@@ -75,15 +74,12 @@ const Login = () => {
       const { role, phone } = jwtDecode(data.token);
 
       // ③ Normalize to E.164
-      let raw = phone.replace(/^0+/, "");           // strip leading zeros
-      const phoneE164 = raw.startsWith("91")
-        ? raw
-        : "91" + raw;
+      let raw = phone.replace(/^0+/, ""); // strip leading zeros
+      const phoneE164 = raw.startsWith("91") ? raw : "91" + raw;
 
       // ④ Fire-and-forget SMS (same shape as registration)
       const message =
-        `Welcome back to Mazedakhale!\n` +
-        `You’ve successfully logged in.\n\n`
+        `Welcome back to Mazedakhale!\n` + `You’ve successfully logged in.\n\n`;
 
       fetch(SMS_URL, {
         method: "POST",
@@ -93,7 +89,7 @@ const Login = () => {
           number: phoneE164,
           message: message,
         }),
-      }).catch(err => console.error("SMS send error:", err));
+      }).catch((err) => console.error("SMS send error:", err));
 
       // ⑤ Notify + redirect
       Swal.fire({

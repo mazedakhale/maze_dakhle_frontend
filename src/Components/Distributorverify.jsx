@@ -14,7 +14,6 @@ const VerifyDocuments = () => {
   const [previewFile, setPreviewFile] = useState(null);
   const [distributorId, setDistributorId] = useState(null);
   const [isAdding, setIsAdding] = useState(false);
-
   const navigate = useNavigate();
 
   // Fetch user ID, documents, and certificates on mount
@@ -235,8 +234,8 @@ const VerifyDocuments = () => {
                   <td className="border px-4 py-2 text-sm">
                     {Array.isArray(doc.document_fields)
                       ? doc.document_fields.find(
-                        (f) => f.field_name === "APPLICANT NAME"
-                      )?.field_value || "-"
+                          (f) => f.field_name === "APPLICANT NAME"
+                        )?.field_value || "-"
                       : doc.document_fields["APPLICANT NAME"] || "-"}
                   </td>
                   <td className="border p-2 text-center">

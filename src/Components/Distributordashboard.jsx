@@ -36,7 +36,6 @@ const Sidebar = ({ onNavigate }) => {
             { icon: <FaUserCheck />, label: "Distributor Request", path: "/Distributorrequest" },
             // { icon: <FaFileSignature />, label: "Request History", path: "/Distributorhistory" },
             { icon: <FaFileSignature />, label: "Feedback", path: "/FeedbackD" },
-
           ].map((item, index) => (
             <li
               key={index}

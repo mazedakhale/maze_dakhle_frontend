@@ -99,7 +99,6 @@ const ApplicationView = () => {
 
   if (!documentData)
     return <div className="text-center text-lg mt-10">Loading Invoice...</div>;
-
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-gray-100 z-50">
       <div className="w-4/5 max-w-4xl border rounded-lg shadow-lg bg-white p-6 overflow-auto h-[90vh] relative">

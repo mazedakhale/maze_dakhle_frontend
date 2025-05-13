@@ -4,9 +4,8 @@ import { useNavigate, useLocation, Link } from "react-router-dom";
 import Swal from "sweetalert2";
 import jwtDecode from "jwt-decode";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-
 const SMS_URL = "https://mazedakhale.in/api/sms/send";
-const SMS_SENDER = "918308178738";  // your LiveOne-registered “from” number
+const SMS_SENDER = "918308178738"; // your LiveOne-registered “from” number
 
 const ResetPassword = () => {
   const navigate = useNavigate();
@@ -50,15 +49,11 @@ const ResetPassword = () => {
 
       // 2️⃣ Retrieve & decode your existing login JWT
       const storedToken = localStorage.getItem("token") || "";
-      const { phone = "" } = storedToken
-        ? jwtDecode(storedToken)
-        : {};
+      const { phone = "" } = storedToken ? jwtDecode(storedToken) : {};
 
       // 3️⃣ Normalize to E.164
-      let raw = phone.replace(/^0+/, "");             // strip leading zeros
-      const phoneE164 = raw.startsWith("91")
-        ? raw
-        : "91" + raw;
+      let raw = phone.replace(/^0+/, ""); // strip leading zeros
+      const phoneE164 = raw.startsWith("91") ? raw : "91" + raw;
 
       // 4️⃣ Build SMS text
       const smsText =
@@ -78,9 +73,7 @@ const ResetPassword = () => {
             number: phoneE164,
             message: smsText,
           }),
-        }).catch((err) =>
-          console.error("SMS send error:", err)
-        );
+        }).catch((err) => console.error("SMS send error:", err));
       }
 
       // 6️⃣ Show success and redirect

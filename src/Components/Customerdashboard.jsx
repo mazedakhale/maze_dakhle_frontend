@@ -7,7 +7,7 @@ import {
   FaFileAlt,
   FaClipboardList,
   FaSignOutAlt,
-  FaCommentDots
+  FaCommentDots,
 } from "react-icons/fa";
 import jwtDecode from "jwt-decode";
 import logo from "../assets/logo.png";
@@ -28,33 +28,52 @@ const Sidebar = ({ onNavigate }) => {
       {/* Logo Section with Full-width Underline */}
       <div className="flex flex-col items-center mb-6 relative">
         <img src={logo} alt="Logo" className="h-12 w-auto mb-2" />
-        <div className="bottom-0 left-0 w-full h-[1px] bg-[#776D6D]"></div> {/* Full-width Underline */}
+        <div className="bottom-0 left-0 w-full h-[1px] bg-[#776D6D]"></div>{" "}
+        {/* Full-width Underline */}
       </div>
 
       {/* Navigation Menu */}
       <nav className="mt-6">
         <ul>
           {[
-            { icon: <FaTachometerAlt />, label: "Dashboard", path: "/Cdashinner" },
-            { icon: <FaClipboardList />, label: "Check Application", path: "/Checkapplication" },
+            {
+              icon: <FaTachometerAlt />,
+              label: "Dashboard",
+              path: "/Cdashinner",
+            },
+            {
+              icon: <FaClipboardList />,
+              label: "Check Application",
+              path: "/Checkapplication",
+            },
             { icon: <FaFileAlt />, label: "Fill Form", path: "/Category" },
-            { icon: <FaClipboardList />, label: " Applications History", path: "/Customerhistory" },
+            {
+              icon: <FaClipboardList />,
+              label: " Applications History",
+              path: "/Customerhistory",
+            },
             // { icon: <FaClipboardList />, label: "Submit error", path: "/Adderrorrequest" },
-            { icon: <FaClipboardList />, label: "Applications", path: "/Customerapply" },
+            {
+              icon: <FaClipboardList />,
+              label: "Applications",
+              path: "/Customerapply",
+            },
             { icon: <FaCommentDots />, label: "Feedback", path: "/Feedback" },
             { icon: <FaCommentDots />, label: "Guide", path: "/Guide" },
-            { icon: <FaCommentDots />, label: "Manage Wallet", path: "/Wallet" },
-
-
+            {
+              icon: <FaCommentDots />,
+              label: "Manage Wallet",
+              path: "/Wallet",
+            },
           ].map((item, index) => (
-
             <li
               key={index}
               className={`flex items-center p-4 rounded-lg cursor-pointer transition duration-300 ease-in-out mb-4 
-            shadow-lg border border-[#111] ${activePath === item.path
-                  ? "bg-orange-500 text-white"
-                  : "bg-[#494E53] hover:bg-orange-400"
-                }`}
+            shadow-lg border border-[#111] ${
+              activePath === item.path
+                ? "bg-orange-500 text-white"
+                : "bg-[#494E53] hover:bg-orange-400"
+            }`}
               onClick={() => handleNavigation(item.path)}
             >
               <span className="mr-3 text-lg">{item.icon}</span>
@@ -65,7 +84,6 @@ const Sidebar = ({ onNavigate }) => {
       </nav>
     </div>
   );
-
 };
 
 // Customer Dashboard Component
@@ -107,19 +125,22 @@ const Customerdashboard = ({ children }) => {
           <span className="text-lg font-bold text-gray-500">
             Customer Dashboard{" "}
             {userName && (
-              <span className="text-sm text-gray-600 font-medium">({userName})</span>
+              <span className="text-sm text-gray-600 font-medium">
+                ({userName})
+              </span>
             )}
           </span>
           {/* Right‑side controls */}
           <div className="flex items-center space-x-4">
             {/* Profile icon */}
             <img
-              src={profilePicture || "https://via.placeholder.com/40x40?text=User"}
+              src={
+                profilePicture || "https://via.placeholder.com/40x40?text=User"
+              }
               alt="Profile"
               className="h-10 w-10 rounded-full cursor-pointer object-cover"
               onClick={() => navigate("/ProfilePage")}
             />
-
 
             {/* Logout Button */}
             <button
@@ -132,12 +153,10 @@ const Customerdashboard = ({ children }) => {
           </div>
         </div>
 
-
         {/* Main Content Area */}
         <div className="mt-6">{children}</div>
       </div>
     </div>
   );
 };
-
 export default Customerdashboard;

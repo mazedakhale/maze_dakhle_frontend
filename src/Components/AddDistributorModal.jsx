@@ -20,6 +20,7 @@ const AddDistributorModal = ({ isOpen, onClose, fetchDistributors }) => {
     setFormData({ ...formData, [name]: value });
   };
 
+  //Used For File Change
   const handleFileChange = (e, field) => {
     const file = e.target.files[0];
     if (file) {

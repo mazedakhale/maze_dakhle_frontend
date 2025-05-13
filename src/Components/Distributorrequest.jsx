@@ -6,7 +6,6 @@ import Swal from "sweetalert2";
 import jwtDecode from "jwt-decode";
 import { useNavigate } from "react-router-dom";
 import { FaDownload, FaTimes, FaCheck } from "react-icons/fa";
-
 const ErrorRequests = () => {
   const [errorRequests, setErrorRequests] = useState([]);
   const [certificates, setCertificates] = useState([]);
@@ -293,16 +292,17 @@ const ErrorRequests = () => {
                     </td>
                     <td className="border p-2 text-center">
                       <span
-                        className={`px-2 py-1 rounded-full text-white text-sm ${r.request_status === "Approved"
-                          ? "bg-green-500"
-                          : r.request_status === "Rejected"
+                        className={`px-2 py-1 rounded-full text-white text-sm ${
+                          r.request_status === "Approved"
+                            ? "bg-green-500"
+                            : r.request_status === "Rejected"
                             ? "bg-red-500"
                             : r.request_status === "Uploaded"
-                              ? "bg-purple-500"
-                              : r.request_status === "Completed"
-                                ? "bg-gray-500"
-                                : "bg-yellow-500"
-                          }`}
+                            ? "bg-purple-500"
+                            : r.request_status === "Completed"
+                            ? "bg-gray-500"
+                            : "bg-yellow-500"
+                        }`}
                       >
                         {r.request_status}
                       </span>

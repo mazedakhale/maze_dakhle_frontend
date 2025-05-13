@@ -218,8 +218,9 @@ const CustomerHistory = () => {
                 documents.map((doc, index) => (
                   <tr
                     key={doc.document_id}
-                    className={`${index % 2 === 0 ? "bg-[#FFFFFF]" : "bg-[#F58A3B14]"
-                      } hover:bg-orange-100 transition duration-200`}
+                    className={`${
+                      index % 2 === 0 ? "bg-[#FFFFFF]" : "bg-[#F58A3B14]"
+                    } hover:bg-orange-100 transition duration-200`}
                   >
                     <td className="px-4 py-4 border border-[#776D6DA8] text-center">
                       {index + 1}
@@ -268,7 +269,6 @@ const CustomerHistory = () => {
                     <td className="px-4 py-4 border border-[#776D6DA8] text-center">
                       {doc.phone}
                     </td>
-
                     {/* Applicant Name */}
                     <td className="px-4 py-4 border border-[#776D6DA8] text-center">
                       {doc?.document_fields ? (
@@ -305,14 +305,15 @@ const CustomerHistory = () => {
                       <div className="flex flex-col gap-1">
                         {/* Status Badge */}
                         <span
-                          className={`px-3 py-1 rounded-full text-white text-xs ${doc.status === "Approved"
-                            ? "bg-green-500"
-                            : doc.status === "Rejected"
+                          className={`px-3 py-1 rounded-full text-white text-xs ${
+                            doc.status === "Approved"
+                              ? "bg-green-500"
+                              : doc.status === "Rejected"
                               ? "bg-red-500"
                               : doc.status === "Pending"
-                                ? "bg-yellow-500"
-                                : "bg-blue-500"
-                            }`}
+                              ? "bg-yellow-500"
+                              : "bg-blue-500"
+                          }`}
                         >
                           {doc.status}
                         </span>

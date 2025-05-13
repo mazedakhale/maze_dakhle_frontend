@@ -88,7 +88,6 @@ const ErrorRequests = () => {
       if (!value) {
         return; // If user cancels, stop further execution
       }
-
       rejectionReason = value.trim();
     }
 
@@ -198,8 +197,9 @@ const ErrorRequests = () => {
                 filteredRequests.map((request, index) => (
                   <tr
                     key={request.request_id}
-                    className={`${index % 2 === 0 ? "bg-[#FFFFFF]" : "bg-[#F58A3B14]"
-                      } hover:bg-orange-100 transition duration-200`}
+                    className={`${
+                      index % 2 === 0 ? "bg-[#FFFFFF]" : "bg-[#F58A3B14]"
+                    } hover:bg-orange-100 transition duration-200`}
                   >
                     <td className="px-4 py-3 border border-[#776D6DA8] text-center">
                       {request.request_id}
@@ -231,14 +231,15 @@ const ErrorRequests = () => {
                     </td>
                     <td className="px-4 py-3 border border-[#776D6DA8] text-center">
                       <span
-                        className={`px-3 py-1 rounded-full text-white text-sm ${request.request_status === "Approved"
-                          ? "bg-green-500"
-                          : request.request_status === "Rejected"
+                        className={`px-3 py-1 rounded-full text-white text-sm ${
+                          request.request_status === "Approved"
+                            ? "bg-green-500"
+                            : request.request_status === "Rejected"
                             ? "bg-red-500"
                             : request.request_status === "Uploaded"
-                              ? "bg-purple-500"
-                              : "bg-yellow-500"
-                          }`}
+                            ? "bg-purple-500"
+                            : "bg-yellow-500"
+                        }`}
                       >
                         {request.request_status}
                       </span>

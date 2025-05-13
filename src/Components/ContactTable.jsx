@@ -11,7 +11,6 @@ const ContactTable = () => {
   const [updatedKey, setUpdatedKey] = useState("");
   const [isAdding, setIsAdding] = useState(false);
   const navigate = useNavigate();
-
   const apiUrl = "https://mazedakhale.in/api/field";
 
   // Fetch all fields

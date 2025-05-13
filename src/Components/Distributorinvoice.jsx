@@ -633,7 +633,6 @@ const InvoicePage = () => {
                 </button>
               )}
             </div>
-
             {/* Certificate */}
             <div className="flex-1">
               <label className="text-sm font-medium text-gray-700">

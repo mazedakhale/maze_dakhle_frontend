@@ -15,6 +15,7 @@ const FieldNames = () => {
     subcategory_id: "",
     document_fields: "",
   });
+
   const [editId, setEditId] = useState(null);
   const [editableField, setEditableField] = useState("");
   const [isAdding, setIsAdding] = useState(false);
@@ -194,8 +195,9 @@ const FieldNames = () => {
                 fields.map((field, index) => (
                   <tr
                     key={field.id}
-                    className={`${index % 2 === 0 ? "bg-[#FFFFFF]" : "bg-[#F58A3B14]"
-                      } hover:bg-orange-100 transition duration-200`}
+                    className={`${
+                      index % 2 === 0 ? "bg-[#FFFFFF]" : "bg-[#F58A3B14]"
+                    } hover:bg-orange-100 transition duration-200`}
                   >
                     <td className="px-4 py-3 border border-[#776D6DA8] text-center">
                       {editId === field.id ? (

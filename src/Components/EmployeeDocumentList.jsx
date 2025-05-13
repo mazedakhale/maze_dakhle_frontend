@@ -9,7 +9,6 @@ import {
   FaCheck,
   FaTimes,
 } from "react-icons/fa";
-
 const EmployeeDocumentList = () => {
   const [documents, setDocuments] = useState([]);
   const [loading, setLoading] = useState(false); // Start with loading false

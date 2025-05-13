@@ -4,7 +4,6 @@ import { FaFileInvoice, FaDownload, FaTimes } from "react-icons/fa";
 import axios from "axios";
 import jwtDecode from "jwt-decode";
 import Swal from "sweetalert2";
-
 const DlistPage = () => {
   const { state } = useLocation();
   const { categoryId, subcategoryId } = state || {};
@@ -200,8 +199,9 @@ const DlistPage = () => {
                 filteredDocuments.map((doc, idx) => (
                   <tr
                     key={doc.document_id}
-                    className={`${idx % 2 === 0 ? "bg-white" : "bg-[#F58A3B14]"
-                      } hover:bg-orange-100`}
+                    className={`${
+                      idx % 2 === 0 ? "bg-white" : "bg-[#F58A3B14]"
+                    } hover:bg-orange-100`}
                   >
                     <td className="px-4 py-2 border text-center">
                       {doc.application_id}

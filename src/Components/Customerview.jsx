@@ -4,7 +4,6 @@ import { useLocation, useParams } from "react-router-dom";
 import logo1 from "../assets/logo.png";
 import { FaFileInvoice, FaDownload, FaTimes } from "react-icons/fa"; // Document icon
 import { useNavigate } from "react-router-dom";
-
 const ApplicationView = () => {
   const { documentId } = useParams();
   const location = useLocation();
@@ -187,12 +186,13 @@ const ApplicationView = () => {
                     <div className="flex flex-col gap-1">
                       {/* Status */}
                       <span
-                        className={`px-3 py-1 rounded-full text-white text-xs ${documentData.status === "Approved"
-                          ? "bg-green-500"
-                          : documentData.status === "Rejected"
+                        className={`px-3 py-1 rounded-full text-white text-xs ${
+                          documentData.status === "Approved"
+                            ? "bg-green-500"
+                            : documentData.status === "Rejected"
                             ? "bg-red-500"
                             : "bg-yellow-500" // Default color for other statuses
-                          }`}
+                        }`}
                       >
                         {documentData.status}
                       </span>
