@@ -79,7 +79,7 @@ const Apply = () => {
     if (formData.category_id && formData.subcategory_id) {
       axios
         .get(
-          ` http://localhost:3000/required-documents/${formData.category_id}/${formData.subcategory_id}`
+          ` https://maze-backend-production.up.railway.app/required-documents/${formData.category_id}/${formData.subcategory_id}`
         )
         .then((response) => {
           if (response.data.length > 0 && response.data[0].document_names) {
@@ -104,7 +104,7 @@ const Apply = () => {
     if (formData.category_id && formData.subcategory_id) {
       axios
         .get(
-          ` http://localhost:3000/field-names/${formData.category_id}/${formData.subcategory_id}`
+          ` https://maze-backend-production.up.railway.app/field-names/${formData.category_id}/${formData.subcategory_id}`
         )
         .then((response) => {
           if (response.data.length > 0 && response.data[0].document_fields) {
@@ -239,7 +239,7 @@ const Apply = () => {
 
     try {
       const response = await axios.post(
-        " http://localhost:3000/documents/upload",
+        " https://maze-backend-production.up.railway.app/documents/upload",
         formDataToSend,
         {
           headers: { "Content-Type": "multipart/form-data" },

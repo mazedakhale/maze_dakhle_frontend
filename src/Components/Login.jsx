@@ -11,14 +11,14 @@ const Login = () => {
   const [subcategories, setSubcategories] = useState({});
   const navigate = useNavigate();
   // src/pages/Login.jsx
-  const SMS_URL = "http://localhost:3000/sms/send";
+  const SMS_URL = "https://maze-backend-production.up.railway.app/sms/send";
   const SMS_SENDER = "918308178738"; // your LiveOne “from” number
 
   // Fetch categories
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await fetch("http://localhost:3000/categories");
+        const response = await fetch("https://maze-backend-production.up.railway.app/categories");
         if (!response.ok) throw new Error("Failed to fetch categories");
         setCategories(await response.json());
       } catch (error) {
@@ -35,7 +35,7 @@ const Login = () => {
       try {
         for (const cat of categories) {
           const resp = await fetch(
-            `http://localhost:3000/subcategories/category/${cat.category_id}`
+            `https://maze-backend-production.up.railway.app/subcategories/category/${cat.category_id}`
           );
           result[cat.category_id] = resp.ok ? await resp.json() : [];
         }
@@ -61,7 +61,7 @@ const Login = () => {
     e.preventDefault();
     try {
       // ① Authenticate
-      const resp = await fetch("http://localhost:3000/users/login", {
+      const resp = await fetch("https://maze-backend-production.up.railway.app/users/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
@@ -116,7 +116,7 @@ const Login = () => {
   const handleForgot = async (e) => {
     e.preventDefault();
     try {
-      const resp = await fetch("http://localhost:3000/users/forgot-password", {
+      const resp = await fetch("https://maze-backend-production.up.railway.app/users/forgot-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: formData.email }),

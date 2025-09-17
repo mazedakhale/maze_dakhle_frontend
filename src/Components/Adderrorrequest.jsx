@@ -56,7 +56,7 @@ export default function AddCertificateRequestPage() {
 
     try {
       const resp = await axios.post(
-        "http://localhost:3000/request-errors/create",
+        "https://maze-backend-production.up.railway.app/request-errors/create",
         formData
       );
       if (resp.status === 201 || resp.status === 200) {

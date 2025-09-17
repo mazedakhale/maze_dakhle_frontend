@@ -15,7 +15,7 @@ const PrivacyPolicyTable = () => {
     policyType: "",
   });
 
-  const apiUrl = "http://localhost:3000/privacy-policy";
+  const apiUrl = "https://maze-backend-production.up.railway.app/privacy-policy";
   const navigate = useNavigate();
 
   useEffect(() => {

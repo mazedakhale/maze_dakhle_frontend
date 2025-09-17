@@ -6,7 +6,7 @@ import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 import { FaTag, FaEdit, FaTrash, FaPlus, FaTimes } from "react-icons/fa";
 
-const API_BASE = "http://localhost:3000/feedback";
+const API_BASE = "https://maze-backend-production.up.railway.app/feedback";
 
 const FeedbackList = () => {
   const [feedbackList, setFeedbackList] = useState([]);

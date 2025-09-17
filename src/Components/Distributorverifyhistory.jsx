@@ -38,7 +38,7 @@ const VerifyDocuments = () => {
   const fetchDocuments = async (distributorId) => {
     try {
       const response = await axios.get(
-        `http://localhost:3000/documents/list/${distributorId}`
+        `https://maze-backend-production.up.railway.app/documents/list/${distributorId}`
       );
 
       // Filter documents and sort by `uploaded_at` in descending order
@@ -61,7 +61,7 @@ const VerifyDocuments = () => {
   const fetchCertificates = async () => {
     try {
       console.log("Fetching certificates...");
-      const response = await axios.get("http://localhost:3000/certificates"); // Adjust URL if needed
+      const response = await axios.get("https://maze-backend-production.up.railway.app/certificates"); // Adjust URL if needed
       console.log("Certificates API Response:", response.data);
       setCertificates(response.data);
     } catch (error) {
@@ -90,7 +90,7 @@ const VerifyDocuments = () => {
         `Fetching certificate for Certificate ID: ${certificate.certificate_id}`
       );
       const response = await axios.get(
-        `http://localhost:3000/certificates/${certificate.certificate_id}`
+        `https://maze-backend-production.up.railway.app/certificates/${certificate.certificate_id}`
       );
       console.log("View Certificate API Response:", response.data);
 
@@ -148,7 +148,7 @@ const VerifyDocuments = () => {
   const handleDownloadCertificate = async (documentId, name) => {
     try {
       const response = await axios.get(
-        `http://localhost:3000/download-certificate/${documentId}`,
+        `https://maze-backend-production.up.railway.app/download-certificate/${documentId}`,
         {
           responseType: "blob", // Important to handle file downloads
         }

@@ -12,7 +12,7 @@ const AddCategory = () => {
   const [isAdding, setIsAdding] = useState(false);
   const navigate = useNavigate();
 
-  const apiUrl = "http://localhost:3000/categories";
+  const apiUrl = "https://maze-backend-production.up.railway.app/categories";
 
   useEffect(() => {
     fetchCategories();

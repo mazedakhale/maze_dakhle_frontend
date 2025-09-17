@@ -10,7 +10,7 @@ import {
 } from "../utils/formValidators";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import "../index.css";
-const SMS_URL = "http://localhost:3000/sms/send";
+const SMS_URL = "https://maze-backend-production.up.railway.app/sms/send";
 const SMS_SENDER = "918308178738"; // your LiveOne-registered “from” number
 
 const Register = () => {
@@ -419,7 +419,7 @@ const Register = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch("http://localhost:3000/categories")
+    fetch("https://maze-backend-production.up.railway.app/categories")
       .then((res) => res.json())
       .then(setCategories)
       .catch(console.error);
@@ -430,7 +430,7 @@ const Register = () => {
       const data = {};
       for (const category of categories) {
         const res = await fetch(
-          `http://localhost:3000/subcategories/category/${category.category_id}`
+          `https://maze-backend-production.up.railway.app/subcategories/category/${category.category_id}`
         );
         data[category.category_id] = res.ok ? await res.json() : [];
       }
@@ -575,7 +575,7 @@ const Register = () => {
         payload.append("profilePhoto", formData.profilePhoto);
       }
 
-      const res = await fetch("http://localhost:3000/users/register", {
+      const res = await fetch("https://maze-backend-production.up.railway.app/users/register", {
         method: "POST",
         body: payload,
       });

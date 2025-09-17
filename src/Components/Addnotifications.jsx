@@ -22,7 +22,7 @@ const NotificationManager = () => {
   // Fetch all notifications
   const fetchNotifications = async () => {
     try {
-      const response = await axios.get("http://localhost:3000/notifications"); // Adjust API URL as needed
+      const response = await axios.get("https://maze-backend-production.up.railway.app/notifications"); // Adjust API URL as needed
       setNotifications(Array.isArray(response.data) ? response.data : []);
     } catch (err) {
       console.error("Error fetching notifications:", err);
@@ -47,7 +47,7 @@ const NotificationManager = () => {
         notification_date:
           newNotification.notification_date || new Date().toISOString(),
       };
-      await axios.post("http://localhost:3000/notifications", payload);
+      await axios.post("https://maze-backend-production.up.railway.app/notifications", payload);
       fetchNotifications();
       setIsModalOpen(false);
       setNewNotification({
@@ -92,7 +92,7 @@ const NotificationManager = () => {
 
       // 2. **API call runs in background, not blocking UI**
       axios
-        .delete(`http://localhost:3000/notifications/${id}`)
+        .delete(`https://maze-backend-production.up.railway.app/notifications/${id}`)
         .then(() => {
           fetchNotifications(); // Refresh list after deletion
         })
@@ -125,7 +125,7 @@ const NotificationManager = () => {
   // Save edited notification
   const handleSaveEdit = async (id) => {
     try {
-      await axios.put(`http://localhost:3000/notifications/${id}`, editData);
+      await axios.put(`https://maze-backend-production.up.railway.app/notifications/${id}`, editData);
       setEditingId(null);
       fetchNotifications();
     } catch (err) {
@@ -137,7 +137,7 @@ const NotificationManager = () => {
   const handleToggleStatus = async (id, currentStatus) => {
     try {
       const newStatus = currentStatus === "Active" ? "Inactive" : "Active";
-      await axios.patch(`http://localhost:3000/notifications/status/${id}`, {
+      await axios.patch(`https://maze-backend-production.up.railway.app/notifications/status/${id}`, {
         notification_status: newStatus,
       });
       fetchNotifications();

@@ -10,7 +10,7 @@ const CustomerList = () => {
   const [updatedPassword, setUpdatedPassword] = useState("");
   const [isAdding, setIsAdding] = useState(false);
   const navigate = useNavigate();
-  const apiUrl = "http://localhost:3000/users/customers";
+  const apiUrl = "https://maze-backend-production.up.railway.app/users/customers";
 
   useEffect(() => {
     fetchCustomers();
@@ -33,7 +33,7 @@ const CustomerList = () => {
   const handleUpdateCustomer = async (id) => {
     try {
       if (updatedPassword) {
-        await axios.patch(`http://localhost:3000/users/password/${id}`, {
+        await axios.patch(`https://maze-backend-production.up.railway.app/users/password/${id}`, {
           newPassword: updatedPassword,
         });
       }
@@ -63,7 +63,7 @@ const CustomerList = () => {
 
     if (confirm.isConfirmed) {
       try {
-        await axios.delete(`http://localhost:3000/users/delete/${id}`);
+        await axios.delete(`https://maze-backend-production.up.railway.app/users/delete/${id}`);
         setCustomers((prev) => prev.filter((c) => c.user_id !== id));
         Swal.fire("Deleted!", "Customer removed.", "success");
       } catch (error) {
@@ -79,7 +79,7 @@ const CustomerList = () => {
       if (!customer) throw new Error("Customer not found");
 
       // Step 1: Update backend status
-      await axios.patch(`http://localhost:3000/users/status/${id}`, {
+      await axios.patch(`https://maze-backend-production.up.railway.app/users/status/${id}`, {
         status: newStatus,
       });
 
@@ -94,7 +94,7 @@ const CustomerList = () => {
       const rawPhone = customer.phone?.replace(/^0+/, "") || "";
       const phoneE164 = rawPhone.startsWith("91") ? rawPhone : "91" + rawPhone;
 
-      const SMS_URL = "http://localhost:3000/sms/send";
+      const SMS_URL = "https://maze-backend-production.up.railway.app/sms/send";
       const SMS_SENDER = "918308178738";
 
       const message =
@@ -122,7 +122,7 @@ const CustomerList = () => {
 
   const updateEditRequestStatus = async (id, newStatus) => {
     try {
-      await axios.patch(`http://localhost:3000/users/request-edit/${id}`, {
+      await axios.patch(`https://maze-backend-production.up.railway.app/users/request-edit/${id}`, {
         status: newStatus,
       });
       setCustomers((prev) =>

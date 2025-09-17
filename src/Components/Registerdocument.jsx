@@ -65,7 +65,7 @@ const RegisterDocument = () => {
     });
 
     try {
-      const response = await fetch(`http://localhost:3000/users/update/${id}`, {
+      const response = await fetch(`https://maze-backend-production.up.railway.app/users/update/${id}`, {
         method: "PUT",
         body: formDataObj,
       });

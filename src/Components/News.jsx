@@ -174,7 +174,7 @@ const News = () => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:3000/news")
+      .get("https://maze-backend-production.up.railway.app/news")
       .then((res) => setNewsList(res.data))
       .catch((err) => {
         console.error(err);

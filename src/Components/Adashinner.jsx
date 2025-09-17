@@ -155,12 +155,12 @@ const Adashinner = () => {
       try {
         // Create an array of promises for all API calls
         const promises = [
-          fetch("http://localhost:3000/statistics/counts").then((res) =>
+          fetch("https://maze-backend-production.up.railway.app/statistics/counts").then((res) =>
             res.json()
           ),
-          axios.get("http://localhost:3000/categories"),
-          axios.get("http://localhost:3000/subcategories"),
-          axios.get("http://localhost:3000/statistics/cscounts"),
+          axios.get("https://maze-backend-production.up.railway.app/categories"),
+          axios.get("https://maze-backend-production.up.railway.app/subcategories"),
+          axios.get("https://maze-backend-production.up.railway.app/statistics/cscounts"),
         ];
 
         // Wait for all promises to resolve

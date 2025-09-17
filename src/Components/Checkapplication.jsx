@@ -66,7 +66,7 @@ const SearchApplication = () => {
 
       axios
         .get(
-          `http://localhost:3000/userdashboard/fetch/${userId}/${applicationId.trim()}`,
+          `https://maze-backend-production.up.railway.app/userdashboard/fetch/${userId}/${applicationId.trim()}`,
           { cancelToken: cancelTokenRef.current.token }
         )
         .then((resp) => {

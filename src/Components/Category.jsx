@@ -9,8 +9,8 @@ const Categories = () => {
   const [subcategories, setSubcategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [isAdding, setIsAdding] = useState(false);
-  const API_BASE_URL = "http://localhost:3000/categories";
-  const SUBCATEGORIES_API_URL = "http://localhost:3000/subcategories";
+  const API_BASE_URL = "https://maze-backend-production.up.railway.app/categories";
+  const SUBCATEGORIES_API_URL = "https://maze-backend-production.up.railway.app/subcategories";
 
   useEffect(() => {
     const fetchCategories = async () => {

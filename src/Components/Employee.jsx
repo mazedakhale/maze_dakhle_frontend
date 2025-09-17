@@ -33,7 +33,7 @@ const Employee = () => {
   const fetchDocuments = async () => {
     setIsLoading(true);
     try {
-      const response = await axios.get("http://localhost:3000/employee");
+      const response = await axios.get("https://maze-backend-production.up.railway.app/employee");
       setDocuments(response.data);
     } catch (error) {
       console.error("Error fetching documents:", error);
@@ -49,7 +49,7 @@ const Employee = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await axios.get("http://localhost:3000/categories");
+      const response = await axios.get("https://maze-backend-production.up.railway.app/categories");
       setCategories(response.data);
     } catch (error) {
       console.error("Error fetching categories:", error);
@@ -60,7 +60,7 @@ const Employee = () => {
   const fetchEmployees = async () => {
     try {
       // Using the same endpoint as in EmployeeList component
-      const response = await axios.get("http://localhost:3000/users/employee");
+      const response = await axios.get("https://maze-backend-production.up.railway.app/users/employee");
       setEmployees(response.data);
     } catch (error) {
       console.error("Error fetching employees:", error);
@@ -91,7 +91,7 @@ const Employee = () => {
     if (selectedCategoryId) {
       try {
         const response = await axios.get(
-          `http://localhost:3000/subcategories/category/${selectedCategoryId}`
+          `https://maze-backend-production.up.railway.app/subcategories/category/${selectedCategoryId}`
         );
         setSubcategories(response.data);
       } catch (error) {
@@ -158,7 +158,7 @@ const Employee = () => {
           },
         });
 
-        await axios.delete(`http://localhost:3000/employee/${id}`);
+        await axios.delete(`https://maze-backend-production.up.railway.app/employee/${id}`);
 
         setDocuments((prevDocuments) =>
           prevDocuments.filter((document) => document.id !== id)
@@ -188,7 +188,7 @@ const Employee = () => {
 
     try {
       const response = await axios.get(
-        `http://localhost:3000/subcategories/category/${groupedDoc.category_id}`
+        `https://maze-backend-production.up.railway.app/subcategories/category/${groupedDoc.category_id}`
       );
       setSubcategories(response.data);
     } catch (error) {
@@ -228,10 +228,10 @@ const Employee = () => {
 
       if (editId) {
         // For edit, use the PUT endpoint with the new API format
-        await axios.put(`http://localhost:3000/employee/${editId}`, dataToSend);
+        await axios.put(`https://maze-backend-production.up.railway.app/employee/${editId}`, dataToSend);
       } else {
         // For create, use the POST endpoint with the new API format
-        await axios.post("http://localhost:3000/employee", dataToSend);
+        await axios.post("https://maze-backend-production.up.railway.app/employee", dataToSend);
       }
 
       Swal.fire({

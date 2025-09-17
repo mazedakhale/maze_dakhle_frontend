@@ -9,7 +9,7 @@ import {
   FaTimes,
 } from "react-icons/fa";
 
-const GUIDE_API_URL = "http://localhost:3000/images";
+const GUIDE_API_URL = "https://maze-backend-production.up.railway.app/images";
 
 export default function Guide() {
   const [images, setImages] = useState([]);

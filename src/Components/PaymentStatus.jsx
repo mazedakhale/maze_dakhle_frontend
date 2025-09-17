@@ -25,7 +25,7 @@ export default function PaymentStatus() {
     }
 
     const statusUrl = import.meta.env.DEV
-      ? `http://localhost:3000/payment/status?merchantOrderId=${merchantOrderId}`
+      ? `https://maze-backend-production.up.railway.app/payment/status?merchantOrderId=${merchantOrderId}`
       : `/payment/status?merchantOrderId=${merchantOrderId}`;
 
     const interval = setInterval(() => {
@@ -54,7 +54,7 @@ export default function PaymentStatus() {
             const txId = normalized.paymentDetails[0]?.transactionId;
             if (txId) {
               const cbUrl = import.meta.env.DEV
-                ? `http://localhost:3000/payment/callback`
+                ? `https://maze-backend-production.up.railway.app/payment/callback`
                 : `/payment/callback`;
 
               axios

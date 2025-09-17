@@ -19,7 +19,7 @@ const Youtube = () => {
   });
 
   const navigate = useNavigate();
-  const apiUrl = "http://localhost:3000/images";
+  const apiUrl = "https://maze-backend-production.up.railway.app/images";
 
   // Fetch all images
   const fetchImages = async () => {

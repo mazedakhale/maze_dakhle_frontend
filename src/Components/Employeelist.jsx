@@ -21,7 +21,7 @@ const EmployeeList = () => {
   });
 
   const navigate = useNavigate();
-  const apiUrl = "http://localhost:3000/users";
+  const apiUrl = "https://maze-backend-production.up.railway.app/users";
 
   useEffect(() => {
     fetchEmployees();

@@ -11,7 +11,7 @@ const ContactTable = () => {
   const [updatedKey, setUpdatedKey] = useState("");
   const [isAdding, setIsAdding] = useState(false);
   const navigate = useNavigate();
-  const apiUrl = "http://localhost:3000/field";
+  const apiUrl = "https://maze-backend-production.up.railway.app/field";
 
   // Fetch all fields
   useEffect(() => {

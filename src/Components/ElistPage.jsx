@@ -20,7 +20,7 @@ const ElistPage = () => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:3000/documents/list")
+      .get("https://maze-backend-production.up.railway.app/documents/list")
       .then((response) => {
         const sortedDocuments = response.data.documents.sort(
           (a, b) => new Date(b.uploaded_at) - new Date(a.uploaded_at)
@@ -30,18 +30,18 @@ const ElistPage = () => {
       .catch((error) => console.error("Error fetching documents:", error));
 
     axios
-      .get("http://localhost:3000/users/distributors")
+      .get("https://maze-backend-production.up.railway.app/users/distributors")
       .then((response) => setDistributors(response.data))
 
       .catch((error) => console.error("Error fetching distributors:", error));
 
     axios
-      .get("http://localhost:3000/certificates")
+      .get("https://maze-backend-production.up.railway.app/certificates")
       .then((response) => setCertificates(response.data))
       .catch((error) => console.error("Error fetching certificates:", error));
 
     axios
-      .get("http://localhost:3000/users/register")
+      .get("https://maze-backend-production.up.railway.app/users/register")
       .then((response) => setUsers(response.data))
       .catch((error) => console.error("Error fetching users:", error));
   }, []);
@@ -131,7 +131,7 @@ const ElistPage = () => {
     }
     try {
       const response = await axios.get(
-        `http://localhost:3000/certificates/${certificateId}`
+        `https://maze-backend-production.up.railway.app/certificates/${certificateId}`
       );
       if (response.data && response.data.file_url) {
         window.open(response.data.file_url, "_blank");
@@ -147,7 +147,7 @@ const ElistPage = () => {
   const handleDownloadCertificate = async (documentId, name) => {
     try {
       const response = await axios.get(
-        `http://localhost:3000/download-certificate/${documentId}`,
+        `https://maze-backend-production.up.railway.app/download-certificate/${documentId}`,
         {
           responseType: "blob", // Important to handle file downloads
         }

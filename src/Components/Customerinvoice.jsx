@@ -50,7 +50,7 @@ const InvoicePage = () => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:3000/users/distributors")
+      .get("https://maze-backend-production.up.railway.app/users/distributors")
       .then((response) => setDistributors(response.data))
       .catch((error) => console.error("Error fetching distributors:", error));
   }, []);
@@ -74,7 +74,7 @@ const InvoicePage = () => {
 
     try {
       await axios.put(
-        `http://localhost:3000/documents/update-status/${documentId}`,
+        `https://maze-backend-production.up.railway.app/documents/update-status/${documentId}`,
         {
           status: newStatus,
           rejectionReason:
@@ -115,7 +115,7 @@ const InvoicePage = () => {
 
       // Make the API call to download the ZIP file with increased timeout
       const response = await axios.get(
-        `http://localhost:3000/download/${documentId}`,
+        `https://maze-backend-production.up.railway.app/download/${documentId}`,
         {
           responseType: "blob", // Handle binary data
           timeout: 60000, // Increase timeout to 60 seconds
@@ -254,7 +254,7 @@ const InvoicePage = () => {
     if (!distributorId) return;
     try {
       await axios.put(
-        `http://localhost:3000/documents/assign-distributor/${documentId}`,
+        `https://maze-backend-production.up.railway.app/documents/assign-distributor/${documentId}`,
         {
           distributor_id: distributorId,
         }
@@ -290,7 +290,7 @@ const InvoicePage = () => {
   const fetchCertificates = async () => {
     try {
       console.log("Fetching certificates...");
-      const response = await axios.get("http://localhost:3000/certificates", {
+      const response = await axios.get("https://maze-backend-production.up.railway.app/certificates", {
         timeout: 30000,
       });
       console.log("Certificates API Response:", response.data);
@@ -302,7 +302,7 @@ const InvoicePage = () => {
   const fetchDocumentData = useCallback(async () => {
     try {
       const response = await axios.get(
-        `http://localhost:3000/singledocument/documentby/${documentId}`
+        `https://maze-backend-production.up.railway.app/singledocument/documentby/${documentId}`
       );
       const data = response.data.document;
       setDocumentData(data);
@@ -312,7 +312,7 @@ const InvoicePage = () => {
 
       if (category && subcategory) {
         const fieldNamesResponse = await axios.get(
-          `http://localhost:3000/field-names/${category}/${subcategory}`
+          `https://maze-backend-production.up.railway.app/field-names/${category}/${subcategory}`
         );
         setDocumentNames(fieldNamesResponse.data);
       }
@@ -379,7 +379,7 @@ const InvoicePage = () => {
 
       try {
         const { data: updatedDocument } = await axios.post(
-          `http://localhost:3000/documents/reupload/${documentId}`,
+          `https://maze-backend-production.up.railway.app/documents/reupload/${documentId}`,
           formData,
           { headers: { "Content-Type": "multipart/form-data" } }
         );
