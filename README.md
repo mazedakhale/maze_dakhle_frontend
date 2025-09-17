@@ -50,3 +50,4 @@ Once the build is ready, deploy it using any static hosting provider such as **V
 
 ## License
 This project is licensed under the **MIT License**.
+"# maze_dakhle_frontend" 
