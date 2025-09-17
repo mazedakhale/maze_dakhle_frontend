@@ -23,7 +23,7 @@ const Rejecteddocuments = () => {
   useEffect(() => {
     // Fetch assigned documents from the new API
     axios
-      .get(`https://mazedakhale.in/api/documents/list`)
+      .get(`http://localhost:3000/documents/list`)
       .then((response) => {
         const sortedDocuments = response.data.documents.sort(
           (a, b) => new Date(b.uploaded_at) - new Date(a.uploaded_at)
@@ -36,19 +36,19 @@ const Rejecteddocuments = () => {
 
     // Fetch distributors
     axios
-      .get(`https://mazedakhale.in/api/users/distributors`)
+      .get(`http://localhost:3000/users/distributors`)
       .then((response) => setDistributors(response.data))
       .catch((error) => console.error("Error fetching distributors:", error));
 
     // Fetch certificates
     axios
-      .get("https://mazedakhale.in/api/certificates")
+      .get("http://localhost:3000/certificates")
       .then((response) => setCertificates(response.data))
       .catch((error) => console.error("Error fetching certificates:", error));
 
     // Fetch users
     axios
-      .get("https://mazedakhale.in/api/users/register")
+      .get("http://localhost:3000/users/register")
       .then((response) => setUsers(response.data))
       .catch((error) => console.error("Error fetching users:", error));
   }, []);
@@ -65,7 +65,7 @@ const Rejecteddocuments = () => {
   const handleUpdateStatus = async (documentId, newStatus) => {
     try {
       await axios.put(
-        `https://mazedakhale.in/api/documents/update-status/${documentId}`,
+        `http://localhost:3000/documents/update-status/${documentId}`,
         {
           status: newStatus,
         }
@@ -133,7 +133,7 @@ const Rejecteddocuments = () => {
     }
     try {
       const response = await axios.get(
-        `https://mazedakhale.in/api/certificates/${certificateId}`
+        `http://localhost:3000/certificates/${certificateId}`
       );
       if (response.data && response.data.file_url) {
         window.open(response.data.file_url, "_blank");
@@ -157,7 +157,7 @@ const Rejecteddocuments = () => {
 
       // Make the API call to download the file
       const response = await axios.get(
-        `https://mazedakhale.in/api/download-certificate/${documentId}`,
+        `http://localhost:3000/download-certificate/${documentId}`,
         {
           responseType: "blob", // Important to handle file downloads
         }
@@ -208,7 +208,7 @@ const Rejecteddocuments = () => {
           formData.append("documentType", documentType);
 
           const response = await axios.post(
-            `https://mazedakhale.in/api/documents/reupload/${documentId}`,
+            `http://localhost:3000/documents/reupload/${documentId}`,
             formData,
             {
               headers: {
@@ -321,8 +321,9 @@ const Rejecteddocuments = () => {
               {filteredDocuments.map((doc, index) => (
                 <tr
                   key={doc.document_id}
-                  className={`border-t ${index % 2 === 0 ? "bg-white" : "bg-white"
-                    } hover:bg-gray-100`}
+                  className={`border-t ${
+                    index % 2 === 0 ? "bg-white" : "bg-white"
+                  } hover:bg-gray-100`}
                 >
                   <td className="border p-2 text-center">{index + 1}</td>
                   <td className="border p-2 text-center">
@@ -393,14 +394,15 @@ const Rejecteddocuments = () => {
                     <div className="flex flex-col gap-1">
                       {/* Status Badge */}
                       <span
-                        className={`px-3 py-1 rounded-full text-white text-xs ${doc.status === "Approved"
-                          ? "bg-green-500"
-                          : doc.status === "Rejected"
+                        className={`px-3 py-1 rounded-full text-white text-xs ${
+                          doc.status === "Approved"
+                            ? "bg-green-500"
+                            : doc.status === "Rejected"
                             ? "bg-red-500"
                             : doc.status === "Pending"
-                              ? "bg-yellow-500"
-                              : "bg-blue-500"
-                          }`}
+                            ? "bg-yellow-500"
+                            : "bg-blue-500"
+                        }`}
                       >
                         {doc.status}
                       </span>

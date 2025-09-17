@@ -21,7 +21,7 @@ const EmployeeList = () => {
   });
 
   const navigate = useNavigate();
-  const apiUrl = "https://mazedakhale.in/api/users";
+  const apiUrl = "http://localhost:3000/users";
 
   useEffect(() => {
     fetchEmployees();

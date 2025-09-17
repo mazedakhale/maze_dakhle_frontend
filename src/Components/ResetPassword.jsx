@@ -4,7 +4,7 @@ import { useNavigate, useLocation, Link } from "react-router-dom";
 import Swal from "sweetalert2";
 import jwtDecode from "jwt-decode";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-const SMS_URL = "https://mazedakhale.in/api/sms/send";
+const SMS_URL = "http://localhost:3000/sms/send";
 const SMS_SENDER = "918308178738"; // your LiveOne-registered “from” number
 
 const ResetPassword = () => {
@@ -32,18 +32,15 @@ const ResetPassword = () => {
 
     try {
       // 1️⃣ Call reset-password endpoint
-      const resp = await fetch(
-        "https://mazedakhale.in/api/users/reset-password",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            token: tokenParam,
-            newPassword: form.newPassword,
-            confirmPassword: form.confirmPassword,
-          }),
-        }
-      );
+      const resp = await fetch("http://localhost:3000/users/reset-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          token: tokenParam,
+          newPassword: form.newPassword,
+          confirmPassword: form.confirmPassword,
+        }),
+      });
       const data = await resp.json();
       if (!resp.ok) throw new Error(data.message || "Reset failed");
 

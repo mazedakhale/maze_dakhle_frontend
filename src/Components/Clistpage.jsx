@@ -42,13 +42,13 @@ const ClistPage = () => {
   useEffect(() => {
     if (categoryId) {
       axios
-        .get(`https://mazedakhale.in/api/categories/${categoryId}`)
+        .get(`http://localhost:3000/categories/${categoryId}`)
         .then((res) => setCategoryName(res.data.category_name))
         .catch((err) => console.error("Error loading category:", err));
     }
     if (subcategoryId) {
       axios
-        .get(`https://mazedakhale.in/api/subcategories/${subcategoryId}`)
+        .get(`http://localhost:3000/subcategories/${subcategoryId}`)
         .then((res) => setSubcategoryName(res.data.subcategory_name))
         .catch((err) => console.error("Error loading subcategory:", err));
     }
@@ -69,7 +69,7 @@ const ClistPage = () => {
 
     // Fetch all documents for this user
     axios
-      .get("https://mazedakhale.in/api/documents/list")
+      .get("http://localhost:3000/documents/list")
       .then((resp) => {
         const filtered = resp.data.documents
           .filter(
@@ -82,7 +82,7 @@ const ClistPage = () => {
 
     // Fetch certificates
     axios
-      .get("https://mazedakhale.in/api/certificates")
+      .get("http://localhost:3000/certificates")
       .then((resp) => setCertificates(resp.data))
       .catch((err) => console.error("Error fetching certificates:", err));
   }, [userId]);
@@ -90,7 +90,7 @@ const ClistPage = () => {
   // 4️⃣ If categoryId & subcategoryId are provided, fetch that subset
   useEffect(() => {
     if (userId && categoryId && subcategoryId) {
-      const url = `https://mazedakhale.in/api/documents/doc/${categoryId}/${subcategoryId}/${userId}`;
+      const url = `http://localhost:3000/documents/doc/${categoryId}/${subcategoryId}/${userId}`;
       axios
         .get(url)
         .then((resp) => setDocuments(resp.data))
@@ -112,7 +112,7 @@ const ClistPage = () => {
 
       try {
         const resp = await axios.post(
-          `https://mazedakhale.in/api/documents/reupload/${documentId}`,
+          `http://localhost:3000/documents/reupload/${documentId}`,
           fd,
           { headers: { "Content-Type": "multipart/form-data" } }
         );
@@ -147,7 +147,7 @@ const ClistPage = () => {
     if (!cert) return alert("Certificate not found");
     try {
       const resp = await axios.get(
-        `https://mazedakhale.in/api/certificates/${cert.certificate_id}`
+        `http://localhost:3000/certificates/${cert.certificate_id}`
       );
       window.open(resp.data.file_url, "_blank");
     } catch (err) {

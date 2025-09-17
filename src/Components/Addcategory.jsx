@@ -12,7 +12,7 @@ const AddCategory = () => {
   const [isAdding, setIsAdding] = useState(false);
   const navigate = useNavigate();
 
-  const apiUrl = "https://mazedakhale.in/api/categories";
+  const apiUrl = "http://localhost:3000/categories";
 
   useEffect(() => {
     fetchCategories();

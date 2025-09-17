@@ -29,8 +29,8 @@ const Sidebar = ({ onNavigate }) => {
   };
 
   return (
-    <div className="w-1/5 bg-[#FFF3E6] p-4 h-screen fixed top-0 left-0 overflow-y-auto z-50">
-      <div className="bg-white text-black rounded-xl shadow-md border border-gray w-full min-h-max pb-10">
+    <div className="w-1/5 bg-[#FFF3E6] fixed top-0 left-0 bottom-0 z-50 flex flex-col">
+      <div className="flex flex-col h-full bg-white border-r border-gray-200 rounded-tr-xl rounded-br-xl overflow-hidden shadow-md">
         <div className="flex flex-col items-center py-6">
           <img src={logo} alt="Logo" className="h-12 w-auto mb-2" />
         </div>
@@ -128,7 +128,10 @@ const Employeedashboard = ({ children }) => {
             >
               <FaRegCircleUser className="text-white" size={40} />
               {showEmail && (
-                <div className="absolute top-12 left-1/2 transform -translate-x-1/2 bg-white text-black p-2 rounded-md w-48 text-center shadow-lg">
+                <div
+                  className="absolute top-12 left-1/2 transform -translate-x-1/2 bg-white text-black p-2 rounded-md w-48 text-center shadow-lg"
+                  onClick={() => navigate("/ProfilePage")}
+                >
                   {userEmail}
                 </div>
               )}

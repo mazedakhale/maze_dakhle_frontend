@@ -35,9 +35,7 @@ const ReceiptErrorRequests = () => {
 
   const fetchErrorRequests = async () => {
     try {
-      const { data } = await axios.get(
-        "https://mazedakhale.in/api/request-errors"
-      );
+      const { data } = await axios.get("http://localhost:3000/request-errors");
       setErrorRequests(data);
     } catch (err) {
       console.error("Error fetching error requests:", err);
@@ -46,9 +44,7 @@ const ReceiptErrorRequests = () => {
 
   const fetchUsers = async () => {
     try {
-      const { data } = await axios.get(
-        "https://mazedakhale.in/api/users/register"
-      );
+      const { data } = await axios.get("http://localhost:3000/users/register");
       setUsers(data);
     } catch (err) {
       console.error("Error fetching users:", err);
@@ -58,7 +54,7 @@ const ReceiptErrorRequests = () => {
   const fetchDistributors = async () => {
     try {
       const { data } = await axios.get(
-        "https://mazedakhale.in/api/users/distributors"
+        "http://localhost:3000/users/distributors"
       );
       setDistributors(data);
     } catch (err) {
@@ -85,7 +81,7 @@ const ReceiptErrorRequests = () => {
   const handleDownloadReceipt = async (applicationId) => {
     try {
       const { data } = await axios.get(
-        `https://mazedakhale.in/api//documents/receipt/${applicationId}`
+        `http://localhost:3000//documents/receipt/${applicationId}`
       );
       const url = data.receipt_url;
       const appId = data.application_id;
@@ -114,7 +110,7 @@ const ReceiptErrorRequests = () => {
   const handleDownloadCertificate = async (applicationId) => {
     try {
       const { data } = await axios.get(
-        `https://mazedakhale.in/api/certificates/certificate/${applicationId}`
+        `http://localhost:3000/certificates/certificate/${applicationId}`
       );
       const url = data.certificate_url;
       const appId = data.application_id;
@@ -167,7 +163,7 @@ const ReceiptErrorRequests = () => {
 
     try {
       await axios.patch(
-        `https://mazedakhale.in/api/request-errors/update-status/${requestId}`,
+        `http://localhost:3000/request-errors/update-status/${requestId}`,
         { request_status: newStatus, rejectionReason }
       );
     } catch (err) {
@@ -336,16 +332,17 @@ const ReceiptErrorRequests = () => {
                     </td>
                     <td className="px-4 py-2	border text-center">
                       <span
-                        className={`px-2 py-1 rounded-full text-white text-sm ${r.request_status === "Approved"
-                          ? "bg-green-500"
-                          : r.request_status === "Rejected"
+                        className={`px-2 py-1 rounded-full text-white text-sm ${
+                          r.request_status === "Approved"
+                            ? "bg-green-500"
+                            : r.request_status === "Rejected"
                             ? "bg-red-500"
                             : r.request_status === "Uploaded"
-                              ? "bg-purple-500"
-                              : r.request_status === "Completed"
-                                ? "bg-gray-500"
-                                : "bg-yellow-500"
-                          }`}
+                            ? "bg-purple-500"
+                            : r.request_status === "Completed"
+                            ? "bg-gray-500"
+                            : "bg-yellow-500"
+                        }`}
                       >
                         {r.request_status}
                       </span>

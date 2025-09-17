@@ -6,7 +6,6 @@ import {
   FaTachometerAlt,
   FaPlus,
   FaListAlt,
-  FaSignOutAlt,
   FaNewspaper,
   FaShieldAlt,
   FaUserTie,
@@ -71,12 +70,6 @@ const Sidebar = ({ onNavigate }) => {
                 path: "/DocumentTable",
               },
               { icon: <FaNewspaper />, label: "Add News", path: "/Newstable" },
-              {
-                icon: <FaNewspaper />,
-                label: "Add Contact Info ",
-                path: "/ContactinfoTable",
-              },
-
               {
                 icon: <FaShieldAlt />,
                 label: "Add Privacy",
@@ -196,22 +189,19 @@ const Admindashboard = ({ children }) => {
   const [userEmail, setUserEmail] = useState("");
   const navigate = useNavigate();
   const [showEmail, setShowEmail] = useState(false); // Toggle email visibility
-  const [profilePicture, setProfilePicture] = useState(null); // Add state
-  const [userName, setUserName] = useState("");
 
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
       try {
         const decodedToken = jwtDecode(token);
-        setUserEmail(decodedToken.email);
-        setUserName(decodedToken.name);
-        setProfilePicture(decodedToken.profile_picture); // ✅ Extract from token
+        setUserEmail(decodedToken.email || "No email found");
       } catch (error) {
         console.error("Invalid token:", error);
       }
     }
   }, []);
+
   const handleLogout = () => {
     localStorage.removeItem("token");
     window.location.href = "/Login";
@@ -226,34 +216,28 @@ const Admindashboard = ({ children }) => {
       <div className="flex-1 p-6 ml-[00%] pt-[70px]">
         {/* Top Navbar */}
         <div className="flex items-center justify-between bg-[#F88F2A] text-white px-4 py-2 shadow-[0_3px_2px_rgba(0,0,0,0.15)] rounded-md fixed top-0 left-[20%] w-[80%] z-10 h-[73px]">
-          <span className="text-lg font-bold text-gray-500">
-            Admin Dashboard{" "}
-            {userName && (
-              <span className="text-sm text-gray-600 font-medium">
-                ({userName})
-              </span>
-            )}
+          <span className="text-lg ml-[50px] font-semibold">
+            Admin Dashboard
           </span>
 
-          {/* Right‑side controls */}
-          <div className="flex items-center space-x-4">
-            {/* Profile icon */}
-            <img
-              src={
-                profilePicture || "https://via.placeholder.com/40x40?text=User"
-              }
-              alt="Profile"
-              className="h-10 w-10 rounded-full cursor-pointer object-cover"
-              onClick={() => navigate("/ProfilePage")}
-            />
+          {/* Profile & Logout Section */}
+          <div className="flex items-center gap-6 relative">
+            {/* Profile Icon with Email Toggle */}
+            <div
+              className="relative cursor-pointer"
+              onClick={() => setShowEmail(!showEmail)}
+            >
+              <FaRegCircleUser className="text-white" size={40} />
+              {showEmail && (
+                <div className="absolute top-12 left-1/2 transform -translate-x-1/2 bg-white shadow-md text-black p-2 rounded-md w-48 text-center">
+                  {userEmail || "No Email Found"}
+                </div>
+              )}
+            </div>
 
             {/* Logout Button */}
-            <button
-              onClick={handleLogout}
-              className="bg-orange-500 hover:bg-orange-600 text-white
-                          p-2 rounded-md transition flex items-center justify-center"
-            >
-              <FaSignOutAlt className="h-6 w-6 text-white" />
+            <button onClick={handleLogout} className="p-0 m-0">
+              <IoMdLogOut className="text-white" size={40} />
             </button>
           </div>
         </div>

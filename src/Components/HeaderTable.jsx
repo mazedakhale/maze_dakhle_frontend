@@ -10,7 +10,7 @@ const HeaderTable = () => {
   const [editingItem, setEditingItem] = useState(null);
 
   const navigate = useNavigate();
-  const apiUrl = "https://mazedakhale.in/api/header";
+  const apiUrl = "http://localhost:3000/header";
 
   useEffect(() => {
     fetchHeaders();

@@ -56,7 +56,7 @@ export default function AddCertificateRequestPage() {
 
     try {
       const resp = await axios.post(
-        "https://mazedakhale.in/api/request-errors/create",
+        "http://localhost:3000/request-errors/create",
         formData
       );
       if (resp.status === 201 || resp.status === 200) {

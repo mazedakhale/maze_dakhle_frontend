@@ -20,9 +20,9 @@ import { BsStopCircle } from "react-icons/bs";
 
 import Logo from "../assets/logo.png";
 
-const API_CATEGORIES = "https://mazedakhale.in/api/categories";
-const API_SUBCATEGORIES = "https://mazedakhale.in/api/subcategories";
-const API_PRICES = "https://mazedakhale.in/api/prices";
+const API_CATEGORIES = "http://localhost:3000/categories";
+const API_SUBCATEGORIES = "http://localhost:3000/subcategories";
+const API_PRICES = "http://localhost:3000/prices";
 
 // Footer links
 const navLabels = [

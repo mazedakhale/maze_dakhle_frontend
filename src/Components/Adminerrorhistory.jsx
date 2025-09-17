@@ -21,9 +21,7 @@ const ErrorRequests = () => {
   // Fetch error requests
   const fetchErrorRequests = async () => {
     try {
-      const response = await axios.get(
-        "https://mazedakhale.in/api/request-errors"
-      );
+      const response = await axios.get("http://localhost:3000/request-errors");
       setErrorRequests(response.data);
     } catch (error) {
       console.error("Error fetching error requests:", error);
@@ -33,9 +31,7 @@ const ErrorRequests = () => {
   // Fetch certificates
   const fetchCertificates = async () => {
     try {
-      const response = await axios.get(
-        "https://mazedakhale.in/api/certificates"
-      );
+      const response = await axios.get("http://localhost:3000/certificates");
       setCertificates(response.data);
     } catch (error) {
       console.error("Error fetching certificates:", error);
@@ -59,7 +55,7 @@ const ErrorRequests = () => {
     }
     try {
       const response = await axios.get(
-        `https://mazedakhale.in/api/certificates/${certificateId}`
+        `http://localhost:3000/certificates/${certificateId}`
       );
       if (response.data && response.data.file_url) {
         window.open(response.data.file_url, "_blank");
@@ -75,7 +71,7 @@ const ErrorRequests = () => {
   const handleDownloadCertificate = async (documentId, requestName) => {
     try {
       const response = await axios.get(
-        `https://mazedakhale.in/api/download-certificate/${documentId}`,
+        `http://localhost:3000/download-certificate/${documentId}`,
         {
           responseType: "blob", // Important to handle file downloads
         }

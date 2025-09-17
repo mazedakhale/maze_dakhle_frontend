@@ -30,7 +30,7 @@ const Price = () => {
   // 1) load prices
   const fetchPrices = async () => {
     try {
-      const { data } = await axios.get("https://mazedakhale.in/api/prices");
+      const { data } = await axios.get("http://localhost:3000/prices");
       setPrices(data.map((p) => ({ ...p, amount: Number(p.amount) })));
     } catch {
       Swal.fire("Error", "Could not load prices", "error");
@@ -41,7 +41,7 @@ const Price = () => {
   const fetchCategoriesAndAllSubcats = async () => {
     try {
       const { data: cats } = await axios.get(
-        "https://mazedakhale.in/api/categories"
+        "http://localhost:3000/categories"
       );
       setCategories(cats);
 
@@ -50,7 +50,7 @@ const Price = () => {
       await Promise.all(
         cats.map(async (cat) => {
           const { data: subs } = await axios.get(
-            `https://mazedakhale.in/api/subcategories/category/${cat.category_id}`
+            `http://localhost:3000/subcategories/category/${cat.category_id}`
           );
           all.push(...subs);
         })
@@ -69,7 +69,7 @@ const Price = () => {
     }
     try {
       const { data } = await axios.get(
-        `https://mazedakhale.in/api/subcategories/category/${categoryId}`
+        `http://localhost:3000/subcategories/category/${categoryId}`
       );
       setSubcategories(data);
     } catch {
@@ -116,7 +116,7 @@ const Price = () => {
     });
     if (!confirm.isConfirmed) return;
     try {
-      await axios.delete(`https://mazedakhale.in/api/prices/${id}`);
+      await axios.delete(`http://localhost:3000/prices/${id}`);
       setPrices((p) => p.filter((x) => x.id !== id));
       Swal.fire("Deleted!", "", "success");
     } catch {
@@ -137,10 +137,10 @@ const Price = () => {
         amount: parseFloat(amount),
       };
       if (editId) {
-        await axios.put(`https://mazedakhale.in/api/prices/${editId}`, payload);
+        await axios.put(`http://localhost:3000/prices/${editId}`, payload);
         Swal.fire("Updated!", "", "success");
       } else {
-        await axios.post("https://mazedakhale.in/api/prices", payload);
+        await axios.post("http://localhost:3000/prices", payload);
         Swal.fire("Added!", "", "success");
       }
       setModalOpen(false);

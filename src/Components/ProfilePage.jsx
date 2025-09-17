@@ -10,7 +10,7 @@ import {
   isValidPassword,
 } from "../utils/formValidators"; // Import your validators
 
-const USER_API_BASE = "https://mazedakhale.in/api/users";
+const USER_API_BASE = "http://localhost:3000/users";
 const PASSWORD_API = `${USER_API_BASE}/password`;
 export default function ProfilePage() {
   const [user, setUser] = useState(null);
@@ -18,6 +18,8 @@ export default function ProfilePage() {
   const [showPass, setShowPass] = useState(false);
   const [newPass, setNewPass] = useState("");
   const [passError, setPassError] = useState("");
+  const [showImageModal, setShowImageModal] = useState(false);
+  const [modalImageSrc, setModalImageSrc] = useState("");
   const [editMode, setEditMode] = useState(false);
   const [formValues, setFormValues] = useState({
     phone: "",
@@ -52,6 +54,11 @@ export default function ProfilePage() {
     }
     setPassError("");
     return true;
+  };
+
+  const openImageModal = (src) => {
+    setModalImageSrc(src);
+    setShowImageModal(true);
   };
 
   // Phone validation
@@ -455,62 +462,36 @@ export default function ProfilePage() {
           <div className="mb-4 flex items-center">
             <span className="w-32 font-semibold">Aadhar Card:</span>
             {formValues.existingAadharPath ? (
-              <a
-                href={formValues.existingAadharPath}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-600 mr-4"
+              <button
+                type="button"
+                onClick={() => openImageModal(formValues.existingAadharPath)}
+                className="text-blue-600 underline mr-4"
               >
                 View
-              </a>
+              </button>
             ) : (
               <span className="mr-4">No file</span>
             )}
-            {editMode && (
-              <div className="flex flex-col">
-                <input
-                  type="file"
-                  accept=".pdf,.jpg,.jpeg,.png"
-                  onChange={(e) => handleFileChange(e, "aadharCard")}
-                />
-                {formValues.errors.aadharCard && (
-                  <span className="text-red-500 text-xs">
-                    {formValues.errors.aadharCard}
-                  </span>
-                )}
-              </div>
-            )}
+
+            {/* REMOVE file input field */}
           </div>
 
           {/* PAN */}
           <div className="mb-4 flex items-center">
             <span className="w-32 font-semibold">PAN Card:</span>
             {formValues.existingPanPath ? (
-              <a
-                href={formValues.existingPanPath}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-600 mr-4"
+              <button
+                type="button"
+                onClick={() => openImageModal(formValues.existingPanPath)}
+                className="text-blue-600 underline mr-4"
               >
                 View
-              </a>
+              </button>
             ) : (
               <span className="mr-4">No file</span>
             )}
-            {editMode && (
-              <div className="flex flex-col">
-                <input
-                  type="file"
-                  accept=".pdf,.jpg,.jpeg,.png"
-                  onChange={(e) => handleFileChange(e, "panCard")}
-                />
-                {formValues.errors.panCard && (
-                  <span className="text-red-500 text-xs">
-                    {formValues.errors.panCard}
-                  </span>
-                )}
-              </div>
-            )}
+
+            {/* REMOVE file input field */}
           </div>
 
           {/* Save / Cancel */}
@@ -554,6 +535,23 @@ export default function ProfilePage() {
           Back
         </button>
       </div>
+      {showImageModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white rounded p-4 relative max-w-[90vw] max-h-[90vh] overflow-auto">
+            <button
+              onClick={() => setShowImageModal(false)}
+              className="absolute top-2 right-2 text-gray-600 hover:text-black"
+            >
+              <FaTimes size={18} />
+            </button>
+            <img
+              src={modalImageSrc}
+              alt="Document Preview"
+              className="max-w-full max-h-[80vh] rounded"
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

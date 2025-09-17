@@ -14,7 +14,7 @@ const DistributorEdit = () => {
 
   useEffect(() => {
     axios
-      .get(`https://mazedakhale.in/api/users/edit/${user_id}`)
+      .get(`http://localhost:3000/users/edit/${user_id}`)
       .then((response) => {
         setFormData(response.data);
       })
@@ -30,7 +30,7 @@ const DistributorEdit = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     axios
-      .put(`https://mazedakhale.in/api/users/edit/${user_id}`, formData)
+      .put(`http://localhost:3000/users/edit/${user_id}`, formData)
       .then(() => {
         alert("Distributor updated successfully!");
         navigate("/distributor-list"); // Redirect after update

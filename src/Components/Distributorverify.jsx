@@ -41,9 +41,7 @@ const VerifyDocuments = () => {
   // Get list of certificates
   const fetchCertificates = async () => {
     try {
-      const response = await axios.get(
-        "https://mazedakhale.in/api/certificates"
-      );
+      const response = await axios.get("http://localhost:3000/certificates");
       // assume response.data is an array of certificate objects
       setCertificates(response.data);
     } catch (err) {
@@ -80,7 +78,7 @@ const VerifyDocuments = () => {
   const fetchDocuments = async (distributorId) => {
     try {
       const response = await axios.get(
-        `https://mazedakhale.in/api/documents/list/${distributorId}`
+        `http://localhost:3000/documents/list/${distributorId}`
       );
       const filtered = response.data.documents.filter(
         (doc) => doc.status !== "Sent"
@@ -138,17 +136,13 @@ const VerifyDocuments = () => {
     formData.append("name", doc.name);
 
     try {
-      await axios.post(
-        "https://mazedakhale.in/api/certificates/upload",
-        formData,
-        {
-          headers: { "Content-Type": "multipart/form-data" },
-        }
-      );
+      await axios.post("http://localhost:3000/certificates/upload", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
       // re-fetch certificates and update document status
       await fetchCertificates();
       await axios.put(
-        `https://mazedakhale.in/api/documents/update-status/${documentId}`,
+        `http://localhost:3000/documents/update-status/${documentId}`,
         { status: "Uploaded" }
       );
       setDocuments((p) =>
@@ -174,7 +168,7 @@ const VerifyDocuments = () => {
       return Swal.fire("Error", "Certificate not found", "error");
     try {
       const res = await axios.get(
-        `https://mazedakhale.in/api/certificates/${certificateId}`
+        `http://localhost:3000/certificates/${certificateId}`
       );
       if (res.data.file_url) window.open(res.data.file_url, "_blank");
       else Swal.fire("Error", "Certificate file not found", "error");

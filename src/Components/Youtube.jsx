@@ -19,7 +19,7 @@ const Youtube = () => {
   });
 
   const navigate = useNavigate();
-  const apiUrl = "https://mazedakhale.in/api/images";
+  const apiUrl = "http://localhost:3000/images";
 
   // Fetch all images
   const fetchImages = async () => {
@@ -173,8 +173,9 @@ const Youtube = () => {
                 images.map((img, i) => (
                   <tr
                     key={img.id}
-                    className={`${i % 2 === 0 ? "bg-white" : "bg-gray-50"
-                      } hover:bg-gray-100`}
+                    className={`${
+                      i % 2 === 0 ? "bg-white" : "bg-gray-50"
+                    } hover:bg-gray-100`}
                   >
                     <td className="px-4 py-2 text-center border">{img.id}</td>
                     <td className="px-4 py-2 text-center border">

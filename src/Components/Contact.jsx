@@ -10,8 +10,8 @@ const Contact = () => {
   const [fieldKeys, setFieldKeys] = useState([]);
   const [isAdding, setIsAdding] = useState(false); // fields from Field API
   const navigate = useNavigate();
-  const contactApiUrl = "https://mazedakhale.in/api/contact";
-  const fieldApiUrl = "https://mazedakhale.in/api/field";
+  const contactApiUrl = "http://localhost:3000/contact";
+  const fieldApiUrl = "http://localhost:3000/field";
 
   useEffect(() => {
     fetchData();

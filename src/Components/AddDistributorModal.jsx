@@ -87,7 +87,7 @@ const AddDistributorModal = ({ isOpen, onClose, fetchDistributors }) => {
 
     try {
       const response = await axios.post(
-        "https://mazedakhale.in/api/users/register",
+        "http://localhost:3000/users/register",
         formDataToSend,
         {
           headers: {

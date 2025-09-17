@@ -66,7 +66,7 @@ const SearchApplication = () => {
 
       axios
         .get(
-          `https://mazedakhale.in/api/userdashboard/fetch/${userId}/${applicationId.trim()}`,
+          `http://localhost:3000/userdashboard/fetch/${userId}/${applicationId.trim()}`,
           { cancelToken: cancelTokenRef.current.token }
         )
         .then((resp) => {

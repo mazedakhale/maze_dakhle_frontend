@@ -144,13 +144,13 @@ const Edashinner = () => {
       try {
         // Create an array of promises for all API calls
         const promises = [
-          fetch("https://mazedakhale.in/api/statistics/counts").then((res) =>
+          fetch("http://localhost:3000/statistics/counts").then((res) =>
             res.json()
           ),
-          axios.get("https://mazedakhale.in/api/categories"),
-          axios.get("https://mazedakhale.in/api/subcategories"),
-          axios.get("https://mazedakhale.in/api/statistics/cscounts"),
-          axios.get("https://mazedakhale.in/api/required-documents"),
+          axios.get("http://localhost:3000/categories"),
+          axios.get("http://localhost:3000/subcategories"),
+          axios.get("http://localhost:3000/statistics/cscounts"),
+          axios.get("http://localhost:3000/required-documents"),
         ];
 
         // Wait for all promises to resolve
@@ -318,7 +318,7 @@ const Edashinner = () => {
             <div
               key={card.id}
               className={`${card.color} text-white flex items-center rounded-lg shadow-md transition-transform transform hover:scale-105 cursor-pointer`}
-              onClick={card.onClick || (() => { })}
+              onClick={card.onClick || (() => {})}
               style={{ width: "320px", height: "120px" }}
             >
               {/* Icon Section with Same Background Color */}

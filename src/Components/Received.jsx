@@ -24,7 +24,7 @@ const Received = () => {
   useEffect(() => {
     // Fetch assigned documents from the new API
     axios
-      .get(`https://mazedakhale.in/api/documents/assigned-list`)
+      .get(`http://localhost:3000/documents/assigned-list`)
       .then((response) => {
         const sortedDocuments = response.data.documents.sort(
           (a, b) => new Date(b.uploaded_at) - new Date(a.uploaded_at)
@@ -39,19 +39,19 @@ const Received = () => {
 
     // Fetch distributors
     axios
-      .get(`https://mazedakhale.in/api/users/distributors`)
+      .get(`http://localhost:3000/users/distributors`)
       .then((response) => setDistributors(response.data))
       .catch((error) => console.error("Error fetching distributors:", error));
 
     // Fetch certificates
     axios
-      .get("https://mazedakhale.in/api/certificates")
+      .get("http://localhost:3000/certificates")
       .then((response) => setCertificates(response.data))
       .catch((error) => console.error("Error fetching certificates:", error));
 
     // Fetch users
     axios
-      .get("https://mazedakhale.in/api/users/register")
+      .get("http://localhost:3000/users/register")
       .then((response) => setUsers(response.data))
       .catch((error) => console.error("Error fetching users:", error));
   }, []);
@@ -104,7 +104,7 @@ const Received = () => {
 
       // Make the API call to update the status with a longer timeout
       const response = await axios.put(
-        `https://mazedakhale.in/api/documents/update-status/${documentId}`,
+        `http://localhost:3000/documents/update-status/${documentId}`,
         { status: newStatus },
         { timeout: 30000 } // Set timeout to 30 seconds
       );
@@ -209,7 +209,7 @@ const Received = () => {
     }
     try {
       const response = await axios.get(
-        `https://mazedakhale.in/api/certificates/${certificateId}`
+        `http://localhost:3000/certificates/${certificateId}`
       );
       if (response.data && response.data.file_url) {
         window.open(response.data.file_url, "_blank");
@@ -233,7 +233,7 @@ const Received = () => {
 
       // Make the API call to download the file
       const response = await axios.get(
-        `https://mazedakhale.in/api/download-certificate/${documentId}`,
+        `http://localhost:3000/download-certificate/${documentId}`,
         {
           responseType: "blob", // Important to handle file downloads
         }
@@ -289,7 +289,7 @@ const Received = () => {
       try {
         // Call the API to update the status to "Rejected" with the rejection reason
         await axios.put(
-          `https://mazedakhale.in/api/documents/update-status/${documentId}`,
+          `http://localhost:3000/documents/update-status/${documentId}`,
           {
             status: "Rejected",
             rejectionReason,
@@ -301,10 +301,10 @@ const Received = () => {
           prev.map((doc) =>
             doc.document_id === documentId
               ? {
-                ...doc,
-                status: "Rejected",
-                rejection_reason: rejectionReason,
-              }
+                  ...doc,
+                  status: "Rejected",
+                  rejection_reason: rejectionReason,
+                }
               : doc
           )
         );
@@ -409,8 +409,9 @@ const Received = () => {
               {filteredDocuments.map((doc, index) => (
                 <tr
                   key={doc.document_id}
-                  className={`border-t ${index % 2 === 0 ? "bg-white" : "bg-white"
-                    } hover:bg-gray-100`}
+                  className={`border-t ${
+                    index % 2 === 0 ? "bg-white" : "bg-white"
+                  } hover:bg-gray-100`}
                 >
                   <td className="border p-2 text-center">{index + 1}</td>
                   <td className="border p-2 text-center">
@@ -465,13 +466,13 @@ const Received = () => {
                           </p>
                         )
                       ) : // Old format (object with key-value pairs)
-                        doc.document_fields["APPLICANT NAME"] ? (
-                          <p>{doc.document_fields["APPLICANT NAME"]}</p>
-                        ) : (
-                          <p className="text-gray-500">
-                            No applicant name available
-                          </p>
-                        )
+                      doc.document_fields["APPLICANT NAME"] ? (
+                        <p>{doc.document_fields["APPLICANT NAME"]}</p>
+                      ) : (
+                        <p className="text-gray-500">
+                          No applicant name available
+                        </p>
+                      )
                     ) : (
                       <p className="text-gray-500">No fields available</p>
                     )}
@@ -488,14 +489,15 @@ const Received = () => {
                     <div className="flex flex-col gap-1">
                       {/* Status Badge */}
                       <span
-                        className={`px-3 py-1 rounded-full text-white text-xs ${doc.status === "Approved"
-                          ? "bg-green-500"
-                          : doc.status === "Rejected"
+                        className={`px-3 py-1 rounded-full text-white text-xs ${
+                          doc.status === "Approved"
+                            ? "bg-green-500"
+                            : doc.status === "Rejected"
                             ? "bg-red-500"
                             : doc.status === "Pending"
-                              ? "bg-yellow-500"
-                              : "bg-blue-500"
-                          }`}
+                            ? "bg-yellow-500"
+                            : "bg-blue-500"
+                        }`}
                       >
                         {doc.status}
                       </span>

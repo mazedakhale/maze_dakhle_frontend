@@ -94,12 +94,12 @@ const InvoicePage = () => {
 
     try {
       await axios.post(
-        `https://mazedakhale.in/api/documents/upload-receipt/${documentId}`,
+        `http://localhost:3000/documents/upload-receipt/${documentId}`,
         form,
         { headers: { "Content-Type": "multipart/form-data" }, timeout: 30000 }
       );
       await axios.put(
-        `https://mazedakhale.in/api/documents/update-status/${documentId}`,
+        `http://localhost:3000/documents/update-status/${documentId}`,
         { status: "Sent" },
         { timeout: 30000 }
       );
@@ -159,14 +159,14 @@ const InvoicePage = () => {
 
     try {
       // 1️⃣ Upload the cert file
-      await axios.post("https://mazedakhale.in/api/certificates/upload", form, {
+      await axios.post("http://localhost:3000/certificates/upload", form, {
         headers: { "Content-Type": "multipart/form-data" },
         timeout: 30000,
       });
 
       // 2️⃣ THEN update the document status
       await axios.put(
-        `https://mazedakhale.in/api/documents/update-status/${documentId}`,
+        `http://localhost:3000/documents/update-status/${documentId}`,
         { status: "Uploaded" },
         { timeout: 30000 }
       );
@@ -203,7 +203,7 @@ const InvoicePage = () => {
 
     try {
       const response = await axios.get(
-        `https://mazedakhale.in/api/download/all/${documentId}`,
+        `http://localhost:3000/download/all/${documentId}`,
         {
           responseType: "blob",
           timeout: 120000,
@@ -228,8 +228,8 @@ const InvoicePage = () => {
       if (!filename) {
         const fld = Array.isArray(documentData.document_fields)
           ? documentData.document_fields.find(
-            (f) => f.field_name === "APPLICANT NAME"
-          )
+              (f) => f.field_name === "APPLICANT NAME"
+            )
           : null;
         filename = fld?.field_value
           ? `${fld.field_value.replace(/\s+/g, "_")}.zip`
@@ -285,7 +285,7 @@ const InvoicePage = () => {
           .map((doc) => documentNames[doc.document_type] || doc.document_type),
       };
       await axios.put(
-        `https://mazedakhale.in/api/documents/update-status/${documentId}`,
+        `http://localhost:3000/documents/update-status/${documentId}`,
         payload,
         { timeout: 30000 }
       );
@@ -309,7 +309,7 @@ const InvoicePage = () => {
   // --- Fetchers & effects ---
   const fetchCertificates = useCallback(async () => {
     try {
-      const res = await axios.get("https://mazedakhale.in/api/certificates", {
+      const res = await axios.get("http://localhost:3000/certificates", {
         timeout: 30000,
       });
       setCertificates(res.data);
@@ -321,7 +321,7 @@ const InvoicePage = () => {
   const fetchDocumentData = useCallback(async () => {
     try {
       const res = await axios.get(
-        `https://mazedakhale.in/api/singledocument/documentby/${documentId}`
+        `http://localhost:3000/singledocument/documentby/${documentId}`
       );
       const doc = res.data.document;
       setDocumentData(doc);
@@ -330,7 +330,7 @@ const InvoicePage = () => {
       const sub = stateSubcategoryId || doc.subcategory_id;
       if (cat && sub) {
         const fn = await axios.get(
-          `https://mazedakhale.in/api/field-names/${cat}/${sub}`
+          `http://localhost:3000/field-names/${cat}/${sub}`
         );
         setDocumentNames(fn.data);
       }
@@ -345,10 +345,10 @@ const InvoicePage = () => {
     if (token) {
       try {
         setUserEmail(jwtDecode(token).email);
-      } catch { }
+      } catch {}
     }
     axios
-      .get("https://mazedakhale.in/api/users/distributors")
+      .get("http://localhost:3000/users/distributors")
       .then((r) => setDistributors(r.data))
       .catch(console.error);
 
@@ -618,8 +618,9 @@ const InvoicePage = () => {
                 <button
                   onClick={() => {
                     const ext = documentData.receipt_url.split(".").pop();
-                    const name = `${documentData.name || "document"
-                      }_receipt.${ext}`;
+                    const name = `${
+                      documentData.name || "document"
+                    }_receipt.${ext}`;
                     const link = document.createElement("a");
                     link.href = documentData.receipt_url;
                     link.download = name;
@@ -661,18 +662,18 @@ const InvoicePage = () => {
               {certificates.some(
                 (c) => String(c.document_id) === String(documentId)
               ) && (
-                  <button
-                    onClick={() => {
-                      const cert = certificates.find(
-                        (c) => String(c.document_id) === String(documentId)
-                      );
-                      window.open(cert.file_url, "_blank");
-                    }}
-                    className="bg-[#F58A3B] text-white px-4 py-2 rounded flex items-center mt-2 w-full"
-                  >
-                    <FaFileAlt className="mr-2" /> View Certificate
-                  </button>
-                )}
+                <button
+                  onClick={() => {
+                    const cert = certificates.find(
+                      (c) => String(c.document_id) === String(documentId)
+                    );
+                    window.open(cert.file_url, "_blank");
+                  }}
+                  className="bg-[#F58A3B] text-white px-4 py-2 rounded flex items-center mt-2 w-full"
+                >
+                  <FaFileAlt className="mr-2" /> View Certificate
+                </button>
+              )}
             </div>
           </div>
 

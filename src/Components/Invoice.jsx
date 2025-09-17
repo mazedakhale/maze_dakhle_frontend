@@ -88,14 +88,14 @@ const InvoicePage = () => {
 
   useEffect(() => {
     axios
-      .get("https://mazedakhale.in/api/users/distributors")
+      .get("http://localhost:3000/users/distributors")
       .then((response) => setDistributors(response.data))
       .catch((error) => console.error("Error fetching distributors:", error));
   }, []);
   const fetchDocumentData = useCallback(async () => {
     try {
       const response = await axios.get(
-        `https://mazedakhale.in/api/singledocument/documentby/${documentId}`
+        `http://localhost:3000/singledocument/documentby/${documentId}`
       );
       const data = response.data.document;
       setDocumentData(data);
@@ -105,7 +105,7 @@ const InvoicePage = () => {
 
       if (category && subcategory) {
         const fieldNamesResponse = await axios.get(
-          `https://mazedakhale.in/api/field-names/${category}/${subcategory}`
+          `http://localhost:3000/field-names/${category}/${subcategory}`
         );
         setDocumentNames(fieldNamesResponse.data);
       }
@@ -148,7 +148,7 @@ const InvoicePage = () => {
       console.log("Payload:", payload); // Debug: Log the payload
 
       const response = await axios.put(
-        `https://mazedakhale.in/api/documents/update-status/${documentId}`,
+        `http://localhost:3000/documents/update-status/${documentId}`,
         payload,
         {
           timeout: 30000, // Increase timeout to 30 seconds
@@ -191,7 +191,7 @@ const InvoicePage = () => {
 
       // Make the API call to download the ZIP file with increased timeout
       const response = await axios.get(
-        `https://mazedakhale.in/api/download/${documentId}`,
+        `http://localhost:3000/download/${documentId}`,
         {
           responseType: "blob", // Handle binary data
           timeout: 60000, // Increase timeout to 60 seconds
@@ -348,7 +348,7 @@ const InvoicePage = () => {
       setIsProcessing(true);
 
       const assignResponse = await axios.put(
-        `https://mazedakhale.in/api/documents/assign-distributor/${documentId}`,
+        `http://localhost:3000/documents/assign-distributor/${documentId}`,
         {
           distributor_id: distributorId,
           remark: distributorRemark,
@@ -357,7 +357,7 @@ const InvoicePage = () => {
       console.log("Assign Distributor Response:", assignResponse.data);
 
       const statusResponse = await axios.put(
-        `https://mazedakhale.in/api/documents/update-status/${documentId}`,
+        `http://localhost:3000/documents/update-status/${documentId}`,
         {
           status: "Approved",
         }

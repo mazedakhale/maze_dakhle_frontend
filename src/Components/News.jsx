@@ -174,7 +174,7 @@ const News = () => {
 
   useEffect(() => {
     axios
-      .get("https://mazedakhale.in/api/news")
+      .get("http://localhost:3000/news")
       .then((res) => setNewsList(res.data))
       .catch((err) => {
         console.error(err);

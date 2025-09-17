@@ -11,7 +11,7 @@ const NewsTable = () => {
   const [editingItem, setEditingItem] = useState(null);
 
   const navigate = useNavigate();
-  const apiUrl = "https://mazedakhale.in/api/news";
+  const apiUrl = "http://localhost:3000/news";
 
   useEffect(() => {
     fetchNews();
@@ -126,8 +126,9 @@ const NewsTable = () => {
                 newsList.map((item, idx) => (
                   <tr
                     key={item.id}
-                    className={`${idx % 2 === 0 ? "bg-white" : "bg-gray-50"
-                      } hover:bg-orange-50 transition-colors`}
+                    className={`${
+                      idx % 2 === 0 ? "bg-white" : "bg-gray-50"
+                    } hover:bg-orange-50 transition-colors`}
                   >
                     <td className="px-4 py-3 border border-gray-300 text-center">
                       {item.id}

@@ -46,7 +46,7 @@ const DistributorList = () => {
 
   const navigate = useNavigate();
 
-  const apiUrl = "https://mazedakhale.in/api/users/distributors";
+  const apiUrl = "http://localhost:3000/users/distributors";
 
   useEffect(() => {
     fetchDistributors();
@@ -69,7 +69,7 @@ const DistributorList = () => {
   const checkEmailExists = async (email) => {
     try {
       const response = await axios.get(
-        `https://mazedakhale.in/api/users/check-email/${email}`,
+        `http://localhost:3000/users/check-email/${email}`,
         { timeout: 30000 }
       );
       return response.data.exists;
@@ -301,7 +301,7 @@ const DistributorList = () => {
 
     try {
       const response = await axios.post(
-        "https://mazedakhale.in/api/users/register",
+        "http://localhost:3000/users/register",
         formDataToSend,
         {
           headers: {
@@ -352,7 +352,7 @@ const DistributorList = () => {
     try {
       if (updatedPassword) {
         await axios.patch(
-          `https://mazedakhale.in/api/users/password/${id}`,
+          `http://localhost:3000/users/password/${id}`,
           { newPassword: updatedPassword },
           { timeout: 30000 }
         );
@@ -415,7 +415,7 @@ const DistributorList = () => {
       });
 
       try {
-        await axios.delete(`https://mazedakhale.in/api/users/delete/${id}`, {
+        await axios.delete(`http://localhost:3000/users/delete/${id}`, {
           timeout: 30000,
         });
 
@@ -449,7 +449,7 @@ const DistributorList = () => {
       );
 
       await axios.patch(
-        `https://mazedakhale.in/api/users/status/${id}`,
+        `http://localhost:3000/users/status/${id}`,
         { status: newStatus },
         { timeout: 30000 }
       );
@@ -472,7 +472,7 @@ const DistributorList = () => {
   };
   const updateEditRequestStatus = async (id, newStatus) => {
     try {
-      await axios.patch(`https://mazedakhale.in/api/users/request-edit/${id}`, {
+      await axios.patch(`http://localhost:3000/users/request-edit/${id}`, {
         status: newStatus,
       });
       setDistributors((prev) =>
