@@ -28,7 +28,11 @@ const CompletedApplicationsList = () => {
     const fetchCompletedDocuments = async () => {
       try {
         const response = await axios.get(
+<<<<<<< Updated upstream
           `https://maze-backend-production.up.railway.app/userdashboard/completed/${userId}`
+=======
+          `http://maze-backend-production.up.railway.app/userdashboard/completed/${userId}`
+>>>>>>> Stashed changes
         );
         const sortedDocs = response.data.sort(
           (a, b) => new Date(b.uploaded_at) - new Date(a.uploaded_at)
@@ -41,7 +45,11 @@ const CompletedApplicationsList = () => {
 
     const fetchCertificates = async () => {
       try {
+<<<<<<< Updated upstream
         const response = await axios.get("https://maze-backend-production.up.railway.app/certificates");
+=======
+        const response = await axios.get("http://maze-backend-production.up.railway.app/certificates");
+>>>>>>> Stashed changes
         setCertificates(response.data);
       } catch (error) {
         console.error("Error fetching certificates:", error);
@@ -78,7 +86,11 @@ const CompletedApplicationsList = () => {
 
     try {
       const response = await axios.get(
+<<<<<<< Updated upstream
         `https://maze-backend-production.up.railway.app/certificates/${certificateId}`
+=======
+        `http://maze-backend-production.up.railway.app/certificates/${certificateId}`
+>>>>>>> Stashed changes
       );
 
       if (response.data && response.data.file_url) {

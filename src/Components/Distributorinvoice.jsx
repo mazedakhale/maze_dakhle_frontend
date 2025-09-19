@@ -94,12 +94,20 @@ const InvoicePage = () => {
 
     try {
       await axios.post(
+<<<<<<< Updated upstream
         `https://maze-backend-production.up.railway.app/documents/upload-receipt/${documentId}`,
+=======
+        `http://maze-backend-production.up.railway.app/documents/upload-receipt/${documentId}`,
+>>>>>>> Stashed changes
         form,
         { headers: { "Content-Type": "multipart/form-data" }, timeout: 30000 }
       );
       await axios.put(
+<<<<<<< Updated upstream
         `https://maze-backend-production.up.railway.app/documents/update-status/${documentId}`,
+=======
+        `http://maze-backend-production.up.railway.app/documents/update-status/${documentId}`,
+>>>>>>> Stashed changes
         { status: "Sent" },
         { timeout: 30000 }
       );
@@ -159,14 +167,22 @@ const InvoicePage = () => {
 
     try {
       // 1️⃣ Upload the cert file
+<<<<<<< Updated upstream
       await axios.post("https://maze-backend-production.up.railway.app/certificates/upload", form, {
+=======
+      await axios.post("http://maze-backend-production.up.railway.app/certificates/upload", form, {
+>>>>>>> Stashed changes
         headers: { "Content-Type": "multipart/form-data" },
         timeout: 30000,
       });
 
       // 2️⃣ THEN update the document status
       await axios.put(
+<<<<<<< Updated upstream
         `https://maze-backend-production.up.railway.app/documents/update-status/${documentId}`,
+=======
+        `http://maze-backend-production.up.railway.app/documents/update-status/${documentId}`,
+>>>>>>> Stashed changes
         { status: "Uploaded" },
         { timeout: 30000 }
       );
@@ -203,7 +219,11 @@ const InvoicePage = () => {
 
     try {
       const response = await axios.get(
+<<<<<<< Updated upstream
         `https://maze-backend-production.up.railway.app/download/all/${documentId}`,
+=======
+        `http://maze-backend-production.up.railway.app/download/all/${documentId}`,
+>>>>>>> Stashed changes
         {
           responseType: "blob",
           timeout: 120000,
@@ -285,7 +305,11 @@ const InvoicePage = () => {
           .map((doc) => documentNames[doc.document_type] || doc.document_type),
       };
       await axios.put(
+<<<<<<< Updated upstream
         `https://maze-backend-production.up.railway.app/documents/update-status/${documentId}`,
+=======
+        `http://maze-backend-production.up.railway.app/documents/update-status/${documentId}`,
+>>>>>>> Stashed changes
         payload,
         { timeout: 30000 }
       );
@@ -309,7 +333,11 @@ const InvoicePage = () => {
   // --- Fetchers & effects ---
   const fetchCertificates = useCallback(async () => {
     try {
+<<<<<<< Updated upstream
       const res = await axios.get("https://maze-backend-production.up.railway.app/certificates", {
+=======
+      const res = await axios.get("http://maze-backend-production.up.railway.app/certificates", {
+>>>>>>> Stashed changes
         timeout: 30000,
       });
       setCertificates(res.data);
@@ -321,7 +349,11 @@ const InvoicePage = () => {
   const fetchDocumentData = useCallback(async () => {
     try {
       const res = await axios.get(
+<<<<<<< Updated upstream
         `https://maze-backend-production.up.railway.app/singledocument/documentby/${documentId}`
+=======
+        `http://maze-backend-production.up.railway.app/singledocument/documentby/${documentId}`
+>>>>>>> Stashed changes
       );
       const doc = res.data.document;
       setDocumentData(doc);
@@ -330,7 +362,11 @@ const InvoicePage = () => {
       const sub = stateSubcategoryId || doc.subcategory_id;
       if (cat && sub) {
         const fn = await axios.get(
+<<<<<<< Updated upstream
           `https://maze-backend-production.up.railway.app/field-names/${cat}/${sub}`
+=======
+          `http://maze-backend-production.up.railway.app/field-names/${cat}/${sub}`
+>>>>>>> Stashed changes
         );
         setDocumentNames(fn.data);
       }
@@ -348,7 +384,11 @@ const InvoicePage = () => {
       } catch {}
     }
     axios
+<<<<<<< Updated upstream
       .get("https://maze-backend-production.up.railway.app/users/distributors")
+=======
+      .get("http://maze-backend-production.up.railway.app/users/distributors")
+>>>>>>> Stashed changes
       .then((r) => setDistributors(r.data))
       .catch(console.error);
 

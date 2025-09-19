@@ -39,7 +39,11 @@ const Dsentlist = () => {
   const fetchDocuments = async (distributorId) => {
     try {
       const response = await axios.get(
+<<<<<<< Updated upstream
         `https://maze-backend-production.up.railway.app/documents/list/${distributorId}`
+=======
+        `http://maze-backend-production.up.railway.app/documents/list/${distributorId}`
+>>>>>>> Stashed changes
       );
 
       // Filter documents with status "Sent" and sort by `uploaded_at` in descending order
@@ -57,7 +61,11 @@ const Dsentlist = () => {
   const fetchCertificates = async () => {
     try {
       console.log("Fetching certificates...");
+<<<<<<< Updated upstream
       const response = await axios.get("https://maze-backend-production.up.railway.app/certificates"); // Adjust URL if needed
+=======
+      const response = await axios.get("http://maze-backend-production.up.railway.app/certificates"); // Adjust URL if needed
+>>>>>>> Stashed changes
       console.log("Certificates API Response:", response.data);
       setCertificates(response.data);
     } catch (error) {
@@ -86,7 +94,11 @@ const Dsentlist = () => {
         `Fetching certificate for Certificate ID: ${certificate.certificate_id}`
       );
       const response = await axios.get(
+<<<<<<< Updated upstream
         `https://maze-backend-production.up.railway.app/certificates/${certificate.certificate_id}`
+=======
+        `http://maze-backend-production.up.railway.app/certificates/${certificate.certificate_id}`
+>>>>>>> Stashed changes
       );
       console.log("View Certificate API Response:", response.data);
 
@@ -144,7 +156,11 @@ const Dsentlist = () => {
   const handleDownloadCertificate = async (documentId, name) => {
     try {
       const response = await axios.get(
+<<<<<<< Updated upstream
         `https://maze-backend-production.up.railway.app/download-certificate/${documentId}`,
+=======
+        `http://maze-backend-production.up.railway.app/download-certificate/${documentId}`,
+>>>>>>> Stashed changes
         {
           responseType: "blob", // Important to handle file downloads
         }

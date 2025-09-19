@@ -21,7 +21,11 @@ const ErrorRequests = () => {
   // Fetch error requests
   const fetchErrorRequests = async () => {
     try {
+<<<<<<< Updated upstream
       const response = await axios.get("https://maze-backend-production.up.railway.app/request-errors");
+=======
+      const response = await axios.get("http://maze-backend-production.up.railway.app/request-errors");
+>>>>>>> Stashed changes
       setErrorRequests(response.data);
     } catch (error) {
       console.error("Error fetching error requests:", error);
@@ -31,7 +35,11 @@ const ErrorRequests = () => {
   // Fetch certificates
   const fetchCertificates = async () => {
     try {
+<<<<<<< Updated upstream
       const response = await axios.get("https://maze-backend-production.up.railway.app/certificates");
+=======
+      const response = await axios.get("http://maze-backend-production.up.railway.app/certificates");
+>>>>>>> Stashed changes
       setCertificates(response.data);
     } catch (error) {
       console.error("Error fetching certificates:", error);
@@ -55,7 +63,11 @@ const ErrorRequests = () => {
     }
     try {
       const response = await axios.get(
+<<<<<<< Updated upstream
         `https://maze-backend-production.up.railway.app/certificates/${certificateId}`
+=======
+        `http://maze-backend-production.up.railway.app/certificates/${certificateId}`
+>>>>>>> Stashed changes
       );
       if (response.data && response.data.file_url) {
         window.open(response.data.file_url, "_blank");
@@ -71,7 +83,11 @@ const ErrorRequests = () => {
   const handleDownloadCertificate = async (documentId, requestName) => {
     try {
       const response = await axios.get(
+<<<<<<< Updated upstream
         `https://maze-backend-production.up.railway.app/download-certificate/${documentId}`,
+=======
+        `http://maze-backend-production.up.railway.app/download-certificate/${documentId}`,
+>>>>>>> Stashed changes
         {
           responseType: "blob", // Important to handle file downloads
         }

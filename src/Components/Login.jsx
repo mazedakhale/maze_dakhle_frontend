@@ -11,14 +11,22 @@ const Login = () => {
   const [subcategories, setSubcategories] = useState({});
   const navigate = useNavigate();
   // src/pages/Login.jsx
+<<<<<<< Updated upstream
   const SMS_URL = "https://maze-backend-production.up.railway.app/sms/send";
+=======
+  const SMS_URL = "http://maze-backend-production.up.railway.app/sms/send";
+>>>>>>> Stashed changes
   const SMS_SENDER = "918308178738"; // your LiveOne “from” number
 
   // Fetch categories
   useEffect(() => {
     const fetchCategories = async () => {
       try {
+<<<<<<< Updated upstream
         const response = await fetch("https://maze-backend-production.up.railway.app/categories");
+=======
+        const response = await fetch("http://maze-backend-production.up.railway.app/categories");
+>>>>>>> Stashed changes
         if (!response.ok) throw new Error("Failed to fetch categories");
         setCategories(await response.json());
       } catch (error) {
@@ -35,7 +43,11 @@ const Login = () => {
       try {
         for (const cat of categories) {
           const resp = await fetch(
+<<<<<<< Updated upstream
             `https://maze-backend-production.up.railway.app/subcategories/category/${cat.category_id}`
+=======
+            `http://maze-backend-production.up.railway.app/subcategories/category/${cat.category_id}`
+>>>>>>> Stashed changes
           );
           result[cat.category_id] = resp.ok ? await resp.json() : [];
         }
@@ -61,7 +73,11 @@ const Login = () => {
     e.preventDefault();
     try {
       // ① Authenticate
+<<<<<<< Updated upstream
       const resp = await fetch("https://maze-backend-production.up.railway.app/users/login", {
+=======
+      const resp = await fetch("http://maze-backend-production.up.railway.app/users/login", {
+>>>>>>> Stashed changes
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
@@ -116,7 +132,11 @@ const Login = () => {
   const handleForgot = async (e) => {
     e.preventDefault();
     try {
+<<<<<<< Updated upstream
       const resp = await fetch("https://maze-backend-production.up.railway.app/users/forgot-password", {
+=======
+      const resp = await fetch("http://maze-backend-production.up.railway.app/users/forgot-password", {
+>>>>>>> Stashed changes
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: formData.email }),

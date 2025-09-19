@@ -20,9 +20,15 @@ import { BsStopCircle } from "react-icons/bs";
 
 import Logo from "../assets/logo.png";
 
+<<<<<<< Updated upstream
 const API_CATEGORIES = "https://maze-backend-production.up.railway.app/categories";
 const API_SUBCATEGORIES = "https://maze-backend-production.up.railway.app/subcategories";
 const API_PRICES = "https://maze-backend-production.up.railway.app/prices";
+=======
+const API_CATEGORIES = "http://maze-backend-production.up.railway.app/categories";
+const API_SUBCATEGORIES = "http://maze-backend-production.up.railway.app/subcategories";
+const API_PRICES = "http://maze-backend-production.up.railway.app/prices";
+>>>>>>> Stashed changes
 
 // Footer links
 const navLabels = [

@@ -32,7 +32,11 @@ const CustomerHistory = () => {
   useEffect(() => {
     if (userId) {
       axios
+<<<<<<< Updated upstream
         .get(` https://maze-backend-production.up.railway.app/documents/list`)
+=======
+        .get(` http://maze-backend-production.up.railway.app/documents/list`)
+>>>>>>> Stashed changes
         .then((response) => {
           const allDocuments = response.data.documents;
           // Filter documents where status is "Completed"
@@ -46,7 +50,11 @@ const CustomerHistory = () => {
         .catch((error) => console.error("Error fetching documents:", error));
 
       axios
+<<<<<<< Updated upstream
         .get(" https://maze-backend-production.up.railway.app/certificates")
+=======
+        .get(" http://maze-backend-production.up.railway.app/certificates")
+>>>>>>> Stashed changes
         .then((response) => setCertificates(response.data))
         .catch((error) => console.error("Error fetching certificates:", error));
     }
@@ -92,7 +100,11 @@ const CustomerHistory = () => {
 
     try {
       const response = await axios.get(
+<<<<<<< Updated upstream
         ` https://maze-backend-production.up.railway.app/certificates/${certificateId}`
+=======
+        ` http://maze-backend-production.up.railway.app/certificates/${certificateId}`
+>>>>>>> Stashed changes
       );
 
       if (response.data && response.data.file_url) {
@@ -109,7 +121,11 @@ const CustomerHistory = () => {
   const handleDownloadCertificate = async (documentId, name) => {
     try {
       const response = await axios.get(
+<<<<<<< Updated upstream
         ` https://maze-backend-production.up.railway.app/download-certificate/${documentId}`,
+=======
+        ` http://maze-backend-production.up.railway.app/download-certificate/${documentId}`,
+>>>>>>> Stashed changes
         {
           responseType: "blob", // Important to handle file downloads
         }

@@ -56,7 +56,11 @@ export default function AddCertificateRequestPage() {
 
     try {
       const resp = await axios.post(
+<<<<<<< Updated upstream
         "https://maze-backend-production.up.railway.app/request-errors/create",
+=======
+        "http://maze-backend-production.up.railway.app/request-errors/create",
+>>>>>>> Stashed changes
         formData
       );
       if (resp.status === 201 || resp.status === 200) {

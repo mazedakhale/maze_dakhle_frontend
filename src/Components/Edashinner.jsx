@@ -144,6 +144,7 @@ const Edashinner = () => {
       try {
         // Create an array of promises for all API calls
         const promises = [
+<<<<<<< Updated upstream
           fetch("https://maze-backend-production.up.railway.app/statistics/counts").then((res) =>
             res.json()
           ),
@@ -151,6 +152,15 @@ const Edashinner = () => {
           axios.get("https://maze-backend-production.up.railway.app/subcategories"),
           axios.get("https://maze-backend-production.up.railway.app/statistics/cscounts"),
           axios.get("https://maze-backend-production.up.railway.app/required-documents"),
+=======
+          fetch("http://maze-backend-production.up.railway.app/statistics/counts").then((res) =>
+            res.json()
+          ),
+          axios.get("http://maze-backend-production.up.railway.app/categories"),
+          axios.get("http://maze-backend-production.up.railway.app/subcategories"),
+          axios.get("http://maze-backend-production.up.railway.app/statistics/cscounts"),
+          axios.get("http://maze-backend-production.up.railway.app/required-documents"),
+>>>>>>> Stashed changes
         ];
 
         // Wait for all promises to resolve

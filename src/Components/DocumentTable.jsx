@@ -21,7 +21,11 @@ const DocumentTable = () => {
 
   const fetchDocuments = async () => {
     try {
+<<<<<<< Updated upstream
       const { data } = await axios.get("https://maze-backend-production.up.railway.app/document-types");
+=======
+      const { data } = await axios.get("http://maze-backend-production.up.railway.app/document-types");
+>>>>>>> Stashed changes
       setDocuments(data);
     } catch (error) {
       console.error("Error fetching documents:", error);
@@ -36,11 +40,19 @@ const DocumentTable = () => {
     try {
       if (editingDoc) {
         await axios.put(
+<<<<<<< Updated upstream
           `https://maze-backend-production.up.railway.app/document-types/${editingDoc.doc_type_id}`,
           formData
         );
       } else {
         await axios.post("https://maze-backend-production.up.railway.app/document-types/", formData);
+=======
+          `http://maze-backend-production.up.railway.app/document-types/${editingDoc.doc_type_id}`,
+          formData
+        );
+      } else {
+        await axios.post("http://maze-backend-production.up.railway.app/document-types/", formData);
+>>>>>>> Stashed changes
       }
       setIsModalOpen(false);
       setEditingDoc(null);
@@ -65,7 +77,11 @@ const DocumentTable = () => {
     });
     if (res.isConfirmed) {
       try {
+<<<<<<< Updated upstream
         await axios.delete(`https://maze-backend-production.up.railway.app/document-types/${id}`);
+=======
+        await axios.delete(`http://maze-backend-production.up.railway.app/document-types/${id}`);
+>>>>>>> Stashed changes
         fetchDocuments();
         Swal.fire("Deleted!", "Document has been deleted.", "success");
       } catch {

@@ -45,7 +45,11 @@ const CustomerApply = () => {
       "Uploaded",
     ];
     axios
+<<<<<<< Updated upstream
       .get("https://maze-backend-production.up.railway.app/documents/list")
+=======
+      .get("http://maze-backend-production.up.railway.app/documents/list")
+>>>>>>> Stashed changes
       .then((response) => {
         const allDocs = response.data.documents;
         const filtered = allDocs
@@ -59,7 +63,11 @@ const CustomerApply = () => {
       .catch((err) => console.error("Error fetching documents:", err));
 
     axios
+<<<<<<< Updated upstream
       .get("https://maze-backend-production.up.railway.app/certificates")
+=======
+      .get("http://maze-backend-production.up.railway.app/certificates")
+>>>>>>> Stashed changes
       .then((res) => setCertificates(res.data))
       .catch((err) => console.error("Error fetching certificates:", err));
   }, [userId]);
@@ -127,7 +135,11 @@ const CustomerApply = () => {
     }
     try {
       const { data } = await axios.get(
+<<<<<<< Updated upstream
         `https://maze-backend-production.up.railway.app/certificates/${cert.certificate_id}`
+=======
+        `http://maze-backend-production.up.railway.app/certificates/${cert.certificate_id}`
+>>>>>>> Stashed changes
       );
       if (data.file_url) window.open(data.file_url, "_blank");
       else throw new Error("No file URL");

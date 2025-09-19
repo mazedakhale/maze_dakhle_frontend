@@ -17,7 +17,11 @@ const ContactInfoTable = () => {
     email: "",
     address: "",
   });
+<<<<<<< Updated upstream
   const apiUrl = "https://maze-backend-production.up.railway.app/contact-info"; // Replace with your actual backend API
+=======
+  const apiUrl = "http://maze-backend-production.up.railway.app/contact-info"; // Replace with your actual backend API
+>>>>>>> Stashed changes
 
   useEffect(() => {
     fetchContactInfo();

@@ -77,7 +77,11 @@ const Register = () => {
     };
 
     try {
+<<<<<<< Updated upstream
       const response = await fetch("https://maze-backend-production.up.railway.app/users/register", {
+=======
+      const response = await fetch("http://maze-backend-production.up.railway.appusers/register", {
+>>>>>>> Stashed changes
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(userData),

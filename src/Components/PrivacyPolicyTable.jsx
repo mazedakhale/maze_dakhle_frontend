@@ -15,7 +15,11 @@ const PrivacyPolicyTable = () => {
     policyType: "",
   });
 
+<<<<<<< Updated upstream
   const apiUrl = "https://maze-backend-production.up.railway.app/privacy-policy";
+=======
+  const apiUrl = "http://maze-backend-production.up.railway.app/privacy-policy";
+>>>>>>> Stashed changes
   const navigate = useNavigate();
 
   useEffect(() => {

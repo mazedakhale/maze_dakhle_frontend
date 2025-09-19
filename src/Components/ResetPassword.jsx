@@ -4,7 +4,11 @@ import { useNavigate, useLocation, Link } from "react-router-dom";
 import Swal from "sweetalert2";
 import jwtDecode from "jwt-decode";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+<<<<<<< Updated upstream
 const SMS_URL = "https://maze-backend-production.up.railway.app/sms/send";
+=======
+const SMS_URL = "http://maze-backend-production.up.railway.app/sms/send";
+>>>>>>> Stashed changes
 const SMS_SENDER = "918308178738"; // your LiveOne-registered “from” number
 
 const ResetPassword = () => {
@@ -32,7 +36,11 @@ const ResetPassword = () => {
 
     try {
       // 1️⃣ Call reset-password endpoint
+<<<<<<< Updated upstream
       const resp = await fetch("https://maze-backend-production.up.railway.app/users/reset-password", {
+=======
+      const resp = await fetch("http://maze-backend-production.up.railway.app/users/reset-password", {
+>>>>>>> Stashed changes
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

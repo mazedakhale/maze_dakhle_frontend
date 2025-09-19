@@ -10,8 +10,13 @@ const Contact = () => {
   const [fieldKeys, setFieldKeys] = useState([]);
   const [isAdding, setIsAdding] = useState(false); // fields from Field API
   const navigate = useNavigate();
+<<<<<<< Updated upstream
   const contactApiUrl = "https://maze-backend-production.up.railway.app/contact";
   const fieldApiUrl = "https://maze-backend-production.up.railway.app/field";
+=======
+  const contactApiUrl = "http://maze-backend-production.up.railway.app/contact";
+  const fieldApiUrl = "http://maze-backend-production.up.railway.app/field";
+>>>>>>> Stashed changes
 
   useEffect(() => {
     fetchData();

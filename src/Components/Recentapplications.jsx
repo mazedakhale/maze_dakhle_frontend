@@ -21,12 +21,21 @@ const RecentApplications = () => {
 
   useEffect(() => {
     // Fetch all data in parallel
+<<<<<<< Updated upstream
     const docsReq = axios.get("https://maze-backend-production.up.railway.app/documents/recent", {
       timeout: 120000,
     });
     const distReq = axios.get("https://maze-backend-production.up.railway.app/users/distributors");
     const certReq = axios.get("https://maze-backend-production.up.railway.app/certificates");
     const usersReq = axios.get("https://maze-backend-production.up.railway.app/users/register");
+=======
+    const docsReq = axios.get("http://maze-backend-production.up.railway.app/documents/recent", {
+      timeout: 120000,
+    });
+    const distReq = axios.get("http://maze-backend-production.up.railway.app/users/distributors");
+    const certReq = axios.get("http://maze-backend-production.up.railway.app/certificates");
+    const usersReq = axios.get("http://maze-backend-production.up.railway.appusers/register");
+>>>>>>> Stashed changes
 
     Promise.all([docsReq, distReq, certReq, usersReq])
       .then(([docsResp, distResp, certResp, usersResp]) => {
@@ -76,7 +85,11 @@ const RecentApplications = () => {
     });
     try {
       await axios.put(
+<<<<<<< Updated upstream
         `https://maze-backend-production.up.railway.app/documents/update-status/${documentId}`,
+=======
+        `http://maze-backend-production.up.railway.app/documents/update-status/${documentId}`,
+>>>>>>> Stashed changes
         { status: newStatus },
         { timeout: 30000 }
       );
@@ -102,7 +115,11 @@ const RecentApplications = () => {
     if (reason) {
       try {
         await axios.put(
+<<<<<<< Updated upstream
           `https://maze-backend-production.up.railway.app/documents/update-status/${documentId}`,
+=======
+          `http://maze-backend-production.up.railway.app/documents/update-status/${documentId}`,
+>>>>>>> Stashed changes
           { status: "Rejected", rejectionReason: reason }
         );
         setApplications((apps) =>
@@ -351,7 +368,11 @@ const RecentApplications = () => {
                               doc.document_id
                             );
                             window.open(
+<<<<<<< Updated upstream
                               `https://maze-backend-production.up.railway.app/certificates/${certId}`,
+=======
+                              `http://maze-backend-production.up.railway.app/certificates/${certId}`,
+>>>>>>> Stashed changes
                               "_blank"
                             );
                           }}

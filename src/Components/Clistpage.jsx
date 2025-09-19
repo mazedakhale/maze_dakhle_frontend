@@ -42,13 +42,21 @@ const ClistPage = () => {
   useEffect(() => {
     if (categoryId) {
       axios
+<<<<<<< Updated upstream
         .get(`https://maze-backend-production.up.railway.app/categories/${categoryId}`)
+=======
+        .get(`http://maze-backend-production.up.railway.app/categories/${categoryId}`)
+>>>>>>> Stashed changes
         .then((res) => setCategoryName(res.data.category_name))
         .catch((err) => console.error("Error loading category:", err));
     }
     if (subcategoryId) {
       axios
+<<<<<<< Updated upstream
         .get(`https://maze-backend-production.up.railway.app/subcategories/${subcategoryId}`)
+=======
+        .get(`http://maze-backend-production.up.railway.app/subcategories/${subcategoryId}`)
+>>>>>>> Stashed changes
         .then((res) => setSubcategoryName(res.data.subcategory_name))
         .catch((err) => console.error("Error loading subcategory:", err));
     }
@@ -69,7 +77,11 @@ const ClistPage = () => {
 
     // Fetch all documents for this user
     axios
+<<<<<<< Updated upstream
       .get("https://maze-backend-production.up.railway.app/documents/list")
+=======
+      .get("http://maze-backend-production.up.railway.app/documents/list")
+>>>>>>> Stashed changes
       .then((resp) => {
         const filtered = resp.data.documents
           .filter(
@@ -82,7 +94,11 @@ const ClistPage = () => {
 
     // Fetch certificates
     axios
+<<<<<<< Updated upstream
       .get("https://maze-backend-production.up.railway.app/certificates")
+=======
+      .get("http://maze-backend-production.up.railway.app/certificates")
+>>>>>>> Stashed changes
       .then((resp) => setCertificates(resp.data))
       .catch((err) => console.error("Error fetching certificates:", err));
   }, [userId]);
@@ -90,7 +106,11 @@ const ClistPage = () => {
   // 4️⃣ If categoryId & subcategoryId are provided, fetch that subset
   useEffect(() => {
     if (userId && categoryId && subcategoryId) {
+<<<<<<< Updated upstream
       const url = `https://maze-backend-production.up.railway.app/documents/doc/${categoryId}/${subcategoryId}/${userId}`;
+=======
+      const url = `http://maze-backend-production.up.railway.app/documents/doc/${categoryId}/${subcategoryId}/${userId}`;
+>>>>>>> Stashed changes
       axios
         .get(url)
         .then((resp) => setDocuments(resp.data))
@@ -112,7 +132,11 @@ const ClistPage = () => {
 
       try {
         const resp = await axios.post(
+<<<<<<< Updated upstream
           `https://maze-backend-production.up.railway.app/documents/reupload/${documentId}`,
+=======
+          `http://maze-backend-production.up.railway.app/documents/reupload/${documentId}`,
+>>>>>>> Stashed changes
           fd,
           { headers: { "Content-Type": "multipart/form-data" } }
         );
@@ -147,7 +171,11 @@ const ClistPage = () => {
     if (!cert) return alert("Certificate not found");
     try {
       const resp = await axios.get(
+<<<<<<< Updated upstream
         `https://maze-backend-production.up.railway.app/certificates/${cert.certificate_id}`
+=======
+        `http://maze-backend-production.up.railway.app/certificates/${cert.certificate_id}`
+>>>>>>> Stashed changes
       );
       window.open(resp.data.file_url, "_blank");
     } catch (err) {

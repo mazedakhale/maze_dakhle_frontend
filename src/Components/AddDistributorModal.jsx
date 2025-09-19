@@ -87,7 +87,11 @@ const AddDistributorModal = ({ isOpen, onClose, fetchDistributors }) => {
 
     try {
       const response = await axios.post(
+<<<<<<< Updated upstream
         "https://maze-backend-production.up.railway.app/users/register",
+=======
+        "http://maze-backend-production.up.railway.appusers/register",
+>>>>>>> Stashed changes
         formDataToSend,
         {
           headers: {

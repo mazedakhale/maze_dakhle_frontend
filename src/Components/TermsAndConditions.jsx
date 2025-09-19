@@ -9,7 +9,11 @@ const TermsAndConditions = () => {
     const fetchTnC = async () => {
       try {
         const response = await axios.get(
+<<<<<<< Updated upstream
           "https://maze-backend-production.up.railway.app/privacy-policy/type/" +
+=======
+          "http://maze-backend-production.up.railway.app/privacy-policy/type/" +
+>>>>>>> Stashed changes
             encodeURIComponent("Terms and Conditions")
         );
         const data = response.data;

@@ -33,7 +33,11 @@ const Employee = () => {
   const fetchDocuments = async () => {
     setIsLoading(true);
     try {
+<<<<<<< Updated upstream
       const response = await axios.get("https://maze-backend-production.up.railway.app/employee");
+=======
+      const response = await axios.get("http://maze-backend-production.up.railway.app/employee");
+>>>>>>> Stashed changes
       setDocuments(response.data);
     } catch (error) {
       console.error("Error fetching documents:", error);
@@ -49,7 +53,11 @@ const Employee = () => {
 
   const fetchCategories = async () => {
     try {
+<<<<<<< Updated upstream
       const response = await axios.get("https://maze-backend-production.up.railway.app/categories");
+=======
+      const response = await axios.get("http://maze-backend-production.up.railway.app/categories");
+>>>>>>> Stashed changes
       setCategories(response.data);
     } catch (error) {
       console.error("Error fetching categories:", error);
@@ -60,7 +68,11 @@ const Employee = () => {
   const fetchEmployees = async () => {
     try {
       // Using the same endpoint as in EmployeeList component
+<<<<<<< Updated upstream
       const response = await axios.get("https://maze-backend-production.up.railway.app/users/employee");
+=======
+      const response = await axios.get("http://maze-backend-production.up.railway.app/users/employee");
+>>>>>>> Stashed changes
       setEmployees(response.data);
     } catch (error) {
       console.error("Error fetching employees:", error);
@@ -91,7 +103,11 @@ const Employee = () => {
     if (selectedCategoryId) {
       try {
         const response = await axios.get(
+<<<<<<< Updated upstream
           `https://maze-backend-production.up.railway.app/subcategories/category/${selectedCategoryId}`
+=======
+          `http://maze-backend-production.up.railway.app/subcategories/category/${selectedCategoryId}`
+>>>>>>> Stashed changes
         );
         setSubcategories(response.data);
       } catch (error) {
@@ -158,7 +174,11 @@ const Employee = () => {
           },
         });
 
+<<<<<<< Updated upstream
         await axios.delete(`https://maze-backend-production.up.railway.app/employee/${id}`);
+=======
+        await axios.delete(`http://maze-backend-production.up.railway.app/employee/${id}`);
+>>>>>>> Stashed changes
 
         setDocuments((prevDocuments) =>
           prevDocuments.filter((document) => document.id !== id)
@@ -188,7 +208,11 @@ const Employee = () => {
 
     try {
       const response = await axios.get(
+<<<<<<< Updated upstream
         `https://maze-backend-production.up.railway.app/subcategories/category/${groupedDoc.category_id}`
+=======
+        `http://maze-backend-production.up.railway.app/subcategories/category/${groupedDoc.category_id}`
+>>>>>>> Stashed changes
       );
       setSubcategories(response.data);
     } catch (error) {
@@ -228,10 +252,17 @@ const Employee = () => {
 
       if (editId) {
         // For edit, use the PUT endpoint with the new API format
+<<<<<<< Updated upstream
         await axios.put(`https://maze-backend-production.up.railway.app/employee/${editId}`, dataToSend);
       } else {
         // For create, use the POST endpoint with the new API format
         await axios.post("https://maze-backend-production.up.railway.app/employee", dataToSend);
+=======
+        await axios.put(`http://maze-backend-production.up.railway.app/employee/${editId}`, dataToSend);
+      } else {
+        // For create, use the POST endpoint with the new API format
+        await axios.post("http://maze-backend-production.up.railway.app/employee", dataToSend);
+>>>>>>> Stashed changes
       }
 
       Swal.fire({

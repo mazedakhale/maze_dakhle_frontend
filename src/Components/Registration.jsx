@@ -10,7 +10,11 @@ import {
 } from "../utils/formValidators";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import "../index.css";
+<<<<<<< Updated upstream
 const SMS_URL = "https://maze-backend-production.up.railway.app/sms/send";
+=======
+const SMS_URL = "http://maze-backend-production.up.railway.app/sms/send";
+>>>>>>> Stashed changes
 const SMS_SENDER = "918308178738"; // your LiveOne-registered “from” number
 
 const Register = () => {
@@ -419,7 +423,11 @@ const Register = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+<<<<<<< Updated upstream
     fetch("https://maze-backend-production.up.railway.app/categories")
+=======
+    fetch("http://maze-backend-production.up.railway.app/categories")
+>>>>>>> Stashed changes
       .then((res) => res.json())
       .then(setCategories)
       .catch(console.error);
@@ -430,7 +438,11 @@ const Register = () => {
       const data = {};
       for (const category of categories) {
         const res = await fetch(
+<<<<<<< Updated upstream
           `https://maze-backend-production.up.railway.app/subcategories/category/${category.category_id}`
+=======
+          `http://maze-backend-production.up.railway.app/subcategories/category/${category.category_id}`
+>>>>>>> Stashed changes
         );
         data[category.category_id] = res.ok ? await res.json() : [];
       }
@@ -575,7 +587,11 @@ const Register = () => {
         payload.append("profilePhoto", formData.profilePhoto);
       }
 
+<<<<<<< Updated upstream
       const res = await fetch("https://maze-backend-production.up.railway.app/users/register", {
+=======
+      const res = await fetch("http://maze-backend-production.up.railway.appusers/register", {
+>>>>>>> Stashed changes
         method: "POST",
         body: payload,
       });
@@ -929,3 +945,5 @@ const Register = () => {
   );
 };
 export default Register;
+
+//dummy change test

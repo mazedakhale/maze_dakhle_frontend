@@ -46,7 +46,11 @@ const DistributorList = () => {
 
   const navigate = useNavigate();
 
+<<<<<<< Updated upstream
   const apiUrl = "https://maze-backend-production.up.railway.app/users/distributors";
+=======
+  const apiUrl = "http://maze-backend-production.up.railway.app/users/distributors";
+>>>>>>> Stashed changes
 
   useEffect(() => {
     fetchDistributors();
@@ -69,7 +73,11 @@ const DistributorList = () => {
   const checkEmailExists = async (email) => {
     try {
       const response = await axios.get(
+<<<<<<< Updated upstream
         `https://maze-backend-production.up.railway.app/users/check-email/${email}`,
+=======
+        `http://maze-backend-production.up.railway.app/users/check-email/${email}`,
+>>>>>>> Stashed changes
         { timeout: 30000 }
       );
       return response.data.exists;
@@ -301,7 +309,11 @@ const DistributorList = () => {
 
     try {
       const response = await axios.post(
+<<<<<<< Updated upstream
         "https://maze-backend-production.up.railway.app/users/register",
+=======
+        "http://maze-backend-production.up.railway.appusers/register",
+>>>>>>> Stashed changes
         formDataToSend,
         {
           headers: {
@@ -352,7 +364,11 @@ const DistributorList = () => {
     try {
       if (updatedPassword) {
         await axios.patch(
+<<<<<<< Updated upstream
           `https://maze-backend-production.up.railway.app/users/password/${id}`,
+=======
+          `http://maze-backend-production.up.railway.app/users/password/${id}`,
+>>>>>>> Stashed changes
           { newPassword: updatedPassword },
           { timeout: 30000 }
         );
@@ -415,7 +431,11 @@ const DistributorList = () => {
       });
 
       try {
+<<<<<<< Updated upstream
         await axios.delete(`https://maze-backend-production.up.railway.app/users/delete/${id}`, {
+=======
+        await axios.delete(`http://maze-backend-production.up.railway.app/users/delete/${id}`, {
+>>>>>>> Stashed changes
           timeout: 30000,
         });
 
@@ -449,7 +469,11 @@ const DistributorList = () => {
       );
 
       await axios.patch(
+<<<<<<< Updated upstream
         `https://maze-backend-production.up.railway.app/users/status/${id}`,
+=======
+        `http://maze-backend-production.up.railway.app/users/status/${id}`,
+>>>>>>> Stashed changes
         { status: newStatus },
         { timeout: 30000 }
       );
@@ -472,7 +496,11 @@ const DistributorList = () => {
   };
   const updateEditRequestStatus = async (id, newStatus) => {
     try {
+<<<<<<< Updated upstream
       await axios.patch(`https://maze-backend-production.up.railway.app/users/request-edit/${id}`, {
+=======
+      await axios.patch(`http://maze-backend-production.up.railway.app/users/request-edit/${id}`, {
+>>>>>>> Stashed changes
         status: newStatus,
       });
       setDistributors((prev) =>

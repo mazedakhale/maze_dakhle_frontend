@@ -30,7 +30,11 @@ const Price = () => {
   // 1) load prices
   const fetchPrices = async () => {
     try {
+<<<<<<< Updated upstream
       const { data } = await axios.get("https://maze-backend-production.up.railway.app/prices");
+=======
+      const { data } = await axios.get("http://maze-backend-production.up.railway.app/prices");
+>>>>>>> Stashed changes
       setPrices(data.map((p) => ({ ...p, amount: Number(p.amount) })));
     } catch {
       Swal.fire("Error", "Could not load prices", "error");
@@ -41,7 +45,11 @@ const Price = () => {
   const fetchCategoriesAndAllSubcats = async () => {
     try {
       const { data: cats } = await axios.get(
+<<<<<<< Updated upstream
         "https://maze-backend-production.up.railway.app/categories"
+=======
+        "http://maze-backend-production.up.railway.app/categories"
+>>>>>>> Stashed changes
       );
       setCategories(cats);
 
@@ -50,7 +58,11 @@ const Price = () => {
       await Promise.all(
         cats.map(async (cat) => {
           const { data: subs } = await axios.get(
+<<<<<<< Updated upstream
             `https://maze-backend-production.up.railway.app/subcategories/category/${cat.category_id}`
+=======
+            `http://maze-backend-production.up.railway.app/subcategories/category/${cat.category_id}`
+>>>>>>> Stashed changes
           );
           all.push(...subs);
         })
@@ -69,7 +81,11 @@ const Price = () => {
     }
     try {
       const { data } = await axios.get(
+<<<<<<< Updated upstream
         `https://maze-backend-production.up.railway.app/subcategories/category/${categoryId}`
+=======
+        `http://maze-backend-production.up.railway.app/subcategories/category/${categoryId}`
+>>>>>>> Stashed changes
       );
       setSubcategories(data);
     } catch {
@@ -116,7 +132,11 @@ const Price = () => {
     });
     if (!confirm.isConfirmed) return;
     try {
+<<<<<<< Updated upstream
       await axios.delete(`https://maze-backend-production.up.railway.app/prices/${id}`);
+=======
+      await axios.delete(`http://maze-backend-production.up.railway.app/prices/${id}`);
+>>>>>>> Stashed changes
       setPrices((p) => p.filter((x) => x.id !== id));
       Swal.fire("Deleted!", "", "success");
     } catch {
@@ -137,10 +157,17 @@ const Price = () => {
         amount: parseFloat(amount),
       };
       if (editId) {
+<<<<<<< Updated upstream
         await axios.put(`https://maze-backend-production.up.railway.app/prices/${editId}`, payload);
         Swal.fire("Updated!", "", "success");
       } else {
         await axios.post("https://maze-backend-production.up.railway.app/prices", payload);
+=======
+        await axios.put(`http://maze-backend-production.up.railway.app/prices/${editId}`, payload);
+        Swal.fire("Updated!", "", "success");
+      } else {
+        await axios.post("http://maze-backend-production.up.railway.app/prices", payload);
+>>>>>>> Stashed changes
         Swal.fire("Added!", "", "success");
       }
       setModalOpen(false);

@@ -174,7 +174,11 @@ const News = () => {
 
   useEffect(() => {
     axios
+<<<<<<< Updated upstream
       .get("https://maze-backend-production.up.railway.app/news")
+=======
+      .get("http://maze-backend-production.up.railway.app/news")
+>>>>>>> Stashed changes
       .then((res) => setNewsList(res.data))
       .catch((err) => {
         console.error(err);

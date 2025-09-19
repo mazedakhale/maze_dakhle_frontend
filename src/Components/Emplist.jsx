@@ -16,7 +16,11 @@ const Emplist = () => {
   useEffect(() => {
     // Fetch documents without a distributor assigned
     axios
+<<<<<<< Updated upstream
       .get("https://maze-backend-production.up.railway.app/documents/list")
+=======
+      .get("http://maze-backend-production.up.railway.app/documents/list")
+>>>>>>> Stashed changes
       .then((response) => {
         const sortedDocuments = response.data.documents.sort(
           (a, b) => new Date(b.uploaded_at) - new Date(a.uploaded_at)
@@ -27,19 +31,31 @@ const Emplist = () => {
 
     // Fetch distributors
     axios
+<<<<<<< Updated upstream
       .get("https://maze-backend-production.up.railway.app/users/distributors")
+=======
+      .get("http://maze-backend-production.up.railway.app/users/distributors")
+>>>>>>> Stashed changes
       .then((response) => setDistributors(response.data))
       .catch((error) => console.error("Error fetching distributors:", error));
 
     // Fetch certificates
     axios
+<<<<<<< Updated upstream
       .get("https://maze-backend-production.up.railway.app/certificates")
+=======
+      .get("http://maze-backend-production.up.railway.app/certificates")
+>>>>>>> Stashed changes
       .then((response) => setCertificates(response.data))
       .catch((error) => console.error("Error fetching certificates:", error));
 
     // Fetch users
     axios
+<<<<<<< Updated upstream
       .get("https://maze-backend-production.up.railway.app/users/register")
+=======
+      .get("http://maze-backend-production.up.railway.appusers/register")
+>>>>>>> Stashed changes
       .then((response) => setUsers(response.data))
       .catch((error) => console.error("Error fetching users:", error));
   }, []);
@@ -88,7 +104,11 @@ const Emplist = () => {
       if (verifiedBy) {
         // Call the API directly
         await axios.put(
+<<<<<<< Updated upstream
           `https://maze-backend-production.up.railway.app/documents/verify/${documentId}`,
+=======
+          `http://maze-backend-production.up.railway.app/documents/verify/${documentId}`,
+>>>>>>> Stashed changes
           { verifiedBy }
         );
 
@@ -113,7 +133,11 @@ const Emplist = () => {
   const handleUpdateStatus = async (documentId, newStatus) => {
     try {
       await axios.put(
+<<<<<<< Updated upstream
         `https://maze-backend-production.up.railway.app/documents/update-status/${documentId}`,
+=======
+        `http://maze-backend-production.up.railway.app/documents/update-status/${documentId}`,
+>>>>>>> Stashed changes
         {
           status: newStatus,
         }
@@ -234,7 +258,11 @@ const Emplist = () => {
       } else {
         // First-time verification
         await axios.put(
+<<<<<<< Updated upstream
           `https://maze-backend-production.up.railway.app/documents/verify/${documentId}`,
+=======
+          `http://maze-backend-production.up.railway.app/documents/verify/${documentId}`,
+>>>>>>> Stashed changes
           { verifiedBy: userId }
         );
 
@@ -294,7 +322,11 @@ const Emplist = () => {
     }
     try {
       const response = await axios.get(
+<<<<<<< Updated upstream
         `https://maze-backend-production.up.railway.app/certificates/${certificateId}`
+=======
+        `http://maze-backend-production.up.railway.app/certificates/${certificateId}`
+>>>>>>> Stashed changes
       );
       if (response.data && response.data.file_url) {
         window.open(response.data.file_url, "_blank");

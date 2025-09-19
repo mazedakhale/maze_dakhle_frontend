@@ -29,7 +29,11 @@ const ErrorRequests = () => {
   const fetchErrorRequests = async () => {
     try {
       const { data } = await axios.get(
+<<<<<<< Updated upstream
         `https://maze-backend-production.up.railway.app/request-errors/distributor/${distributorId}`
+=======
+        `http://maze-backend-production.up.railway.app/request-errors/distributor/${distributorId}`
+>>>>>>> Stashed changes
       );
       setErrorRequests(
         data.filter(
@@ -45,7 +49,11 @@ const ErrorRequests = () => {
 
   const fetchCertificates = async () => {
     try {
+<<<<<<< Updated upstream
       const { data } = await axios.get("https://maze-backend-production.up.railway.app/certificates");
+=======
+      const { data } = await axios.get("http://maze-backend-production.up.railway.app/certificates");
+>>>>>>> Stashed changes
       setCertificates(data);
     } catch (err) {
       console.error("Error fetching certificates:", err);
@@ -56,7 +64,11 @@ const ErrorRequests = () => {
   const fetchAssignedDocuments = async () => {
     try {
       const { data } = await axios.get(
+<<<<<<< Updated upstream
         `https://maze-backend-production.up.railway.app/documents/list/${distributorId}`
+=======
+        `http://maze-backend-production.up.railway.app/documents/list/${distributorId}`
+>>>>>>> Stashed changes
       );
       setAssignedDocs(data.documents);
     } catch (err) {
@@ -86,7 +98,11 @@ const ErrorRequests = () => {
     if (!reason) return;
     try {
       await axios.patch(
+<<<<<<< Updated upstream
         `https://maze-backend-production.up.railway.app/request-errors/update-status/${requestId}`,
+=======
+        `http://maze-backend-production.up.railway.app/request-errors/update-status/${requestId}`,
+>>>>>>> Stashed changes
         { request_status: "Distributor Rejected", rejectionReason: reason }
       );
       await fetchErrorRequests();
@@ -99,7 +115,11 @@ const ErrorRequests = () => {
   const handleDownloadReceipt = async (applicationId) => {
     try {
       const { data } = await axios.get(
+<<<<<<< Updated upstream
         `https://maze-backend-production.up.railway.app/documents/receipt/${applicationId}`
+=======
+        `http://maze-backend-production.up.railway.app/documents/receipt/${applicationId}`
+>>>>>>> Stashed changes
       );
       const url = data.receipt_url;
       if (!url) throw new Error("No receipt available");
@@ -123,7 +143,11 @@ const ErrorRequests = () => {
   const handleDownloadCertificate = async (applicationId) => {
     try {
       const { data } = await axios.get(
+<<<<<<< Updated upstream
         `https://maze-backend-production.up.railway.app/certificates/certificate/${applicationId}`
+=======
+        `http://maze-backend-production.up.railway.app/certificates/certificate/${applicationId}`
+>>>>>>> Stashed changes
       );
       const url = data.certificate_url;
       if (!url) throw new Error("No certificate available");
@@ -158,14 +182,23 @@ const ErrorRequests = () => {
 
     const url =
       type === "certificate"
+<<<<<<< Updated upstream
         ? `https://maze-backend-production.up.railway.app/certificates/update/${req.document_id}`
         : `https://maze-backend-production.up.railway.app/documents/update-receipt/${req.document_id}`;
+=======
+        ? `http://maze-backend-production.up.railway.app/certificates/update/${req.document_id}`
+        : `http://maze-backend-production.up.railway.app/documents/update-receipt/${req.document_id}`;
+>>>>>>> Stashed changes
     const method = type === "certificate" ? "patch" : "put";
 
     try {
       await axios[method](url, formData);
       await axios.patch(
+<<<<<<< Updated upstream
         `https://maze-backend-production.up.railway.app/request-errors/update-status/${req.request_id}`,
+=======
+        `http://maze-backend-production.up.railway.app/request-errors/update-status/${req.request_id}`,
+>>>>>>> Stashed changes
         {
           request_status:
             type === "certificate" ? "Uploaded" : "Receipt Uploaded",

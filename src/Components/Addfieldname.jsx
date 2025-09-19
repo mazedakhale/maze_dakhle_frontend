@@ -28,7 +28,11 @@ const FieldNames = () => {
 
   const fetchFields = async () => {
     try {
+<<<<<<< Updated upstream
       const response = await axios.get("https://maze-backend-production.up.railway.app/field-names");
+=======
+      const response = await axios.get("http://maze-backend-production.up.railway.app/field-names");
+>>>>>>> Stashed changes
       setFields(response.data);
     } catch (error) {
       console.error("Error fetching field names:", error);
@@ -37,7 +41,11 @@ const FieldNames = () => {
 
   const fetchCategories = async () => {
     try {
+<<<<<<< Updated upstream
       const response = await axios.get("https://maze-backend-production.up.railway.app/categories");
+=======
+      const response = await axios.get("http://maze-backend-production.up.railway.app/categories");
+>>>>>>> Stashed changes
       setCategories(response.data);
     } catch (error) {
       console.error("Error fetching categories:", error);
@@ -48,7 +56,11 @@ const FieldNames = () => {
     if (!categoryId) return;
     try {
       const response = await axios.get(
+<<<<<<< Updated upstream
         `https://maze-backend-production.up.railway.app/subcategories/category/${categoryId}`
+=======
+        `http://maze-backend-production.up.railway.app/subcategories/category/${categoryId}`
+>>>>>>> Stashed changes
       );
       setSubcategories(response.data);
     } catch (error) {
@@ -98,7 +110,11 @@ const FieldNames = () => {
 
       // **Perform API call in the background**
       axios
+<<<<<<< Updated upstream
         .delete(`https://maze-backend-production.up.railway.app/field-names/${id}`)
+=======
+        .delete(`http://maze-backend-production.up.railway.app/field-names/${id}`)
+>>>>>>> Stashed changes
         .then(() => {
           fetchFields(); // Refresh field list
         })
@@ -116,7 +132,11 @@ const FieldNames = () => {
 
   const handleSave = async (id) => {
     try {
+<<<<<<< Updated upstream
       await axios.patch(`https://maze-backend-production.up.railway.app/field-names/${id}`, {
+=======
+      await axios.patch(`http://maze-backend-production.up.railway.app/field-names/${id}`, {
+>>>>>>> Stashed changes
         document_fields: editableField,
       });
       Swal.fire("Updated!", "Field Name updated successfully", "success");
@@ -131,7 +151,11 @@ const FieldNames = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+<<<<<<< Updated upstream
       await axios.post("https://maze-backend-production.up.railway.app/field-names", formData);
+=======
+      await axios.post("http://maze-backend-production.up.railway.app/field-names", formData);
+>>>>>>> Stashed changes
       Swal.fire("Added!", "Field Name added successfully", "success");
       fetchFields();
       setModalOpen(false);

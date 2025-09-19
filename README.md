@@ -26,7 +26,7 @@ To start the development server:
 ```bash
 $ npm run dev
 ```
-This will launch the application on `http://localhost:5173/` (or another available port).
+This will launch the application on `http://maze-backend-production.up.railway.app:5173/` (or another available port).
 
 ## Build for Production
 To create an optimized production build:

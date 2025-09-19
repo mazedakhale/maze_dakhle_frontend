@@ -6,8 +6,13 @@ const ContactForm = () => {
   const [formValues, setFormValues] = useState({}); // Stores key-value pairs for the Contact API
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false); // State to track form submission
+<<<<<<< Updated upstream
   const fieldApiUrl = "https://maze-backend-production.up.railway.app/field"; // API to fetch keys
   const contactApiUrl = "https://maze-backend-production.up.railway.app/contact"; // API to save key-value pairs
+=======
+  const fieldApiUrl = "http://maze-backend-production.up.railway.app/field"; // API to fetch keys
+  const contactApiUrl = "http://maze-backend-production.up.railway.app/contact"; // API to save key-value pairs
+>>>>>>> Stashed changes
 
   // Fetch keys from the Field API
   useEffect(() => {
