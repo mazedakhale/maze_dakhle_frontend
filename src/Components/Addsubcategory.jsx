@@ -17,11 +17,16 @@ const Addsubcategory = () => {
   const [isAdding, setIsAdding] = useState(false);
   const navigate = useNavigate();
 
-  const API_BASE_URL = "https://mazedakhale.in/api";
+  // Update the API_BASE_URL to match the backend URL
+  const API_BASE_URL = "https://maze-backend-production.up.railway.app";
 
   useEffect(() => {
-    fetchSubcategories();
-    fetchCategories();
+    const loadInitialData = async () => {
+      await fetchCategories();
+      await fetchSubcategories();
+    };
+    
+    loadInitialData();
   }, []);
 
   const fetchSubcategories = async () => {
@@ -36,25 +41,34 @@ const Addsubcategory = () => {
   const fetchCategories = async () => {
     try {
       const response = await axios.get(`${API_BASE_URL}/categories`);
-      setCategories(response.data);
+      // Sort categories by name for better UX
+      const sortedCategories = response.data.sort((a, b) =>
+        a.category_name.localeCompare(b.category_name)
+      );
+      setCategories(sortedCategories);
     } catch (error) {
       console.error("Error fetching categories:", error);
+      Swal.fire("Error", "Failed to load categories", "error");
     }
   };
 
   const addSubcategory = async () => {
-    if (
-      !newSubcategory.subcategory_name.trim() ||
-      !newSubcategory.category_id
-    ) {
-      Swal.fire("Error", "Please fill all fields!", "error");
+    // Validate both fields
+    if (!newSubcategory.subcategory_name.trim()) {
+      Swal.fire("Error", "Please enter a subcategory name", "error");
       return;
     }
+    
+    if (!newSubcategory.category_id) {
+      Swal.fire("Error", "Please select a category", "error");
+      return;
+    }
+
     try {
       await axios.post(`${API_BASE_URL}/subcategories`, newSubcategory);
+      await fetchSubcategories(); // Refresh the list
       setNewSubcategory({ subcategory_name: "", category_id: "" });
       setIsAdding(false);
-      fetchSubcategories();
       Swal.fire("Success", "Subcategory added successfully!", "success");
     } catch (error) {
       console.error("Error adding subcategory:", error);
@@ -248,23 +262,33 @@ const Addsubcategory = () => {
             </h2>
 
             {/* Category Dropdown */}
-            <select
-              value={newSubcategory.category_id}
-              onChange={(e) =>
-                setNewSubcategory({
-                  ...newSubcategory,
-                  category_id: e.target.value,
-                })
-              }
-              className="w-full p-2 border border-gray-300 rounded mb-4"
-            >
-              <option value="">Select Category</option>
-              {categories.map((cat) => (
-                <option key={cat.category_id} value={cat.category_id}>
-                  {cat.category_name}
-                </option>
-              ))}
-            </select>
+            <div className="mb-4">
+              <label className="block text-gray-700 text-sm font-bold mb-2">
+                Category <span className="text-red-500">*</span>
+              </label>
+              <select
+                value={newSubcategory.category_id}
+                onChange={(e) =>
+                  setNewSubcategory({
+                    ...newSubcategory,
+                    category_id: e.target.value,
+                  })
+                }
+                className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:border-orange-500"
+                required
+              >
+                <option value="">Select Category</option>
+                {categories.length > 0 ? (
+                  categories.map((cat) => (
+                    <option key={cat.category_id} value={cat.category_id}>
+                      {cat.category_name}
+                    </option>
+                  ))
+                ) : (
+                  <option value="" disabled>No categories available</option>
+                )}
+              </select>
+            </div>
 
             {/* Subcategory Input */}
             <input
