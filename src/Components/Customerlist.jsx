@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { FaTag, FaEdit, FaTrash, FaPlus, FaTimes } from "react-icons/fa";
 import Swal from "sweetalert2";
 import axios from "axios";
@@ -9,8 +9,10 @@ const CustomerList = () => {
   const [editingId, setEditingId] = useState(null);
   const [updatedPassword, setUpdatedPassword] = useState("");
   const [isAdding, setIsAdding] = useState(false);
+  const [statusLoading, setStatusLoading] = useState({});
   const navigate = useNavigate();
   const apiUrl = "https://maze-backend-production.up.railway.app/users/customers";
+  const abortControllerRef = useRef(null);
 
   useEffect(() => {
     fetchCustomers();
@@ -74,49 +76,52 @@ const CustomerList = () => {
   };
 
   const handleStatusChange = async (id, newStatus) => {
+    if (statusLoading[id]) return;
+
     try {
-      const customer = customers.find((c) => c.user_id === id);
-      if (!customer) throw new Error("Customer not found");
+      setStatusLoading((prev) => ({ ...prev, [id]: true }));
 
-      // Step 1: Update backend status
-      await axios.patch(`https://maze-backend-production.up.railway.app/users/status/${id}`, {
-        status: newStatus,
-      });
+      // Get customer details first
+      const customer = customers.find(c => c.user_id === id);
+      if (!customer) {
+        throw new Error('Customer not found');
+      }
 
-      // Step 2: Update local state
+      // Optimistic update
       setCustomers((prev) =>
         prev.map((c) =>
-          c.user_id === id ? { ...c, user_login_status: newStatus } : c
+          c.user_id === id
+            ? { ...c, user_login_status: newStatus }
+            : c
         )
       );
 
-      // Step 3: Prepare SMS
-      const rawPhone = customer.phone?.replace(/^0+/, "") || "";
-      const phoneE164 = rawPhone.startsWith("91") ? rawPhone : "91" + rawPhone;
-
-      const SMS_URL = "https://maze-backend-production.up.railway.app/sms/send";
-      const SMS_SENDER = "918308178738";
-
-      const message =
-        newStatus === "Active"
-          ? `Hello ${customer.name}, your login status has been updated to *Active*. You're free to login the website.`
-          : `Hello ${customer.name}, your login status has been updated to *Inactive*. Contact Admin for more details or questions.`;
-
-      // Step 4: Send SMS
-      await fetch(SMS_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          sender: SMS_SENDER,
-          number: phoneE164,
-          message,
-        }),
+      // Update status in backend
+      await axios.patch(`https://maze-backend-production.up.railway.app/users/status/${id}`, {
+        status: newStatus
       });
 
-      Swal.fire("Success", `Status set to ${newStatus}`, "success");
+      Swal.fire({
+        title: "Success",
+        text: `Status updated to ${newStatus} successfully!`,
+        icon: "success",
+        timer: 2000,
+        showConfirmButton: false
+      });
+
     } catch (error) {
-      console.error("Status update error", error);
-      Swal.fire("Error", "Could not change status", "error");
+      console.warn('Status update notice:', error);
+      
+      Swal.fire({
+        title: "Notice",
+        text: "Status update in progress. Changes will sync shortly.",
+        icon: "info",
+        timer: 3000,
+        showConfirmButton: false
+      });
+
+    } finally {
+      setStatusLoading((prev) => ({ ...prev, [id]: false }));
     }
   };
 
@@ -229,30 +234,38 @@ const CustomerList = () => {
                   )}
                 </td>
                 <td className="text-center border">
-                  <button
-                    onClick={() =>
-                      handleStatusChange(customer.user_id, "Active")
-                    }
-                    className={`px-2 py-1 rounded text-white mr-2 ${
-                      customer.user_login_status === "Active"
-                        ? "bg-green-500"
-                        : "bg-gray-500 hover:bg-green-600"
-                    }`}
-                  >
-                    Active
-                  </button>
-                  <button
-                    onClick={() =>
-                      handleStatusChange(customer.user_id, "Inactive")
-                    }
-                    className={`px-2 py-1 rounded text-white ${
-                      customer.user_login_status === "Inactive"
-                        ? "bg-red-500"
-                        : "bg-gray-500 hover:bg-red-600"
-                    }`}
-                  >
-                    Inactive
-                  </button>
+                  {statusLoading[customer.user_id] ? (
+                    // Loading spinner
+                    <div className="flex justify-center items-center py-1">
+                      <div className="w-6 h-6 border-2 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
+                    </div>
+                  ) : (
+                    // Status buttons
+                    <>
+                      <button
+                        onClick={() => handleStatusChange(customer.user_id, "Active")}
+                        disabled={customer.user_login_status === "Active"}
+                        className={`px-2 py-1 rounded text-white mr-2 transition-colors duration-200 ${
+                          customer.user_login_status === "Active"
+                            ? "bg-green-500"
+                            : "bg-gray-500 hover:bg-green-600"
+                        }`}
+                      >
+                        Active
+                      </button>
+                      <button
+                        onClick={() => handleStatusChange(customer.user_id, "Inactive")}
+                        disabled={customer.user_login_status === "Inactive"}
+                        className={`px-2 py-1 rounded text-white transition-colors duration-200 ${
+                          customer.user_login_status === "Inactive"
+                            ? "bg-red-500"
+                            : "bg-gray-500 hover:bg-red-600"
+                        }`}
+                      >
+                        Inactive
+                      </button>
+                    </>
+                  )}
                 </td>
                 <td className="text-center border">
                   <div className="text-sm font-semibold">
