@@ -19,11 +19,7 @@ const ErrorRequests = () => {
 
   const fetchErrorRequests = async () => {
     try {
-<<<<<<< Updated upstream
       const response = await axios.get("https://maze-backend-production.up.railway.app/request-errors");
-=======
-      const response = await axios.get("http://maze-backend-production.up.railway.app/request-errors");
->>>>>>> Stashed changes
       setErrorRequests(response.data);
     } catch (error) {
       console.error("Error fetching error requests:", error);
@@ -32,11 +28,7 @@ const ErrorRequests = () => {
 
   const fetchCertificates = async () => {
     try {
-<<<<<<< Updated upstream
       const response = await axios.get("https://maze-backend-production.up.railway.app/certificates");
-=======
-      const response = await axios.get("http://maze-backend-production.up.railway.app/certificates");
->>>>>>> Stashed changes
       setCertificates(response.data);
     } catch (error) {
       console.error("Error fetching certificates:", error);
@@ -58,11 +50,7 @@ const ErrorRequests = () => {
     }
     try {
       const response = await axios.get(
-<<<<<<< Updated upstream
         `https://maze-backend-production.up.railway.app/certificates/${certificateId}`
-=======
-        `http://maze-backend-production.up.railway.app/certificates/${certificateId}`
->>>>>>> Stashed changes
       );
       if (response.data && response.data.file_url) {
         window.open(response.data.file_url, "_blank");
@@ -118,11 +106,7 @@ const ErrorRequests = () => {
 
     try {
       await axios.patch(
-<<<<<<< Updated upstream
         `https://maze-backend-production.up.railway.app/request-errors/update-status/${requestId}`,
-=======
-        `http://maze-backend-production.up.railway.app/request-errors/update-status/${requestId}`,
->>>>>>> Stashed changes
         {
           request_status: newStatus,
           rejectionReason,

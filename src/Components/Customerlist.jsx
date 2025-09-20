@@ -10,11 +10,7 @@ const CustomerList = () => {
   const [updatedPassword, setUpdatedPassword] = useState("");
   const [isAdding, setIsAdding] = useState(false);
   const navigate = useNavigate();
-<<<<<<< Updated upstream
   const apiUrl = "https://maze-backend-production.up.railway.app/users/customers";
-=======
-  const apiUrl = "http://maze-backend-production.up.railway.app/users/customers";
->>>>>>> Stashed changes
 
   useEffect(() => {
     fetchCustomers();
@@ -37,11 +33,7 @@ const CustomerList = () => {
   const handleUpdateCustomer = async (id) => {
     try {
       if (updatedPassword) {
-<<<<<<< Updated upstream
         await axios.patch(`https://maze-backend-production.up.railway.app/users/password/${id}`, {
-=======
-        await axios.patch(`http://maze-backend-production.up.railway.app/users/password/${id}`, {
->>>>>>> Stashed changes
           newPassword: updatedPassword,
         });
       }
@@ -71,11 +63,7 @@ const CustomerList = () => {
 
     if (confirm.isConfirmed) {
       try {
-<<<<<<< Updated upstream
         await axios.delete(`https://maze-backend-production.up.railway.app/users/delete/${id}`);
-=======
-        await axios.delete(`http://maze-backend-production.up.railway.app/users/delete/${id}`);
->>>>>>> Stashed changes
         setCustomers((prev) => prev.filter((c) => c.user_id !== id));
         Swal.fire("Deleted!", "Customer removed.", "success");
       } catch (error) {
@@ -91,11 +79,7 @@ const CustomerList = () => {
       if (!customer) throw new Error("Customer not found");
 
       // Step 1: Update backend status
-<<<<<<< Updated upstream
       await axios.patch(`https://maze-backend-production.up.railway.app/users/status/${id}`, {
-=======
-      await axios.patch(`http://maze-backend-production.up.railway.app/users/status/${id}`, {
->>>>>>> Stashed changes
         status: newStatus,
       });
 
@@ -110,11 +94,7 @@ const CustomerList = () => {
       const rawPhone = customer.phone?.replace(/^0+/, "") || "";
       const phoneE164 = rawPhone.startsWith("91") ? rawPhone : "91" + rawPhone;
 
-<<<<<<< Updated upstream
       const SMS_URL = "https://maze-backend-production.up.railway.app/sms/send";
-=======
-      const SMS_URL = "http://maze-backend-production.up.railway.app/sms/send";
->>>>>>> Stashed changes
       const SMS_SENDER = "918308178738";
 
       const message =
@@ -142,11 +122,7 @@ const CustomerList = () => {
 
   const updateEditRequestStatus = async (id, newStatus) => {
     try {
-<<<<<<< Updated upstream
       await axios.patch(`https://maze-backend-production.up.railway.app/users/request-edit/${id}`, {
-=======
-      await axios.patch(`http://maze-backend-production.up.railway.app/users/request-edit/${id}`, {
->>>>>>> Stashed changes
         status: newStatus,
       });
       setCustomers((prev) =>

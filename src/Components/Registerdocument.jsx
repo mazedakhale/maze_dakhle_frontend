@@ -65,11 +65,7 @@ const RegisterDocument = () => {
     });
 
     try {
-<<<<<<< Updated upstream
       const response = await fetch(`https://maze-backend-production.up.railway.app/users/update/${id}`, {
-=======
-      const response = await fetch(`http://maze-backend-production.up.railway.app/users/update/${id}`, {
->>>>>>> Stashed changes
         method: "PUT",
         body: formDataObj,
       });

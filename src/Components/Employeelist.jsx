@@ -21,11 +21,7 @@ const EmployeeList = () => {
   });
 
   const navigate = useNavigate();
-<<<<<<< Updated upstream
   const apiUrl = "https://maze-backend-production.up.railway.app/users";
-=======
-  const apiUrl = "http://maze-backend-production.up.railway.app/users";
->>>>>>> Stashed changes
 
   useEffect(() => {
     fetchEmployees();

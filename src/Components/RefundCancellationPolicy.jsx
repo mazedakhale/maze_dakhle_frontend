@@ -10,11 +10,7 @@ const RefundCancellationPolicy = () => {
     const fetchRefundPolicy = async () => {
       try {
         const response = await axios.get(
-<<<<<<< Updated upstream
           "https://maze-backend-production.up.railway.app/privacy-policy/type/" +
-=======
-          "http://maze-backend-production.up.railway.app/privacy-policy/type/" +
->>>>>>> Stashed changes
             encodeURIComponent("Return Policy")
         );
         const data = response.data;

@@ -30,11 +30,7 @@ const RequiredDocuments = () => {
   const fetchDocuments = async () => {
     try {
       const response = await axios.get(
-<<<<<<< Updated upstream
         "https://maze-backend-production.up.railway.app/required-documents"
-=======
-        "http://maze-backend-production.up.railway.app/required-documents"
->>>>>>> Stashed changes
       );
       // Add default values for category and subcategory if they are null
       const documentsWithDefaults = response.data.map((doc) => ({
@@ -53,11 +49,7 @@ const RequiredDocuments = () => {
 
   const fetchCategories = async () => {
     try {
-<<<<<<< Updated upstream
       const response = await axios.get("https://maze-backend-production.up.railway.app/categories");
-=======
-      const response = await axios.get("http://maze-backend-production.up.railway.app/categories");
->>>>>>> Stashed changes
       setCategories(response.data);
     } catch (error) {
       console.error("Error fetching categories:", error);
@@ -68,11 +60,7 @@ const RequiredDocuments = () => {
     if (!categoryId) return;
     try {
       const response = await axios.get(
-<<<<<<< Updated upstream
         `https://maze-backend-production.up.railway.app/subcategories/category/${categoryId}`
-=======
-        `http://maze-backend-production.up.railway.app/subcategories/category/${categoryId}`
->>>>>>> Stashed changes
       );
       setSubcategories(response.data);
     } catch (error) {
@@ -115,11 +103,7 @@ const RequiredDocuments = () => {
 
     if (confirmDelete.isConfirmed) {
       try {
-<<<<<<< Updated upstream
         await axios.delete(`https://maze-backend-production.up.railway.app/required-documents/${id}`);
-=======
-        await axios.delete(`http://maze-backend-production.up.railway.app/required-documents/${id}`);
->>>>>>> Stashed changes
         setDocuments((prevDocuments) =>
           prevDocuments.filter((document) => document.id !== id)
         );
@@ -171,13 +155,8 @@ const RequiredDocuments = () => {
       }
 
       const url = editId
-<<<<<<< Updated upstream
         ? `https://maze-backend-production.up.railway.app/required-documents/${editId}`
         : "https://maze-backend-production.up.railway.app/required-documents";
-=======
-        ? `http://maze-backend-production.up.railway.app/required-documents/${editId}`
-        : "http://maze-backend-production.up.railway.app/required-documents";
->>>>>>> Stashed changes
 
       const method = editId ? "patch" : "post";
 

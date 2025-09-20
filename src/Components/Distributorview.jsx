@@ -27,11 +27,7 @@ const ApplicationView = () => {
   const fetchDocumentData = useCallback(async () => {
     try {
       const response = await axios.get(
-<<<<<<< Updated upstream
         `https://maze-backend-production.up.railway.app/singledocument/documentby/${documentId}`
-=======
-        `http://maze-backend-production.up.railway.app/singledocument/documentby/${documentId}`
->>>>>>> Stashed changes
       );
       const data = response.data.document;
       setDocumentData(data);
@@ -41,11 +37,7 @@ const ApplicationView = () => {
 
       if (category && subcategory) {
         const fieldNamesResponse = await axios.get(
-<<<<<<< Updated upstream
           `https://maze-backend-production.up.railway.app/field-names/${category}/${subcategory}`
-=======
-          `http://maze-backend-production.up.railway.app/field-names/${category}/${subcategory}`
->>>>>>> Stashed changes
         );
         setDocumentNames(fieldNamesResponse.data);
       }

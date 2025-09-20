@@ -36,21 +36,13 @@ const DlistPage = () => {
   useEffect(() => {
     if (categoryId) {
       axios
-<<<<<<< Updated upstream
         .get(`https://maze-backend-production.up.railway.app/categories/${categoryId}`)
-=======
-        .get(`http://maze-backend-production.up.railway.app/categories/${categoryId}`)
->>>>>>> Stashed changes
         .then((res) => setCategoryName(res.data.category_name))
         .catch((err) => console.error("Error loading category:", err));
     }
     if (subcategoryId) {
       axios
-<<<<<<< Updated upstream
         .get(`https://maze-backend-production.up.railway.app/subcategories/${subcategoryId}`)
-=======
-        .get(`http://maze-backend-production.up.railway.app/subcategories/${subcategoryId}`)
->>>>>>> Stashed changes
         .then((res) => setSubcategoryName(res.data.subcategory_name))
         .catch((err) => console.error("Error loading subcategory:", err));
     }
@@ -60,11 +52,7 @@ const DlistPage = () => {
   useEffect(() => {
     if (!categoryId || !subcategoryId || !distributorId) return;
 
-<<<<<<< Updated upstream
     const url = `https://maze-backend-production.up.railway.app/documents/${categoryId}/${subcategoryId}?distributorId=${distributorId}`;
-=======
-    const url = `http://maze-backend-production.up.railway.app/documents/${categoryId}/${subcategoryId}?distributorId=${distributorId}`;
->>>>>>> Stashed changes
     axios
       .get(url)
       .then((resp) => {
@@ -76,11 +64,7 @@ const DlistPage = () => {
       .catch((err) => console.error("Error fetching documents:", err));
 
     axios
-<<<<<<< Updated upstream
       .get("https://maze-backend-production.up.railway.app/certificates")
-=======
-      .get("http://maze-backend-production.up.railway.app/certificates")
->>>>>>> Stashed changes
       .then((resp) => setCertificates(resp.data))
       .catch((err) => console.error("Error fetching certificates:", err));
   }, [categoryId, subcategoryId, distributorId]);
@@ -118,11 +102,7 @@ const DlistPage = () => {
     if (!cert) return Swal.fire("Error", "Certificate not found.", "error");
     try {
       const resp = await axios.get(
-<<<<<<< Updated upstream
         `https://maze-backend-production.up.railway.app/certificates/${cert.certificate_id}`
-=======
-        `http://maze-backend-production.up.railway.app/certificates/${cert.certificate_id}`
->>>>>>> Stashed changes
       );
       const link = document.createElement("a");
       link.href = resp.data.file_url;

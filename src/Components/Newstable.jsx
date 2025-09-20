@@ -11,11 +11,7 @@ const NewsTable = () => {
   const [editingItem, setEditingItem] = useState(null);
 
   const navigate = useNavigate();
-<<<<<<< Updated upstream
   const apiUrl = "https://maze-backend-production.up.railway.app/news";
-=======
-  const apiUrl = "http://maze-backend-production.up.railway.app/news";
->>>>>>> Stashed changes
 
   useEffect(() => {
     fetchNews();

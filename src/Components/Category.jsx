@@ -9,13 +9,8 @@ const Categories = () => {
   const [subcategories, setSubcategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [isAdding, setIsAdding] = useState(false);
-<<<<<<< Updated upstream
   const API_BASE_URL = "https://maze-backend-production.up.railway.app/categories";
   const SUBCATEGORIES_API_URL = "https://maze-backend-production.up.railway.app/subcategories";
-=======
-  const API_BASE_URL = "http://maze-backend-production.up.railway.app/categories";
-  const SUBCATEGORIES_API_URL = "http://maze-backend-production.up.railway.app/subcategories";
->>>>>>> Stashed changes
 
   useEffect(() => {
     const fetchCategories = async () => {

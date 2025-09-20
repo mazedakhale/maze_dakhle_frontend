@@ -38,11 +38,7 @@ const Userpendinglist = () => {
     const allowedStatuses = ["Pending"];
 
     axios
-<<<<<<< Updated upstream
       .get("https://maze-backend-production.up.railway.app/documents/list")
-=======
-      .get("http://maze-backend-production.up.railway.app/documents/list")
->>>>>>> Stashed changes
       .then((response) => {
         const allDocuments = response.data.documents;
         const filteredDocs = allDocuments
@@ -57,11 +53,7 @@ const Userpendinglist = () => {
 
     // Fetch certificates
     axios
-<<<<<<< Updated upstream
       .get("https://maze-backend-production.up.railway.app/certificates")
-=======
-      .get("http://maze-backend-production.up.railway.app/certificates")
->>>>>>> Stashed changes
       .then((response) => setCertificates(response.data))
       .catch((error) => console.error("Error fetching certificates:", error));
   }, [userId]);
@@ -94,11 +86,7 @@ const Userpendinglist = () => {
           formData.append("documentType", documentType);
 
           const response = await axios.post(
-<<<<<<< Updated upstream
             ` https://maze-backend-production.up.railway.app/documents/reupload/${documentId}`,
-=======
-            ` http://maze-backend-production.up.railway.app/documents/reupload/${documentId}`,
->>>>>>> Stashed changes
             formData,
             {
               headers: {
@@ -167,11 +155,7 @@ const Userpendinglist = () => {
 
     try {
       const response = await axios.get(
-<<<<<<< Updated upstream
         ` https://maze-backend-production.up.railway.app/certificates/${certificate.certificate_id}`
-=======
-        ` http://maze-backend-production.up.railway.app/certificates/${certificate.certificate_id}`
->>>>>>> Stashed changes
       );
       if (response.data && response.data.file_url) {
         newTab.location.href = response.data.file_url;

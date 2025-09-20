@@ -12,11 +12,7 @@ const AddCategory = () => {
   const [isAdding, setIsAdding] = useState(false);
   const navigate = useNavigate();
 
-<<<<<<< Updated upstream
   const apiUrl = "https://maze-backend-production.up.railway.app/categories";
-=======
-  const apiUrl = "http://maze-backend-production.up.railway.app/categories";
->>>>>>> Stashed changes
 
   useEffect(() => {
     fetchCategories();

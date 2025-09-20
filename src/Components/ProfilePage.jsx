@@ -10,11 +10,7 @@ import {
   isValidPassword,
 } from "../utils/formValidators"; // Import your validators
 
-<<<<<<< Updated upstream
 const USER_API_BASE = "https://maze-backend-production.up.railway.app/users";
-=======
-const USER_API_BASE = "http://maze-backend-production.up.railway.app/users";
->>>>>>> Stashed changes
 const PASSWORD_API = `${USER_API_BASE}/password`;
 export default function ProfilePage() {
   const [user, setUser] = useState(null);

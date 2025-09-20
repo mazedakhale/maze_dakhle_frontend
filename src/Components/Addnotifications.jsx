@@ -22,11 +22,7 @@ const NotificationManager = () => {
   // Fetch all notifications
   const fetchNotifications = async () => {
     try {
-<<<<<<< Updated upstream
       const response = await axios.get("https://maze-backend-production.up.railway.app/notifications"); // Adjust API URL as needed
-=======
-      const response = await axios.get("http://maze-backend-production.up.railway.app/notifications"); // Adjust API URL as needed
->>>>>>> Stashed changes
       setNotifications(Array.isArray(response.data) ? response.data : []);
     } catch (err) {
       console.error("Error fetching notifications:", err);
@@ -51,11 +47,7 @@ const NotificationManager = () => {
         notification_date:
           newNotification.notification_date || new Date().toISOString(),
       };
-<<<<<<< Updated upstream
       await axios.post("https://maze-backend-production.up.railway.app/notifications", payload);
-=======
-      await axios.post("http://maze-backend-production.up.railway.app/notifications", payload);
->>>>>>> Stashed changes
       fetchNotifications();
       setIsModalOpen(false);
       setNewNotification({
@@ -100,11 +92,7 @@ const NotificationManager = () => {
 
       // 2. **API call runs in background, not blocking UI**
       axios
-<<<<<<< Updated upstream
         .delete(`https://maze-backend-production.up.railway.app/notifications/${id}`)
-=======
-        .delete(`http://maze-backend-production.up.railway.app/notifications/${id}`)
->>>>>>> Stashed changes
         .then(() => {
           fetchNotifications(); // Refresh list after deletion
         })
@@ -137,11 +125,7 @@ const NotificationManager = () => {
   // Save edited notification
   const handleSaveEdit = async (id) => {
     try {
-<<<<<<< Updated upstream
       await axios.put(`https://maze-backend-production.up.railway.app/notifications/${id}`, editData);
-=======
-      await axios.put(`http://maze-backend-production.up.railway.app/notifications/${id}`, editData);
->>>>>>> Stashed changes
       setEditingId(null);
       fetchNotifications();
     } catch (err) {
@@ -153,11 +137,7 @@ const NotificationManager = () => {
   const handleToggleStatus = async (id, currentStatus) => {
     try {
       const newStatus = currentStatus === "Active" ? "Inactive" : "Active";
-<<<<<<< Updated upstream
       await axios.patch(`https://maze-backend-production.up.railway.app/notifications/status/${id}`, {
-=======
-      await axios.patch(`http://maze-backend-production.up.railway.app/notifications/status/${id}`, {
->>>>>>> Stashed changes
         notification_status: newStatus,
       });
       fetchNotifications();

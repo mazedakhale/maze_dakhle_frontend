@@ -49,11 +49,7 @@ const Feedback = () => {
     }
 
     try {
-<<<<<<< Updated upstream
       await axios.post("https://maze-backend-production.up.railway.app/feedback", {
-=======
-      await axios.post("http://maze-backend-production.up.railway.app/feedback", {
->>>>>>> Stashed changes
         comment,
         rating,
         user_id: storedUser.user_id, // ✅ Extract user_id correctly

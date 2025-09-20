@@ -20,11 +20,7 @@ const ElistPage = () => {
 
   useEffect(() => {
     axios
-<<<<<<< Updated upstream
       .get("https://maze-backend-production.up.railway.app/documents/list")
-=======
-      .get("http://maze-backend-production.up.railway.app/documents/list")
->>>>>>> Stashed changes
       .then((response) => {
         const sortedDocuments = response.data.documents.sort(
           (a, b) => new Date(b.uploaded_at) - new Date(a.uploaded_at)
@@ -34,30 +30,18 @@ const ElistPage = () => {
       .catch((error) => console.error("Error fetching documents:", error));
 
     axios
-<<<<<<< Updated upstream
       .get("https://maze-backend-production.up.railway.app/users/distributors")
-=======
-      .get("http://maze-backend-production.up.railway.app/users/distributors")
->>>>>>> Stashed changes
       .then((response) => setDistributors(response.data))
 
       .catch((error) => console.error("Error fetching distributors:", error));
 
     axios
-<<<<<<< Updated upstream
       .get("https://maze-backend-production.up.railway.app/certificates")
-=======
-      .get("http://maze-backend-production.up.railway.app/certificates")
->>>>>>> Stashed changes
       .then((response) => setCertificates(response.data))
       .catch((error) => console.error("Error fetching certificates:", error));
 
     axios
-<<<<<<< Updated upstream
       .get("https://maze-backend-production.up.railway.app/users/register")
-=======
-      .get("http://maze-backend-production.up.railway.appusers/register")
->>>>>>> Stashed changes
       .then((response) => setUsers(response.data))
       .catch((error) => console.error("Error fetching users:", error));
   }, []);
@@ -147,11 +131,7 @@ const ElistPage = () => {
     }
     try {
       const response = await axios.get(
-<<<<<<< Updated upstream
         `https://maze-backend-production.up.railway.app/certificates/${certificateId}`
-=======
-        `http://maze-backend-production.up.railway.app/certificates/${certificateId}`
->>>>>>> Stashed changes
       );
       if (response.data && response.data.file_url) {
         window.open(response.data.file_url, "_blank");
@@ -167,11 +147,7 @@ const ElistPage = () => {
   const handleDownloadCertificate = async (documentId, name) => {
     try {
       const response = await axios.get(
-<<<<<<< Updated upstream
         `https://maze-backend-production.up.railway.app/download-certificate/${documentId}`,
-=======
-        `http://maze-backend-production.up.railway.app/download-certificate/${documentId}`,
->>>>>>> Stashed changes
         {
           responseType: "blob", // Important to handle file downloads
         }

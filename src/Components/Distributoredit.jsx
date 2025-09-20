@@ -14,11 +14,7 @@ const DistributorEdit = () => {
 
   useEffect(() => {
     axios
-<<<<<<< Updated upstream
       .get(`https://maze-backend-production.up.railway.app/users/edit/${user_id}`)
-=======
-      .get(`http://maze-backend-production.up.railway.app/users/edit/${user_id}`)
->>>>>>> Stashed changes
       .then((response) => {
         setFormData(response.data);
       })
@@ -34,11 +30,7 @@ const DistributorEdit = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     axios
-<<<<<<< Updated upstream
       .put(`https://maze-backend-production.up.railway.app/users/edit/${user_id}`, formData)
-=======
-      .put(`http://maze-backend-production.up.railway.app/users/edit/${user_id}`, formData)
->>>>>>> Stashed changes
       .then(() => {
         alert("Distributor updated successfully!");
         navigate("/distributor-list"); // Redirect after update

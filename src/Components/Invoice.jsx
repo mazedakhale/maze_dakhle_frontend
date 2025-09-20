@@ -88,22 +88,14 @@ const InvoicePage = () => {
 
   useEffect(() => {
     axios
-<<<<<<< Updated upstream
       .get("https://maze-backend-production.up.railway.app/users/distributors")
-=======
-      .get("http://maze-backend-production.up.railway.app/users/distributors")
->>>>>>> Stashed changes
       .then((response) => setDistributors(response.data))
       .catch((error) => console.error("Error fetching distributors:", error));
   }, []);
   const fetchDocumentData = useCallback(async () => {
     try {
       const response = await axios.get(
-<<<<<<< Updated upstream
         `https://maze-backend-production.up.railway.app/singledocument/documentby/${documentId}`
-=======
-        `http://maze-backend-production.up.railway.app/singledocument/documentby/${documentId}`
->>>>>>> Stashed changes
       );
       const data = response.data.document;
       setDocumentData(data);
@@ -113,11 +105,7 @@ const InvoicePage = () => {
 
       if (category && subcategory) {
         const fieldNamesResponse = await axios.get(
-<<<<<<< Updated upstream
           `https://maze-backend-production.up.railway.app/field-names/${category}/${subcategory}`
-=======
-          `http://maze-backend-production.up.railway.app/field-names/${category}/${subcategory}`
->>>>>>> Stashed changes
         );
         setDocumentNames(fieldNamesResponse.data);
       }
@@ -160,11 +148,7 @@ const InvoicePage = () => {
       console.log("Payload:", payload); // Debug: Log the payload
 
       const response = await axios.put(
-<<<<<<< Updated upstream
         `https://maze-backend-production.up.railway.app/documents/update-status/${documentId}`,
-=======
-        `http://maze-backend-production.up.railway.app/documents/update-status/${documentId}`,
->>>>>>> Stashed changes
         payload,
         {
           timeout: 30000, // Increase timeout to 30 seconds
@@ -207,11 +191,7 @@ const InvoicePage = () => {
 
       // Make the API call to download the ZIP file with increased timeout
       const response = await axios.get(
-<<<<<<< Updated upstream
         `https://maze-backend-production.up.railway.app/download/${documentId}`,
-=======
-        `http://maze-backend-production.up.railway.app/download/${documentId}`,
->>>>>>> Stashed changes
         {
           responseType: "blob", // Handle binary data
           timeout: 60000, // Increase timeout to 60 seconds
@@ -368,11 +348,7 @@ const InvoicePage = () => {
       setIsProcessing(true);
 
       const assignResponse = await axios.put(
-<<<<<<< Updated upstream
         `https://maze-backend-production.up.railway.app/documents/assign-distributor/${documentId}`,
-=======
-        `http://maze-backend-production.up.railway.app/documents/assign-distributor/${documentId}`,
->>>>>>> Stashed changes
         {
           distributor_id: distributorId,
           remark: distributorRemark,
@@ -381,11 +357,7 @@ const InvoicePage = () => {
       console.log("Assign Distributor Response:", assignResponse.data);
 
       const statusResponse = await axios.put(
-<<<<<<< Updated upstream
         `https://maze-backend-production.up.railway.app/documents/update-status/${documentId}`,
-=======
-        `http://maze-backend-production.up.railway.app/documents/update-status/${documentId}`,
->>>>>>> Stashed changes
         {
           status: "Approved",
         }

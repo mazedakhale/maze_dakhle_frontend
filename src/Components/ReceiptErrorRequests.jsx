@@ -35,11 +35,7 @@ const ReceiptErrorRequests = () => {
 
   const fetchErrorRequests = async () => {
     try {
-<<<<<<< Updated upstream
       const { data } = await axios.get("https://maze-backend-production.up.railway.app/request-errors");
-=======
-      const { data } = await axios.get("http://maze-backend-production.up.railway.app/request-errors");
->>>>>>> Stashed changes
       setErrorRequests(data);
     } catch (err) {
       console.error("Error fetching error requests:", err);
@@ -48,11 +44,7 @@ const ReceiptErrorRequests = () => {
 
   const fetchUsers = async () => {
     try {
-<<<<<<< Updated upstream
       const { data } = await axios.get("https://maze-backend-production.up.railway.app/users/register");
-=======
-      const { data } = await axios.get("http://maze-backend-production.up.railway.appusers/register");
->>>>>>> Stashed changes
       setUsers(data);
     } catch (err) {
       console.error("Error fetching users:", err);
@@ -62,11 +54,7 @@ const ReceiptErrorRequests = () => {
   const fetchDistributors = async () => {
     try {
       const { data } = await axios.get(
-<<<<<<< Updated upstream
         "https://maze-backend-production.up.railway.app/users/distributors"
-=======
-        "http://maze-backend-production.up.railway.app/users/distributors"
->>>>>>> Stashed changes
       );
       setDistributors(data);
     } catch (err) {
@@ -93,11 +81,7 @@ const ReceiptErrorRequests = () => {
   const handleDownloadReceipt = async (applicationId) => {
     try {
       const { data } = await axios.get(
-<<<<<<< Updated upstream
         `https://maze-backend-production.up.railway.app//documents/receipt/${applicationId}`
-=======
-        `http://maze-backend-production.up.railway.app//documents/receipt/${applicationId}`
->>>>>>> Stashed changes
       );
       const url = data.receipt_url;
       const appId = data.application_id;
@@ -126,11 +110,7 @@ const ReceiptErrorRequests = () => {
   const handleDownloadCertificate = async (applicationId) => {
     try {
       const { data } = await axios.get(
-<<<<<<< Updated upstream
         `https://maze-backend-production.up.railway.app/certificates/certificate/${applicationId}`
-=======
-        `http://maze-backend-production.up.railway.app/certificates/certificate/${applicationId}`
->>>>>>> Stashed changes
       );
       const url = data.certificate_url;
       const appId = data.application_id;
@@ -183,11 +163,7 @@ const ReceiptErrorRequests = () => {
 
     try {
       await axios.patch(
-<<<<<<< Updated upstream
         `https://maze-backend-production.up.railway.app/request-errors/update-status/${requestId}`,
-=======
-        `http://maze-backend-production.up.railway.app/request-errors/update-status/${requestId}`,
->>>>>>> Stashed changes
         { request_status: newStatus, rejectionReason }
       );
     } catch (err) {

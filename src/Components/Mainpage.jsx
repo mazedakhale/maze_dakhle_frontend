@@ -95,11 +95,7 @@ const PurpleBanner = () => {
   const [description, setDescription] = useState("");
   useEffect(() => {
     axios
-<<<<<<< Updated upstream
       .get("https://maze-backend-production.up.railway.app/header")
-=======
-      .get("http://maze-backend-production.up.railway.app/header")
->>>>>>> Stashed changes
       .then((res) =>
         setDescription(
           res.data[0]?.description || "Welcome to our website! 📞 0998766534"
@@ -128,11 +124,7 @@ const Footer = () => {
   const [contactInfo, setContactInfo] = useState(null);
   useEffect(() => {
     axios
-<<<<<<< Updated upstream
       .get("https://maze-backend-production.up.railway.app/contact-info")
-=======
-      .get("http://maze-backend-production.up.railway.app/contact-info")
->>>>>>> Stashed changes
       .then((res) => setContactInfo(res.data[0] || {}))
       .catch(() => setContactInfo(null));
   }, []);
@@ -218,20 +210,12 @@ const Mainpage = () => {
 
   useEffect(() => {
     axios
-<<<<<<< Updated upstream
       .get("https://maze-backend-production.up.railway.app/document-types")
-=======
-      .get("http://maze-backend-production.up.railway.app/document-types")
->>>>>>> Stashed changes
       .then((res) => setDocumentTypes(res.data))
       .catch(() => setError("Failed to load documents"));
 
     axios
-<<<<<<< Updated upstream
       .get("https://maze-backend-production.up.railway.app/news")
-=======
-      .get("http://maze-backend-production.up.railway.app/news")
->>>>>>> Stashed changes
       .then((res) => setNewsList(res.data))
       .catch(() => setError("Failed to load news"))
       .finally(() => setLoading(false));

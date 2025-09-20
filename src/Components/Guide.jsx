@@ -9,11 +9,7 @@ import {
   FaTimes,
 } from "react-icons/fa";
 
-<<<<<<< Updated upstream
 const GUIDE_API_URL = "https://maze-backend-production.up.railway.app/images";
-=======
-const GUIDE_API_URL = "http://maze-backend-production.up.railway.app/images";
->>>>>>> Stashed changes
 
 export default function Guide() {
   const [images, setImages] = useState([]);

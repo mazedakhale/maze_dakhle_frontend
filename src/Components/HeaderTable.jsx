@@ -10,11 +10,7 @@ const HeaderTable = () => {
   const [editingItem, setEditingItem] = useState(null);
 
   const navigate = useNavigate();
-<<<<<<< Updated upstream
   const apiUrl = "https://maze-backend-production.up.railway.app/header";
-=======
-  const apiUrl = "http://maze-backend-production.up.railway.app/header";
->>>>>>> Stashed changes
 
   useEffect(() => {
     fetchHeaders();

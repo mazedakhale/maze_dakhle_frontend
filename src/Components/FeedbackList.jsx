@@ -6,11 +6,7 @@ import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 import { FaTag, FaEdit, FaTrash, FaPlus, FaTimes } from "react-icons/fa";
 
-<<<<<<< Updated upstream
 const API_BASE = "https://maze-backend-production.up.railway.app/feedback";
-=======
-const API_BASE = "http://maze-backend-production.up.railway.app/feedback";
->>>>>>> Stashed changes
 
 const FeedbackList = () => {
   const [feedbackList, setFeedbackList] = useState([]);

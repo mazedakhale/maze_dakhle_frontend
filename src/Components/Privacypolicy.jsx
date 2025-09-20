@@ -11,11 +11,7 @@ const PrivacyPolicy = () => {
       try {
         // Fetch only the "Privacy Policy" type
         const response = await axios.get(
-<<<<<<< Updated upstream
           "https://maze-backend-production.up.railway.app/privacy-policy/type/Privacy%20Policy"
-=======
-          "http://maze-backend-production.up.railway.app/privacy-policy/type/Privacy%20Policy"
->>>>>>> Stashed changes
         );
         const data = response.data;
 

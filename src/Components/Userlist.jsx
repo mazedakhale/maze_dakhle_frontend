@@ -7,15 +7,12 @@ const UserTable = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  
   useEffect(() => {
     const fetchUsers = async () => {
       try {
         const response = await axios.get(
-<<<<<<< Updated upstream
           "https://maze-backend-production.up.railway.app/users/register"
-=======
-          "http://maze-backend-production.up.railway.appusers/register"
->>>>>>> Stashed changes
         );
         const distributors = response.data.filter(
           (user) => user.role === "Customer"

@@ -79,11 +79,7 @@ const Apply = () => {
     if (formData.category_id && formData.subcategory_id) {
       axios
         .get(
-<<<<<<< Updated upstream
           ` https://maze-backend-production.up.railway.app/required-documents/${formData.category_id}/${formData.subcategory_id}`
-=======
-          ` http://maze-backend-production.up.railway.app/required-documents/${formData.category_id}/${formData.subcategory_id}`
->>>>>>> Stashed changes
         )
         .then((response) => {
           if (response.data.length > 0 && response.data[0].document_names) {
@@ -108,11 +104,7 @@ const Apply = () => {
     if (formData.category_id && formData.subcategory_id) {
       axios
         .get(
-<<<<<<< Updated upstream
           ` https://maze-backend-production.up.railway.app/field-names/${formData.category_id}/${formData.subcategory_id}`
-=======
-          ` http://maze-backend-production.up.railway.app/field-names/${formData.category_id}/${formData.subcategory_id}`
->>>>>>> Stashed changes
         )
         .then((response) => {
           if (response.data.length > 0 && response.data[0].document_fields) {
@@ -247,11 +239,7 @@ const Apply = () => {
 
     try {
       const response = await axios.post(
-<<<<<<< Updated upstream
         " https://maze-backend-production.up.railway.app/documents/upload",
-=======
-        " http://maze-backend-production.up.railway.app/documents/upload",
->>>>>>> Stashed changes
         formDataToSend,
         {
           headers: { "Content-Type": "multipart/form-data" },

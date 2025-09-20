@@ -11,11 +11,7 @@ const ContactTable = () => {
   const [updatedKey, setUpdatedKey] = useState("");
   const [isAdding, setIsAdding] = useState(false);
   const navigate = useNavigate();
-<<<<<<< Updated upstream
   const apiUrl = "https://maze-backend-production.up.railway.app/field";
-=======
-  const apiUrl = "http://maze-backend-production.up.railway.app/field";
->>>>>>> Stashed changes
 
   // Fetch all fields
   useEffect(() => {

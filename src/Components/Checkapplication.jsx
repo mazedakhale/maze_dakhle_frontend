@@ -66,11 +66,7 @@ const SearchApplication = () => {
 
       axios
         .get(
-<<<<<<< Updated upstream
           `https://maze-backend-production.up.railway.app/userdashboard/fetch/${userId}/${applicationId.trim()}`,
-=======
-          `http://maze-backend-production.up.railway.app/userdashboard/fetch/${userId}/${applicationId.trim()}`,
->>>>>>> Stashed changes
           { cancelToken: cancelTokenRef.current.token }
         )
         .then((resp) => {

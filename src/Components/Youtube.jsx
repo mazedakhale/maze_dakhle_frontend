@@ -19,11 +19,7 @@ const Youtube = () => {
   });
 
   const navigate = useNavigate();
-<<<<<<< Updated upstream
   const apiUrl = "https://maze-backend-production.up.railway.app/images";
-=======
-  const apiUrl = "http://maze-backend-production.up.railway.app/images";
->>>>>>> Stashed changes
 
   // Fetch all images
   const fetchImages = async () => {

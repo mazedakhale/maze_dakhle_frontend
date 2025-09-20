@@ -94,11 +94,7 @@ const EmployeeDocumentList = () => {
       if (userRole === "Admin" || userRole === "Employee") {
         // Use the API endpoint
         const response = await axios.get(
-<<<<<<< Updated upstream
           `https://maze-backend-production.up.railway.app/documents/category-docs/${categoryId}/${subcategoryId}/${userId}`
-=======
-          `http://maze-backend-production.up.railway.app/documents/category-docs/${categoryId}/${subcategoryId}/${userId}`
->>>>>>> Stashed changes
         );
 
         if (response.data.error) {
@@ -237,11 +233,7 @@ const EmployeeDocumentList = () => {
   const handleViewCertificate = async (documentId) => {
     try {
       const response = await axios.get(
-<<<<<<< Updated upstream
         `https://maze-backend-production.up.railway.app/certificates/by-document/${documentId}`
-=======
-        `http://maze-backend-production.up.railway.app/certificates/by-document/${documentId}`
->>>>>>> Stashed changes
       );
       if (response.data && response.data.file_url) {
         window.open(response.data.file_url, "_blank");

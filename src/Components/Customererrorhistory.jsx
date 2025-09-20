@@ -24,11 +24,7 @@ const ErrorRequests = () => {
   // Fetch error requests (only completed ones)
   const fetchErrorRequests = async () => {
     try {
-<<<<<<< Updated upstream
       const response = await axios.get("https://maze-backend-production.up.railway.app/request-errors");
-=======
-      const response = await axios.get("http://maze-backend-production.up.railway.app/request-errors");
->>>>>>> Stashed changes
 
       // ✅ Filter requests to include only those with status "Completed"
       const completedRequests = response.data.filter(
@@ -44,11 +40,7 @@ const ErrorRequests = () => {
   // Fetch certificates
   const fetchCertificates = async () => {
     try {
-<<<<<<< Updated upstream
       const response = await axios.get("https://maze-backend-production.up.railway.app/certificates");
-=======
-      const response = await axios.get("http://maze-backend-production.up.railway.app/certificates");
->>>>>>> Stashed changes
       setCertificates(response.data);
     } catch (error) {
       console.error("Error fetching certificates:", error);
@@ -72,11 +64,7 @@ const ErrorRequests = () => {
     }
     try {
       const response = await axios.get(
-<<<<<<< Updated upstream
         `https://maze-backend-production.up.railway.app/certificates/${certificateId}`
-=======
-        `http://maze-backend-production.up.railway.app/certificates/${certificateId}`
->>>>>>> Stashed changes
       );
       if (response.data && response.data.file_url) {
         window.open(response.data.file_url, "_blank");
@@ -93,11 +81,7 @@ const ErrorRequests = () => {
   const handleDownloadCertificate = async (documentId, requestName) => {
     try {
       const response = await axios.get(
-<<<<<<< Updated upstream
         `https://maze-backend-production.up.railway.app/download-certificate/${documentId}`,
-=======
-        `http://maze-backend-production.up.railway.app/download-certificate/${documentId}`,
->>>>>>> Stashed changes
         {
           responseType: "blob", // Important to handle file downloads
         }
