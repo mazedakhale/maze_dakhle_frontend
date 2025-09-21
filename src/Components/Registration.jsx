@@ -526,16 +526,36 @@ const Register = () => {
       formData.taluka &&
       formData.aadharCard &&
       formData.panCard &&
-      formData.profilePhoto &&
       formData.agreeToTerms &&
       Object.values(formData.errors).every((err) => !err)
     );
   };
 
+  // Update the handleSubmit function
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!validateForm()) {
-      return Swal.fire("Validation Error", "Please fix errors.", "error");
+
+    // Check only required fields
+    const requiredFields = {
+      name: formData.name,
+      email: formData.email,
+      password: formData.password,
+      phone: formData.phone,
+      address: formData.address,
+      district: formData.district,
+      taluka: formData.taluka,
+      aadharCard: formData.aadharCard,
+      panCard: formData.panCard,
+      agreeToTerms: formData.agreeToTerms,
+    };
+
+    // Validate required fields
+    const hasEmptyFields = Object.values(requiredFields).some(
+      (field) => !field
+    );
+
+    if (hasEmptyFields) {
+      return Swal.fire("Validation Error", "Please fill all required fields.", "error");
     }
 
     Swal.fire({
@@ -571,38 +591,21 @@ const Register = () => {
       payload.append("documentTypes", "PAN Card");
 
       // Append profile photo
-      if (formData.profilePhoto) {
+      if (formData?.profilePhoto) {
         payload.append("profilePhoto", formData.profilePhoto);
       }
 
-      const res = await fetch("https://maze-backend-production.up.railway.app/users/register", {
-        method: "POST",
-        body: payload,
-      });
+      const res = await fetch(
+        "https://maze-backend-production.up.railway.app/users/register",
+        {
+          method: "POST",
+          body: payload,
+        }
+      );
 
       const data = await res.json();
       Swal.close();
       if (!res.ok) throw new Error(data.message || "Registration failed");
-
-      // SMS Logic
-      const phoneE164 = formData.phone.startsWith("91")
-        ? formData.phone
-        : "91" + formData.phone;
-      const message =
-        `Welcome to Mazedakhale! Your registration was successful, *Wait For Admin Approval*.\n\n` +
-        `Here are your login credentials:\n` +
-        `Email: ${formData.email}\n` +
-        `Password: ${formData.password}\n\n` +
-        `Thank you for joining us!`;
-      fetch(SMS_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          sender: SMS_SENDER,
-          number: phoneE164,
-          message,
-        }),
-      }).catch(console.error);
 
       Swal.fire(
         "Success",
