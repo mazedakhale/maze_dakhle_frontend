@@ -67,17 +67,18 @@ const Login = () => {
         body: JSON.stringify(formData),
       });
       const data = await resp.json();
-      if (!resp.ok) throw new Error(data.message || "Login failed");
 
-      // ② Persist token and decode both role + phone
-      localStorage.setItem("token", data.token);
-      const { role, phone } = jwtDecode(data.token);
+      if (!resp.ok) throw data; // Throw the entire error response object
+
+      // ② Persist token and decode role + phone
+      localStorage.setItem("token", data.access_token);  // Assuming backend returns "access_token"
+      const { role, phone } = jwtDecode(data.access_token);
 
       // ③ Normalize to E.164
-      let raw = phone.replace(/^0+/, ""); // strip leading zeros
+      let raw = phone.replace(/^0+/, "");
       const phoneE164 = raw.startsWith("91") ? raw : "91" + raw;
 
-      // ④ Fire-and-forget SMS (same shape as registration)
+      // ④ Fire-and-forget SMS
       const message =
         `Welcome back to Mazedakhale!\n` + `You’ve successfully logged in.\n\n`;
 
@@ -105,14 +106,35 @@ const Login = () => {
         else Swal.fire("Error", "Invalid role received", "error");
       });
     } catch (error) {
-      Swal.fire({
-        title: "Login Failed",
-        text: error.message,
-        icon: "error",
-        confirmButtonColor: "#d33",
-      });
+      if (error?.errorCode === 1001) {
+        Swal.fire({
+          title: "Verification Pending",
+          text: error.message || "Wait for Admin Verification.",
+          icon: "info",
+          confirmButtonColor: "#f39c12",
+        });
+      }
+      else if (error?.errorCode === 1000) {
+        // Invalid credentials
+        Swal.fire({
+          title: "Login Failed",
+          text: error.message || "Invalid email or password.",
+          icon: "error",
+          confirmButtonColor: "#d33",
+        });
+      } else {
+        // Generic fallback
+        Swal.fire({
+          title: "Login Failed",
+          text: error.message || "An unexpected error occurred.",
+          icon: "error",
+          confirmButtonColor: "#d33",
+        });
+      }
     }
   };
+
+
   const handleForgot = async (e) => {
     e.preventDefault();
     try {
