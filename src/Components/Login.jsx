@@ -60,37 +60,40 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      // ① Authenticate
+      //Authenticate
       const resp = await fetch("https://maze-backend-production.up.railway.app/users/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
+
+      //get response
       const data = await resp.json();
 
-      if (!resp.ok) throw data; // Throw the entire error response object
+      //log data
+      //console.log(data);
+
+      if (!resp.ok) throw data; 
 
       // ② Persist token and decode role + phone
-      localStorage.setItem("token", data.access_token);  // Assuming backend returns "access_token"
-      const { role, phone } = jwtDecode(data.access_token);
+      localStorage.setItem("token", data.token);  // Assuming backend returns "access_token"
+      const { role, phone } = jwtDecode(data.token);
 
-      // ③ Normalize to E.164
-      let raw = phone.replace(/^0+/, "");
-      const phoneE164 = raw.startsWith("91") ? raw : "91" + raw;
-
+      //TODO: Fix this phone verification later
+      // let raw = phone.replace(/^0+/, "");
+      // const phoneE164 = raw.startsWith("91") ? raw : "91" + raw;
       // ④ Fire-and-forget SMS
-      const message =
-        `Welcome back to Mazedakhale!\n` + `You’ve successfully logged in.\n\n`;
-
-      fetch(SMS_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          sender: SMS_SENDER,
-          number: phoneE164,
-          message: message,
-        }),
-      }).catch((err) => console.error("SMS send error:", err));
+      //const message =
+      // `Welcome back to Mazedakhale!\n` + `You’ve successfully logged in.\n\n`;
+      // fetch(SMS_URL, {
+      //   method: "POST",
+      //   headers: { "Content-Type": "application/json" },
+      //   body: JSON.stringify({
+      //     sender: SMS_SENDER,
+      //     number: phoneE164,
+      //     message: message,
+      //   }),
+      // }).catch((err) => console.error("SMS send error:", err));
 
       // ⑤ Notify + redirect
       Swal.fire({
@@ -133,7 +136,7 @@ const Login = () => {
       }
     }
   };
-
+  
 
   const handleForgot = async (e) => {
     e.preventDefault();
