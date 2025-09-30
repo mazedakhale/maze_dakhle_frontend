@@ -94,12 +94,12 @@ const Edashinner = () => {
           requiredDocsResponse,
           userAssignmentsResponse,
         ] = await Promise.all([
-          fetch("http://localhost:3000/statistics/counts").then((res) => res.json()),
-          axios.get("http://localhost:3000/categories"),
-          axios.get("http://localhost:3000/subcategories"),
-          axios.get("http://localhost:3000/statistics/cscounts"),
-          axios.get("http://localhost:3000/required-documents"),
-          axios.get(`http://localhost:3000/employee/employeeAsUser/${currentUserId}`),
+          fetch("https://maze-backend-production.up.railway.app/statistics/counts").then((res) => res.json()),
+          axios.get("https://maze-backend-production.up.railway.app/categories"),
+          axios.get("https://maze-backend-production.up.railway.app/subcategories"),
+          axios.get("https://maze-backend-production.up.railway.app/statistics/cscounts"),
+          axios.get("https://maze-backend-production.up.railway.app/required-documents"),
+          axios.get(`https://maze-backend-production.up.railway.app/employee/employeeAsUser/${currentUserId}`),
         ]);
 
         const totalCounts = countsData.totalCounts || DEFAULT_COUNTS;
