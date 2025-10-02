@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import jwtDecode from "jwt-decode";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+
 const Login = () => {
   const [mode, setMode] = useState("login");
   const [formData, setFormData] = useState({ email: "", password: "" });
@@ -56,46 +57,59 @@ const Login = () => {
     setShowPassword((prev) => !prev);
   };
 
+
+  const showResendVerificationPopup = (email) => {
+    Swal.fire({
+      title: "Email Not Verified",
+      text: "Your email is not verified. Would you like us to resend the verification email?",
+      icon: "info",
+      showCancelButton: true,
+      confirmButtonText: "Resend Verification Email",
+      cancelButtonText: "Cancel",
+      confirmButtonColor: "#F58A3B",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const resp = await fetch("https://maze-backend-production.up.railway.app/users/resend-verification", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email }),
+          });
+          const data = await resp.json();
+          if (!resp.ok) throw data;
+
+          Swal.fire("Success", data.message || "Verification email sent!", "success");
+        } catch (error) {
+          Swal.fire(
+            "Error",
+            error.message || "Failed to resend verification email. Please try again later.",
+            "error"
+          );
+        }
+      }
+    });
+  };
+
+
   // LOGIN
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      //Authenticate
       const resp = await fetch("https://maze-backend-production.up.railway.app/users/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
 
-      //get response
       const data = await resp.json();
 
-      //log data
-      //console.log(data);
+      if (!resp.ok) throw data;
 
-      if (!resp.ok) throw data; 
-
-      // ② Persist token and decode role + phone
-      localStorage.setItem("token", data.token);  // Assuming backend returns "access_token"
+      localStorage.setItem("token", data.token);
       const { role, phone } = jwtDecode(data.token);
 
-      //TODO: Fix this phone verification later
-      // let raw = phone.replace(/^0+/, "");
-      // const phoneE164 = raw.startsWith("91") ? raw : "91" + raw;
-      // ④ Fire-and-forget SMS
-      //const message =
-      // `Welcome back to Mazedakhale!\n` + `You’ve successfully logged in.\n\n`;
-      // fetch(SMS_URL, {
-      //   method: "POST",
-      //   headers: { "Content-Type": "application/json" },
-      //   body: JSON.stringify({
-      //     sender: SMS_SENDER,
-      //     number: phoneE164,
-      //     message: message,
-      //   }),
-      // }).catch((err) => console.error("SMS send error:", err));
+      // TODO: Re-enable phone verification SMS as needed
 
-      // ⑤ Notify + redirect
       Swal.fire({
         title: "Login Successful!",
         text: "Redirecting to your dashboard…",
@@ -108,25 +122,25 @@ const Login = () => {
         else if (role === "Employee") navigate("/Edashinner");
         else Swal.fire("Error", "Invalid role received", "error");
       });
+
     } catch (error) {
-      if (error?.errorCode === 1001) {
+      if (error?.errorCode === 1000) {
         Swal.fire({
           title: "Verification Pending",
-          text: error.message || "Wait for Admin Verification.",
+          text: error.message || "Invalid email or password",
           icon: "info",
           confirmButtonColor: "#f39c12",
         });
-      }
-      else if (error?.errorCode === 1000) {
-        // Invalid credentials
+      } else if (error?.errorCode === 1001) {
         Swal.fire({
           title: "Login Failed",
-          text: error.message || "Invalid email or password.",
+          text: error.message || "Wait for Admin Verification.",
           icon: "error",
           confirmButtonColor: "#d33",
         });
+      } else if (error?.errorCode === 1002) {
+        showResendVerificationPopup(formData.email);
       } else {
-        // Generic fallback
         Swal.fire({
           title: "Login Failed",
           text: error.message || "An unexpected error occurred.",
@@ -136,7 +150,6 @@ const Login = () => {
       }
     }
   };
-  
 
   const handleForgot = async (e) => {
     e.preventDefault();
