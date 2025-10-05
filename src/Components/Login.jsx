@@ -126,16 +126,16 @@ const Login = () => {
     } catch (error) {
       if (error?.errorCode === 1000) {
         Swal.fire({
-          title: "Verification Pending",
+          title: "Login Failed",
           text: error.message || "Invalid email or password",
           icon: "info",
           confirmButtonColor: "#f39c12",
         });
       } else if (error?.errorCode === 1001) {
         Swal.fire({
-          title: "Login Failed",
+          title: "Verification Pending",
           text: error.message || "Wait for Admin Verification.",
-          icon: "error",
+          icon: "info",
           confirmButtonColor: "#d33",
         });
       } else if (error?.errorCode === 1002) {
