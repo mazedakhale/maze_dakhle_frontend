@@ -138,9 +138,9 @@ const Login = () => {
           icon: "info",
           confirmButtonColor: "#d33",
         });
-      } else if (error?.errorCode === 1002) {
+      } /*else if (error?.errorCode === 1002) {
         showResendVerificationPopup(formData.email);
-      } else {
+      }*/ else {
         Swal.fire({
           title: "Login Failed",
           text: error.message || "An unexpected error occurred.",
