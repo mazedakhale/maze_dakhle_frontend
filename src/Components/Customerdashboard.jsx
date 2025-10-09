@@ -45,12 +45,14 @@ const Sidebar = ({ onNavigate }) => {
               { icon: <FaFileAlt />, label: "Fill Form", path: "/Category" },
               {
                 icon: <FaClipboardList />,
-                label: "Applications History",
+                label: "Completed Applications",
+                // label: "Applications History",
                 path: "/Customerhistory",
               },
               {
                 icon: <FaClipboardList />,
-                label: "Applications",
+                label: "Applied Applications",
+                // label: "Applications",
                 path: "/Customerapply",
               },
               { icon: <FaCommentDots />, label: "Feedback", path: "/Feedback" },

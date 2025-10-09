@@ -18,17 +18,18 @@ import VerifiedUserIcon from "@mui/icons-material/VerifiedUser";
 
 ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 // Base URL for API calls
-const BASE_URL = "https://mazedakhale.in/api";
+// const BASE_URL = "https://maze-backend-production.up.railway.app/api";
+const BASE_URL = "https://maze-backend-production.up.railway.app";
 
 // Configure axios for faster responses
 axios.defaults.timeout = 5000; // 5 second timeout
 const api = axios.create({
   baseURL: BASE_URL,
-  headers: {
-    "Cache-Control": "no-cache",
-    Pragma: "no-cache",
-    Expires: "0",
-  },
+  // headers: {
+  //   "Cache-Control": "no-cache",
+  //   Pragma: "no-cache",
+  //   Expires: "0",
+  // },
 });
 
 // Default notification

@@ -34,8 +34,14 @@ const SearchApplication = () => {
   // get user id once
   useEffect(() => {
     const token = localStorage.getItem("token");
+    const base64Payload = token.split(".")[1]
+      .replace(/-/g, '+') // Replace '-' with '+'
+      .replace(/_/g, '/') // Replace '_' with '/'
+      .padEnd(Math.ceil(token.split(".")[1].length / 4) * 4, '='); // Add padding if necessary
+
     if (token) {
-      const decoded = JSON.parse(atob(token.split(".")[1]));
+      const decoded = JSON.parse(atob(base64Payload));
+      // const decoded = JSON.parse(atob(token.split(".")[1]));
       setUserId(decoded.user_id);
     }
   }, []);

@@ -552,8 +552,9 @@ const InvoicePage = () => {
                     </td>
                     <td
                       className="p-2 border border-gray-300 text-blue-600 cursor-pointer hover:underline"
-                      onClick={() =>
-                        setPreviewFile(doc.file_path) || setShowPreview(true)
+                      onClick={() =>{
+                        setCheckedDocs((prev) => ({ ...prev, [i]: true }));
+                        setPreviewFile(doc.file_path) || setShowPreview(true)}
                       }
                     >
                       {documentNames[doc.document_type] || doc.document_type}

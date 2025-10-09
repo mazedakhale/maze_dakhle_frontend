@@ -40,6 +40,7 @@ const DocumentViewer = ({ filePath, onClose }) => {
           </div>
           <iframe
             src={filePath}
+            sandbox="allow-same-origin allow-scripts allow-forms allow-popups"
             title="Document Viewer"
             className="w-full h-full border"
             style={{ minHeight: "calc(100% - 40px)" }}
@@ -328,7 +329,11 @@ const InvoicePage = () => {
   };
   const navigate = useNavigate(); // ← Add this inside your component
 
-  const handleAssignDistributor = async (distributorId) => {
+  const handleAssignDistributor = async (
+    distributorId,
+    previousDistributorId
+  ) => {
+    console.log("Previous Distributor ID:", previousDistributorId);
     if (!distributorId) {
       alert("Please select a distributor.");
       return;
@@ -377,9 +382,13 @@ const InvoicePage = () => {
       alert(
         "Distributor assigned successfully and status updated to Approved."
       );
-
+      console.log("Fetch Somethings", previousDistributorId);
       // ✅ Redirect to VerifyDocuments page
-      navigate("/Verifydocuments"); // Change path if different
+      if (previousDistributorId) {
+        navigate("/Assigndistributorlist");
+      } else {
+        navigate("/Verifydocuments");
+      } // Change path if different
     } catch (error) {
       console.error("Error assigning distributor or updating status:", error);
       console.error("Error details:", error.response?.data);
@@ -422,8 +431,8 @@ const InvoicePage = () => {
     setDistributorRemark(e.target.value);
   };
 
-  const handleSaveClick = (userId) => {
-    handleAssignDistributor(userId);
+  const handleSaveClick = (userId, distributorId) => {
+    handleAssignDistributor(userId, distributorId);
   };
 
   const handleLogout = () => {
@@ -447,7 +456,7 @@ const InvoicePage = () => {
         <button
           onClick={() => {
             setIsAdding(false);
-            navigate("/Adashinner");
+            navigate("/Verifydocuments");
           }}
           className="absolute top-1/2 right-4 transform -translate-y-1/2 text-gray-600 hover:text-gray-800"
         >
@@ -663,6 +672,8 @@ const InvoicePage = () => {
               ))}
             </tbody>
           </table>
+          {console.log("Document Names:", documentData)}
+          {console.log("Document Distributor:", filteredDistributors)}
           <div className="mt-2 flex space-x-3 items-center">
             {/* Download Documents Button */}
             <button
@@ -719,12 +730,97 @@ const InvoicePage = () => {
                       />
                       <span className="flex-1">{dist.name}</span>
                       {selectedDistributor === dist.user_id && (
-                        <button
-                          onClick={() => handleSaveClick(dist.user_id)}
-                          className="bg-blue-900 text-white px-2 py-1 rounded hover:bg-blue-600 text-sm"
-                        >
-                          Assign to Distributor
-                        </button>
+                        // <button
+                        //   onClick={() => handleSaveClick(dist.user_id)}
+                        //   disabled={(dist.user_id)?.toString() == documentData.distributor_id}
+                        //   className={`${(dist.user_id)?.toString() == documentData.distributor_id ? "bg-gray-400 hover:bg-gray-900":"bg-blue-900 hover:bg-blue-600"} bg-blue-900 text-white px-2 py-1 rounded hover:bg-blue-600 text-sm`}
+                        // >
+                        //   {(dist.user_id)?.toString() == documentData.distributor_id ?"Cannot Assign":"Assign to Distributor"}
+
+                        //   {console.log("Distributor ID:", dist.user_id)}
+                        // </button>
+                        <>
+                          {documentData.distributor_id == null ? (
+                            <>
+                              <div className="relative group inline-block">
+                                <button
+                                  onClick={() =>
+                                    handleSaveClick(
+                                      dist.user_id,
+                                      null
+                                    )
+                                  }
+                                  disabled={
+                                    dist.user_id?.toString() ===
+                                    documentData.distributor_id
+                                  }
+                                  className={`px-2 py-1 rounded text-white text-sm transition 
+      ${
+        dist.user_id?.toString() === documentData.distributor_id
+          ? "bg-gray-400 cursor-not-allowed"
+          : "bg-blue-900 hover:bg-blue-600"
+      }`}
+                                >
+                                  {dist.user_id?.toString() ===
+                                  documentData.distributor_id
+                                    ? "Cannot Assign"
+                                    : "Assign to Distributor"}
+
+                                  {console.log(
+                                    "Distributor ID:",
+                                    documentData.distributor_id
+                                  )}
+                                </button>
+
+                                {/* Tooltip when disabled */}
+                                {dist.user_id?.toString() ===
+                                  documentData.distributor_id && (
+                                  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-1 hidden group-hover:block bg-black text-white text-xs rounded py-1 px-2 z-10 whitespace-nowrap">
+                                    Already assigned
+                                  </div>
+                                )}
+                              </div>
+                            </>
+                          ) : (
+                            <>
+                              <div className="relative group inline-block">
+                                <button
+                                  onClick={() =>
+                                    handleSaveClick(dist.user_id, documentData.distributor_id)
+                                  }
+                                  disabled={
+                                    dist.user_id?.toString() ===
+                                    documentData.distributor_id
+                                  }
+                                  className={`px-2 py-1 rounded text-white text-sm transition 
+      ${
+        dist.user_id?.toString() === documentData.distributor_id
+          ? "bg-gray-400 cursor-not-allowed"
+          : "bg-blue-900 hover:bg-blue-600"
+      }`}
+                                >
+                                  {dist.user_id?.toString() ===
+                                  documentData.distributor_id
+                                    ? "Cannot Assign"
+                                    : "Change Distributor"}
+
+                                  {console.log(
+                                    "Distributor ID:",
+                                    documentData.distributor_id
+                                  )}
+                                </button>
+
+                                {/* Tooltip when disabled */}
+                                {dist.user_id?.toString() ===
+                                  documentData.distributor_id && (
+                                  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-1 hidden group-hover:block bg-black text-white text-xs rounded py-1 px-2 z-10 whitespace-nowrap">
+                                    Already assigned
+                                  </div>
+                                )}
+                              </div>
+                            </>
+                          )}
+                        </>
                       )}
                     </li>
                   ))}

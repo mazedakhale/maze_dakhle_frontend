@@ -50,7 +50,8 @@ const Sidebar = ({ onNavigate }) => {
               },
               {
                 icon: <FaClockRotateLeft />,
-                label: "Sent History",
+                label: "Receipt History",
+                // label: "Sent History",
                 path: "/Dsentlist",
               },
               {

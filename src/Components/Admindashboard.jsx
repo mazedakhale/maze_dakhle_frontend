@@ -154,10 +154,14 @@ const Sidebar = ({ onNavigate }) => {
               },
               {
                 icon: <FaFileUpload />,
-                label: "Uploaded List",
+                label: "Certificate List",
+                // label: "Uploaded List",
                 path: "/Uploadeddocuments",
               },
-              { icon: <FaInbox />, label: "Received List", path: "/Received" },
+              { icon: <FaInbox />, 
+                label: "Receipt List", 
+                // label: "Received List", 
+                path: "/Received" },
               {
                 icon: <FaCommentDots />,
                 label: "Feedback List",
