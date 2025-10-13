@@ -14,7 +14,7 @@ const DistributorEdit = () => {
 
   useEffect(() => {
     axios
-      .get(`https://maze-backend-production.up.railway.app/users/edit/${user_id}`)
+      .get(`http://72.60.206.65:3000/users/edit/${user_id}`)
       .then((response) => {
         setFormData(response.data);
       })
@@ -30,7 +30,7 @@ const DistributorEdit = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     axios
-      .put(`https://maze-backend-production.up.railway.app/users/edit/${user_id}`, formData)
+      .put(`http://72.60.206.65:3000/users/edit/${user_id}`, formData)
       .then(() => {
         alert("Distributor updated successfully!");
         navigate("/distributor-list"); // Redirect after update

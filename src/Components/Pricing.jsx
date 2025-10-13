@@ -20,9 +20,9 @@ import { BsStopCircle } from "react-icons/bs";
 
 import Logo from "../assets/logo.png";
 
-const API_CATEGORIES = "https://maze-backend-production.up.railway.app/categories";
-const API_SUBCATEGORIES = "https://maze-backend-production.up.railway.app/subcategories";
-const API_PRICES = "https://maze-backend-production.up.railway.app/prices";
+const API_CATEGORIES = "http://72.60.206.65:3000/categories";
+const API_SUBCATEGORIES = "http://72.60.206.65:3000/subcategories";
+const API_PRICES = "http://72.60.206.65:3000/prices";
 
 // Footer links
 const navLabels = [

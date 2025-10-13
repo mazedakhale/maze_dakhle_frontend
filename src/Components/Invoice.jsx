@@ -89,14 +89,14 @@ const InvoicePage = () => {
 
   useEffect(() => {
     axios
-      .get("https://maze-backend-production.up.railway.app/users/distributors")
+      .get("http://72.60.206.65:3000/users/distributors")
       .then((response) => setDistributors(response.data))
       .catch((error) => console.error("Error fetching distributors:", error));
   }, []);
   const fetchDocumentData = useCallback(async () => {
     try {
       const response = await axios.get(
-        `https://maze-backend-production.up.railway.app/singledocument/documentby/${documentId}`
+        `http://72.60.206.65:3000/singledocument/documentby/${documentId}`
       );
       const data = response.data.document;
       setDocumentData(data);
@@ -106,7 +106,7 @@ const InvoicePage = () => {
 
       if (category && subcategory) {
         const fieldNamesResponse = await axios.get(
-          `https://maze-backend-production.up.railway.app/field-names/${category}/${subcategory}`
+          `http://72.60.206.65:3000/field-names/${category}/${subcategory}`
         );
         setDocumentNames(fieldNamesResponse.data);
       }
@@ -149,7 +149,7 @@ const InvoicePage = () => {
       console.log("Payload:", payload); // Debug: Log the payload
 
       const response = await axios.put(
-        `https://maze-backend-production.up.railway.app/documents/update-status/${documentId}`,
+        `http://72.60.206.65:3000/documents/update-status/${documentId}`,
         payload,
         {
           timeout: 30000, // Increase timeout to 30 seconds
@@ -192,7 +192,7 @@ const InvoicePage = () => {
 
       // Make the API call to download the ZIP file with increased timeout
       const response = await axios.get(
-        `https://maze-backend-production.up.railway.app/download/${documentId}`,
+        `http://72.60.206.65:3000/download/${documentId}`,
         {
           responseType: "blob", // Handle binary data
           timeout: 60000, // Increase timeout to 60 seconds
@@ -353,7 +353,7 @@ const InvoicePage = () => {
       setIsProcessing(true);
 
       const assignResponse = await axios.put(
-        `https://maze-backend-production.up.railway.app/documents/assign-distributor/${documentId}`,
+        `http://72.60.206.65:3000/documents/assign-distributor/${documentId}`,
         {
           distributor_id: distributorId,
           remark: distributorRemark,
@@ -362,7 +362,7 @@ const InvoicePage = () => {
       console.log("Assign Distributor Response:", assignResponse.data);
 
       const statusResponse = await axios.put(
-        `https://maze-backend-production.up.railway.app/documents/update-status/${documentId}`,
+        `http://72.60.206.65:3000/documents/update-status/${documentId}`,
         {
           status: "Approved",
         }

@@ -20,7 +20,7 @@ const ElistPage = () => {
 
   useEffect(() => {
     axios
-      .get("https://maze-backend-production.up.railway.app/documents/list")
+      .get("http://72.60.206.65:3000/documents/list")
       .then((response) => {
         const sortedDocuments = response.data.documents.sort(
           (a, b) => new Date(b.uploaded_at) - new Date(a.uploaded_at)
@@ -30,18 +30,18 @@ const ElistPage = () => {
       .catch((error) => console.error("Error fetching documents:", error));
 
     axios
-      .get("https://maze-backend-production.up.railway.app/users/distributors")
+      .get("http://72.60.206.65:3000/users/distributors")
       .then((response) => setDistributors(response.data))
 
       .catch((error) => console.error("Error fetching distributors:", error));
 
     axios
-      .get("https://maze-backend-production.up.railway.app/certificates")
+      .get("http://72.60.206.65:3000/certificates")
       .then((response) => setCertificates(response.data))
       .catch((error) => console.error("Error fetching certificates:", error));
 
     axios
-      .get("https://maze-backend-production.up.railway.app/users/register")
+      .get("http://72.60.206.65:3000/users/register")
       .then((response) => setUsers(response.data))
       .catch((error) => console.error("Error fetching users:", error));
   }, []);
@@ -131,7 +131,7 @@ const ElistPage = () => {
     }
     try {
       const response = await axios.get(
-        `https://maze-backend-production.up.railway.app/certificates/${certificateId}`
+        `http://72.60.206.65:3000/certificates/${certificateId}`
       );
       if (response.data && response.data.file_url) {
         window.open(response.data.file_url, "_blank");
@@ -147,7 +147,7 @@ const ElistPage = () => {
   const handleDownloadCertificate = async (documentId, name) => {
     try {
       const response = await axios.get(
-        `https://maze-backend-production.up.railway.app/download-certificate/${documentId}`,
+        `http://72.60.206.65:3000/download-certificate/${documentId}`,
         {
           responseType: "blob", // Important to handle file downloads
         }
@@ -183,7 +183,7 @@ const ElistPage = () => {
               placeholder="Search..."
               className="border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-300 w-64"
               value={searchQuery}
-              onChange={handleSearchQueryChange}
+              onChange={handleSearch}
             />
             <span className="text-gray-700">Filter by Status:</span>
             {/* <label className="flex items-center">

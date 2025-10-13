@@ -26,7 +26,7 @@ const ApplicationView = () => {
   const fetchDocumentData = useCallback(async () => {
     try {
       const response = await axios.get(
-        `https://maze-backend-production.up.railway.app/singledocument/documentby/${documentId}`
+        `http://72.60.206.65:3000/singledocument/documentby/${documentId}`
       );
       const data = response.data.document;
       setDocumentData(data);
@@ -36,7 +36,7 @@ const ApplicationView = () => {
 
       if (category && subcategory) {
         const fieldNamesResponse = await axios.get(
-          `https://maze-backend-production.up.railway.app/field-names/${category}/${subcategory}`
+          `http://72.60.206.65:3000/field-names/${category}/${subcategory}`
         );
         setDocumentNames(fieldNamesResponse.data);
       }

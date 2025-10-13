@@ -28,7 +28,7 @@ const FieldNames = () => {
 
   const fetchFields = async () => {
     try {
-      const response = await axios.get("https://maze-backend-production.up.railway.app/field-names");
+      const response = await axios.get("http://72.60.206.65:3000/field-names");
       setFields(response.data);
     } catch (error) {
       console.error("Error fetching field names:", error);
@@ -37,7 +37,7 @@ const FieldNames = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await axios.get("https://maze-backend-production.up.railway.app/categories");
+      const response = await axios.get("http://72.60.206.65:3000/categories");
       setCategories(response.data);
     } catch (error) {
       console.error("Error fetching categories:", error);
@@ -48,7 +48,7 @@ const FieldNames = () => {
     if (!categoryId) return;
     try {
       const response = await axios.get(
-        `https://maze-backend-production.up.railway.app/subcategories/category/${categoryId}`
+        `http://72.60.206.65:3000/subcategories/category/${categoryId}`
       );
       setSubcategories(response.data);
     } catch (error) {
@@ -98,7 +98,7 @@ const FieldNames = () => {
 
       // **Perform API call in the background**
       axios
-        .delete(`https://maze-backend-production.up.railway.app/field-names/${id}`)
+        .delete(`http://72.60.206.65:3000/field-names/${id}`)
         .then(() => {
           fetchFields(); // Refresh field list
         })
@@ -116,7 +116,7 @@ const FieldNames = () => {
 
   const handleSave = async (id) => {
     try {
-      await axios.patch(`https://maze-backend-production.up.railway.app/field-names/${id}`, {
+      await axios.patch(`http://72.60.206.65:3000/field-names/${id}`, {
         document_fields: editableField,
       });
       Swal.fire("Updated!", "Field Name updated successfully", "success");
@@ -131,7 +131,7 @@ const FieldNames = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("https://maze-backend-production.up.railway.app/field-names", formData);
+      await axios.post("http://72.60.206.65:3000/field-names", formData);
       Swal.fire("Added!", "Field Name added successfully", "success");
       fetchFields();
       setModalOpen(false);

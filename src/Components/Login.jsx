@@ -12,14 +12,14 @@ const Login = () => {
   const [subcategories, setSubcategories] = useState({});
   const navigate = useNavigate();
   // src/pages/Login.jsx
-  const SMS_URL = "https://maze-backend-production.up.railway.app/sms/send";
+  const SMS_URL = "http://72.60.206.65:3000/sms/send";
   const SMS_SENDER = "918308178738"; // your LiveOne “from” number
 
   // Fetch categories
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await fetch("https://maze-backend-production.up.railway.app/categories");
+        const response = await fetch("http://72.60.206.65:3000/categories");
         if (!response.ok) throw new Error("Failed to fetch categories");
         setCategories(await response.json());
       } catch (error) {
@@ -36,7 +36,7 @@ const Login = () => {
       try {
         for (const cat of categories) {
           const resp = await fetch(
-            `https://maze-backend-production.up.railway.app/subcategories/category/${cat.category_id}`
+            `http://72.60.206.65:3000/subcategories/category/${cat.category_id}`
           );
           result[cat.category_id] = resp.ok ? await resp.json() : [];
         }
@@ -70,7 +70,7 @@ const Login = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const resp = await fetch("https://maze-backend-production.up.railway.app/users/resend-verification", {
+          const resp = await fetch("http://72.60.206.65:3000/users/resend-verification", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email }),
@@ -95,7 +95,7 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const resp = await fetch("https://maze-backend-production.up.railway.app/users/login", {
+      const resp = await fetch("http://72.60.206.65:3000/users/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
@@ -154,7 +154,7 @@ const Login = () => {
   const handleForgot = async (e) => {
     e.preventDefault();
     try {
-      const resp = await fetch("https://maze-backend-production.up.railway.app/users/forgot-password", {
+      const resp = await fetch("http://72.60.206.65:3000/users/forgot-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: formData.email }),

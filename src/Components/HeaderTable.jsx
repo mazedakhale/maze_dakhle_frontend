@@ -10,7 +10,7 @@ const HeaderTable = () => {
   const [editingItem, setEditingItem] = useState(null);
 
   const navigate = useNavigate();
-  const apiUrl = "https://maze-backend-production.up.railway.app/header";
+  const apiUrl = "http://72.60.206.65:3000/header";
 
   useEffect(() => {
     fetchHeaders();
