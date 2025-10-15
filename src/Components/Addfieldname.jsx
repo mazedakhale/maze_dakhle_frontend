@@ -28,8 +28,9 @@ const FieldNames = () => {
 
   const fetchFields = async () => {
     try {
+
       const response = await axios.get(" http://72.60.206.65:3000/field-names");
-      setFields(response.data);
+setFields(response.data);
     } catch (error) {
       console.error("Error fetching field names:", error);
     }
@@ -48,7 +49,7 @@ const FieldNames = () => {
     if (!categoryId) return;
     try {
       const response = await axios.get(
-        ` http://72.60.206.65:3000/subcategories/category/${categoryId}`
+        `http://72.60.206.65:3000/subcategories/category/${categoryId}`
       );
       setSubcategories(response.data);
     } catch (error) {

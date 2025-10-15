@@ -174,7 +174,7 @@ const News = () => {
 
   useEffect(() => {
     axios
-      .get(" http://72.60.206.65:3000/news")
+      .get("http://72.60.206.65:3000/news")
       .then((res) => setNewsList(res.data))
       .catch((err) => {
         console.error(err);

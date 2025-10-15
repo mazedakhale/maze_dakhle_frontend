@@ -38,7 +38,7 @@ const VerifyDocuments = () => {
   const fetchDocuments = async (distributorId) => {
     try {
       const response = await axios.get(
-        ` http://72.60.206.65:3000/documents/list/${distributorId}`
+        `http://72.60.206.65:3000/documents/list/${distributorId}`
       );
 
       // Filter documents and sort by `uploaded_at` in descending order
@@ -61,7 +61,7 @@ const VerifyDocuments = () => {
   const fetchCertificates = async () => {
     try {
       console.log("Fetching certificates...");
-      const response = await axios.get(" http://72.60.206.65:3000/certificates"); // Adjust URL if needed
+      const response = await axios.get("http://72.60.206.65:3000/certificates"); // Adjust URL if needed
       console.log("Certificates API Response:", response.data);
       setCertificates(response.data);
     } catch (error) {
@@ -90,7 +90,7 @@ const VerifyDocuments = () => {
         `Fetching certificate for Certificate ID: ${certificate.certificate_id}`
       );
       const response = await axios.get(
-        ` http://72.60.206.65:3000/certificates/${certificate.certificate_id}`
+        `http://72.60.206.65:3000/certificates/${certificate.certificate_id}`
       );
       console.log("View Certificate API Response:", response.data);
 
@@ -148,7 +148,7 @@ const VerifyDocuments = () => {
   const handleDownloadCertificate = async (documentId, name) => {
     try {
       const response = await axios.get(
-        ` http://72.60.206.65:3000/download-certificate/${documentId}`,
+        `http://72.60.206.65:3000/download-certificate/${documentId}`,
         {
           responseType: "blob", // Important to handle file downloads
         }

@@ -19,7 +19,7 @@ const Youtube = () => {
   });
 
   const navigate = useNavigate();
-  const apiUrl = " http://72.60.206.65:3000/images";
+  const apiUrl = "http://72.60.206.65:3000/images";
 
   // Fetch all images
   const fetchImages = async () => {

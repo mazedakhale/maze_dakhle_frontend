@@ -10,7 +10,7 @@ import {
 } from "../utils/formValidators";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import "../index.css";
-const SMS_URL = " http://72.60.206.65:3000/sms/send";
+const SMS_URL = "http://72.60.206.65:3000/sms/send";
 const SMS_SENDER = "918308178738"; // your LiveOne-registered “from” number
 
 const Register = () => {
@@ -419,7 +419,7 @@ const Register = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch(" http://72.60.206.65:3000/categories")
+    fetch("http://72.60.206.65:3000/categories")
       .then((res) => res.json())
       .then(setCategories)
       .catch(console.error);
@@ -430,7 +430,7 @@ const Register = () => {
       const data = {};
       for (const category of categories) {
         const res = await fetch(
-          ` http://72.60.206.65:3000/subcategories/category/${category.category_id}`
+          `http://72.60.206.65:3000/subcategories/category/${category.category_id}`
         );
         data[category.category_id] = res.ok ? await res.json() : [];
       }
@@ -596,7 +596,7 @@ const Register = () => {
       }
 
       const res = await fetch(
-        " http://72.60.206.65:3000/users/register",
+        "http://72.60.206.65:3000/users/register",
         {
           method: "POST",
           body: payload,

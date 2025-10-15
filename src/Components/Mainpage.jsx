@@ -95,7 +95,7 @@ const PurpleBanner = () => {
   const [description, setDescription] = useState("");
   useEffect(() => {
     axios
-      .get(" http://72.60.206.65:3000/header")
+      .get("http://72.60.206.65:3000/header")
       .then((res) =>
         setDescription(
           res.data[0]?.description || "Welcome to our website! 📞 0998766534"
@@ -124,7 +124,7 @@ const Footer = () => {
   const [contactInfo, setContactInfo] = useState(null);
   useEffect(() => {
     axios
-      .get(" http://72.60.206.65:3000/contact-info")
+      .get("http://72.60.206.65:3000/contact-info")
       .then((res) => setContactInfo(res.data[0] || {}))
       .catch(() => setContactInfo(null));
   }, []);
@@ -210,12 +210,12 @@ const Mainpage = () => {
 
   useEffect(() => {
     axios
-      .get(" http://72.60.206.65:3000/document-types")
+      .get("http://72.60.206.65:3000/document-types")
       .then((res) => setDocumentTypes(res.data))
       .catch(() => setError("Failed to load documents"));
 
     axios
-      .get(" http://72.60.206.65:3000/news")
+      .get("http://72.60.206.65:3000/news")
       .then((res) => setNewsList(res.data))
       .catch(() => setError("Failed to load news"))
       .finally(() => setLoading(false));
