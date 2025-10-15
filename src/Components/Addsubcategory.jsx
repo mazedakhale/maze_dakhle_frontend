@@ -18,7 +18,7 @@ const Addsubcategory = () => {
   const navigate = useNavigate();
 
   // Update the API_BASE_URL to match the backend URL
-  const API_BASE_URL = "http://72.60.206.65:3000";
+  const API_BASE_URL = "http://localhost:3000";
 
   useEffect(() => {
     const loadInitialData = async () => {
