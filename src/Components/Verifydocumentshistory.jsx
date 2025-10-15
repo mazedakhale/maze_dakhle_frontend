@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState , useRef} from "react";
 import axios from "axios";
 import {
   FaRegFileAlt,
@@ -6,7 +6,10 @@ import {
   FaFileInvoice,
   FaCheck,
   FaTimes,
+  FaEye,
 } from "react-icons/fa";
+import Draggable from "react-draggable";
+import getEmbeddableUrl from "../utils/getEmbeddableUrl.js"
 import { useNavigate } from "react-router-dom";
 
 import "../styles/style.css"; // Import the CSS file
@@ -19,6 +22,9 @@ const Verifydocumentshistory = () => {
   const [isAdding, setIsAdding] = useState(false);
 
   const [users, setUsers] = useState([]);
+  const [previewFile, setPreviewFile] = useState(null);
+  const nodeRef = useRef(null);
+
   const navigate = useNavigate();
 
   // Fetch assigned documents from the new API
@@ -162,7 +168,9 @@ const Verifydocumentshistory = () => {
         `http://localhost:3000/certificates/${certificateId}`
       );
       if (response.data && response.data.file_url) {
-        window.open(response.data.file_url, "_blank");
+        return response.data?.file_url
+        // window.open(response.data.file_url, "_blank");
+        // window.open(response.data.file_url, "_blank");
       } else {
         alert("Certificate not found.");
       }
@@ -434,14 +442,29 @@ const Verifydocumentshistory = () => {
                   </td>
                   <td className="border p-3 text-center">
                     {doc.receipt_url ? ( // Check if receipt_url exists
-                      <button
-                        onClick={() =>
-                          handleDownloadReceipt(doc.receipt_url, doc.name)
-                        }
-                        className="bg-blue-500 text-white px-3 py-1 rounded flex justify-center items-center hover:bg-blue-600 transition"
-                      >
-                        <FaDownload className="mr-1" /> Receipt
-                      </button>
+                      <>
+                        <button
+                          onClick={() =>
+                            handleDownloadReceipt(doc.receipt_url, doc.name)
+                          }
+                          className="bg-blue-500 text-white px-3 py-1 rounded flex justify-center items-center hover:bg-blue-600 transition"
+                        >
+                          <FaDownload className="mr-1" /> Receipt
+                        </button>
+                        {/* ✅ Update the eye icon button */}
+                        <button
+                          onClick={() => {
+                            const embeddableUrl = getEmbeddableUrl(
+                              doc.receipt_url
+                            );
+                            setPreviewFile(embeddableUrl);
+                          }}
+                          className="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600 transition ml-2"
+                          title="Preview Receipt"
+                        >
+                          <FaEye className="mr-1" /> View
+                        </button>
+                      </>
                     ) : (
                       <span className="text-gray-500 text-center">
                         Not Available
@@ -450,12 +473,27 @@ const Verifydocumentshistory = () => {
                   </td>
                   <td className="border p-2 text-center">
                     {getCertificateByDocumentId(doc.document_id) ? (
+                      <>
                       <button
                         onClick={() => handleViewCertificate(doc.document_id)}
                         className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 transition text-xs"
                       >
                         <FaCheck className="mr-1" /> Certificate
                       </button>
+                      <button
+                          onClick={async() => {
+                           const filePath= await handleViewCertificate(doc.document_id)
+
+                           console.log("CHeck",filePath)
+                            const embeddableUrl = getEmbeddableUrl(filePath);
+                            setPreviewFile(embeddableUrl);
+                          }}
+                          className="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600 transition ml-2"
+                          title="Preview Receipt"
+                        >
+                          <FaEye className="mr-1" /> View
+                        </button>
+                      </>
                     ) : (
                       <span className="text-gray-500">Not Available</span>
                     )}
@@ -466,6 +504,51 @@ const Verifydocumentshistory = () => {
           </table>
         </div>
       </div>
+      {previewFile && (
+      <Draggable handle=".drag-handle" nodeRef={nodeRef}>
+        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+          <div
+            ref={nodeRef}
+            className="relative w-3/4 md:w-2/3 lg:w-1/2 h-3/4 bg-gray-100 rounded-lg p-4 drag-handle cursor-move"
+            style={{ maxWidth: '90vw', maxHeight: '90vh' }}
+          >
+            <button
+              className="absolute top-2 right-2 text-gray-600 hover:text-red-600 text-2xl font-bold z-10"
+              onClick={() => setPreviewFile(null)}
+            >
+              &times;
+            </button>
+            <h3 className="text-xl font-medium mb-4 text-center">
+              Receipt Preview
+            </h3>
+            
+            {/* Enhanced iframe with error handling */}
+            <iframe
+              src={previewFile}
+              title="Receipt Preview"
+              className="w-full border rounded"
+              style={{ height: 'calc(100% - 80px)' }}
+              onError={(e) => {
+                console.error('Iframe loading error:', e);
+              }}
+              sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
+            />
+            
+            {/* Fallback link */}
+            <div className="mt-2 text-center">
+              <a
+                href={previewFile}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-500 hover:text-blue-700 text-sm"
+              >
+                Open in new tab if preview doesn't work
+              </a>
+            </div>
+          </div>
+        </div>
+      </Draggable>
+    )}
     </div>
   );
 };

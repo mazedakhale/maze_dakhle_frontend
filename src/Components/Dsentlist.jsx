@@ -44,7 +44,7 @@ const Dsentlist = () => {
 
       // Filter documents with status "Sent" and sort by `uploaded_at` in descending order
       const filteredDocuments = response.data.documents
-        .filter((doc) => doc.status === "Sent") // Only include documents with status "Sent"
+        .filter((doc) => doc.status === "Sent" || doc.status === "Received" ) // Only include documents with status "Sent"
         .sort((a, b) => new Date(b.uploaded_at) - new Date(a.uploaded_at)); // Sort by most recent
 
       setDocuments(filteredDocuments);

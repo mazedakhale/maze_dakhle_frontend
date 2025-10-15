@@ -3,6 +3,7 @@ import axios from "axios";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { FaCheck, FaTimes, FaUserPlus } from "react-icons/fa";
 import logo1 from "../assets/logo.png";
+import getEmbeddableUrl from "../utils/getEmbeddableUrl";
 import jwtDecode from "jwt-decode";
 import { FaUserCircle, FaDownload } from "react-icons/fa";
 import Draggable from "react-draggable";
@@ -787,7 +788,7 @@ const InvoicePage = () => {
                   </h3>
                   {/* Iframe Preview */}
                   <iframe
-                    src={selectedDocument}
+                    src={getEmbeddableUrl(selectedDocument)}
                     title="Document Preview"
                     className="w-full h-full border rounded"
                   />

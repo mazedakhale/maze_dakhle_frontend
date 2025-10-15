@@ -92,6 +92,7 @@ import PaymentTest from "./Components/PaymentTest";
 import Wallet from "./Components/Wallet";
 import TransactionTable from "./Components/TransactionTable";
 import api from "./utils/api";
+import TransactionHistory from "./Components/TransactionHistory";
 function App() {
   return (
     <Router>
@@ -152,6 +153,8 @@ function App() {
         <Route path="/Uploadeddocuments" element={<Admindashboard><Uploadeddocuments /></Admindashboard>} />
         <Route path="/Rejecteddocuments" element={<Admindashboard><Rejecteddocuments /></Admindashboard>} />
         <Route path="/RejectedBefore" element={<Admindashboard><RejectedBefore /></Admindashboard>} />
+        <Route path="/CustomerTransactions" element={<Admindashboard><TransactionHistory /></Admindashboard>} />
+
 
         <Route path="/Lazycharts" element={<Admindashboard><LazyCharts /></Admindashboard>} />
         <Route path="/Received" element={<Admindashboard><Received /></Admindashboard>} />

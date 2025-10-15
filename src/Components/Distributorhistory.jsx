@@ -38,7 +38,7 @@ const ErrorRequests = () => {
         `Fetching error requests for distributor ID: ${distributorId}`
       );
       const response = await axios.get(
-        `https://maze-backend-production.up.railway.app/apirequest-errors/distributor/${distributorId}`
+        ` http://72.60.206.65:3000/apirequest-errors/distributor/${distributorId}`
       );
       console.log("Error Requests API Response:", response.data);
 
@@ -60,7 +60,7 @@ const ErrorRequests = () => {
     try {
       console.log("Fetching certificates...");
       const response = await axios.get(
-        "https://maze-backend-production.up.railway.app/apicertificates"
+        " http://72.60.206.65:3000/apicertificates"
       );
       console.log("Certificates API Response:", response.data);
       setCertificates(response.data);
@@ -91,7 +91,7 @@ const ErrorRequests = () => {
     try {
       console.log(`Fetching certificate for Certificate ID: ${certificateId}`);
       const response = await axios.get(
-        `https://maze-backend-production.up.railway.app/apicertificates/${certificateId}`
+        ` http://72.60.206.65:3000/apicertificates/${certificateId}`
       );
       console.log("View Certificate API Response:", response.data);
 
@@ -118,7 +118,7 @@ const ErrorRequests = () => {
   const handleDownloadCertificate = async (documentId, requestName) => {
     try {
       const response = await axios.get(
-        `https://maze-backend-production.up.railway.app/apidownload-certificate/${documentId}`,
+        ` http://72.60.206.65:3000/apidownload-certificate/${documentId}`,
         {
           responseType: "blob", // Important to handle file downloads
         }

@@ -43,6 +43,7 @@ const CustomerApply = () => {
       "Approved",
       "Rejected",
       "Uploaded",
+      "Sent"
     ];
     axios
       .get("http://localhost:3000/documents/list")
@@ -307,7 +308,7 @@ const CustomerApply = () => {
                       </div>
                     </td>
                     <td className="border px-4 py-3 text-center">
-                      {(doc.status === "Received" ||
+                      {(doc.status === "Received" || doc.status === "Sent" ||
                         doc.status === "Uploaded") &&
                       doc.receipt_url ? (
                         <button

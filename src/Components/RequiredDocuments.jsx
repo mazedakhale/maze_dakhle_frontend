@@ -10,6 +10,7 @@ const RequiredDocuments = () => {
   const [subcategories, setSubcategories] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
+  const [submitDisabled, setSubmitDisabled] = useState(false);
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -132,6 +133,7 @@ const RequiredDocuments = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setSubmitDisabled(true);
 
     // Validate category and subcategory
     if (!formData.category_id || !formData.subcategory_id) {
@@ -192,6 +194,9 @@ const RequiredDocuments = () => {
           "error"
         );
       }
+    } finally {
+      setSubmitDisabled(false);
+      setEditId(null);
     }
   };
 
@@ -255,16 +260,16 @@ const RequiredDocuments = () => {
                     } hover:bg-orange-100 transition duration-200`}
                   >
                     <td className="px-4 py-3 border border-[#776D6DA8] text-center">
-                      {editId === doc.id ? (
+                      {/* {editId === doc.id ? (
                         <input
                           type="text"
                           value={editedName}
                           onChange={(e) => setEditedName(e.target.value)}
                           className="border border-gray-400 p-2 rounded w-full"
                         />
-                      ) : (
-                        doc.document_names
-                      )}
+                      ) : ( */}
+                        {doc.document_names}
+                      {/* )} */}
                     </td>
                     <td className="px-4 py-3 border border-[#776D6DA8] text-center">
                       {doc.category ? doc.category.category_name : "N/A"}
@@ -289,21 +294,21 @@ const RequiredDocuments = () => {
                       )}
                     </td>
                     <td className="px-4 py-3 border border-[#776D6DA8] text-center">
-                      {editId === doc.id ? (
+                      {/* {editId === doc.id ? (
                         <button
                           onClick={() => handleSubmit(doc.id)}
                           className="bg-green-500 text-white px-3 py-1 rounded mr-2 hover:bg-green-600"
                         >
                           <FaSave />
                         </button>
-                      ) : (
+                      ) : ( */}
                         <button
                           onClick={() => handleEdit(doc)}
                           className="bg-blue-500 text-white px-3 py-1 rounded mr-2 hover:bg-blue-600"
                         >
                           <FaEdit />
                         </button>
-                      )}
+                      {/* )} */}
                       <button
                         onClick={() => handleDelete(doc.id)}
                         className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
@@ -391,9 +396,12 @@ const RequiredDocuments = () => {
               <div className="flex justify-end space-x-3">
                 <button
                   type="submit"
-                  className="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600"
+                  disabled={submitDisabled}
+                  className={` text-white px-4 py-2 rounded ${!submitDisabled ? "bg-orange-500 hover:bg-orange-600":"bg-gray-500 hover:bg-gray-600"}`}
                 >
-                  {editId ? "Update" : "Save"}
+      
+                  {submitDisabled ? "Submitting..." : ""}
+                  {!submitDisabled && `${editId ? "Update" : "Save"}`}
                 </button>
                 <button
                   type="button"

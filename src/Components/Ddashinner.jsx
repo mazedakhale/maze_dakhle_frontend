@@ -18,8 +18,8 @@ import VerifiedUserIcon from "@mui/icons-material/VerifiedUser";
 
 ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 // Base URL for API calls
-// const BASE_URL = "https://maze-backend-production.up.railway.app/api";
-const BASE_URL = "https://maze-backend-production.up.railway.app";
+// const BASE_URL = " http://72.60.206.65:3000/api";
+const BASE_URL = " http://72.60.206.65:3000";
 
 // Configure axios for faster responses
 axios.defaults.timeout = 5000; // 5 second timeout

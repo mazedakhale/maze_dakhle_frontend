@@ -186,17 +186,17 @@ const ElistPage = () => {
               onChange={handleSearch}
             />
             <span className="text-gray-700">Filter by Status:</span>
-            {/* <label className="flex items-center">
+            <label className="flex items-center">
                                 <input
                                     type="radio"
                                     name="status"
                                     value="All"
-                                    checked={statusFilter === "All"}
+                                    checked={statusFilter === ""}
                                     onChange={handleStatusFilterChange}
                                     className="mr-2"
                                 />
                                 All
-                            </label> */}
+                            </label>
             <label className="flex items-center">
               <input
                 type="radio"

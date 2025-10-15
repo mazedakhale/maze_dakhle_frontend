@@ -4,6 +4,7 @@ import { FaTimes, FaDownload, FaCheck } from "react-icons/fa";
 import jwtDecode from "jwt-decode";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
+import getEmbeddableUrl from "../utils/getEmbeddableUrl";
 
 const VerifyDocuments = () => {
   const [documents, setDocuments] = useState([]);
@@ -322,7 +323,7 @@ const VerifyDocuments = () => {
             >
               Close
             </button>
-            <iframe src={previewFile} className="w-full h-full border-none" />
+            <iframe src={getEmbeddableUrl(previewFile)} className="w-full h-full border-none" />
           </div>
         </div>
       )}

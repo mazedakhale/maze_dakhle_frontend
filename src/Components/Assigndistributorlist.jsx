@@ -214,7 +214,7 @@ const AssignedDistributorsList = () => {
           <button
             onClick={() => {
               setIsAdding(false);
-              navigate("/Adashinner");
+              navigate("/Assigndistributorlist");
             }}
             className="absolute top-1/2 right-4 transform -translate-y-1/2 text-gray-600 hover:text-gray-800"
           >
