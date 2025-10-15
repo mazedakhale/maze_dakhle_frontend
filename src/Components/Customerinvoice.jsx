@@ -3,6 +3,7 @@ import axios from "axios";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { FaCheck, FaTimes, FaUserPlus } from "react-icons/fa";
 import logo1 from "../assets/logo.png";
+import getEmbeddableUrl from "../utils/getEmbeddableUrl";
 import jwtDecode from "jwt-decode";
 import { FaUserCircle, FaDownload } from "react-icons/fa";
 import Draggable from "react-draggable";
@@ -50,7 +51,7 @@ const InvoicePage = () => {
 
   useEffect(() => {
     axios
-      .get("https://maze-backend-production.up.railway.app/users/distributors")
+      .get(" http://72.60.206.65:3000/users/distributors")
       .then((response) => setDistributors(response.data))
       .catch((error) => console.error("Error fetching distributors:", error));
   }, []);
@@ -74,7 +75,7 @@ const InvoicePage = () => {
 
     try {
       await axios.put(
-        `https://maze-backend-production.up.railway.app/documents/update-status/${documentId}`,
+        ` http://72.60.206.65:3000/documents/update-status/${documentId}`,
         {
           status: newStatus,
           rejectionReason:
@@ -115,7 +116,7 @@ const InvoicePage = () => {
 
       // Make the API call to download the ZIP file with increased timeout
       const response = await axios.get(
-        `https://maze-backend-production.up.railway.app/download/${documentId}`,
+        ` http://72.60.206.65:3000/download/${documentId}`,
         {
           responseType: "blob", // Handle binary data
           timeout: 60000, // Increase timeout to 60 seconds
@@ -254,7 +255,7 @@ const InvoicePage = () => {
     if (!distributorId) return;
     try {
       await axios.put(
-        `https://maze-backend-production.up.railway.app/documents/assign-distributor/${documentId}`,
+        ` http://72.60.206.65:3000/documents/assign-distributor/${documentId}`,
         {
           distributor_id: distributorId,
         }
@@ -290,7 +291,7 @@ const InvoicePage = () => {
   const fetchCertificates = async () => {
     try {
       console.log("Fetching certificates...");
-      const response = await axios.get("https://maze-backend-production.up.railway.app/certificates", {
+      const response = await axios.get(" http://72.60.206.65:3000/certificates", {
         timeout: 30000,
       });
       console.log("Certificates API Response:", response.data);
@@ -302,7 +303,7 @@ const InvoicePage = () => {
   const fetchDocumentData = useCallback(async () => {
     try {
       const response = await axios.get(
-        `https://maze-backend-production.up.railway.app/singledocument/documentby/${documentId}`
+        ` http://72.60.206.65:3000/singledocument/documentby/${documentId}`
       );
       const data = response.data.document;
       setDocumentData(data);
@@ -312,7 +313,7 @@ const InvoicePage = () => {
 
       if (category && subcategory) {
         const fieldNamesResponse = await axios.get(
-          `https://maze-backend-production.up.railway.app/field-names/${category}/${subcategory}`
+          ` http://72.60.206.65:3000/field-names/${category}/${subcategory}`
         );
         setDocumentNames(fieldNamesResponse.data);
       }
@@ -379,7 +380,7 @@ const InvoicePage = () => {
 
       try {
         const { data: updatedDocument } = await axios.post(
-          `https://maze-backend-production.up.railway.app/documents/reupload/${documentId}`,
+          ` http://72.60.206.65:3000/documents/reupload/${documentId}`,
           formData,
           { headers: { "Content-Type": "multipart/form-data" } }
         );
@@ -787,7 +788,7 @@ const InvoicePage = () => {
                   </h3>
                   {/* Iframe Preview */}
                   <iframe
-                    src={selectedDocument}
+                    src={getEmbeddableUrl(selectedDocument)}
                     title="Document Preview"
                     className="w-full h-full border rounded"
                   />

@@ -87,7 +87,7 @@ const AddDistributorModal = ({ isOpen, onClose, fetchDistributors }) => {
 
     try {
       const response = await axios.post(
-        "https://maze-backend-production.up.railway.app/users/register",
+        " http://72.60.206.65:3000/users/register",
         formDataToSend,
         {
           headers: {

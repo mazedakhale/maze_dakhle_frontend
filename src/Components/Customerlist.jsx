@@ -11,7 +11,7 @@ const CustomerList = () => {
   const [isAdding, setIsAdding] = useState(false);
   const [statusLoading, setStatusLoading] = useState({});
   const navigate = useNavigate();
-  const apiUrl = "https://maze-backend-production.up.railway.app/users/customers";
+  const apiUrl = " http://72.60.206.65:3000/users/customers";
   const abortControllerRef = useRef(null);
 
   useEffect(() => {
@@ -35,7 +35,7 @@ const CustomerList = () => {
   const handleUpdateCustomer = async (id) => {
     try {
       if (updatedPassword) {
-        await axios.patch(`https://maze-backend-production.up.railway.app/users/password/${id}`, {
+        await axios.patch(` http://72.60.206.65:3000/users/password/${id}`, {
           newPassword: updatedPassword,
         });
       }
@@ -65,7 +65,7 @@ const CustomerList = () => {
 
     if (confirm.isConfirmed) {
       try {
-        await axios.delete(`https://maze-backend-production.up.railway.app/users/delete/${id}`);
+        await axios.delete(` http://72.60.206.65:3000/users/delete/${id}`);
         setCustomers((prev) => prev.filter((c) => c.user_id !== id));
         Swal.fire("Deleted!", "Customer removed.", "success");
       } catch (error) {
@@ -97,7 +97,7 @@ const CustomerList = () => {
       );
 
       // Update status in backend
-      await axios.patch(`https://maze-backend-production.up.railway.app/users/status/${id}`, {
+      await axios.patch(` http://72.60.206.65:3000/users/status/${id}`, {
         status: newStatus
       });
 
@@ -127,7 +127,7 @@ const CustomerList = () => {
 
   const updateEditRequestStatus = async (id, newStatus) => {
     try {
-      await axios.patch(`https://maze-backend-production.up.railway.app/users/request-edit/${id}`, {
+      await axios.patch(` http://72.60.206.65:3000/users/request-edit/${id}`, {
         status: newStatus,
       });
       setCustomers((prev) =>

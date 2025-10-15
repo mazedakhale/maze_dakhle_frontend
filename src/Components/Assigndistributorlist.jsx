@@ -21,7 +21,7 @@ const AssignedDistributorsList = () => {
 
   useEffect(() => {
     axios
-      .get(`https://maze-backend-production.up.railway.app/documents/assigned-list`)
+      .get(` http://72.60.206.65:3000/documents/assigned-list`)
       .then((response) => {
         console.log("API Response:", response.data); // Log full response
         const sortedDocuments = response.data.documents.sort(
@@ -35,19 +35,19 @@ const AssignedDistributorsList = () => {
 
     // Fetch distributors
     axios
-      .get(`https://maze-backend-production.up.railway.app/users/distributors`)
+      .get(` http://72.60.206.65:3000/users/distributors`)
       .then((response) => setDistributors(response.data))
       .catch((error) => console.error("Error fetching distributors:", error));
 
     // Fetch certificates
     axios
-      .get("https://maze-backend-production.up.railway.app/certificates")
+      .get(" http://72.60.206.65:3000/certificates")
       .then((response) => setCertificates(response.data))
       .catch((error) => console.error("Error fetching certificates:", error));
 
     // Fetch users
     axios
-      .get("https://maze-backend-production.up.railway.app/users/register")
+      .get(" http://72.60.206.65:3000/users/register")
       .then((response) => setUsers(response.data))
       .catch((error) => console.error("Error fetching users:", error));
   }, []);
@@ -64,7 +64,7 @@ const AssignedDistributorsList = () => {
   const handleUpdateStatus = async (documentId, newStatus) => {
     try {
       await axios.put(
-        `https://maze-backend-production.up.railway.app/documents/update-status/${documentId}`,
+        ` http://72.60.206.65:3000/documents/update-status/${documentId}`,
         {
           status: newStatus,
           status_updated_at: new Date().toISOString(), // Add timestamp
@@ -141,7 +141,7 @@ const AssignedDistributorsList = () => {
     }
     try {
       const response = await axios.get(
-        `https://maze-backend-production.up.railway.app/certificates/${certificateId}`
+        ` http://72.60.206.65:3000/certificates/${certificateId}`
       );
       if (response.data && response.data.file_url) {
         window.open(response.data.file_url, "_blank");
@@ -165,7 +165,7 @@ const AssignedDistributorsList = () => {
 
       // Make the API call to download the file
       const response = await axios.get(
-        `https://maze-backend-production.up.railway.app/download-certificate/${documentId}`,
+        ` http://72.60.206.65:3000/download-certificate/${documentId}`,
         {
           responseType: "blob", // Important to handle file downloads
         }
@@ -214,7 +214,7 @@ const AssignedDistributorsList = () => {
           <button
             onClick={() => {
               setIsAdding(false);
-              navigate("/Adashinner");
+              navigate("/Assigndistributorlist");
             }}
             className="absolute top-1/2 right-4 transform -translate-y-1/2 text-gray-600 hover:text-gray-800"
           >

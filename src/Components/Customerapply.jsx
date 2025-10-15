@@ -43,9 +43,10 @@ const CustomerApply = () => {
       "Approved",
       "Rejected",
       "Uploaded",
+      "Sent"
     ];
     axios
-      .get("https://maze-backend-production.up.railway.app/documents/list")
+      .get(" http://72.60.206.65:3000/documents/list")
       .then((response) => {
         const allDocs = response.data.documents;
         const filtered = allDocs
@@ -59,7 +60,7 @@ const CustomerApply = () => {
       .catch((err) => console.error("Error fetching documents:", err));
 
     axios
-      .get("https://maze-backend-production.up.railway.app/certificates")
+      .get(" http://72.60.206.65:3000/certificates")
       .then((res) => setCertificates(res.data))
       .catch((err) => console.error("Error fetching certificates:", err));
   }, [userId]);
@@ -127,7 +128,7 @@ const CustomerApply = () => {
     }
     try {
       const { data } = await axios.get(
-        `https://maze-backend-production.up.railway.app/certificates/${cert.certificate_id}`
+        ` http://72.60.206.65:3000/certificates/${cert.certificate_id}`
       );
       if (data.file_url) window.open(data.file_url, "_blank");
       else throw new Error("No file URL");
@@ -307,7 +308,7 @@ const CustomerApply = () => {
                       </div>
                     </td>
                     <td className="border px-4 py-3 text-center">
-                      {(doc.status === "Received" ||
+                      {(doc.status === "Received" || doc.status === "Sent" ||
                         doc.status === "Uploaded") &&
                       doc.receipt_url ? (
                         <button

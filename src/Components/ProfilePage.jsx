@@ -10,7 +10,7 @@ import {
   isValidPassword,
 } from "../utils/formValidators"; // Import your validators
 
-const USER_API_BASE = "https://maze-backend-production.up.railway.app/users";
+const USER_API_BASE = " http://72.60.206.65:3000/users";
 const PASSWORD_API = `${USER_API_BASE}/password`;
 export default function ProfilePage() {
   const [user, setUser] = useState(null);

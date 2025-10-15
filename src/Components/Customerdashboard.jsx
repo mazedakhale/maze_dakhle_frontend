@@ -7,6 +7,7 @@ import {
   FaClipboardList,
   FaFileAlt,
   FaCommentDots,
+  FaWallet,
 } from "react-icons/fa";
 import { IoMdLogOut } from "react-icons/io";
 import { FaRegCircleUser } from "react-icons/fa6";
@@ -54,6 +55,12 @@ const Sidebar = ({ onNavigate }) => {
                 label: "Applied Applications",
                 // label: "Applications",
                 path: "/Customerapply",
+              },
+              {
+                icon: <FaWallet />,
+                label: "Wallet",
+                // label: "",
+                path: "/Wallet",
               },
               { icon: <FaCommentDots />, label: "Feedback", path: "/Feedback" },
               { icon: <FaCommentDots />, label: "Guide", path: "/Guide" },
@@ -136,7 +143,7 @@ const Customerdashboard = ({ children }) => {
         </div>
 
         {/* Main Content Area */}
-        <div className="mt-6">{children}</div>
+        <div className="mt-6 ">{children}</div>
       </div>
     </div>
   );

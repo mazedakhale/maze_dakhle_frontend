@@ -24,11 +24,12 @@ import {
   FaYoutube,
   FaEnvelope,
   FaExclamationTriangle,
+  FaMoneyBill,
 } from "react-icons/fa";
 
 import jwtDecode from "jwt-decode";
 import logo from "../assets/logo.png";
-import { FaRegCircleUser } from "react-icons/fa6";
+import { FaMoneyBill1Wave, FaRegCircleUser } from "react-icons/fa6";
 import { IoMdLogOut } from "react-icons/io";
 
 // Sidebar Component
@@ -146,6 +147,11 @@ const Sidebar = ({ onNavigate }) => {
                 icon: <FaHistory />,
                 label: "Applications History",
                 path: "/Verifydocumentshistory",
+              },
+              {
+                icon: <FaMoneyBill1Wave />,
+                label: "Transaction History",
+                path: "/CustomerTransactions",
               },
               {
                 icon: <FaUserTie />,

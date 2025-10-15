@@ -10,8 +10,8 @@ const Contact = () => {
   const [fieldKeys, setFieldKeys] = useState([]);
   const [isAdding, setIsAdding] = useState(false); // fields from Field API
   const navigate = useNavigate();
-  const contactApiUrl = "https://maze-backend-production.up.railway.app/contact";
-  const fieldApiUrl = "https://maze-backend-production.up.railway.app/field";
+  const contactApiUrl = " http://72.60.206.65:3000/contact";
+  const fieldApiUrl = " http://72.60.206.65:3000/field";
 
   useEffect(() => {
     fetchData();

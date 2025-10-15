@@ -12,13 +12,44 @@ import { useNavigate } from "react-router-dom";
 const DocumentViewer = ({ filePath, onClose }) => {
   const nodeRef = useRef(null);
 
+  // ✅ Function to get the correct URL for iframe embedding
+  const getEmbeddableUrl = (url) => {
+    if (!url) return '';
+
+    // ✅ If it's already a Google Drive preview URL, use it as is
+    if (url.includes('/preview')) {
+      return url;
+    }
+
+    // ✅ If it's a Google Drive view URL, convert to preview URL
+    if (url.includes('drive.google.com/file/d/')) {
+      const fileIdMatch = url.match(/\/file\/d\/([a-zA-Z0-9-_]+)/);
+      if (fileIdMatch) {
+        return `https://drive.google.com/file/d/${fileIdMatch[1]}/preview`;
+      }
+    }
+
+    // ✅ If it's a Google Drive usercontent URL, convert to preview URL
+    if (url.includes('drive.google.com/uc')) {
+      const fileIdMatch = url.match(/id=([a-zA-Z0-9-_]+)/);
+      if (fileIdMatch) {
+        return `https://drive.google.com/file/d/${fileIdMatch[1]}/preview`;
+      }
+    }
+
+    // ✅ For local URLs, return as is
+    return url;
+  };
+
+  const embeddableUrl = getEmbeddableUrl(filePath);
+
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
       <Draggable
         nodeRef={nodeRef}
         handle=".handle"
         bounds="parent"
-        defaultPosition={{ x: window.innerWidth / 5, y: 50 }} // Changed from /3 to /5 for more left position
+        defaultPosition={{ x: window.innerWidth / 5, y: 50 }}
       >
         <div
           ref={nodeRef}
@@ -26,7 +57,7 @@ const DocumentViewer = ({ filePath, onClose }) => {
           style={{
             minWidth: "200px",
             minHeight: "600px",
-            left: "20%", // Additional left positioning
+            left: "20%",
           }}
         >
           <div className="flex justify-between items-center mb-3 handle cursor-move">
@@ -38,13 +69,32 @@ const DocumentViewer = ({ filePath, onClose }) => {
               &times;
             </button>
           </div>
+          
+          {/* ✅ Enhanced iframe with error handling */}
           <iframe
-            src={filePath}
-            sandbox="allow-same-origin allow-scripts allow-forms allow-popups"
+            src={embeddableUrl}
             title="Document Viewer"
             className="w-full h-full border"
             style={{ minHeight: "calc(100% - 40px)" }}
+            onError={(e) => {
+              console.error('Iframe loading error:', e);
+              // Fallback: open in new tab if iframe fails
+              window.open(filePath, '_blank');
+            }}
+            sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
           />
+          
+          {/* ✅ Fallback link in case iframe doesn't work */}
+          <div className="mt-2 text-center">
+            <a
+              href={filePath}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-500 hover:text-blue-700 text-sm"
+            >
+              Open in new tab if preview doesn't work
+            </a>
+          </div>
         </div>
       </Draggable>
     </div>
@@ -89,14 +139,14 @@ const InvoicePage = () => {
 
   useEffect(() => {
     axios
-      .get("https://maze-backend-production.up.railway.app/users/distributors")
+      .get("http://72.60.206.65:3000/users/distributors")
       .then((response) => setDistributors(response.data))
       .catch((error) => console.error("Error fetching distributors:", error));
   }, []);
   const fetchDocumentData = useCallback(async () => {
     try {
       const response = await axios.get(
-        `https://maze-backend-production.up.railway.app/singledocument/documentby/${documentId}`
+        `http://72.60.206.65:3000/singledocument/documentby/${documentId}`
       );
       const data = response.data.document;
       setDocumentData(data);
@@ -106,7 +156,7 @@ const InvoicePage = () => {
 
       if (category && subcategory) {
         const fieldNamesResponse = await axios.get(
-          `https://maze-backend-production.up.railway.app/field-names/${category}/${subcategory}`
+          `http://72.60.206.65:3000/field-names/${category}/${subcategory}`
         );
         setDocumentNames(fieldNamesResponse.data);
       }
@@ -149,7 +199,7 @@ const InvoicePage = () => {
       console.log("Payload:", payload); // Debug: Log the payload
 
       const response = await axios.put(
-        `https://maze-backend-production.up.railway.app/documents/update-status/${documentId}`,
+        `http://72.60.206.65:3000/documents/update-status/${documentId}`,
         payload,
         {
           timeout: 30000, // Increase timeout to 30 seconds
@@ -192,7 +242,7 @@ const InvoicePage = () => {
 
       // Make the API call to download the ZIP file with increased timeout
       const response = await axios.get(
-        `https://maze-backend-production.up.railway.app/download/${documentId}`,
+        `http://72.60.206.65:3000/download/${documentId}`,
         {
           responseType: "blob", // Handle binary data
           timeout: 60000, // Increase timeout to 60 seconds
@@ -353,7 +403,7 @@ const InvoicePage = () => {
       setIsProcessing(true);
 
       const assignResponse = await axios.put(
-        `https://maze-backend-production.up.railway.app/documents/assign-distributor/${documentId}`,
+        `http://72.60.206.65:3000/documents/assign-distributor/${documentId}`,
         {
           distributor_id: distributorId,
           remark: distributorRemark,
@@ -362,7 +412,7 @@ const InvoicePage = () => {
       console.log("Assign Distributor Response:", assignResponse.data);
 
       const statusResponse = await axios.put(
-        `https://maze-backend-production.up.railway.app/documents/update-status/${documentId}`,
+        `http://72.60.206.65:3000/documents/update-status/${documentId}`,
         {
           status: "Approved",
         }

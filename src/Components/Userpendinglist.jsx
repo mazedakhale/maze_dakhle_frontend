@@ -38,7 +38,7 @@ const Userpendinglist = () => {
     const allowedStatuses = ["Pending"];
 
     axios
-      .get("https://maze-backend-production.up.railway.app/documents/list")
+      .get(" http://72.60.206.65:3000/documents/list")
       .then((response) => {
         const allDocuments = response.data.documents;
         const filteredDocs = allDocuments
@@ -53,7 +53,7 @@ const Userpendinglist = () => {
 
     // Fetch certificates
     axios
-      .get("https://maze-backend-production.up.railway.app/certificates")
+      .get(" http://72.60.206.65:3000/certificates")
       .then((response) => setCertificates(response.data))
       .catch((error) => console.error("Error fetching certificates:", error));
   }, [userId]);
@@ -86,7 +86,7 @@ const Userpendinglist = () => {
           formData.append("documentType", documentType);
 
           const response = await axios.post(
-            ` https://maze-backend-production.up.railway.app/documents/reupload/${documentId}`,
+            `  http://72.60.206.65:3000/documents/reupload/${documentId}`,
             formData,
             {
               headers: {
@@ -155,7 +155,7 @@ const Userpendinglist = () => {
 
     try {
       const response = await axios.get(
-        ` https://maze-backend-production.up.railway.app/certificates/${certificate.certificate_id}`
+        `  http://72.60.206.65:3000/certificates/${certificate.certificate_id}`
       );
       if (response.data && response.data.file_url) {
         newTab.location.href = response.data.file_url;

@@ -32,7 +32,7 @@ const CustomerHistory = () => {
   useEffect(() => {
     if (userId) {
       axios
-        .get(` https://maze-backend-production.up.railway.app/documents/list`)
+        .get(`  http://72.60.206.65:3000/documents/list`)
         .then((response) => {
           const allDocuments = response.data.documents;
           // Filter documents where status is "Completed"
@@ -46,7 +46,7 @@ const CustomerHistory = () => {
         .catch((error) => console.error("Error fetching documents:", error));
 
       axios
-        .get(" https://maze-backend-production.up.railway.app/certificates")
+        .get("  http://72.60.206.65:3000/certificates")
         .then((response) => setCertificates(response.data))
         .catch((error) => console.error("Error fetching certificates:", error));
     }
@@ -92,7 +92,7 @@ const CustomerHistory = () => {
 
     try {
       const response = await axios.get(
-        ` https://maze-backend-production.up.railway.app/certificates/${certificateId}`
+        `  http://72.60.206.65:3000/certificates/${certificateId}`
       );
 
       if (response.data && response.data.file_url) {
@@ -109,7 +109,7 @@ const CustomerHistory = () => {
   const handleDownloadCertificate = async (documentId, name) => {
     try {
       const response = await axios.get(
-        ` https://maze-backend-production.up.railway.app/download-certificate/${documentId}`,
+        `  http://72.60.206.65:3000/download-certificate/${documentId}`,
         {
           responseType: "blob", // Important to handle file downloads
         }

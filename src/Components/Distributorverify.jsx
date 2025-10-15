@@ -4,6 +4,7 @@ import { FaTimes, FaDownload, FaCheck } from "react-icons/fa";
 import jwtDecode from "jwt-decode";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
+import getEmbeddableUrl from "../utils/getEmbeddableUrl";
 
 const VerifyDocuments = () => {
   const [documents, setDocuments] = useState([]);
@@ -41,7 +42,7 @@ const VerifyDocuments = () => {
   // Get list of certificates
   const fetchCertificates = async () => {
     try {
-      const response = await axios.get("https://maze-backend-production.up.railway.app/certificates");
+      const response = await axios.get(" http://72.60.206.65:3000/certificates");
       // assume response.data is an array of certificate objects
       setCertificates(response.data);
     } catch (err) {
@@ -78,7 +79,7 @@ const VerifyDocuments = () => {
   const fetchDocuments = async (distributorId) => {
     try {
       const response = await axios.get(
-        `https://maze-backend-production.up.railway.app/documents/list/${distributorId}`
+        ` http://72.60.206.65:3000/documents/list/${distributorId}`
       );
       const filtered = response.data.documents.filter(
         (doc) => doc.status !== "Sent"
@@ -136,13 +137,13 @@ const VerifyDocuments = () => {
     formData.append("name", doc.name);
 
     try {
-      await axios.post("https://maze-backend-production.up.railway.app/certificates/upload", formData, {
+      await axios.post(" http://72.60.206.65:3000/certificates/upload", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       // re-fetch certificates and update document status
       await fetchCertificates();
       await axios.put(
-        `https://maze-backend-production.up.railway.app/documents/update-status/${documentId}`,
+        ` http://72.60.206.65:3000/documents/update-status/${documentId}`,
         { status: "Uploaded" }
       );
       setDocuments((p) =>
@@ -168,7 +169,7 @@ const VerifyDocuments = () => {
       return Swal.fire("Error", "Certificate not found", "error");
     try {
       const res = await axios.get(
-        `https://maze-backend-production.up.railway.app/certificates/${certificateId}`
+        ` http://72.60.206.65:3000/certificates/${certificateId}`
       );
       if (res.data.file_url) window.open(res.data.file_url, "_blank");
       else Swal.fire("Error", "Certificate file not found", "error");
@@ -322,7 +323,7 @@ const VerifyDocuments = () => {
             >
               Close
             </button>
-            <iframe src={previewFile} className="w-full h-full border-none" />
+            <iframe src={getEmbeddableUrl(previewFile)} className="w-full h-full border-none" />
           </div>
         </div>
       )}
