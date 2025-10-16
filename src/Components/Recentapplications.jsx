@@ -21,12 +21,12 @@ const RecentApplications = () => {
 
   useEffect(() => {
     // Fetch all data in parallel
-    const docsReq = axios.get("http://localhost:3000/documents/recent", {
+    const docsReq = axios.get("http://72.60.206.65:3000/documents/recent", {
       timeout: 120000,
     });
-    const distReq = axios.get("http://localhost:3000/users/distributors");
-    const certReq = axios.get("http://localhost:3000/certificates");
-    const usersReq = axios.get("http://localhost:3000/users/register");
+    const distReq = axios.get("http://72.60.206.65:3000/users/distributors");
+    const certReq = axios.get("http://72.60.206.65:3000/certificates");
+    const usersReq = axios.get("http://72.60.206.65:3000/users/register");
 
     Promise.all([docsReq, distReq, certReq, usersReq])
       .then(([docsResp, distResp, certResp, usersResp]) => {
@@ -76,7 +76,7 @@ const RecentApplications = () => {
     });
     try {
       await axios.put(
-        `http://localhost:3000/documents/update-status/${documentId}`,
+        `http://72.60.206.65:3000/documents/update-status/${documentId}`,
         { status: newStatus },
         { timeout: 30000 }
       );
@@ -102,7 +102,7 @@ const RecentApplications = () => {
     if (reason) {
       try {
         await axios.put(
-          `http://localhost:3000/documents/update-status/${documentId}`,
+          `http://72.60.206.65:3000/documents/update-status/${documentId}`,
           { status: "Rejected", rejectionReason: reason }
         );
         setApplications((apps) =>
@@ -351,7 +351,7 @@ const RecentApplications = () => {
                               doc.document_id
                             );
                             window.open(
-                              `http://localhost:3000/certificates/${certId}`,
+                              `http://72.60.206.65:3000/certificates/${certId}`,
                               "_blank"
                             );
                           }}

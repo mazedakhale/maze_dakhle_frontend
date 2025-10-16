@@ -75,7 +75,7 @@ const Apply = () => {
     if (formData.category_id && formData.subcategory_id) {
       axios
         .get(
-          `http://localhost:3000/required-documents/${formData.category_id}/${formData.subcategory_id}`
+          `http://72.60.206.65:3000/required-documents/${formData.category_id}/${formData.subcategory_id}`
         )
         .then((response) => {
           if (response.data.length > 0 && response.data[0].document_names) {
@@ -102,7 +102,7 @@ const Apply = () => {
     if (formData.category_id && formData.subcategory_id) {
       axios
         .get(
-          `http://localhost:3000/field-names/${formData.category_id}/${formData.subcategory_id}`
+          `http://72.60.206.65:3000/field-names/${formData.category_id}/${formData.subcategory_id}`
         )
         .then((response) => {
           if (response.data.length > 0 && response.data[0].document_fields) {
@@ -298,7 +298,7 @@ const Apply = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:3000/documents/upload",
+        "http://72.60.206.65:3000/documents/upload",
         formDataToSend,
         { timeout: 60000 }
       );

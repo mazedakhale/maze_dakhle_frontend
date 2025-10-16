@@ -77,18 +77,18 @@ export default function CustomerDashboard() {
 
     // 1. Applied / Completed
     axios
-      .get(`http://localhost:3000/userdashboard/total-applied/${userId}`)
+      .get(`http://72.60.206.65:3000/userdashboard/total-applied/${userId}`)
       .then((res) => setAppliedCount(res.data.totalCount))
       .catch(console.error);
 
     axios
-      .get(`http://localhost:3000/userdashboard/total-completed/${userId}`)
+      .get(`http://72.60.206.65:3000/userdashboard/total-completed/${userId}`)
       .then((res) => setCompletedCount(res.data.totalCompleted))
       .catch(console.error);
 
     // 2. Wallet balance
     axios
-      .get(`http://localhost:3000/wallet`, { headers: authHeaders })
+      .get(`http://72.60.206.65:3000/wallet`, { headers: authHeaders })
       .then((res) => {
         const num = parseFloat(res.data.balance);
         setWalletBalance(isNaN(num) ? 0 : num);
@@ -97,7 +97,7 @@ export default function CustomerDashboard() {
 
     // 3. Status distribution
     axios
-      .get(`http://localhost:3000/userdashboard/status-count/${userId}`)
+      .get(`http://72.60.206.65:3000/userdashboard/status-count/${userId}`)
       .then((res) =>
         setStatusData(
           res.data.map((item) => ({
@@ -110,7 +110,7 @@ export default function CustomerDashboard() {
 
     // 4. Category / Subcategory counts
     axios
-      .get(`http://localhost:3000/userdashboard/category-counts/${userId}`)
+      .get(`http://72.60.206.65:3000/userdashboard/category-counts/${userId}`)
       .then((res) => {
         const withColors = res.data.categories.map((c, i) => ({
           name: c.category,
@@ -126,7 +126,7 @@ export default function CustomerDashboard() {
 
     // 5. Notifications
     axios
-      .get("http://localhost:3000/notifications/active")
+      .get("http://72.60.206.65:3000/notifications/active")
       .then((res) => setNotifications(res.data))
       .catch(console.error);
 
@@ -139,19 +139,19 @@ export default function CustomerDashboard() {
   // ─── Helper Fetchers ────────────────────────────────
   const fetchCategories = async () => {
     try {
-      const { data } = await axios.get("http://localhost:3000/categories");
+      const { data } = await axios.get("http://72.60.206.65:3000/categories");
       setCategories(data);
     } catch {}
   };
   const fetchSubcategories = async () => {
     try {
-      const { data } = await axios.get("http://localhost:3000/subcategories");
+      const { data } = await axios.get("http://72.60.206.65:3000/subcategories");
       setSubcategories(data);
     } catch {}
   };
   const fetchPrices = async () => {
     try {
-      const { data } = await axios.get("http://localhost:3000/prices");
+      const { data } = await axios.get("http://72.60.206.65:3000/prices");
       setPrices(data.map((p) => ({ ...p, amount: Number(p.amount) })));
     } catch {}
   };
@@ -160,7 +160,7 @@ export default function CustomerDashboard() {
   const openDocsModal = async (catId, subId) => {
     try {
       const { data } = await axios.get(
-        `http://localhost:3000/required-documents/${catId}/${subId}`
+        `http://72.60.206.65:3000/required-documents/${catId}/${subId}`
       );
       setRequiredDocuments(data);
       const files = {};

@@ -31,7 +31,7 @@ const RequiredDocuments = () => {
   const fetchDocuments = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:3000/required-documents"
+        "http://72.60.206.65:3000/required-documents"
       );
       // Add default values for category and subcategory if they are null
       const documentsWithDefaults = response.data.map((doc) => ({
@@ -50,7 +50,7 @@ const RequiredDocuments = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await axios.get("http://localhost:3000/categories");
+      const response = await axios.get("http://72.60.206.65:3000/categories");
       setCategories(response.data);
     } catch (error) {
       console.error("Error fetching categories:", error);
@@ -61,7 +61,7 @@ const RequiredDocuments = () => {
     if (!categoryId) return;
     try {
       const response = await axios.get(
-        `http://localhost:3000/subcategories/category/${categoryId}`
+        `http://72.60.206.65:3000/subcategories/category/${categoryId}`
       );
       setSubcategories(response.data);
     } catch (error) {
@@ -104,7 +104,7 @@ const RequiredDocuments = () => {
 
     if (confirmDelete.isConfirmed) {
       try {
-        await axios.delete(`http://localhost:3000/required-documents/${id}`);
+        await axios.delete(`http://72.60.206.65:3000/required-documents/${id}`);
         setDocuments((prevDocuments) =>
           prevDocuments.filter((document) => document.id !== id)
         );
@@ -157,8 +157,8 @@ const RequiredDocuments = () => {
       }
 
       const url = editId
-        ? `http://localhost:3000/required-documents/${editId}`
-        : "http://localhost:3000/required-documents";
+        ? `http://72.60.206.65:3000/required-documents/${editId}`
+        : "http://72.60.206.65:3000/required-documents";
 
       const method = editId ? "patch" : "post";
 

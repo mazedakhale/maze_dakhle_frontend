@@ -11,7 +11,7 @@ const ContactTable = () => {
   const [updatedKey, setUpdatedKey] = useState("");
   const [isAdding, setIsAdding] = useState(false);
   const navigate = useNavigate();
-  const apiUrl = "http://localhost:3000/field";
+  const apiUrl = "http://72.60.206.65:3000/field";
 
   // Fetch all fields
   useEffect(() => {
