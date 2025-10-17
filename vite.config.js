@@ -11,7 +11,6 @@ export default defineConfig({
     watch: {
       usePolling: true,
     },
-    // Only your actual domain and www subdomain allowed
     allowedHosts: ["mazhedakhle.in", "www.mazhedakhle.in"],
     proxy: {
       "/api": {
@@ -21,7 +20,8 @@ export default defineConfig({
       },
     },
     hmr: {
-      overlay: false, // Disable error overlay in browser
+      overlay: false, // Disable error overlay
+      clientPort: 80 // <-- Add this line to use port 80 for HMR websocket client
     },
   },
 });
