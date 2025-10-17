@@ -11,11 +11,11 @@ export default defineConfig({
     watch: {
       usePolling: true,
     },
-    // Allow both root and www subdomain to access the dev server
-    allowedHosts: ["mazedakhale.in", "www.mazedakhale.in", "mazhedakhale.in","www.mazhedakhale.in"],
+    // Only your actual domain and www subdomain allowed
+    allowedHosts: ["mazhedakhle.in", "www.mazhedakhle.in"],
     proxy: {
       "/api": {
-        target: "https://mazedakhale.in/api",
+        target: "https://mazhedakhle.in/api",
         changeOrigin: true,
         secure: false,
       },
