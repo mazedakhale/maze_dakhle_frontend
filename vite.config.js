@@ -11,7 +11,8 @@ export default defineConfig({
     watch: {
       usePolling: true,
     },
-    allowedHosts: ["mazedakhale.in"],
+    // Allow both root and www subdomain to access the dev server
+    allowedHosts: ["mazedakhale.in", "www.mazedakhale.in"],
     proxy: {
       "/api": {
         target: "https://mazedakhale.in/api",
@@ -20,7 +21,7 @@ export default defineConfig({
       },
     },
     hmr: {
-      overlay: false, // ✅ This disables the error overlay
+      overlay: false, // Disable error overlay in browser
     },
   },
 });
