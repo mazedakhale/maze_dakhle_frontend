@@ -12,7 +12,7 @@ export default defineConfig({
       usePolling: true,
     },
     // Allow both root and www subdomain to access the dev server
-    allowedHosts: ["mazedakhale.in", "www.mazedakhale.in"],
+    allowedHosts: ["mazedakhale.in", "www.mazedakhale.in", "mazhedakhale.in","www.mazhedakhale.in"],
     proxy: {
       "/api": {
         target: "https://mazedakhale.in/api",
