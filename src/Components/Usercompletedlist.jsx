@@ -28,7 +28,7 @@ const CompletedApplicationsList = () => {
     const fetchCompletedDocuments = async () => {
       try {
         const response = await axios.get(
-          `http://72.60.206.65:3000/userdashboard/completed/${userId}`
+          `/api/userdashboard/completed/${userId}`
         );
         const sortedDocs = response.data.sort(
           (a, b) => new Date(b.uploaded_at) - new Date(a.uploaded_at)
@@ -41,7 +41,7 @@ const CompletedApplicationsList = () => {
 
     const fetchCertificates = async () => {
       try {
-        const response = await axios.get("http://72.60.206.65:3000/certificates");
+        const response = await axios.get("/api/certificates");
         setCertificates(response.data);
       } catch (error) {
         console.error("Error fetching certificates:", error);
@@ -78,7 +78,7 @@ const CompletedApplicationsList = () => {
 
     try {
       const response = await axios.get(
-        `http://72.60.206.65:3000/certificates/${certificateId}`
+        `/api/certificates/${certificateId}`
       );
 
       if (response.data && response.data.file_url) {

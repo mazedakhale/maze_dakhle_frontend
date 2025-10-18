@@ -50,7 +50,7 @@ const FeedbackD = () => {
     }
 
     try {
-      await axios.post("http://72.60.206.65:3000/feedback", {
+      await axios.post("/api/feedback", {
         comment,
         rating,
         user_id: storedUser.user_id, // ✅ Extract user_id correctly

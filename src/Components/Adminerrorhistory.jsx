@@ -21,7 +21,7 @@ const ErrorRequests = () => {
   // Fetch error requests
   const fetchErrorRequests = async () => {
     try {
-      const response = await axios.get("http://72.60.206.65:3000/request-errors");
+      const response = await axios.get("/api/request-errors");
       setErrorRequests(response.data);
     } catch (error) {
       console.error("Error fetching error requests:", error);
@@ -31,7 +31,7 @@ const ErrorRequests = () => {
   // Fetch certificates
   const fetchCertificates = async () => {
     try {
-      const response = await axios.get("http://72.60.206.65:3000/certificates");
+      const response = await axios.get("/api/certificates");
       setCertificates(response.data);
     } catch (error) {
       console.error("Error fetching certificates:", error);
@@ -55,7 +55,7 @@ const ErrorRequests = () => {
     }
     try {
       const response = await axios.get(
-        `http://72.60.206.65:3000/certificates/${certificateId}`
+        `/api/certificates/${certificateId}`
       );
       if (response.data && response.data.file_url) {
         window.open(response.data.file_url, "_blank");
@@ -71,7 +71,7 @@ const ErrorRequests = () => {
   const handleDownloadCertificate = async (documentId, requestName) => {
     try {
       const response = await axios.get(
-        `http://72.60.206.65:3000/download-certificate/${documentId}`,
+        `/api/download-certificate/${documentId}`,
         {
           responseType: "blob", // Important to handle file downloads
         }

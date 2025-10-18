@@ -20,9 +20,9 @@ import { BsStopCircle } from "react-icons/bs";
 
 import Logo from "../assets/logo.png";
 
-const API_CATEGORIES = "http://72.60.206.65:3000/categories";
-const API_SUBCATEGORIES = "http://72.60.206.65:3000/subcategories";
-const API_PRICES = "http://72.60.206.65:3000/prices";
+const API_CATEGORIES = "/api/categories";
+const API_SUBCATEGORIES = "/api/subcategories";
+const API_PRICES = "/api/prices";
 
 // Footer links
 const navLabels = [

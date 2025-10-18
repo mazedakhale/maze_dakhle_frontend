@@ -30,7 +30,7 @@ const Price = () => {
   // 1) load prices
   const fetchPrices = async () => {
     try {
-      const { data } = await axios.get("http://72.60.206.65:3000/prices");
+      const { data } = await axios.get("/api/prices");
       setPrices(data.map((p) => ({ ...p, amount: Number(p.amount) })));
     } catch {
       Swal.fire("Error", "Could not load prices", "error");
@@ -41,7 +41,7 @@ const Price = () => {
   const fetchCategoriesAndAllSubcats = async () => {
     try {
       const { data: cats } = await axios.get(
-        "http://72.60.206.65:3000/categories"
+        "/api/categories"
       );
       setCategories(cats);
 
@@ -50,7 +50,7 @@ const Price = () => {
       await Promise.all(
         cats.map(async (cat) => {
           const { data: subs } = await axios.get(
-            `http://72.60.206.65:3000/subcategories/category/${cat.category_id}`
+            `/api/subcategories/category/${cat.category_id}`
           );
           all.push(...subs);
         })
@@ -69,7 +69,7 @@ const Price = () => {
     }
     try {
       const { data } = await axios.get(
-        `http://72.60.206.65:3000/subcategories/category/${categoryId}`
+        `/api/subcategories/category/${categoryId}`
       );
       setSubcategories(data);
     } catch {
@@ -116,7 +116,7 @@ const Price = () => {
     });
     if (!confirm.isConfirmed) return;
     try {
-      await axios.delete(`http://72.60.206.65:3000/prices/${id}`);
+      await axios.delete(`/api/prices/${id}`);
       setPrices((p) => p.filter((x) => x.id !== id));
       Swal.fire("Deleted!", "", "success");
     } catch {
@@ -137,10 +137,10 @@ const Price = () => {
         amount: parseFloat(amount),
       };
       if (editId) {
-        await axios.put(`http://72.60.206.65:3000/prices/${editId}`, payload);
+        await axios.put(`/api/prices/${editId}`, payload);
         Swal.fire("Updated!", "", "success");
       } else {
-        await axios.post("http://72.60.206.65:3000/prices", payload);
+        await axios.post("/api/prices", payload);
         Swal.fire("Added!", "", "success");
       }
       setModalOpen(false);

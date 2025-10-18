@@ -5,7 +5,7 @@ import TransactionTable from './TransactionTable'
 import PaymentButton from './PaymentButton'
 
 export default function Wallet() {
-    const API = import.meta.env.VITE_API_URL || 'http://72.60.206.65:3000'
+    const API = import.meta.env.VITE_API_URL || '/api'
     // const API = import.meta.env.VITE_API_URL || 'https://mazedakhale.in/api'
 
     const [balance, setBalance] = useState(0)
