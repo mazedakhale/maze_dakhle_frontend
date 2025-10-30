@@ -13,6 +13,7 @@ import { IoMdLogOut } from "react-icons/io";
 import { FaRegCircleUser } from "react-icons/fa6";
 import jwtDecode from "jwt-decode";
 import logo from "../assets/logo.png";
+import { FaMoneyBill } from "react-icons/fa";
 
 // Sidebar Component
 const Sidebar = ({ onNavigate }) => {
@@ -63,6 +64,11 @@ const Sidebar = ({ onNavigate }) => {
                 icon: <FaUserCheck />,
                 label: "Distributor Request",
                 path: "/Distributorrequest",
+              },
+              {
+                icon: <FaMoneyBill />,
+                label: "Payment Request",
+                path: "/PaymentRequest",
               },
               {
                 icon: <FaFileSignature />,

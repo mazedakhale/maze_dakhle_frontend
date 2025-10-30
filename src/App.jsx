@@ -1,6 +1,9 @@
 // eslint-disable-next-line no-unused-vars
-import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import React, { useEffect } from "react";
+import { BrowserRouter as Router, Routes, Route, useNavigate } from "react-router-dom";
+import ProtectedRoute from "./Components/ProtectedRoute";
+import AutoRedirect from "./Components/AutoRedirect";
+import jwtDecode from "jwt-decode";
 import Registration from "./Components/Registration";
 import Login from "./Components/Login";
 import Admindashboard from "./Components/Admindashboard";
@@ -66,6 +69,7 @@ import Spage from "./Components/EmployeeDocumentList"
 import Received from "./Components/Received";
 import Dsentlist from "./Components/Dsentlist";
 import Distributorrejected from "./Components/Distributorrejected";
+import PaymentRequest from "./Components/PaymentRequest";
 import Emplist from "./Components/Emplist";
 import MainPage from "./Components/Mainpage";
 import PrivacyPolicy from "./Components/Privacypolicy";
@@ -93,17 +97,19 @@ import Wallet from "./Components/Wallet";
 import TransactionTable from "./Components/TransactionTable";
 import api from "./utils/api";
 import TransactionHistory from "./Components/TransactionHistory";
+import DistributorPaymentRequest from "./Components/DistributorPaymentRequest";
+import AdminWallet from "./Components/AdminWallet";
 function App() {
   return (
     <Router>
       <Routes>
         {/* Authentication */}
-        <Route path="/" element={<MainPage />} />
+        <Route path="/" element={<AutoRedirect><MainPage /></AutoRedirect>} />
 
-        <Route path="/Login" element={<Login />} />
-        <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/Login" element={<AutoRedirect><Login /></AutoRedirect>} />
+        <Route path="/reset-password" element={<AutoRedirect><ResetPassword /></AutoRedirect>} />
 
-        <Route path="/Registration" element={<Registration />} />
+        <Route path="/Registration" element={<AutoRedirect><Registration /></AutoRedirect>} />
         <Route path="/Privacypolicy" element={<PrivacyPolicy />} />
         <Route path="/ContactForm" element={<ContactForm />} />
         <Route path="/RefundCancellationPolicy" element={<RefundCancellationPolicy />} />
@@ -112,121 +118,128 @@ function App() {
         <Route path="/News" element={<News />} />
 
         {/* Admin Routes */}
-        <Route path="/Admindashboard" element={<Admindashboard />} />
-        <Route path="/Adashinner" element={<Admindashboard><Adashinner /></Admindashboard>} />
-        <Route path="/ElistPage" element={<Admindashboard><ElistPage /></Admindashboard>} />
-        <Route path="/Customerlist" element={<Admindashboard><Customerlist /></Admindashboard>} />
-        <Route path="/Addcategory" element={<Admindashboard><Addcategory /></Admindashboard>} />
-        <Route path="/Addsubcategory" element={<Admindashboard><Addsubcategory /></Admindashboard>} />
-        <Route path="/Requireddocuments" element={<Admindashboard><RequiredDocuments /></Admindashboard>} />
-        <Route path="/Price" element={<Admindashboard><Price /></Admindashboard>} />
+        <Route path="/Admindashboard" element={<ProtectedRoute allowedRoles={['Admin']}><Admindashboard /></ProtectedRoute>} />
+        <Route path="/Adashinner" element={<ProtectedRoute allowedRoles={['Admin']}><Admindashboard><Adashinner /></Admindashboard></ProtectedRoute>} />
+        <Route path="/ElistPage" element={<ProtectedRoute allowedRoles={['Admin']}><Admindashboard><ElistPage /></Admindashboard></ProtectedRoute>} />
+        <Route path="/Customerlist" element={<ProtectedRoute allowedRoles={['Admin']}><Admindashboard><Customerlist /></Admindashboard></ProtectedRoute>} />
+        <Route path="/Addcategory" element={<ProtectedRoute allowedRoles={['Admin']}><Admindashboard><Addcategory /></Admindashboard></ProtectedRoute>} />
+        <Route path="/Addsubcategory" element={<ProtectedRoute allowedRoles={['Admin']}><Admindashboard><Addsubcategory /></Admindashboard></ProtectedRoute>} />
+        <Route path="/Requireddocuments" element={<ProtectedRoute allowedRoles={['Admin']}><Admindashboard><RequiredDocuments /></Admindashboard></ProtectedRoute>} />
+        <Route path="/Price" element={<ProtectedRoute allowedRoles={['Admin']}><Admindashboard><Price /></Admindashboard></ProtectedRoute>} />
 
-        <Route path="/ContactTable" element={<Admindashboard><ContactTable /></Admindashboard>} />
-        <Route path="/Contact" element={<Admindashboard><Contact /></Admindashboard>} />
+        <Route path="/ContactTable" element={<ProtectedRoute allowedRoles={['Admin']}><Admindashboard><ContactTable /></Admindashboard></ProtectedRoute>} />
+        <Route path="/Contact" element={<ProtectedRoute allowedRoles={['Admin']}><Admindashboard><Contact /></Admindashboard></ProtectedRoute>} />
 
-        <Route path="/Documenttable" element={<Admindashboard><DocumentTable /></Admindashboard>} />
-        <Route path="/Newstable" element={<Admindashboard><Newstable /></Admindashboard>} />
-        <Route path="/HeaderTable" element={<Admindashboard><HeaderTable /></Admindashboard>} />
-        <Route path="/ContactinfoTable" element={<Admindashboard><ContactinfoTable /></Admindashboard>} />
+        <Route path="/Documenttable" element={<ProtectedRoute allowedRoles={['Admin']}><Admindashboard><DocumentTable /></Admindashboard></ProtectedRoute>} />
+        <Route path="/Newstable" element={<ProtectedRoute allowedRoles={['Admin']}><Admindashboard><Newstable /></Admindashboard></ProtectedRoute>} />
+        <Route path="/HeaderTable" element={<ProtectedRoute allowedRoles={['Admin']}><Admindashboard><HeaderTable /></Admindashboard></ProtectedRoute>} />
+        <Route path="/ContactinfoTable" element={<ProtectedRoute allowedRoles={['Admin']}><Admindashboard><ContactinfoTable /></Admindashboard></ProtectedRoute>} />
 
-        <Route path="/Addfieldname" element={<Admindashboard><Addfieldname /></Admindashboard>} />
-        <Route path="/Verifydocuments" element={<Admindashboard><Verifydocuments /></Admindashboard>} />
-        <Route path="/Distributorlist" element={<Admindashboard><DistributorList /></Admindashboard>} />
-        <Route path="/Employeelist" element={<Admindashboard><Employeelist /></Admindashboard>} />
-        <Route path="/Employee" element={<Admindashboard><Employee /></Admindashboard>} />
+        <Route path="/Addfieldname" element={<ProtectedRoute allowedRoles={['Admin']}><Admindashboard><Addfieldname /></Admindashboard></ProtectedRoute>} />
+        <Route path="/Verifydocuments" element={<ProtectedRoute allowedRoles={['Admin']}><Admindashboard><Verifydocuments /></Admindashboard></ProtectedRoute>} />
+        <Route path="/Distributorlist" element={<ProtectedRoute allowedRoles={['Admin']}><Admindashboard><DistributorList /></Admindashboard></ProtectedRoute>} />
+        <Route path="/Employeelist" element={<ProtectedRoute allowedRoles={['Admin']}><Admindashboard><Employeelist /></Admindashboard></ProtectedRoute>} />
+        <Route path="/Employee" element={<ProtectedRoute allowedRoles={['Admin']}><Admindashboard><Employee /></Admindashboard></ProtectedRoute>} />
 
-        <Route path="/PrivacyPolicyTable" element={<Admindashboard><PrivacyPolicyTable /></Admindashboard>} />
-        <Route path="/Youtube" element={<Admindashboard><Youtube /></Admindashboard>} />
+        <Route path="/PrivacyPolicyTable" element={<ProtectedRoute allowedRoles={['Admin']}><Admindashboard><PrivacyPolicyTable /></Admindashboard></ProtectedRoute>} />
+        <Route path="/Youtube" element={<ProtectedRoute allowedRoles={['Admin']}><Admindashboard><Youtube /></Admindashboard></ProtectedRoute>} />
 
-        <Route path="/Distributorregister" element={<Admindashboard><Distributorregister /></Admindashboard>} />
-        <Route path="/Recentapplications" element={<Admindashboard><Recentapplications /></Admindashboard>} />
-        <Route path="/Userlist" element={<Admindashboard><Userlist /></Admindashboard>} />
-        <Route path="/Distributorlistonly" element={<Admindashboard><Distributorlistonly /></Admindashboard>} />
-        <Route path="/Addnotifications" element={<Admindashboard><Addnotifications /></Admindashboard>} />
-        <Route path="/Adminrequest" element={<Admindashboard><Adminrequest /></Admindashboard>} />
-        <Route path="/ReceiptErrorRequests" element={<Admindashboard><ReceiptErrorRequests /></Admindashboard>} />
+        <Route path="/Distributorregister" element={<ProtectedRoute allowedRoles={['Admin']}><Admindashboard><Distributorregister /></Admindashboard></ProtectedRoute>} />
+        <Route path="/Recentapplications" element={<ProtectedRoute allowedRoles={['Admin']}><Admindashboard><Recentapplications /></Admindashboard></ProtectedRoute>} />
+        <Route path="/Userlist" element={<ProtectedRoute allowedRoles={['Admin']}><Admindashboard><Userlist /></Admindashboard></ProtectedRoute>} />
+        <Route path="/Distributorlistonly" element={<ProtectedRoute allowedRoles={['Admin']}><Admindashboard><Distributorlistonly /></Admindashboard></ProtectedRoute>} />
+        <Route path="/Addnotifications" element={<ProtectedRoute allowedRoles={['Admin']}><Admindashboard><Addnotifications /></Admindashboard></ProtectedRoute>} />
+        <Route path="/Adminrequest" element={<ProtectedRoute allowedRoles={['Admin']}><Admindashboard><Adminrequest /></Admindashboard></ProtectedRoute>} />
+        <Route path="/ReceiptErrorRequests" element={<ProtectedRoute allowedRoles={['Admin']}><Admindashboard><ReceiptErrorRequests /></Admindashboard></ProtectedRoute>} />
 
-        <Route path="/Adminerrorhistory" element={<Admindashboard><Adminerrorhistory /></Admindashboard>} />
-        <Route path="/FeedbackList" element={<Admindashboard><FeedbackList /></Admindashboard>} />
-        <Route path="/Verifydocumentshistory" element={<Admindashboard><Verifydocumentshistory /></Admindashboard>} />
-        <Route path="/Assigndistributorlist" element={<Admindashboard><Assigndistributorlist /></Admindashboard>} />
-        <Route path="/Uploadeddocuments" element={<Admindashboard><Uploadeddocuments /></Admindashboard>} />
-        <Route path="/Rejecteddocuments" element={<Admindashboard><Rejecteddocuments /></Admindashboard>} />
-        <Route path="/RejectedBefore" element={<Admindashboard><RejectedBefore /></Admindashboard>} />
-        <Route path="/CustomerTransactions" element={<Admindashboard><TransactionHistory /></Admindashboard>} />
+        <Route path="/Adminerrorhistory" element={<ProtectedRoute allowedRoles={['Admin']}><Admindashboard><Adminerrorhistory /></Admindashboard></ProtectedRoute>} />
+        <Route path="/FeedbackList" element={<ProtectedRoute allowedRoles={['Admin']}><Admindashboard><FeedbackList /></Admindashboard></ProtectedRoute>} />
+        <Route path="/Verifydocumentshistory" element={<ProtectedRoute allowedRoles={['Admin']}><Admindashboard><Verifydocumentshistory /></Admindashboard></ProtectedRoute>} />
+        <Route path="/Assigndistributorlist" element={<ProtectedRoute allowedRoles={['Admin']}><Admindashboard><Assigndistributorlist /></Admindashboard></ProtectedRoute>} />
+        <Route path="/Uploadeddocuments" element={<ProtectedRoute allowedRoles={['Admin']}><Admindashboard><Uploadeddocuments /></Admindashboard></ProtectedRoute>} />
+        <Route path="/Rejecteddocuments" element={<ProtectedRoute allowedRoles={['Admin']}><Admindashboard><Rejecteddocuments /></Admindashboard></ProtectedRoute>} />
+        <Route path="/RejectedBefore" element={<ProtectedRoute allowedRoles={['Admin']}><Admindashboard><RejectedBefore /></Admindashboard></ProtectedRoute>} />
+        <Route path="/CustomerTransactions" element={<ProtectedRoute allowedRoles={['Admin']}><Admindashboard><TransactionHistory /></Admindashboard></ProtectedRoute>} />
+        <Route path="/DistributorPaymentRequest" element={<ProtectedRoute allowedRoles={['Admin']}><Admindashboard><DistributorPaymentRequest /></Admindashboard></ProtectedRoute>} />
+        <Route path="/AdminWallet" element={<ProtectedRoute allowedRoles={['Admin']}><Admindashboard><AdminWallet /></Admindashboard></ProtectedRoute>} />
 
+        <Route path="/Lazycharts" element={<ProtectedRoute allowedRoles={['Admin']}><Admindashboard><LazyCharts /></Admindashboard></ProtectedRoute>} />
+        <Route path="/Received" element={<ProtectedRoute allowedRoles={['Admin']}><Admindashboard><Received /></Admindashboard></ProtectedRoute>} />
 
-        <Route path="/Lazycharts" element={<Admindashboard><LazyCharts /></Admindashboard>} />
-        <Route path="/Received" element={<Admindashboard><Received /></Admindashboard>} />
 
 
 
         {/* Customer Routes */}
-        <Route path="/Customerdashboard" element={<Customerdashboard />} />
+        <Route path="/Customerdashboard" element={<ProtectedRoute allowedRoles={['Customer']}><Customerdashboard /></ProtectedRoute>} />
         {/* Profile page */}
         <Route
           path="/ProfilePage"
           element={
-            <Customerdashboard>
-              <ProfilePage />
-            </Customerdashboard>
+            <ProtectedRoute allowedRoles={['Customer']}>
+              <Customerdashboard>
+                <ProfilePage />
+              </Customerdashboard>
+            </ProtectedRoute>
           }
         />
 
-        <Route path="/Cdashinner" element={<Customerdashboard><Cdashinner /></Customerdashboard>} />
-        <Route path="/Userpendinglist" element={<Customerdashboard><Userpendinglist /></Customerdashboard>} />
-        <Route path="/Usercompletedlist" element={<Customerdashboard><Usercompletedlist /></Customerdashboard>} />
-        <Route path="/Customerapply" element={<Customerdashboard><Customerapply /></Customerdashboard>} />
-        <Route path="/Feedback" element={<Customerdashboard><Feedback /></Customerdashboard>} />
-        <Route path="/Guide" element={<Customerdashboard><Guide /></Customerdashboard>} />
-        <Route path="/payment-status" element={<Customerdashboard><PaymentStatus /></Customerdashboard>} />
-        <Route path="/payment-test" element={<Customerdashboard><PaymentTest /></Customerdashboard>} />
-        <Route path="/PaymentButton" element={<Customerdashboard><PaymentButton /></Customerdashboard>} />
-        <Route path="/TransactionTable" element={<Customerdashboard><TransactionTable /></Customerdashboard>} />
+        <Route path="/Cdashinner" element={<ProtectedRoute allowedRoles={['Customer']}><Customerdashboard><Cdashinner /></Customerdashboard></ProtectedRoute>} />
+        <Route path="/Userpendinglist" element={<ProtectedRoute allowedRoles={['Customer']}><Customerdashboard><Userpendinglist /></Customerdashboard></ProtectedRoute>} />
+        <Route path="/Usercompletedlist" element={<ProtectedRoute allowedRoles={['Customer']}><Customerdashboard><Usercompletedlist /></Customerdashboard></ProtectedRoute>} />
+        <Route path="/Customerapply" element={<ProtectedRoute allowedRoles={['Customer']}><Customerdashboard><Customerapply /></Customerdashboard></ProtectedRoute>} />
+        <Route path="/Feedback" element={<ProtectedRoute allowedRoles={['Customer']}><Customerdashboard><Feedback /></Customerdashboard></ProtectedRoute>} />
+        <Route path="/Guide" element={<ProtectedRoute allowedRoles={['Customer']}><Customerdashboard><Guide /></Customerdashboard></ProtectedRoute>} />
+        <Route path="/payment-status" element={<ProtectedRoute allowedRoles={['Customer']}><Customerdashboard><PaymentStatus /></Customerdashboard></ProtectedRoute>} />
+        <Route path="/payment-test" element={<ProtectedRoute allowedRoles={['Customer']}><Customerdashboard><PaymentTest /></Customerdashboard></ProtectedRoute>} />
+        <Route path="/PaymentButton" element={<ProtectedRoute allowedRoles={['Customer']}><Customerdashboard><PaymentButton /></Customerdashboard></ProtectedRoute>} />
+        <Route path="/TransactionTable" element={<ProtectedRoute allowedRoles={['Customer']}><Customerdashboard><TransactionTable /></Customerdashboard></ProtectedRoute>} />
 
         <Route
           path="/wallet"
           element={
-            <Customerdashboard>
-              <Wallet />
-            </Customerdashboard>
+            <ProtectedRoute allowedRoles={['Customer']}>
+              <Customerdashboard>
+                <Wallet />
+              </Customerdashboard>
+            </ProtectedRoute>
           }
         />
 
-        <Route path="/Checkapplication" element={<Customerdashboard><Checkapplication /></Customerdashboard>} />
-        <Route path="/Adderrorrequest" element={<Customerdashboard><Adderrorrequest /></Customerdashboard>} />
-        {/* <Route path="/Addreceiptrequest" element={<Customerdashboard><Addreceiptrequest /></Customerdashboard>} /> */}
+        <Route path="/Checkapplication" element={<ProtectedRoute allowedRoles={['Customer']}><Customerdashboard><Checkapplication /></Customerdashboard></ProtectedRoute>} />
+        <Route path="/Adderrorrequest" element={<ProtectedRoute allowedRoles={['Customer']}><Customerdashboard><Adderrorrequest /></Customerdashboard></ProtectedRoute>} />
+        {/* <Route path="/Addreceiptrequest" element={<ProtectedRoute allowedRoles={['Customer']}><Customerdashboard><Addreceiptrequest /></Customerdashboard></ProtectedRoute>} /> */}
 
-        <Route path="/Customerhistory" element={<Customerdashboard><Customerhistory /></Customerdashboard>} />
-        <Route path="/Customererrorhistory" element={<Customerdashboard><Customererrorhistory /></Customerdashboard>} />
-        <Route path="/Apply" element={<Customerdashboard><Apply /></Customerdashboard>} />
-        <Route path="/Category" element={<Customerdashboard><Category /></Customerdashboard>} />
-        <Route path="/Clistpage" element={<Customerdashboard><Clistpage /></Customerdashboard>} />
-        <Route path="/Customerinvoice/:documentId" element={<Customerinvoice />} />
-        <Route path="/Customerview/:documentId" element={<Customerview />} />
+        <Route path="/Customerhistory" element={<ProtectedRoute allowedRoles={['Customer']}><Customerdashboard><Customerhistory /></Customerdashboard></ProtectedRoute>} />
+        <Route path="/Customererrorhistory" element={<ProtectedRoute allowedRoles={['Customer']}><Customerdashboard><Customererrorhistory /></Customerdashboard></ProtectedRoute>} />
+        <Route path="/Apply" element={<ProtectedRoute allowedRoles={['Customer']}><Customerdashboard><Apply /></Customerdashboard></ProtectedRoute>} />
+        <Route path="/Category" element={<ProtectedRoute allowedRoles={['Customer']}><Customerdashboard><Category /></Customerdashboard></ProtectedRoute>} />
+        <Route path="/Clistpage" element={<ProtectedRoute allowedRoles={['Customer']}><Customerdashboard><Clistpage /></Customerdashboard></ProtectedRoute>} />
+        <Route path="/Customerinvoice/:documentId" element={<ProtectedRoute allowedRoles={['Customer']}><Customerinvoice /></ProtectedRoute>} />
+        <Route path="/Customerview/:documentId" element={<ProtectedRoute allowedRoles={['Customer']}><Customerview /></ProtectedRoute>} />
 
         {/* Distributor Routes */}
-        <Route path="/Distributordashboard" element={<Distributordashboard />} />
-        <Route path="/Ddashinner" element={<Distributordashboard><Ddashinner /></Distributordashboard>} />
-        <Route path="/Distributorrequest" element={<Distributordashboard><Distributorrequest /></Distributordashboard>} />
-        <Route path="/FeedbackD" element={<Distributordashboard><FeedbackD /></Distributordashboard>} />
-        <Route path="/Distributorverify" element={<Distributordashboard><Distributorverify /></Distributordashboard>} />
-        <Route path="/Distributorverifyhistory" element={<Distributordashboard><Distributorverifyhistory /></Distributordashboard>} />
-        <Route path="/Dlistpage" element={<Distributordashboard><Dlistpage /></Distributordashboard>} />
-        <Route path="/Distributorhistory" element={<Distributordashboard><Distributorhistory /></Distributordashboard>} />
-        <Route path="/Dsentlist" element={<Distributordashboard><Dsentlist /></Distributordashboard>} />
-        <Route path="/Distributorrejected" element={<Distributordashboard><Distributorrejected /></Distributordashboard>} />
+        <Route path="/Distributordashboard" element={<ProtectedRoute allowedRoles={['Distributor']}><Distributordashboard /></ProtectedRoute>} />
+        <Route path="/Ddashinner" element={<ProtectedRoute allowedRoles={['Distributor']}><Distributordashboard><Ddashinner /></Distributordashboard></ProtectedRoute>} />
+        <Route path="/Distributorrequest" element={<ProtectedRoute allowedRoles={['Distributor']}><Distributordashboard><Distributorrequest /></Distributordashboard></ProtectedRoute>} />
+        <Route path="/FeedbackD" element={<ProtectedRoute allowedRoles={['Distributor']}><Distributordashboard><FeedbackD /></Distributordashboard></ProtectedRoute>} />
+        <Route path="/Distributorverify" element={<ProtectedRoute allowedRoles={['Distributor']}><Distributordashboard><Distributorverify /></Distributordashboard></ProtectedRoute>} />
+        <Route path="/Distributorverifyhistory" element={<ProtectedRoute allowedRoles={['Distributor']}><Distributordashboard><Distributorverifyhistory /></Distributordashboard></ProtectedRoute>} />
+        <Route path="/Dlistpage" element={<ProtectedRoute allowedRoles={['Distributor']}><Distributordashboard><Dlistpage /></Distributordashboard></ProtectedRoute>} />
+        <Route path="/Distributorhistory" element={<ProtectedRoute allowedRoles={['Distributor']}><Distributordashboard><Distributorhistory /></Distributordashboard></ProtectedRoute>} />
+        <Route path="/Dsentlist" element={<ProtectedRoute allowedRoles={['Distributor']}><Distributordashboard><Dsentlist /></Distributordashboard></ProtectedRoute>} />
+        <Route path="/Distributorrejected" element={<ProtectedRoute allowedRoles={['Distributor']}><Distributordashboard><Distributorrejected /></Distributordashboard></ProtectedRoute>} />
+        <Route path="/PaymentRequest" element={<ProtectedRoute allowedRoles={['Distributor']}><Distributordashboard><PaymentRequest /></Distributordashboard></ProtectedRoute>} />
 
-        <Route path="/Distributorinvoice/:documentId" element={<Distributorinvoice />} />
-        <Route path="/Distributorview/:documentId" element={<Distributorview />} />
+        <Route path="/Distributorinvoice/:documentId" element={<ProtectedRoute allowedRoles={['Distributor']}><Distributorinvoice /></ProtectedRoute>} />
+        <Route path="/Distributorview/:documentId" element={<ProtectedRoute allowedRoles={['Distributor']}><Distributorview /></ProtectedRoute>} />
         {/* Employee Routes */}
 
-        <Route path="/Employeedashboard" element={<Employeedashboard />} />
-        <Route path="/Edashinner" element={<Employeedashboard><Edashinner /></Employeedashboard>} />
-        <Route path="/Emplist" element={<Employeedashboard><Emplist /></Employeedashboard>} />
+        <Route path="/Employeedashboard" element={<ProtectedRoute allowedRoles={['Employee']}><Employeedashboard /></ProtectedRoute>} />
+        <Route path="/Edashinner" element={<ProtectedRoute allowedRoles={['Employee']}><Employeedashboard><Edashinner /></Employeedashboard></ProtectedRoute>} />
+        <Route path="/Emplist" element={<ProtectedRoute allowedRoles={['Employee']}><Employeedashboard><Emplist /></Employeedashboard></ProtectedRoute>} />
 
-        <Route path="/Employee" element={<Employeedashboard><Employee /></Employeedashboard>} />
-        <Route path="/Spage" element={<Employeedashboard><Spage /></Employeedashboard>} />
+        <Route path="/Employee" element={<ProtectedRoute allowedRoles={['Employee']}><Employeedashboard><Employee /></Employeedashboard></ProtectedRoute>} />
+        <Route path="/Spage" element={<ProtectedRoute allowedRoles={['Employee']}><Employeedashboard><Spage /></Employeedashboard></ProtectedRoute>} />
 
 
         {/* Invoice & Document Routes */}

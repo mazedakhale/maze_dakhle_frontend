@@ -13,7 +13,41 @@ const Login = () => {
   const navigate = useNavigate();
   // src/pages/Login.jsx
   const SMS_URL = "http://72.60.206.65:3000/sms/send";
-  const SMS_SENDER = "918308178738"; // your LiveOne “from” number
+  const SMS_SENDER = "918308178738"; // your LiveOne "from" number
+
+  // Check if user is already logged in and redirect to dashboard
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      try {
+        const decodedToken = jwtDecode(token);
+        const { role } = decodedToken;
+        
+        console.log("🔑 Token found, redirecting to dashboard for role:", role);
+        
+        // Show popup message
+        Swal.fire({
+          title: 'Already Logged In!',
+          text: `Welcome back! Redirecting to your ${role} dashboard...`,
+          icon: 'success',
+          timer: 2000,
+          showConfirmButton: false,
+          confirmButtonColor: '#F58A3B',
+        });
+        
+        // Redirect based on role after a short delay
+        setTimeout(() => {
+          if (role === "Customer") navigate("/Cdashinner");
+          else if (role === "Admin") navigate("/Adashinner");
+          else if (role === "Distributor") navigate("/Ddashinner");
+          else if (role === "Employee") navigate("/Edashinner");
+        }, 2000);
+      } catch (error) {
+        console.error("❌ Invalid token, clearing...", error);
+        localStorage.removeItem("token");
+      }
+    }
+  }, [navigate]);
 
   // Fetch categories
   useEffect(() => {
@@ -108,6 +142,7 @@ const Login = () => {
       localStorage.setItem("token", data.token);
       const { role, phone } = jwtDecode(data.token);
 
+      console.log("Role Login",role)
       // TODO: Re-enable phone verification SMS as needed
 
       Swal.fire({

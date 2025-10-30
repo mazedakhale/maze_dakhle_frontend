@@ -29,7 +29,7 @@ import {
 
 import jwtDecode from "jwt-decode";
 import logo from "../assets/logo.png";
-import { FaMoneyBill1Wave, FaRegCircleUser } from "react-icons/fa6";
+import { FaMoneyBill1Wave, FaMoneyBillTransfer, FaRegCircleUser } from "react-icons/fa6";
 import { IoMdLogOut } from "react-icons/io";
 
 // Sidebar Component
@@ -149,9 +149,19 @@ const Sidebar = ({ onNavigate }) => {
                 path: "/Verifydocumentshistory",
               },
               {
+                icon: <FaMoneyBill />,
+                label: "Admin Wallet",
+                path:"/AdminWallet"
+              },
+              {
                 icon: <FaMoneyBill1Wave />,
                 label: "Transaction History",
                 path: "/CustomerTransactions",
+              },
+              {
+                icon: <FaMoneyBillTransfer />,
+                label: "Distributor Payment Request",
+                path: "/DistributorPaymentRequest",
               },
               {
                 icon: <FaUserTie />,
