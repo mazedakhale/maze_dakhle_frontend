@@ -38,8 +38,6 @@ const Apply = () => {
   const [fieldNames, setFieldNames] = useState([]);
   const [selectedFiles, setSelectedFiles] = useState({});
   const [errors, setErrors] = useState({});
-  const [applicationFee, setApplicationFee] = useState(0);
-  const [walletBalance, setWalletBalance] = useState(0);
 
   // Decode JWT token to get user info
   useEffect(() => {
@@ -49,9 +47,7 @@ const Apply = () => {
         const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
         const decodedPayload = JSON.parse(atob(base64));
         setUserData({
-          user_id: decodedPayload?.user_id
-            ? String(decodedPayload.user_id)
-            : "",
+          user_id: decodedPayload?.user_id ? String(decodedPayload.user_id) : "",
           name: decodedPayload?.name || "",
           email: decodedPayload?.email || "",
           phone: decodedPayload?.phone || "",
@@ -77,53 +73,25 @@ const Apply = () => {
 
   useEffect(() => {
     if (formData.category_id && formData.subcategory_id) {
-      const fetchRequiredDocuments = async () => {
-        try {
-          const response = await axios.get(
-            ` http://72.60.206.65:3000/required-documents/${formData.category_id}/${formData.subcategory_id}`
-          );
-
-          let documentsArray = [];
-
-          // ✅ Handle different response formats
-          if (response.data && Array.isArray(response.data)) {
-            // New format: array of objects with document_names property
-            documentsArray = response.data
-              .map((item) => item.document_names?.trim())
-              .filter((doc) => doc && doc.length > 0); // Remove empty/null values
-          } else if (
-            response.data &&
-            response.data.length > 0 &&
-            response.data[0]?.document_names
-          ) {
-            // Old format: single object with comma-separated string
-            documentsArray = response.data[0].document_names
+      axios
+        .get(
+          `/api/required-documents/${formData.category_id}/${formData.subcategory_id}`
+        )
+        .then((response) => {
+          if (response.data.length > 0 && response.data[0].document_names) {
+            const documentsArray = response.data[0].document_names
               .split(",")
-              .map((doc) => doc.trim())
-              .filter((doc) => doc.length > 0);
-          }
-
-          if (documentsArray.length > 0) {
+              .map((doc) => doc.trim());
             setDocumentNames(documentsArray);
             setSelectedFiles(
               documentsArray.reduce((acc, doc) => ({ ...acc, [doc]: null }), {})
             );
           } else {
-            // No documents found
-            console.warn(
-              "No required documents found for this category/subcategory"
-            );
             setDocumentNames([]);
             setSelectedFiles({});
           }
-        } catch (error) {
-          console.error("Error fetching required documents:", error);
-          setDocumentNames([]);
-          setSelectedFiles({});
-        }
-      };
-
-      fetchRequiredDocuments();
+        })
+        .catch((error) => console.error("Error fetching documents:", error));
     } else {
       setDocumentNames([]);
       setSelectedFiles({});
@@ -132,32 +100,15 @@ const Apply = () => {
 
   useEffect(() => {
     if (formData.category_id && formData.subcategory_id) {
-      const fetchFieldNames = async () => {
-        try {
-          const response = await axios.get(
-            `http://72.60.206.65:3000/field-names/${formData.category_id}/${formData.subcategory_id}`
-          );
-
-          let fieldsArray = [];
-
-          // ✅ Handle different response formats
-          if (response.data && Array.isArray(response.data)) {
-            // New format: array of objects
-            fieldsArray = response.data
-              .map((item) => item.document_fields?.trim())
-              .filter((field) => field && field.length > 0); // Remove empty/null values
-          } else if (
-            response.data &&
-            response.data.length > 0 &&
-            response.data[0]?.document_fields
-          ) {
-            // Old format: single object with comma-separated string
-            fieldsArray = response.data[0].document_fields
+      axios
+        .get(
+          `/api/field-names/${formData.category_id}/${formData.subcategory_id}`
+        )
+        .then((response) => {
+          if (response.data.length > 0 && response.data[0].document_fields) {
+            const fieldsArray = response.data[0].document_fields
               .split(",")
-              .map((field) => field.trim())
-              .filter((field) => field.length > 0);
-          }
-          if (fieldsArray.length > 0) {
+              .map((field) => field.trim());
             setFieldNames(fieldsArray);
             setFormData((prev) => ({
               ...prev,
@@ -167,24 +118,14 @@ const Apply = () => {
               ),
             }));
           } else {
-            // No fields found
             setFieldNames([]);
             setFormData((prev) => ({
               ...prev,
               document_fields: {},
             }));
           }
-        } catch (error) {
-          console.error("Error fetching field names:", error);
-          setFieldNames([]);
-          setFormData((prev) => ({
-            ...prev,
-            document_fields: {},
-          }));
-        }
-      };
-
-      fetchFieldNames();
+        })
+        .catch((error) => console.error("Error fetching field names:", error));
     } else {
       setFieldNames([]);
       setFormData((prev) => ({
@@ -193,40 +134,6 @@ const Apply = () => {
       }));
     }
   }, [formData.category_id, formData.subcategory_id]);
-
-  // Fetch application fee and wallet balance
-  useEffect(() => {
-    const fetchApplicationFee = async () => {
-      if (formData.category_id && formData.subcategory_id) {
-        try {
-          const response = await axios.get(
-            `http://72.60.206.65:3000/prices/category/${formData.category_id}/subcategory/${formData.subcategory_id}`
-          );
-          setApplicationFee(response.data.amount || 0);
-        } catch (error) {
-          console.error("Error fetching application fee:", error);
-          setApplicationFee(0);
-        }
-      }
-    };
-
-    const fetchWalletBalance = async () => {
-      if (userData.user_id) {
-        try {
-          const response = await axios.get(`http://72.60.206.65:3000/wallet`, {
-            headers: { Authorization: `Bearer ${token}` },
-          });
-          setWalletBalance(response.data.balance || 0);
-        } catch (error) {
-          console.error("Error fetching wallet balance:", error);
-          setWalletBalance(0);
-        }
-      }
-    };
-
-    fetchApplicationFee();
-    fetchWalletBalance();
-  }, [formData.category_id, formData.subcategory_id, userData.user_id]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -270,7 +177,7 @@ const Apply = () => {
           (["doc", "docx"].includes(ext) &&
             (type === "application/msword" ||
               type ===
-                "application/vnd.openxmlformats-officedocument.wordprocessingml.document")) ||
+              "application/vnd.openxmlformats-officedocument.wordprocessingml.document")) ||
           (ext === "png" && type === "image/png") ||
           (["jpg", "jpeg"].includes(ext) &&
             (type === "image/jpeg" || type === "image/jpg"))
@@ -324,10 +231,7 @@ const Apply = () => {
 
     // Applicant info fields required checks
     fieldNames.forEach((field) => {
-      if (
-        !formData.document_fields[field] ||
-        formData.document_fields[field].trim() === ""
-      ) {
+      if (!formData.document_fields[field] || formData.document_fields[field].trim() === "") {
         newErrors[field] = `${field} is required.`;
       }
     });
@@ -360,59 +264,9 @@ const Apply = () => {
       return;
     }
 
-    // ✅ Check wallet balance before proceeding
-    if (walletBalance < applicationFee) {
-      Swal.fire({
-        icon: "warning",
-        title: "Insufficient Wallet Balance",
-        text: `Your wallet balance (₹${walletBalance}) is insufficient. Application fee is ₹${applicationFee}. Please top up your wallet to proceed.`,
-        showCancelButton: true,
-        confirmButtonText: "Top Up Wallet",
-        cancelButtonText: "Cancel",
-        confirmButtonColor: "#f97316",
-      }).then((result) => {
-        if (result.isConfirmed) {
-          // Navigate to wallet top-up page
-          navigate("/wallet", {
-            state: {
-              requiredAmount: applicationFee,
-              returnPath: "/apply",
-              formData: formData,
-            },
-          });
-        }
-      });
-      return;
-    }
-
-    // ✅ Show confirmation with fee deduction info
-    const confirmResult = await Swal.fire({
-      icon: "info",
-      title: "Confirm Application Submission",
-      html: `
-        <div class="text-left">
-          <p><strong>Application Fee:</strong> ₹${applicationFee}</p>
-          <p><strong>Current Wallet Balance:</strong> ₹${walletBalance}</p>
-          <p><strong>Balance After Deduction:</strong> ₹${
-            walletBalance - applicationFee
-          }</p>
-          <br>
-          <p class="text-gray-600">The application fee will be automatically deducted from your wallet.</p>
-        </div>
-      `,
-      showCancelButton: true,
-      confirmButtonText: "Submit & Pay",
-      cancelButtonText: "Cancel",
-      confirmButtonColor: "#f97316",
-    });
-
-    if (!confirmResult.isConfirmed) {
-      return;
-    }
-
     Swal.fire({
       title: "Processing...",
-      text: "Please wait while your application is being submitted and payment is being processed.",
+      text: "Please wait while your application is being submitted.",
       allowOutsideClick: false,
       didOpen: () => {
         Swal.showLoading();
@@ -426,14 +280,7 @@ const Apply = () => {
       field_name: fieldName,
       field_value: formData.document_fields[fieldName] || "",
     }));
-    formDataToSend.append(
-      "document_fields",
-      JSON.stringify(orderedDocumentFields)
-    );
-
-    // ✅ Add application fee for wallet deduction
-    formDataToSend.append("application_fee", applicationFee);
-    formDataToSend.append("wallet_payment", "true");
+    formDataToSend.append("document_fields", JSON.stringify(orderedDocumentFields));
 
     // Append other form fields (excluding files and document_fields)
     Object.entries(formData).forEach(([key, value]) => {
@@ -451,77 +298,29 @@ const Apply = () => {
 
     try {
       const response = await axios.post(
-        "http://72.60.206.65:3000/documents/upload",
+        "/api/documents/upload",
         formDataToSend,
-        {
-          timeout: 60000,
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "multipart/form-data",
-          },
-        }
+        { timeout: 60000 }
       );
 
       Swal.close();
 
-      // ✅ Update wallet balance after successful submission
-      setWalletBalance((prev) => prev - applicationFee);
-
       Swal.fire({
         icon: "success",
-        title: "Application Submitted Successfully!",
-        html: `
-          <div class="text-left">
-            <p>✅ Your application has been submitted successfully!</p>
-            <p>💰 Application fee of ₹${applicationFee} has been deducted from your wallet.</p>
-            <p>💳 Updated wallet balance: ₹${walletBalance - applicationFee}</p>
-            <br>
-            <p class="text-gray-600">You will receive updates on your application status via email.</p>
-          </div>
-        `,
+        title: "Success!",
+        text: "Your application has been submitted successfully!",
       }).then(() => {
         navigate("/customerapply");
       });
     } catch (error) {
       Swal.close();
-
-      let errorMessage = "Unknown error occurred";
-
-      if (error.response?.data?.message) {
-        errorMessage = error.response.data.message;
-      } else if (error.response?.data?.error) {
-        errorMessage = error.response.data.error;
-      } else if (error.message) {
-        errorMessage = error.message;
-      }
-
-      // ✅ Handle specific wallet-related errors
-      if (
-        errorMessage.includes("insufficient") ||
-        errorMessage.includes("wallet")
-      ) {
-        Swal.fire({
-          icon: "error",
-          title: "Payment Failed",
-          text: errorMessage,
-          showCancelButton: true,
-          confirmButtonText: "Top Up Wallet",
-          cancelButtonText: "Try Again",
-        }).then((result) => {
-          if (result.isConfirmed) {
-            navigate("/wallet");
-          }
-        });
-      } else {
-        Swal.fire({
-          icon: "error",
-          title: "Submission Failed",
-          text: errorMessage,
-        });
-      }
+      Swal.fire({
+        icon: "error",
+        title: "Submission Failed",
+        text: error.response?.data?.message || error.message || "Unknown error",
+      });
     }
   };
-
 
   return (
     <div className="ml-[250px] flex flex-col items-center min-h-screen p-6 bg-gray-100">
@@ -576,14 +375,11 @@ const Apply = () => {
                 value={formData.name}
                 onChange={handleChange}
                 readOnly
-                className={`w-full mt-1 p-2 border ${
-                  errors.name ? "border-red-500" : "border-gray-300"
-                } rounded-md bg-gray-100 shadow-sm cursor-not-allowed text-sm`}
+                className={`w-full mt-1 p-2 border ${errors.name ? "border-red-500" : "border-gray-300"
+                  } rounded-md bg-gray-100 shadow-sm cursor-not-allowed text-sm`}
                 placeholder="Enter Full Name"
               />
-              {errors.name && (
-                <p className="text-red-500 text-xs">{errors.name}</p>
-              )}
+              {errors.name && <p className="text-red-500 text-xs">{errors.name}</p>}
             </div>
           </div>
 
@@ -599,14 +395,11 @@ const Apply = () => {
                 value={formData.email}
                 onChange={handleChange}
                 readOnly
-                className={`w-full mt-1 p-2 border ${
-                  errors.email ? "border-red-500" : "border-gray-300"
-                } rounded-md bg-gray-100 shadow-sm cursor-not-allowed text-sm`}
+                className={`w-full mt-1 p-2 border ${errors.email ? "border-red-500" : "border-gray-300"
+                  } rounded-md bg-gray-100 shadow-sm cursor-not-allowed text-sm`}
                 placeholder="Enter Email"
               />
-              {errors.email && (
-                <p className="text-red-500 text-xs">{errors.email}</p>
-              )}
+              {errors.email && <p className="text-red-500 text-xs">{errors.email}</p>}
             </div>
             <div>
               <label className="block text-gray-700 font-medium text-base">
@@ -618,14 +411,11 @@ const Apply = () => {
                 value={formData.phone}
                 onChange={handleChange}
                 readOnly
-                className={`w-full mt-1 p-2 border ${
-                  errors.phone ? "border-red-500" : "border-gray-300"
-                } rounded-md bg-gray-100 shadow-sm cursor-not-allowed text-sm`}
+                className={`w-full mt-1 p-2 border ${errors.phone ? "border-red-500" : "border-gray-300"
+                  } rounded-md bg-gray-100 shadow-sm cursor-not-allowed text-sm`}
                 placeholder="Enter Phone Number"
               />
-              {errors.phone && (
-                <p className="text-red-500 text-xs">{errors.phone}</p>
-              )}
+              {errors.phone && <p className="text-red-500 text-xs">{errors.phone}</p>}
             </div>
           </div>
 
@@ -644,9 +434,8 @@ const Apply = () => {
                     type="text"
                     value={formData.document_fields[field] || ""}
                     onChange={(e) => handleFieldChange(e, field)}
-                    className={`w-full p-3 border ${
-                      errors[field] ? "border-red-500" : "border-gray-300"
-                    } rounded-lg shadow-md`}
+                    className={`w-full p-3 border ${errors[field] ? "border-red-500" : "border-gray-300"
+                      } rounded-lg shadow-md`}
                     placeholder={`Enter ${field}`}
                   />
                   {errors[field] && (
@@ -667,17 +456,16 @@ const Apply = () => {
                 <div key={index} className="mb-2">
                   <label className="block text-gray-700 font-semibold">
                     {docName}
-                    {docName.toLowerCase() !== "other" &&
-                      docName.toLowerCase() !== "others" && (
+                    {(docName.toLowerCase() !== "other" &&
+                      docName.toLowerCase() !== "others") && (
                         <span className="text-red-500"> *</span>
                       )}
                   </label>
                   <input
                     type="file"
                     onChange={(e) => handleFileUpload(e, docName)}
-                    className={`w-full mt-2 p-3 border ${
-                      errors[docName] ? "border-red-500" : "border-gray-300"
-                    } rounded-lg bg-gray-100 shadow-md`}
+                    className={`w-full mt-2 p-3 border ${errors[docName] ? "border-red-500" : "border-gray-300"
+                      } rounded-lg bg-gray-100 shadow-md`}
                     accept=".pdf,.doc,.docx,.png,.jpg,.jpeg"
                   />
                   {errors[docName] && (
@@ -685,34 +473,6 @@ const Apply = () => {
                   )}
                 </div>
               ))}
-            </div>
-          </div>
-
-          {/* Application Fee and Wallet Balance */}
-          <div className="mb-6">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-gray-700 font-semibold text-base">
-                  Application Fee
-                </label>
-                <input
-                  type="text"
-                  value={`₹ ${Number(applicationFee)?.toFixed(2)}`}
-                  readOnly
-                  className="w-full mt-1 p-2 border border-gray-300 rounded-md bg-gray-100 shadow-sm text-sm"
-                />
-              </div>
-              <div>
-                <label className="block text-gray-700 font-semibold text-base">
-                  Wallet Balance
-                </label>
-                <input
-                  type="text"
-                  value={`₹ ${Number(walletBalance)?.toFixed(2)}`}
-                  readOnly
-                  className="w-full mt-1 p-2 border border-gray-300 rounded-md bg-gray-100 shadow-sm text-sm"
-                />
-              </div>
             </div>
           </div>
 

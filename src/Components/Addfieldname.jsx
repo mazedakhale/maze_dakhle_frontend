@@ -28,9 +28,8 @@ const FieldNames = () => {
 
   const fetchFields = async () => {
     try {
-
-      const response = await axios.get(" http://72.60.206.65:3000/field-names");
-setFields(response.data);
+      const response = await axios.get("/api/field-names");
+      setFields(response.data);
     } catch (error) {
       console.error("Error fetching field names:", error);
     }
@@ -38,7 +37,7 @@ setFields(response.data);
 
   const fetchCategories = async () => {
     try {
-      const response = await axios.get(" http://72.60.206.65:3000/categories");
+      const response = await axios.get("/api/categories");
       setCategories(response.data);
     } catch (error) {
       console.error("Error fetching categories:", error);
@@ -49,7 +48,7 @@ setFields(response.data);
     if (!categoryId) return;
     try {
       const response = await axios.get(
-        `http://72.60.206.65:3000/subcategories/category/${categoryId}`
+        `/api/subcategories/category/${categoryId}`
       );
       setSubcategories(response.data);
     } catch (error) {
@@ -99,7 +98,7 @@ setFields(response.data);
 
       // **Perform API call in the background**
       axios
-        .delete(` http://72.60.206.65:3000/field-names/${id}`)
+        .delete(`/api/field-names/${id}`)
         .then(() => {
           fetchFields(); // Refresh field list
         })
@@ -117,7 +116,7 @@ setFields(response.data);
 
   const handleSave = async (id) => {
     try {
-      await axios.patch(` http://72.60.206.65:3000/field-names/${id}`, {
+      await axios.patch(`/api/field-names/${id}`, {
         document_fields: editableField,
       });
       Swal.fire("Updated!", "Field Name updated successfully", "success");
@@ -132,7 +131,7 @@ setFields(response.data);
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post(" http://72.60.206.65:3000/field-names", formData);
+      await axios.post("/api/field-names", formData);
       Swal.fire("Added!", "Field Name added successfully", "success");
       fetchFields();
       setModalOpen(false);

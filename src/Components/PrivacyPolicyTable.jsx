@@ -15,7 +15,7 @@ const PrivacyPolicyTable = () => {
     policyType: "",
   });
 
-  const apiUrl = "http://72.60.206.65:3000/privacy-policy";
+  const apiUrl = "/api/privacy-policy";
   const navigate = useNavigate();
 
   useEffect(() => {

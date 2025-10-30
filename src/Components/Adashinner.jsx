@@ -155,13 +155,12 @@ const Adashinner = () => {
       try {
         // Create an array of promises for all API calls
         const promises = [
-
-          fetch("http://72.60.206.65:3000/statistics/counts").then((res) =>
+          fetch("/api/statistics/counts").then((res) =>
             res.json()
           ),
-          axios.get("http://72.60.206.65:3000/categories"),
-          axios.get("http://72.60.206.65:3000/subcategories"),
-          axios.get("http://72.60.206.65:3000/statistics/cscounts"),
+          axios.get("/api/categories"),
+          axios.get("/api/subcategories"),
+          axios.get("/api/statistics/cscounts"),
         ];
 
         // Wait for all promises to resolve

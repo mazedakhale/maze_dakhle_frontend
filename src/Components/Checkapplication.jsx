@@ -72,7 +72,7 @@ const SearchApplication = () => {
 
       axios
         .get(
-          `http://72.60.206.65:3000/userdashboard/fetch/${userId}/${applicationId.trim()}`,
+          `/api/userdashboard/fetch/${userId}/${applicationId.trim()}`,
           { cancelToken: cancelTokenRef.current.token }
         )
         .then((resp) => {

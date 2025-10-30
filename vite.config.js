@@ -11,16 +11,17 @@ export default defineConfig({
     watch: {
       usePolling: true,
     },
-    allowedHosts: ["mazedakhale.in"],
+    allowedHosts: ["mazedakhale.in", "www.mazedakhale.in"],
     proxy: {
       "/api": {
-        target: "https://mazedakhale.in/api",
+        target: "http://mazedakhale.in/api", // point to your domain's API path
         changeOrigin: true,
         secure: false,
       },
     },
     hmr: {
-      overlay: false, // ✅ This disables the error overlay
+      overlay: false,          // disable error overlay in browser
+      clientPort: 80,          // use port 80 for HMR websocket client
     },
   },
 });

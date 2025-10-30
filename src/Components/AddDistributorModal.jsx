@@ -87,7 +87,7 @@ const AddDistributorModal = ({ isOpen, onClose, fetchDistributors }) => {
 
     try {
       const response = await axios.post(
-        " http://72.60.206.65:3000/users/register",
+        "/api/users/register",
         formDataToSend,
         {
           headers: {

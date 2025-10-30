@@ -6,8 +6,8 @@ const ContactForm = () => {
   const [formValues, setFormValues] = useState({}); // Stores key-value pairs for the Contact API
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false); // State to track form submission
-  const fieldApiUrl = "http://72.60.206.65:3000/field"; // API to fetch keys
-  const contactApiUrl = "http://72.60.206.65:3000/contact"; // API to save key-value pairs
+  const fieldApiUrl = "/api/field"; // API to fetch keys
+  const contactApiUrl = "/api/contact"; // API to save key-value pairs
 
   // Fetch keys from the Field API
   useEffect(() => {

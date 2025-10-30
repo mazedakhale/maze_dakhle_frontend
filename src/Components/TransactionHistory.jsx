@@ -15,7 +15,7 @@ const TransactionHistory = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  const API_BASE = 'http://72.60.206.65:3000';
+  const API_BASE = '/api';
 
   useEffect(() => {
     fetchAnalytics();

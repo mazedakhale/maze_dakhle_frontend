@@ -51,7 +51,7 @@ const InvoicePage = () => {
 
   useEffect(() => {
     axios
-      .get("http://72.60.206.65:3000/users/distributors")
+      .get("/api/users/distributors")
       .then((response) => setDistributors(response.data))
       .catch((error) => console.error("Error fetching distributors:", error));
   }, []);
@@ -75,7 +75,7 @@ const InvoicePage = () => {
 
     try {
       await axios.put(
-        `http://72.60.206.65:3000/documents/update-status/${documentId}`,
+        `/api/documents/update-status/${documentId}`,
         {
           status: newStatus,
           rejectionReason:
@@ -116,7 +116,7 @@ const InvoicePage = () => {
 
       // Make the API call to download the ZIP file with increased timeout
       const response = await axios.get(
-        `http://72.60.206.65:3000/download/${documentId}`,
+        `/api/download/${documentId}`,
         {
           responseType: "blob", // Handle binary data
           timeout: 60000, // Increase timeout to 60 seconds
@@ -255,7 +255,7 @@ const InvoicePage = () => {
     if (!distributorId) return;
     try {
       await axios.put(
-        `http://72.60.206.65:3000/documents/assign-distributor/${documentId}`,
+        `/api/documents/assign-distributor/${documentId}`,
         {
           distributor_id: distributorId,
         }
@@ -291,7 +291,7 @@ const InvoicePage = () => {
   const fetchCertificates = async () => {
     try {
       console.log("Fetching certificates...");
-      const response = await axios.get("http://72.60.206.65:3000/certificates", {
+      const response = await axios.get("/api/certificates", {
         timeout: 30000,
       });
       console.log("Certificates API Response:", response.data);
@@ -303,7 +303,7 @@ const InvoicePage = () => {
   const fetchDocumentData = useCallback(async () => {
     try {
       const response = await axios.get(
-        `http://72.60.206.65:3000/singledocument/documentby/${documentId}`
+        `/api/singledocument/documentby/${documentId}`
       );
       const data = response.data.document;
       setDocumentData(data);
@@ -313,7 +313,7 @@ const InvoicePage = () => {
 
       if (category && subcategory) {
         const fieldNamesResponse = await axios.get(
-          `http://72.60.206.65:3000/field-names/${category}/${subcategory}`
+          `/api/field-names/${category}/${subcategory}`
         );
         setDocumentNames(fieldNamesResponse.data);
       }
@@ -380,7 +380,7 @@ const InvoicePage = () => {
 
       try {
         const { data: updatedDocument } = await axios.post(
-          `http://72.60.206.65:3000/documents/reupload/${documentId}`,
+          `/api/documents/reupload/${documentId}`,
           formData,
           { headers: { "Content-Type": "multipart/form-data" } }
         );
