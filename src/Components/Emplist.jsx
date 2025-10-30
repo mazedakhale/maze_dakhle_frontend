@@ -1,16 +1,24 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { FaRegFileAlt, FaFileInvoice, FaCheck, FaTimes } from "react-icons/fa";
+import { FaRegFileAlt, FaFileInvoice } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import Swal from "sweetalert2";
 const Emplist = () => {
-  const [distributors, setDistributors] = useState([]);
-  const [certificates, setCertificates] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [documents, setDocuments] = useState([]);
   const [users, setUsers] = useState([]);
+  const [employeeAssignments, setEmployeeAssignments] = useState([]);
   const navigate = useNavigate();
+
+  // Get userId from token
+  const token = localStorage.getItem("token");
+  let userId = null;
+  try {
+    const tokenData = JSON.parse(atob(token.split(".")[1]));
+    userId = tokenData.user_id;
+  } catch (error) {
+    console.error("Error parsing token:", error);
+  }
 
   // Fetch data on component mount
   useEffect(() => {
@@ -25,24 +33,23 @@ const Emplist = () => {
       })
       .catch((error) => console.error("Error fetching documents:", error));
 
-    // Fetch distributors
-    axios
-      .get("/api/users/distributors")
-      .then((response) => setDistributors(response.data))
-      .catch((error) => console.error("Error fetching distributors:", error));
-
-    // Fetch certificates
-    axios
-      .get("/api/certificates")
-      .then((response) => setCertificates(response.data))
-      .catch((error) => console.error("Error fetching certificates:", error));
-
     // Fetch users
     axios
       .get("/api/users/register")
       .then((response) => setUsers(response.data))
       .catch((error) => console.error("Error fetching users:", error));
-  }, []);
+
+    // Fetch employee assignments if userId is available
+    if (userId) {
+      axios
+        .get("/api/employee")
+        .then((response) => {
+          console.log("Employee assignments:", response.data);
+          setEmployeeAssignments(response.data);
+        })
+        .catch((error) => console.error("Error fetching employee assignments:", error));
+    }
+  }, [userId]);
 
   // Handle status filter change
   const handleStatusFilterChange = (e) => {
@@ -54,97 +61,38 @@ const Emplist = () => {
     setSearchQuery(e.target.value);
   };
 
-  // Handle document verification
-  // Handle document verification
-  const handleVerifyDocument = async (documentId) => {
-    try {
-      // Get user_id from token in localStorage
-      const token = localStorage.getItem("token");
-      if (!token) {
-        Swal.fire({
-          title: "Error",
-          text: "You need to be logged in to verify documents",
-          icon: "error",
-        });
-        return;
-      }
-
-      // Parse the token to get user_id
-      let verifiedBy = null;
-      try {
-        const tokenData = JSON.parse(atob(token.split(".")[1]));
-        verifiedBy = tokenData.user_id;
-      } catch (error) {
-        console.error("Error parsing token:", error);
-        Swal.fire({
-          title: "Error",
-          text: "Could not identify you as a verified user",
-          icon: "error",
-        });
-        return;
-      }
-
-      // Proceed directly if user_id is found
-      if (verifiedBy) {
-        // Call the API directly
-        await axios.put(
-          `/api/documents/verify/${documentId}`,
-          { verifiedBy }
-        );
-
-        // Update the document in the local state
-        setDocuments((prevDocs) =>
-          prevDocs.map((doc) =>
-            doc.document_id === documentId
-              ? {
-                  ...doc,
-                  verified_by: [...(doc.verified_by || []), verifiedBy],
-                  verified_at: new Date(),
-                }
-              : doc
-          )
-        );
-      }
-    } catch (error) {
-      console.error("Error verifying document:", error);
-    }
+  // Filter documents based on employee assignments
+  // Get employee assignments for the logged-in employee
+  const getEmployeeAssignments = (userId) => {
+    return employeeAssignments
+      .filter((assignment) => assignment.user_id === parseInt(userId))
+      .map((assignment) => ({
+        category_id: assignment.category?.category_id || assignment.category_id,
+        subcategory_id: assignment.subcategory?.subcategory_id || assignment.subcategory_id,
+      }));
   };
 
-  const handleUpdateStatus = async (documentId, newStatus) => {
-    try {
-      await axios.put(
-        `/api/documents/update-status/${documentId}`,
-        {
-          status: newStatus,
-        }
+  // Check if document matches employee's assignments
+  const isDocumentAssignedToEmployee = (doc) => {
+    if (!userId) return false;
+    
+    const assignments = getEmployeeAssignments(userId);
+    
+    // If no assignments, don't show any documents
+    if (assignments.length === 0) return false;
+    
+    // Check if document's category and subcategory match any assignment
+    return assignments.some((assignment) => {
+      return (
+        assignment.category_id === doc.category_id &&
+        assignment.subcategory_id === doc.subcategory_id
       );
-      setDocuments((prev) =>
-        prev.map((doc) =>
-          doc.document_id === documentId ? { ...doc, status: newStatus } : doc
-        )
-      );
-    } catch (error) {
-      console.error("Error updating status:", error);
-      alert("Failed to update status.");
-    }
+    });
   };
 
-  // Filter documents based on selected status and search query
-  // Filter documents based only on search query and status filter
-  // Filter documents based only on search query and status filter
-  // Parse the token to get user_id
-  // Parse the token to get user_id
-  const token = localStorage.getItem("token");
-  let userId = null;
-  try {
-    const tokenData = JSON.parse(atob(token.split(".")[1]));
-    userId = tokenData.user_id;
-  } catch (error) {
-    console.error("Error parsing token:", error);
-  }
-
-  // Filter documents based on status, search query, and user verification
-  // Assuming userId is already extracted from the token
+  console.log("User ID for filtering:", userId);
+  console.log("Employee assignments:", employeeAssignments);
+  
   const filteredDocuments = documents
     .filter((doc) =>
       statusFilter
@@ -167,11 +115,8 @@ const Emplist = () => {
       );
     })
     .filter((doc) => {
-      // Check if 'verified_by' array contains the userId
-      return (
-        Array.isArray(doc.verified_by) &&
-        doc.verified_by.includes(userId.toString())
-      );
+      // Filter documents based on employee's assigned categories and subcategories
+      return isDocumentAssignedToEmployee(doc);
     });
 
   console.log("Filtered Documents:", filteredDocuments);
@@ -187,89 +132,10 @@ const Emplist = () => {
   console.log("Users array:", users);
 
   // Navigate to invoice view
-  // Navigate to invoice view
-  const handleViewInvoice = async (documentId, categoryId, subcategoryId) => {
-    try {
-      // Get user_id from token in localStorage
-      const token = localStorage.getItem("token");
-      if (!token) {
-        Swal.fire({
-          title: "Error",
-          text: "You need to be logged in to view the invoice",
-          icon: "error",
-        });
-        return;
-      }
-
-      // Parse the token to get user_id
-      let userId = null;
-      try {
-        const tokenData = JSON.parse(atob(token.split(".")[1]));
-        userId = tokenData.user_id;
-      } catch (error) {
-        console.error("Error parsing token:", error);
-        Swal.fire({
-          title: "Error",
-          text: "Could not identify user",
-          icon: "error",
-        });
-        return;
-      }
-
-      // Find the document
-      const document = documents.find((doc) => doc.document_id === documentId);
-
-      // Check if the user has already verified this document
-      const alreadyVerified =
-        document &&
-        document.verified_by &&
-        Array.isArray(document.verified_by) &&
-        document.verified_by.includes(userId);
-
-      if (alreadyVerified) {
-        // Directly navigate to the invoice without API call
-        navigate(`/Invoice/${documentId}`, {
-          state: { categoryId, subcategoryId },
-        });
-      } else {
-        // First-time verification
-        await axios.put(
-          `/api/documents/verify/${documentId}`,
-          { verifiedBy: userId }
-        );
-
-        // Update the document in the local state
-        setDocuments((prevDocs) =>
-          prevDocs.map((doc) =>
-            doc.document_id === documentId
-              ? {
-                  ...doc,
-                  verified_by: [...(doc.verified_by || []), userId],
-                  verified_at: new Date(),
-                }
-              : doc
-          )
-        );
-
-        // Show alert only for the first verification
-        Swal.fire({
-          title: "Verified",
-          text: "You are  verified user.",
-          icon: "success",
-          confirmButtonText: "Proceed to Invoice",
-        }).then(() => {
-          navigate(`/Invoice/${documentId}`, {
-            state: { categoryId, subcategoryId },
-          });
-        });
-      }
-    } catch (error) {
-      console.error("Error in invoice view process:", error);
-      // Navigate anyway in case of an error
-      navigate(`/Invoice/${documentId}`, {
-        state: { categoryId, subcategoryId },
-      });
-    }
+  const handleViewInvoice = (documentId, categoryId, subcategoryId) => {
+    navigate(`/Invoice/${documentId}`, {
+      state: { categoryId, subcategoryId },
+    });
   };
 
   // Navigate to document view
@@ -277,43 +143,8 @@ const Emplist = () => {
     navigate(`/View/${documentId}`, { state: { categoryId, subcategoryId } });
   };
 
-  // Get certificate by document ID
-  const getCertificateByDocumentId = (documentId) => {
-    const matchedCertificate = certificates.find(
-      (cert) => cert.document_id === documentId
-    );
-    return matchedCertificate ? matchedCertificate.certificate_id : null;
-  };
-
-  // View certificate
-  const handleViewCertificate = async (documentId) => {
-    const certificateId = getCertificateByDocumentId(documentId);
-    if (!certificateId) {
-      alert("Certificate not found.");
-      return;
-    }
-    try {
-      const response = await axios.get(
-        `/api/certificates/${certificateId}`
-      );
-      if (response.data && response.data.file_url) {
-        window.open(response.data.file_url, "_blank");
-      } else {
-        alert("Certificate not found.");
-      }
-    } catch (error) {
-      console.error("Error fetching certificate:", error);
-      alert("Failed to fetch certificate.");
-    }
-  };
-  const getUserNameById = (userId) => {
-    const user = users.find(
-      (user) => user.user_id.toString() === userId.toString()
-    );
-    return user ? user.name : "Unknown User";
-  };
   return (
-    <div className="w-[calc(100%-350px)] ml-[310px] mt-[80px] p-6">
+    <div className="w-[calc(100%-270px)] ml-[310px] mt-[80px] p-6">
       {/* Outer Container */}
       <div className=" bg-white shadow-lg rounded-lg border border-gray-300 ">
         {/* Header */}
@@ -372,9 +203,7 @@ const Emplist = () => {
                 <th className="border p-2 font-bold">VLE Email</th>
                 <th className="border p-2 font-bold">VLE Phone no</th>
                 <th className="border p-2 font-bold">Assigned Distributor</th>
-                <th className="border p-2 font-bold">Verification</th>
-                <th className="border p-2 font-bold">verified user</th>
-
+                <th className="border p-2 font-bold">Status</th>
                 <th className="border p-2 font-bold">Action</th>
                 <th className="border p-2 font-bold">View</th>
               </tr>
@@ -481,33 +310,8 @@ const Emplist = () => {
                             )}
                           </div>
                         ))}
-                      {/* Verification Badge - Show if document has been verified */}
-                      {doc.verified_by && doc.verified_by.length > 0 && (
-                        <div className="flex flex-col">
-                          <span className="px-3 py-1 mt-1 rounded-full text-white text-xs bg-teal-500">
-                            Verified
-                          </span>
-                          {doc.verified_at && (
-                            <span className="text-xs text-gray-600 mt-1">
-                              {new Date(doc.verified_at).toLocaleString(
-                                "en-US",
-                                {
-                                  year: "numeric",
-                                  month: "2-digit",
-                                  day: "2-digit",
-                                  hour: "2-digit",
-                                  minute: "2-digit",
-                                  hour12: true,
-                                }
-                              )}
-                            </span>
-                          )}
-                        </div>
-                      )}
                     </div>
                   </td>
-                  <td>{getUserNameById(doc.verified_by?.[0])}</td>{" "}
-                  {/* Assuming first verifier's ID */}
                   <td className="border p-2 text-center">
                     <button
                       onClick={() => handleViewInvoice(doc.document_id)}

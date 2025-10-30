@@ -34,6 +34,7 @@ const Employee = () => {
     setIsLoading(true);
     try {
       const response = await axios.get("/api/employee");
+      console.log("Fetched employee documents:", response.data);
       setDocuments(response.data);
     } catch (error) {
       console.error("Error fetching documents:", error);
@@ -182,7 +183,7 @@ const Employee = () => {
     setEditId(groupedDoc.id);
     setFormData({
       category_id: groupedDoc.category_id,
-      subcategory_ids: groupedDoc.subcategory_ids.map((id) => id.toString()),
+      subcategory_ids: groupedDoc.subcategory_ids.map((id) => id?.toString()),
       user_id: groupedDoc.user_id,
     });
 
@@ -199,11 +200,56 @@ const Employee = () => {
     setModalOpen(true);
   };
 
+  // Check if a subcategory is already assigned to the selected employee
+  const isSubcategoryAlreadyAssigned = (subcategoryId) => {
+    if (!formData.user_id || !formData.category_id) return false;
+    
+    return documents.some((doc) => {
+      const docCategoryId = doc.category?.category_id || doc.category_id;
+      const docSubcategoryId = doc.subcategory?.subcategory_id || doc.subcategory_id;
+      const docUserId = doc.user_id;
+      
+      // If editing, exclude the current document from the check
+      if (editId && doc.id === editId) return false;
+      
+      // Check if this employee already has this category+subcategory combination
+      return (
+        docUserId === parseInt(formData.user_id) &&
+        docCategoryId === parseInt(formData.category_id) &&
+        docSubcategoryId === parseInt(subcategoryId)
+      );
+    });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (formData.subcategory_ids.length === 0) {
       Swal.fire("Error", "Please select at least one subcategory", "error");
+      return;
+    }
+
+    // Check for duplicate assignments
+    const alreadyAssignedSubcategories = formData.subcategory_ids.filter((subId) =>
+      isSubcategoryAlreadyAssigned(subId)
+    );
+
+    if (alreadyAssignedSubcategories.length > 0 && !editId) {
+      const subcategoryNames = alreadyAssignedSubcategories
+        .map((subId) => {
+          const sub = subcategories.find(
+            (s) => s.subcategory_id === parseInt(subId)
+          );
+          return sub?.subcategory_name || subId;
+        })
+        .join(", ");
+
+      Swal.fire({
+        title: "Already Assigned!",
+        text: `The following subcategories are already assigned to this employee: ${subcategoryNames}`,
+        icon: "warning",
+        confirmButtonColor: "#f58a3b",
+      });
       return;
     }
 
@@ -302,28 +348,47 @@ const Employee = () => {
               </label>
               <div className="max-h-40 overflow-y-auto border rounded p-2">
                 {subcategories.length > 0 ? (
-                  subcategories.map((subcategory) => (
-                    <div key={subcategory.subcategory_id} className="mb-2">
-                      <label className="inline-flex items-center">
-                        <input
-                          type="checkbox"
-                          value={subcategory.subcategory_id}
-                          checked={formData.subcategory_ids.includes(
-                            subcategory.subcategory_id.toString()
-                          )}
-                          onChange={() =>
-                            handleSubcategoryChange(
-                              subcategory.subcategory_id.toString()
-                            )
-                          }
-                          className="form-checkbox h-5 w-5 text-orange-500"
-                        />
-                        <span className="ml-2">
-                          {subcategory.subcategory_name}
-                        </span>
-                      </label>
-                    </div>
-                  ))
+                  subcategories.map((subcategory) => {
+                    const isAlreadyAssigned = isSubcategoryAlreadyAssigned(
+                      subcategory.subcategory_id?.toString()
+                    );
+                    const isChecked = formData.subcategory_ids.includes(
+                      subcategory.subcategory_id?.toString()
+                    );
+
+                    return (
+                      <div key={subcategory.subcategory_id} className="mb-2">
+                        <label
+                          className={`inline-flex items-center ${
+                            isAlreadyAssigned && !editId
+                              ? "opacity-50 cursor-not-allowed"
+                              : "cursor-pointer"
+                          }`}
+                        >
+                          <input
+                            type="checkbox"
+                            value={subcategory.subcategory_id}
+                            checked={isChecked}
+                            disabled={isAlreadyAssigned && !editId}
+                            onChange={() =>
+                              handleSubcategoryChange(
+                                subcategory.subcategory_id?.toString()
+                              )
+                            }
+                            className="form-checkbox h-5 w-5 text-orange-500 disabled:cursor-not-allowed"
+                          />
+                          <span className="ml-2">
+                            {subcategory.subcategory_name}
+                            {isAlreadyAssigned && !editId && (
+                              <span className="ml-2 text-xs text-red-500 font-semibold">
+                                (Already Assigned)
+                              </span>
+                            )}
+                          </span>
+                        </label>
+                      </div>
+                    );
+                  })
                 ) : (
                   <p className="text-gray-500 text-sm">
                     {formData.category_id
@@ -440,23 +505,40 @@ const Employee = () => {
                 {documents.length > 0 ? (
                   // Group documents by category_id and user_id
                   Object.values(
-                    documents.reduce((acc, doc) => {
+                    documents
+                      .filter((doc) => {
+                        // Filter out documents with null category and subcategory
+                        const categoryId = doc.category?.category_id || doc.category_id;
+                        const subcategoryId = doc.subcategory?.subcategory_id || doc.subcategory_id;
+                        return categoryId && subcategoryId;
+                      })
+                      .reduce((acc, doc) => {
                       // Create a unique key for each category+employee combination
-                      const key = `${doc.category_id}-${doc.user_id}`;
+                      // Handle both nested objects and direct IDs
+                      const categoryId = doc.category?.category_id || doc.category_id;
+                      const subcategoryId = doc.subcategory?.subcategory_id || doc.subcategory_id;
+                      const key = `${categoryId}-${doc.user_id}`;
 
                       if (!acc[key]) {
                         acc[key] = {
                           id: doc.id, // Keep first document's ID for edit/delete
-                          category_id: doc.category_id,
+                          category_id: categoryId,
+                          category_name: doc.category?.category_name,
                           user_id: doc.user_id,
-                          subcategory_ids: [doc.subcategory_id],
+                          subcategory_ids: [subcategoryId],
+                          subcategories: [{
+                            id: subcategoryId,
+                            name: doc.subcategory?.subcategory_name
+                          }],
                         };
                       } else {
                         // Add subcategory to existing group if not already included
-                        if (
-                          !acc[key].subcategory_ids.includes(doc.subcategory_id)
-                        ) {
-                          acc[key].subcategory_ids.push(doc.subcategory_id);
+                        if (!acc[key].subcategory_ids.includes(subcategoryId)) {
+                          acc[key].subcategory_ids.push(subcategoryId);
+                          acc[key].subcategories.push({
+                            id: subcategoryId,
+                            name: doc.subcategory?.subcategory_name
+                          });
                         }
                       }
                       return acc;
@@ -469,22 +551,20 @@ const Employee = () => {
                       } hover:bg-orange-100 transition duration-200`}
                     >
                       <td className="px-4 py-3 border border-[#776D6DA8] text-center">
-                        {categories.find(
-                          (c) => c.category_id === groupedDoc.category_id
-                        )?.category_name || groupedDoc.category_id}
+                        {groupedDoc.category_name || 
+                         categories.find((c) => c.category_id === groupedDoc.category_id)?.category_name || 
+                         groupedDoc.category_id}
                       </td>
                       <td className="px-4 py-3 border border-[#776D6DA8] text-center">
                         <div className="flex flex-wrap gap-1 justify-center">
-                          {groupedDoc.subcategory_ids.map((subId) => (
+                          {groupedDoc.subcategories?.map((sub, idx) => (
                             <span
-                              key={subId}
+                              key={sub.id || idx}
                               className="bg-orange-100 text-orange-800 text-xs px-2 py-1 rounded-full"
                             >
-                              {subcategories.find(
-                                (s) =>
-                                  s.subcategory_id === subId ||
-                                  s.subcategory_id === parseInt(subId)
-                              )?.subcategory_name || subId}
+                              {sub.name || 
+                               subcategories.find((s) => s.subcategory_id === sub.id)?.subcategory_name || 
+                               sub.id}
                             </span>
                           ))}
                         </div>
