@@ -50,6 +50,7 @@ const Ddashinner = () => {
   const [notifications, setNotifications] = useState([]);
   const [distributorId, setDistributorId] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const [walletBalance, setWalletBalance] = useState(0);
   const navigate = useNavigate();
 
   // Immediately load cached data if available
@@ -151,6 +152,28 @@ const Ddashinner = () => {
   useEffect(() => {
     if (!distributorId) return;
 
+    // Fetch wallet balance
+    const token = localStorage.getItem("token");
+    console.log("🔑 Token:", token ? "exists" : "missing");
+    console.log("👤 Distributor ID:", distributorId);
+    
+    if (token) {
+      axios
+        .get(`http://72.60.206.65:3000/wallet`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        .then((response) => {
+          console.log("✅ Wallet balance response:", response.data);
+          setWalletBalance(response.data.balance || 0);
+        })
+        .catch((error) => {
+          console.error("❌ Error fetching wallet balance:", error.response?.data || error.message);
+          setWalletBalance(0);
+        });
+    }
+
     // Fetch pending counts
     api
       .get(`/statistics/pending-counts/${distributorId}`)
@@ -182,23 +205,11 @@ const Ddashinner = () => {
       .get(`/statistics/distributor-counts/${distributorId}`)
       .then((response) => {
         setCounts(response.data || {});
-
-        // Update cache with all the latest data
-        const cacheData = {
-          counts: response.data,
-          categoryCounts: categoryCounts,
-          subcategoryCounts: subcategoryCounts,
-          notifications: notifications,
-        };
-        localStorage.setItem(
-          "distributorDashboardData",
-          JSON.stringify(cacheData)
-        );
       })
       .catch((error) => {
         console.error("Error fetching distributor counts:", error);
       });
-  }, [distributorId, categoryCounts, subcategoryCounts, notifications]);
+  }, [distributorId]);
 
   // Handle category selection
   const handleCategorySelect = (categoryId, categoryName) => {
@@ -286,7 +297,7 @@ const Ddashinner = () => {
 
         {/* Static Cards with Dynamic Counts */}
         <Grid container spacing={3}>
-          <Grid item xs={12} sm={4} md={4}>
+          <Grid item xs={12} sm={6} md={3}>
             <Card
               style={{
                 display: "flex",
@@ -325,7 +336,7 @@ const Ddashinner = () => {
             </Card>
           </Grid>
 
-          <Grid item xs={12} sm={4} md={4}>
+          <Grid item xs={12} sm={6} md={3}>
             <Card
               style={{
                 display: "flex",
@@ -362,7 +373,7 @@ const Ddashinner = () => {
             </Card>
           </Grid>
 
-          <Grid item xs={12} sm={4} md={4}>
+          <Grid item xs={12} sm={6} md={3}>
             <Card
               style={{
                 display: "flex",
@@ -396,6 +407,43 @@ const Ddashinner = () => {
                   style={{ textAlign: "right", fontWeight: "bold" }}
                 >
                   {counts.totalCompletedCertifiedUsers || 0}
+                </Typography>
+              </div>
+            </Card>
+          </Grid>
+
+          <Grid item xs={12} sm={6} md={3}>
+            <Card
+              style={{
+                display: "flex",
+                alignItems: "center",
+                backgroundColor: "#27ae60",
+                color: "white",
+                padding: "10px",
+                borderRadius: "8px",
+                boxShadow: "0px 4px 8px rgba(0,0,0,0.1)",
+              }}
+            >
+              <span style={{ fontSize: "40px", marginRight: "90px" }}>💰</span>
+              <div
+                style={{
+                  flexGrow: 1,
+                  marginLeft: "-75px",
+                  borderLeft: "2px solid white",
+                  paddingLeft: "10px",
+                }}
+              >
+                <Typography
+                  variant="h6"
+                  style={{ fontSize: "16px", fontWeight: "bold" }}
+                >
+                  Wallet Balance
+                </Typography>
+                <Typography
+                  variant="h4"
+                  style={{ textAlign: "right", fontWeight: "bold" }}
+                >
+                  ₹{Number(walletBalance)?.toFixed(2)}
                 </Typography>
               </div>
             </Card>
