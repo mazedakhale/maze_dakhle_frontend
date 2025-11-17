@@ -43,7 +43,15 @@ const iconMapping = {
   Alpabhudharak: FaUserShield,
 };
 
-const Header = () => (
+const Header = () => {
+  const [contactInfo, setContactInfo] = useState(null);
+  useEffect(() => {
+    axios
+      .get("/api/contact-info")
+      .then((res) => setContactInfo(res.data[0] || {}))
+      .catch(() => setContactInfo(null));
+  }, []);
+  return(
   <header className="bg-[#F79711] py-3 shadow-md">
     <div className="container mx-auto flex justify-between items-center px-4">
       <Link to="/">
@@ -52,11 +60,13 @@ const Header = () => (
       <div className="hidden lg:flex items-center space-x-8 text-white">
         <div className="flex items-center space-x-2">
           <FaEnvelope />
-          <span>demomazedhakale@gmail.com</span>
+          <span>{contactInfo?.email || "..."}</span>
+          {/* <span>demomazedhakale@gmail.com</span> */}
         </div>
         <div className="flex items-center space-x-4">
           <FaPhone />
-          <span>+91 0987654321</span>
+          <span>{contactInfo?.phone || "..."}</span>
+          {/* <span>+91 0987654321</span> */}
           <FaFacebookF className="cursor-pointer" />
           <FaTwitter className="cursor-pointer" />
           <FaLinkedinIn className="cursor-pointer" />
@@ -89,7 +99,7 @@ const Header = () => (
       </nav>
     </div>
   </header>
-);
+);}
 
 const PurpleBanner = () => {
   const [description, setDescription] = useState("");

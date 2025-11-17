@@ -44,7 +44,7 @@ const PaymentRequest = () => {
    const fetchDocuments = async (distributorId) => {
      try {
        const response = await axios.get(
-         `http://72.60.206.65:3000/documents/list/${distributorId}`
+         `/api/documents/list/${distributorId}`
        );
  
        // Filter documents and sort by `uploaded_at` in descending order
@@ -66,8 +66,7 @@ const PaymentRequest = () => {
    // Fetch certificates
    const fetchCertificates = async () => {
      try {
-       console.log("Fetching certificates...");
-       const response = await axios.get("http://72.60.206.65:3000/certificates"); // Adjust URL if needed
+       const response = await axios.get("/api/certificates"); // Adjust URL if needed
        console.log("Certificates API Response:", response.data);
        setCertificates(response.data);
      } catch (error) {
@@ -82,7 +81,7 @@ const PaymentRequest = () => {
        console.log("Fetching payment requests for distributor:", id);
        if (!id) return;
        const response = await axios.get(
-         `http://72.60.206.65:3000/payment-requests/distributor/${id}`
+         `/api/payment-requests/distributor/${id}`
        );
        const requestsMap = {};
        console.log("Payment Requests API Response:", response.data);
@@ -122,7 +121,7 @@ const PaymentRequest = () => {
 
       // Get the document price
       const priceResponse = await axios.get(
-        `http://72.60.206.65:3000/prices/category/${doc.category_id}/subcategory/${doc.subcategory_id}`
+        `/api/prices/category/${doc.category_id}/subcategory/${doc.subcategory_id}`
       );
 
       if (!priceResponse.data) {
@@ -148,7 +147,7 @@ const PaymentRequest = () => {
 
       // Create payment request
       const response = await axios.post(
-        "http://72.60.206.65:3000/payment-requests",
+        "/api/payment-requests",
         {
           document_id: doc.document_id,
           application_id: doc.application_id,
@@ -201,7 +200,7 @@ const PaymentRequest = () => {
          `Fetching certificate for Certificate ID: ${certificate.certificate_id}`
        );
        const response = await axios.get(
-         `http://72.60.206.65:3000/certificates/${certificate.certificate_id}`
+         `/api/certificates/${certificate.certificate_id}`
        );
        console.log("View Certificate API Response:", response.data);
  
@@ -259,7 +258,7 @@ const PaymentRequest = () => {
    const handleDownloadCertificate = async (documentId, name) => {
      try {
        const response = await axios.get(
-         `http://72.60.206.65:3000/download-certificate/${documentId}`,
+         `/api/download-certificate/${documentId}`,
          {
            responseType: "blob", // Important to handle file downloads
          }
@@ -334,35 +333,27 @@ const PaymentRequest = () => {
                      {doc.application_id}
                    </td>
                    <td className="px-4 py-2 border text-sm">
-                     {doc?.document_fields ? (
-                       Array.isArray(doc.document_fields) ? (
-                         // New format (array of objects)
-                         doc.document_fields.find(
-                           (field) => field.field_name === "APPLICANT NAME"
-                         ) ? (
-                           <p>
-                             {
-                               doc.document_fields.find(
-                                 (field) => field.field_name === "APPLICANT NAME"
-                               ).field_value
-                             }
-                           </p>
-                         ) : (
-                           <p className="text-gray-500">
-                             No applicant name available
-                           </p>
-                         )
-                       ) : // Old format (object with key-value pairs)
-                       doc.document_fields["APPLICANT NAME"] ? (
-                         <p>{doc.document_fields["APPLICANT NAME"]}</p>
-                       ) : (
-                         <p className="text-gray-500">
-                           No applicant name available
-                         </p>
-                       )
-                     ) : (
-                       <p className="text-gray-500">No fields available</p>
-                     )}
+                                           {
+  Array.isArray(doc.document_fields)
+    ? (
+        doc.document_fields.find(
+          (f) =>
+            typeof f.field_name === "string" &&
+            f.field_name.toLowerCase().includes("name")
+        )?.field_value || "-"
+      )
+    : (
+        Object.keys(doc.document_fields).find(
+          (key) => key.toLowerCase().includes("name")
+        )
+          ? doc.document_fields[
+              Object.keys(doc.document_fields).find((key) =>
+                key.toLowerCase().includes("name")
+              )
+            ]
+          : "-"
+      )
+}
                    </td>
                    <td className="border p-2 text-center">
                      {(() => {

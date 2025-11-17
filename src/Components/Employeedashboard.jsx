@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
   FaTachometerAlt,
   FaPlus,
@@ -21,10 +21,10 @@ import jwtDecode from "jwt-decode";
 import logo from "../assets/logo.png";
 // Sidebar Component
 const Sidebar = ({ onNavigate }) => {
-  const [activePath, setActivePath] = useState("/");
+  const location = useLocation();
+  const activePath = location.pathname;
 
   const handleNavigation = (path) => {
-    setActivePath(path);
     onNavigate(path);
   };
 
@@ -115,7 +115,7 @@ const Employeedashboard = ({ children }) => {
       <Sidebar onNavigate={(path) => navigate(path)} />
 
       {/* Main Content */}
-      <div className="flex-1 p-6 ml-[00%] pt-[70px]">
+      <div className="flex-1 p-6 ml-[00%] pt-[70px] overflow-auto">
         {/* Top Navbar */}
         <div className="flex items-center justify-between bg-[#F88F2A] text-white px-4 py-2 shadow-md fixed top-0 left-[20%] w-[80%] z-10 h-[73px] rounded-md">
           <span className="text-lg font-bold">Employee Dashboard</span>

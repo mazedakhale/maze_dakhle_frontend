@@ -238,11 +238,28 @@ const CustomerApply = () => {
                       {doc.application_id}
                     </td>
                     <td className="border px-4 py-2">
-                      {Array.isArray(doc.document_fields)
-                        ? doc.document_fields.find(
-                            (f) => f.field_name === "APPLICANT NAME"
-                          )?.field_value || "-"
-                        : doc.document_fields["APPLICANT NAME"] || "-"}
+                      {
+  Array.isArray(doc.document_fields)
+    ? (
+        doc.document_fields.find(
+          (f) =>
+            typeof f.field_name === "string" &&
+            f.field_name.toLowerCase().includes("name")
+        )?.field_value || "-"
+      )
+    : (
+        Object.keys(doc.document_fields).find(
+          (key) => key.toLowerCase().includes("name")
+        )
+          ? doc.document_fields[
+              Object.keys(doc.document_fields).find((key) =>
+                key.toLowerCase().includes("name")
+              )
+            ]
+          : "-"
+      )
+}
+
                     </td>
                     <td className="border px-4 py-2 text-center">
                       {new Date(doc.uploaded_at).toLocaleString()}

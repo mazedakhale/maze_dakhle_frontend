@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
   FaTachometerAlt,
   FaClipboardList,
@@ -16,10 +16,10 @@ import logo from "../assets/logo.png";
 
 // Sidebar Component
 const Sidebar = ({ onNavigate }) => {
-  const [activePath, setActivePath] = useState("/");
+  const location = useLocation();
+  const activePath = location.pathname;
 
   const handleNavigation = (path) => {
-    setActivePath(path);
     onNavigate(path);
   };
 

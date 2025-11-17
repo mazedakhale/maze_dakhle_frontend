@@ -117,24 +117,67 @@ const EmployeeList = () => {
   };
 
   const handleDeleteEmployee = async (id) => {
-    const result = await Swal.fire({
+    const codeResult = await Swal.fire({
       title: "Enter Deletion Code",
+      text: "Please enter the deletion code to confirm",
       input: "text",
-      inputPlaceholder: "Enter code…",
+      inputPlaceholder: "Enter deletion code",
       showCancelButton: true,
-      confirmButtonText: "Delete",
-      preConfirm: (val) =>
-        val !== "0000" && Swal.showValidationMessage("Wrong code"),
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Verify & Delete",
+      inputValidator: (value) => {
+        if (!value) return "Please enter the deletion code";
+      },
     });
 
-    if (!result.isConfirmed) return;
+    if (!codeResult.isConfirmed) return;
 
     try {
-      await axios.delete(`${apiUrl}/employee/${id}`);
+      Swal.fire({
+        title: "Verifying...",
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading(),
+      });
+
+      await axios.delete(`${apiUrl}/${id}`, {
+        data: { code: codeResult.value }
+      });
+
       setEmployees((prev) => prev.filter((e) => e.user_id !== id));
-      Swal.fire("Deleted", "Employee removed", "success");
-    } catch {
-      Swal.fire("Error", "Delete failed", "error");
+
+      Swal.fire({
+        icon: "success",
+        title: "Deleted!",
+        text: "Employee deleted successfully",
+        timer: 2000,
+        showConfirmButton: false,
+      });
+    } catch (error) {
+      console.error("Error deleting employee:", error);
+      const errorMessage = error.response?.data?.message || "Failed to delete employee";
+      
+      if (errorMessage.includes("Invalid deletion code")) {
+        Swal.fire({
+          icon: "error",
+          title: "Invalid Deletion Code",
+          html: `
+            <p>${errorMessage}</p>
+            <p style="margin-top: 15px;">
+              <a href="/AdminDeletionCodeSettings" style="color: #f58a3b; text-decoration: underline;">
+                Forgot Code?  Change Code Here
+              </a>
+            </p>
+          `,
+          confirmButtonColor: "#f58a3b",
+        });
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: errorMessage,
+        });
+      }
     }
   };
 

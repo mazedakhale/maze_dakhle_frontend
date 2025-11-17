@@ -17,7 +17,7 @@ const DistributorPaymentRequest = () => {
   const fetchPaymentRequests = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('http://72.60.206.65:3000/payment-requests');
+      const response = await axios.get('/api/payment-requests');
       setPaymentRequests(response.data);
     } catch (error) {
       console.error('Error fetching payment requests:', error);
@@ -29,7 +29,7 @@ const DistributorPaymentRequest = () => {
 
   const fetchStatistics = async () => {
     try {
-      const response = await axios.get('http://72.60.206.65:3000/payment-requests/statistics');
+      const response = await axios.get('/api/payment-requests/statistics');
       setStatistics(response.data);
     } catch (error) {
       console.error('Error fetching statistics:', error);
@@ -49,7 +49,7 @@ const DistributorPaymentRequest = () => {
 
     if (result.isConfirmed) {
       try {
-        await axios.put(`http://72.60.206.65:3000/payment-requests/${requestId}/status`, {
+        await axios.put(`/api/payment-requests/${requestId}/status`, {
           status: 'Approved',
         });
         Swal.fire('Approved!', 'Payment has been processed successfully.', 'success');
@@ -86,7 +86,7 @@ const DistributorPaymentRequest = () => {
 
     if (reason) {
       try {
-        await axios.put(`http://72.60.206.65:3000/payment-requests/${requestId}/status`, {
+        await axios.put(`/api/payment-requests/${requestId}/status`, {
           status: 'Rejected',
           rejection_reason: reason,
         });

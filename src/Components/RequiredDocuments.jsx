@@ -81,37 +81,68 @@ const RequiredDocuments = () => {
   };
 
   const handleDelete = async (id) => {
-    const confirmDelete = await Swal.fire({
+    const codeResult = await Swal.fire({
       title: "Enter Deletion Code",
-      text: "Please enter the code to confirm deletion.",
+      text: "Please enter the deletion code to confirm",
       input: "text",
-      inputPlaceholder: "Enter code here...",
-      inputAttributes: { autocapitalize: "off" },
+      inputPlaceholder: "Enter deletion code",
       showCancelButton: true,
       confirmButtonColor: "#d33",
       cancelButtonColor: "#3085d6",
-      confirmButtonText: "Delete",
-      showLoaderOnConfirm: true,
-      preConfirm: (inputValue) => {
-        if (inputValue !== "0000") {
-          Swal.showValidationMessage("Incorrect code! Deletion not allowed.");
-          return false;
-        }
-        return true;
+      confirmButtonText: "Verify & Delete",
+      inputValidator: (value) => {
+        if (!value) return "Please enter the deletion code";
       },
-      allowOutsideClick: () => !Swal.isLoading(),
     });
 
-    if (confirmDelete.isConfirmed) {
-      try {
-        await axios.delete(`/api/required-documents/${id}`);
-        setDocuments((prevDocuments) =>
-          prevDocuments.filter((document) => document.id !== id)
-        );
-        Swal.fire("Deleted!", "Document deleted successfully", "success");
-      } catch (error) {
-        console.error("Error deleting document:", error);
-        Swal.fire("Error!", "Failed to delete document", "error");
+    if (!codeResult.isConfirmed) return;
+
+    try {
+      Swal.fire({
+        title: "Verifying...",
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading(),
+      });
+
+      await axios.delete(`/api/required-documents/${id}`, {
+        data: { code: codeResult.value }
+      });
+
+      setDocuments((prevDocuments) =>
+        prevDocuments.filter((document) => document.id !== id)
+      );
+
+      Swal.fire({
+        icon: "success",
+        title: "Deleted!",
+        text: "Document deleted successfully",
+        timer: 2000,
+        showConfirmButton: false,
+      });
+    } catch (error) {
+      console.error("Error deleting document:", error);
+      const errorMessage = error.response?.data?.message || "Failed to delete document";
+      
+      if (errorMessage.includes("Invalid deletion code")) {
+        Swal.fire({
+          icon: "error",
+          title: "Invalid Deletion Code",
+          html: `
+            <p>${errorMessage}</p>
+            <p style="margin-top: 15px;">
+              <a href="/AdminDeletionCodeSettings" style="color: #f58a3b; text-decoration: underline;">
+                Forgot Code?  Change Code Here
+              </a>
+            </p>
+          `,
+          confirmButtonColor: "#f58a3b",
+        });
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: errorMessage,
+        });
       }
     }
   };

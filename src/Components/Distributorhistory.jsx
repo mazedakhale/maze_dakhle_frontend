@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
 import jwtDecode from "jwt-decode";
-import { FaDownload, FaTimes } from "react-icons/fa";
+import { FaDownload, FaTimes, FaEye } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
 const ErrorRequests = () => {
@@ -115,6 +115,140 @@ const ErrorRequests = () => {
     )
   );
 
+  const handleDownloadAllDocuments = async (documentId, doc) => {
+    try {
+      setIsAdding(true);
+      const loadingToast = Swal.fire({
+        title: "Preparing download...",
+        text: "Please wait while we prepare your documents.",
+        icon: "info",
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        didOpen: () => {
+          Swal.showLoading();
+        },
+      });
+
+      const response = await axios.get(
+        `/api/download/${documentId}`,
+        {
+          responseType: "blob",
+          timeout: 120000,
+          onDownloadProgress: (progressEvent) => {
+            if (progressEvent.total) {
+              const percentCompleted = Math.round(
+                (progressEvent.loaded * 100) / progressEvent.total
+              );
+              Swal.update({
+                title: "Downloading...",
+                text: `${percentCompleted}% complete`,
+              });
+            }
+          },
+        }
+      );
+
+      loadingToast.close();
+
+      // Extract filename from Content-Disposition header
+      let filename = "";
+      const contentDisposition = response.headers["content-disposition"];
+
+      if (contentDisposition) {
+        const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+        const matches = filenameRegex.exec(contentDisposition);
+        if (matches != null && matches[1]) {
+          filename = matches[1].replace(/['"]/g, "");
+        }
+      }
+
+      // If no filename from header, extract from document data
+      if (!filename) {
+        let applicantName = "";
+
+        if (doc && doc.document_fields) {
+          // Handle both array and object formats
+          if (Array.isArray(doc.document_fields)) {
+            const nameField = doc.document_fields.find(
+              (f) =>
+                typeof f.field_name === "string" &&
+                f.field_name.toLowerCase().includes("name")
+            );
+            applicantName = nameField?.field_value || "";
+          } else if (typeof doc.document_fields === "object") {
+            const nameKey = Object.keys(doc.document_fields).find((key) =>
+              key.toLowerCase().includes("name")
+            );
+            applicantName = nameKey ? doc.document_fields[nameKey] : "";
+          }
+        }
+
+        // Use applicant name or fallback to application ID
+        if (applicantName) {
+          filename = `${applicantName.replace(/\s+/g, "_")}.zip`;
+        } else {
+          filename = `${doc.application_id || `Document_${documentId}`}.zip`;
+        }
+      }
+
+      // Create download link
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", filename);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+
+      Swal.fire({
+        title: "Success",
+        text: "Documents downloaded successfully!",
+        icon: "success",
+      });
+    } catch (error) {
+      console.error("Error downloading documents:", error);
+
+      let errorMessage = "Failed to download documents. Please try again.";
+
+      if (error.code === "ECONNABORTED" || error.message.includes("timeout")) {
+        errorMessage = "Download timed out. Please try again later.";
+      } else if (error.response) {
+        if (
+          error.response.data instanceof Blob &&
+          error.response.data.type === "application/json"
+        ) {
+          try {
+            const errorText = await new Response(error.response.data).text();
+            const errorData = JSON.parse(errorText);
+            errorMessage = errorData.message || errorMessage;
+          } catch (parseError) {
+            console.error("Error parsing error response:", parseError);
+          }
+        } else if (error.response.status === 404) {
+          errorMessage = "No documents found for download.";
+        } else if (error.response.status === 500) {
+          errorMessage = "Server error. Please try again later.";
+        } else {
+          errorMessage = error.response.data?.message || errorMessage;
+        }
+      } else if (error.request) {
+        errorMessage = "Network error. Please check your connection.";
+      } else {
+        errorMessage = error.message || errorMessage;
+      }
+
+      Swal.fire({
+        title: "Error",
+        text: errorMessage,
+        icon: "error",
+      });
+    } finally {
+      setIsAdding(false);
+    }
+  };
+  
   const handleDownloadCertificate = async (documentId, requestName) => {
     try {
       const response = await axios.get(
@@ -183,6 +317,7 @@ const ErrorRequests = () => {
                   "Request Date",
                   "Certificate",
                   "Download Certificate",
+                  "Download OC",
                 ].map((header, index) => (
                   <th
                     key={index}
@@ -209,34 +344,27 @@ const ErrorRequests = () => {
                       {request.application_id}
                     </td>
                     <td className="px-4 py-2 border">
-                      {document?.document_fields ? ( // Use `document` instead of `doc`
-                        Array.isArray(document.document_fields) ? (
-                          document.document_fields.find(
-                            (field) => field.field_name === "APPLICANT NAME"
-                          ) ? (
-                            <p>
-                              {
-                                document.document_fields.find(
-                                  (field) =>
-                                    field.field_name === "APPLICANT NAME"
-                                ).field_value
-                              }
-                            </p>
-                          ) : (
-                            <p className="text-gray-500">
-                              No applicant name available
-                            </p>
-                          )
-                        ) : document.document_fields["APPLICANT NAME"] ? (
-                          <p>{document.document_fields["APPLICANT NAME"]}</p>
-                        ) : (
-                          <p className="text-gray-500">
-                            No applicant name available
-                          </p>
-                        )
-                      ) : (
-                        <p className="text-gray-500">No fields available</p>
-                      )}
+                                            {
+  Array.isArray(request.document_fields)
+    ? (
+        request.document_fields.find(
+          (f) =>
+            typeof f.field_name === "string" &&
+            f.field_name.toLowerCase().includes("name")
+        )?.field_value || "-"
+      )
+    : (
+        Object.keys(request.document_fields).find(
+          (key) => key.toLowerCase().includes("name")
+        )
+          ? request.document_fields[
+              Object.keys(request.document_fields).find((key) =>
+                key.toLowerCase().includes("name")
+              )
+            ]
+          : "-"
+      )
+}
                     </td>
                     <td className="border p-3">
                       {request.request_description}
@@ -310,6 +438,18 @@ const ErrorRequests = () => {
                       ) : (
                         <span className="text-gray-500">Not Available</span>
                       )}
+                    </td>
+
+                    {/* Download OC */}
+                    <td className="border p-3 text-center">
+                      <button
+                        onClick={() =>
+                          handleDownloadAllDocuments(request.document_id, request)
+                        }
+                        className="bg-purple-500 text-white px-3 py-1 rounded-md flex items-center gap-2 hover:bg-purple-600 transition"
+                      >
+                        <FaDownload /> Download OC
+                      </button>
                     </td>
                   </tr>
                 ))

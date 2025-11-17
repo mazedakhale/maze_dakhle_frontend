@@ -26,7 +26,7 @@ export default function PaymentStatus() {
 
     const statusUrl = import.meta.env.DEV
       ? `/api/payment/status?merchantOrderId=${merchantOrderId}`
-      : `/payment/status?merchantOrderId=${merchantOrderId}`;
+      : `/api/payment/status?merchantOrderId=${merchantOrderId}`;
 
     const interval = setInterval(() => {
       axios

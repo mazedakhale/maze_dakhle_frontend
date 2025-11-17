@@ -354,7 +354,7 @@ const Adashinner = () => {
       )}
 
       <h2 className="text-2xl font-bold mb-4">Total Counts</h2>
-      <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-3 gap-6 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-6 mb-8">
         {staticCards.map((card) => {
           const count = getCountForCard(card.id);
 
@@ -363,7 +363,7 @@ const Adashinner = () => {
               key={card.id}
               className={`${card.color} text-white flex items-center rounded-lg shadow-md transition-transform transform hover:scale-105 cursor-pointer`}
               onClick={card.onClick || (() => {})}
-              style={{ width: "320px", height: "120px" }} // Increased Size
+              style={{ height: "120px" }} // Increased Size
             >
               {/* Icon Section with Same Background Color */}
               <div

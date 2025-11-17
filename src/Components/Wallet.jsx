@@ -29,6 +29,7 @@ export default function Wallet() {
                 `${API}/wallet/transactions`,
                 { headers }
             )
+      
             setTransactions(txs)
         } catch (err) {
             if (err.response?.status === 401) {
@@ -69,7 +70,7 @@ export default function Wallet() {
             )}
             <div className="flex justify-between items-center mb-4">
                 <h3 className="text-xl font-semibold">
-                    Balance: ₹{balance.toFixed(2)}
+                    Balance: ₹{balance?.toFixed(2)}
                 </h3>
                 <div className="space-x-2">
                     <button

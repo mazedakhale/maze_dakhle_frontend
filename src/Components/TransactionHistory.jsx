@@ -34,7 +34,7 @@ const TransactionHistory = () => {
       setCustomerWallets(walletsRes.data);
 
       const transactionsRes = await axios.get(`${API_BASE}/wallet/admin/transactions/all`, { headers });
-      setAllTransactions(transactionsRes.data);
+      setAllTransactions(transactionsRes.data || []);
 
     } catch (err) {
       setError('Failed to fetch wallet data');
@@ -202,7 +202,7 @@ const TransactionHistory = () => {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {analytics.recentTransactions.map((transaction, index) => (
+                  {analytics?.recentTransactions?.map((transaction, index) => (
                     <tr key={index}>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                         <div>
@@ -264,7 +264,7 @@ const TransactionHistory = () => {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {customerWallets.map((wallet) => (
+                {customerWallets?.map((wallet) => (
                   <tr key={wallet.id}>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                       <div>

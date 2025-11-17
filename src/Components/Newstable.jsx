@@ -26,8 +26,12 @@ const NewsTable = () => {
     }
   };
 
-  const handleChange = (e) =>
-    setFormData((fd) => ({ ...fd, [e.target.name]: e.target.value }));
+  const handleChange = (e) => {
+    setFormData((fd) => {
+      const newData = { ...fd, [e.target.name]: e.target.value };
+      return newData;
+    });
+  };
 
   const openModalForAdd = () => {
     setEditingItem(null);
@@ -37,16 +41,28 @@ const NewsTable = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Validate description is not empty
+    if (!formData.description || formData.description.trim() === "") {
+      console.error("❌ Description is empty!");
+      Swal.fire("Error", "Please enter a description", "error");
+      return;
+    }
+    
     try {
       if (editingItem) {
-        await axios.put(`${apiUrl}/${editingItem.id}`, formData);
+        console.log("📤 Updating news with ID:", editingItem.id);
+        const response = await axios.put(`${apiUrl}/${editingItem.id}`, formData);
       } else {
-        await axios.post(apiUrl, formData);
+        console.log("📤 Creating new news with data:", formData);
+        const response = await axios.post(apiUrl, formData);
       }
       setIsModalOpen(false);
       fetchNews();
       Swal.fire("Success", "News saved!", "success");
-    } catch {
+    } catch (error) {
+      console.error("❌ Error saving news:", error);
+      console.error("Error response:", error.response?.data);
       Swal.fire("Error", "Failed to save news", "error");
     }
   };

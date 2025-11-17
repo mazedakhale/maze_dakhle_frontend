@@ -9,6 +9,8 @@ import Login from "./Components/Login";
 import Admindashboard from "./Components/Admindashboard";
 import Adashinner from "./Components/Adashinner";
 import Addcategory from "./Components/Addcategory";
+import AddImpDoc from "./Components/AddImpDoc";
+import ViewImpDoc from "./Components/ViewImpDoc";
 import Addsubcategory from "./Components/Addsubcategory";
 import RequiredDocuments from "./Components/RequiredDocuments";
 import DocumentTable from "./Components/DocumentTable";
@@ -99,6 +101,7 @@ import api from "./utils/api";
 import TransactionHistory from "./Components/TransactionHistory";
 import DistributorPaymentRequest from "./Components/DistributorPaymentRequest";
 import AdminWallet from "./Components/AdminWallet";
+import AdminDeletionCodeSettings from "./Components/AdminDeletionCodeSettings";
 function App() {
   return (
     <Router>
@@ -123,6 +126,7 @@ function App() {
         <Route path="/ElistPage" element={<ProtectedRoute allowedRoles={['Admin']}><Admindashboard><ElistPage /></Admindashboard></ProtectedRoute>} />
         <Route path="/Customerlist" element={<ProtectedRoute allowedRoles={['Admin']}><Admindashboard><Customerlist /></Admindashboard></ProtectedRoute>} />
         <Route path="/Addcategory" element={<ProtectedRoute allowedRoles={['Admin']}><Admindashboard><Addcategory /></Admindashboard></ProtectedRoute>} />
+        <Route path="/AddImpDoc" element={<ProtectedRoute allowedRoles={['Admin']}><Admindashboard><AddImpDoc /></Admindashboard></ProtectedRoute>} />
         <Route path="/Addsubcategory" element={<ProtectedRoute allowedRoles={['Admin']}><Admindashboard><Addsubcategory /></Admindashboard></ProtectedRoute>} />
         <Route path="/Requireddocuments" element={<ProtectedRoute allowedRoles={['Admin']}><Admindashboard><RequiredDocuments /></Admindashboard></ProtectedRoute>} />
         <Route path="/Price" element={<ProtectedRoute allowedRoles={['Admin']}><Admindashboard><Price /></Admindashboard></ProtectedRoute>} />
@@ -162,6 +166,7 @@ function App() {
         <Route path="/CustomerTransactions" element={<ProtectedRoute allowedRoles={['Admin']}><Admindashboard><TransactionHistory /></Admindashboard></ProtectedRoute>} />
         <Route path="/DistributorPaymentRequest" element={<ProtectedRoute allowedRoles={['Admin']}><Admindashboard><DistributorPaymentRequest /></Admindashboard></ProtectedRoute>} />
         <Route path="/AdminWallet" element={<ProtectedRoute allowedRoles={['Admin']}><Admindashboard><AdminWallet /></Admindashboard></ProtectedRoute>} />
+        <Route path="/AdminDeletionCodeSettings" element={<ProtectedRoute allowedRoles={['Admin']}><Admindashboard><AdminDeletionCodeSettings /></Admindashboard></ProtectedRoute>} />
 
         <Route path="/Lazycharts" element={<ProtectedRoute allowedRoles={['Admin']}><Admindashboard><LazyCharts /></Admindashboard></ProtectedRoute>} />
         <Route path="/Received" element={<ProtectedRoute allowedRoles={['Admin']}><Admindashboard><Received /></Admindashboard></ProtectedRoute>} />
@@ -229,6 +234,7 @@ function App() {
         <Route path="/Dsentlist" element={<ProtectedRoute allowedRoles={['Distributor']}><Distributordashboard><Dsentlist /></Distributordashboard></ProtectedRoute>} />
         <Route path="/Distributorrejected" element={<ProtectedRoute allowedRoles={['Distributor']}><Distributordashboard><Distributorrejected /></Distributordashboard></ProtectedRoute>} />
         <Route path="/PaymentRequest" element={<ProtectedRoute allowedRoles={['Distributor']}><Distributordashboard><PaymentRequest /></Distributordashboard></ProtectedRoute>} />
+        <Route path="/ViewImpDocD" element={<ProtectedRoute allowedRoles={['Distributor']}><Distributordashboard><ViewImpDoc /></Distributordashboard></ProtectedRoute>} />
 
         <Route path="/Distributorinvoice/:documentId" element={<ProtectedRoute allowedRoles={['Distributor']}><Distributorinvoice /></ProtectedRoute>} />
         <Route path="/Distributorview/:documentId" element={<ProtectedRoute allowedRoles={['Distributor']}><Distributorview /></ProtectedRoute>} />
@@ -237,6 +243,7 @@ function App() {
         <Route path="/Employeedashboard" element={<ProtectedRoute allowedRoles={['Employee']}><Employeedashboard /></ProtectedRoute>} />
         <Route path="/Edashinner" element={<ProtectedRoute allowedRoles={['Employee']}><Employeedashboard><Edashinner /></Employeedashboard></ProtectedRoute>} />
         <Route path="/Emplist" element={<ProtectedRoute allowedRoles={['Employee']}><Employeedashboard><Emplist /></Employeedashboard></ProtectedRoute>} />
+        <Route path="/ViewImpDocE" element={<ProtectedRoute allowedRoles={['Employee']}><Employeedashboard><ViewImpDoc /></Employeedashboard></ProtectedRoute>} />
 
         <Route path="/Employee" element={<ProtectedRoute allowedRoles={['Employee']}><Employeedashboard><Employee /></Employeedashboard></ProtectedRoute>} />
         <Route path="/Spage" element={<ProtectedRoute allowedRoles={['Employee']}><Employeedashboard><Spage /></Employeedashboard></ProtectedRoute>} />

@@ -22,7 +22,7 @@ const AdminWallet = () => {
   const fetchWalletData = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('http://72.60.206.65:3000/wallet', {
+      const response = await axios.get('/api/wallet', {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -39,7 +39,7 @@ const AdminWallet = () => {
   const fetchTransactions = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('http://72.60.206.65:3000/wallet/transactions', {
+      const response = await axios.get('/api/wallet/transactions', {
         headers: {
           Authorization: `Bearer ${token}`
         }

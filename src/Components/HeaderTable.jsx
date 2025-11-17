@@ -45,7 +45,8 @@ const HeaderTable = () => {
       setIsModalOpen(false);
       fetchHeaders();
       Swal.fire("Success", "Header saved!", "success");
-    } catch {
+    } catch (error) {
+      console.error("Error saving header:", error);
       Swal.fire("Error", "Failed to save header", "error");
     }
   };

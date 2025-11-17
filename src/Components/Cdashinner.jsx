@@ -296,7 +296,7 @@ export default function CustomerDashboard() {
 
       {/* Categories & Subcategories Grid */}
       <div className="w-full max-w-7xl mx-auto mt-6">
-        {categories.map((cat) => {
+        {categories.slice().reverse().map((cat) => {
           const catCount = categoryCounts.find(
             (c) => c.category === cat.category_name
           );

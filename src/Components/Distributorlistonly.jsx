@@ -378,56 +378,68 @@ const UserTable = () => {
   };
 
   const handleDeleteDistributor = async (id) => {
-    const confirmDelete = await Swal.fire({
+    const codeResult = await Swal.fire({
       title: "Enter Deletion Code",
-      text: "Please enter the code to confirm deletion.",
+      text: "Please enter the deletion code to confirm",
       input: "text",
-      inputPlaceholder: "Enter code here...",
-      inputAttributes: { autocapitalize: "off" },
+      inputPlaceholder: "Enter deletion code",
       showCancelButton: true,
       confirmButtonColor: "#d33",
       cancelButtonColor: "#3085d6",
-      confirmButtonText: "Delete",
-      showLoaderOnConfirm: true,
-      preConfirm: (inputValue) => {
-        if (inputValue !== "0000") {
-          Swal.showValidationMessage("Incorrect code! Deletion not allowed.");
-          return false;
-        }
-        return true;
+      confirmButtonText: "Verify & Delete",
+      inputValidator: (value) => {
+        if (!value) return "Please enter the deletion code";
       },
-      allowOutsideClick: () => !Swal.isLoading(),
     });
 
-    if (confirmDelete.isConfirmed) {
+    if (!codeResult.isConfirmed) return;
+
+    try {
       Swal.fire({
-        title: "Deleting...",
-        text: "Please wait while we process your request",
+        title: "Verifying...",
         allowOutsideClick: false,
-        didOpen: () => {
-          Swal.showLoading();
-        },
+        didOpen: () => Swal.showLoading(),
       });
 
-      try {
-        await axios.delete(`/api/users/delete/${id}`, {
-          timeout: 30000,
-        });
+      await axios.delete(`/api/users/${id}`, {
+        data: { code: codeResult.value }
+      });
 
+      setDistributors((prevDistributors) =>
+        prevDistributors.filter((distributor) => distributor.user_id !== id)
+      );
+
+      Swal.fire({
+        icon: "success",
+        title: "Deleted!",
+        text: "Distributor deleted successfully",
+        timer: 2000,
+        showConfirmButton: false,
+      });
+    } catch (error) {
+      console.error("Error deleting distributor:", error);
+      const errorMessage = error.response?.data?.message || "Failed to delete distributor";
+      
+      if (errorMessage.includes("Invalid deletion code")) {
         Swal.fire({
-          title: "Deleted!",
-          text: "Distributor has been deleted.",
-          icon: "success",
-          timer: 1500,
-          showConfirmButton: false,
+          icon: "error",
+          title: "Invalid Deletion Code",
+          html: `
+            <p>${errorMessage}</p>
+            <p style="margin-top: 15px;">
+              <a href="/AdminDeletionCodeSettings" style="color: #f58a3b; text-decoration: underline;">
+                Forgot Code?  Change Code Here
+              </a>
+            </p>
+          `,
+          confirmButtonColor: "#f58a3b",
         });
-
-        setDistributors((prevDistributors) =>
-          prevDistributors.filter((distributor) => distributor.user_id !== id)
-        );
-      } catch (error) {
-        console.error("Error deleting distributor:", error);
-        Swal.fire("Error", "Failed to delete distributor", "error");
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: errorMessage,
+        });
       }
     }
   };

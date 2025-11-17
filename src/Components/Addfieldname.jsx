@@ -68,44 +68,67 @@ const FieldNames = () => {
   };
 
   const handleDelete = async (id) => {
-    const confirmDelete = await Swal.fire({
+    const codeResult = await Swal.fire({
       title: "Enter Deletion Code",
-      text: "Please enter the code to confirm deletion.",
+      text: "Please enter the deletion code to confirm",
       input: "text",
-      inputPlaceholder: "Enter code here...",
-      inputAttributes: { autocapitalize: "off" },
+      inputPlaceholder: "Enter deletion code",
       showCancelButton: true,
       confirmButtonColor: "#d33",
       cancelButtonColor: "#3085d6",
-      confirmButtonText: "Delete",
-      showLoaderOnConfirm: true,
-      preConfirm: (inputValue) => {
-        if (inputValue !== "0000") {
-          Swal.showValidationMessage("Incorrect code! Deletion not allowed.");
-          return false;
-        }
-        return true;
+      confirmButtonText: "Verify & Delete",
+      inputValidator: (value) => {
+        if (!value) return "Please enter the deletion code";
       },
-      allowOutsideClick: () => !Swal.isLoading(),
     });
 
-    if (confirmDelete.isConfirmed) {
-      // **Remove the field from UI immediately**
+    if (!codeResult.isConfirmed) return;
+
+    try {
+      Swal.fire({
+        title: "Verifying...",
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading(),
+      });
+
+      await axios.delete(`/api/field-names/${id}`, {
+        data: { code: codeResult.value }
+      });
+
       setFields((prevFields) => prevFields.filter((field) => field.id !== id));
 
-      // **Show success message instantly**
-      Swal.fire("Deleted!", "Field Name deleted successfully", "success");
-
-      // **Perform API call in the background**
-      axios
-        .delete(`/api/field-names/${id}`)
-        .then(() => {
-          fetchFields(); // Refresh field list
-        })
-        .catch((error) => {
-          console.error("Error deleting field:", error);
-          Swal.fire("Error!", "Failed to delete Field Name", "error");
+      Swal.fire({
+        icon: "success",
+        title: "Deleted!",
+        text: "Field Name deleted successfully",
+        timer: 2000,
+        showConfirmButton: false,
+      });
+    } catch (error) {
+      console.error("Error deleting field name:", error);
+      const errorMessage = error.response?.data?.message || "Failed to delete field name";
+      
+      if (errorMessage.includes("Invalid deletion code")) {
+        Swal.fire({
+          icon: "error",
+          title: "Invalid Deletion Code",
+          html: `
+            <p>${errorMessage}</p>
+            <p style="margin-top: 15px;">
+              <a href="/AdminDeletionCodeSettings" style="color: #f58a3b; text-decoration: underline;">
+                Forgot Code?  Change Code Here
+              </a>
+            </p>
+          `,
+          confirmButtonColor: "#f58a3b",
         });
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: errorMessage,
+        });
+      }
     }
   };
 

@@ -64,7 +64,7 @@ const DocumentViewer = ({ filePath, onClose }) => {
             <h2 className="text-lg font-bold">Document Preview</h2>
             <button
               onClick={onClose}
-              className="text-gray-500 hover:text-gray-700 text-sm"
+              className="text-gray-500 hover:text-gray-700 text-3xl font-bold"
             >
               &times;
             </button>
@@ -279,21 +279,27 @@ const InvoicePage = () => {
 
       // If no filename was found in the header, use a fallback
       if (!filename) {
-        // Try to get applicant name from document_fields if available
+        // Try to get applicant name from document_fields
         let applicantName = "";
 
-        // Safely check if document_fields exists and is an array
-        if (
-          documentData &&
-          documentData.document_fields &&
-          Array.isArray(documentData.document_fields)
-        ) {
-          const applicantField = documentData.document_fields.find(
-            (field) => field.field_name === "APPLICANT NAME"
-          );
-
-          if (applicantField && applicantField.field_value) {
-            applicantName = applicantField.field_value;
+        if (documentData && documentData.document_fields) {
+          // Handle both array and object formats
+          if (Array.isArray(documentData.document_fields)) {
+            // Array format: find field with "name" in field_name
+            const nameField = documentData.document_fields.find(
+              (f) =>
+                typeof f.field_name === "string" &&
+                f.field_name.toLowerCase().includes("name")
+            );
+            applicantName = nameField?.field_value || "";
+          } else if (typeof documentData.document_fields === "object") {
+            // Object format: find key with "name" in it
+            const nameKey = Object.keys(documentData.document_fields).find(
+              (key) => key.toLowerCase().includes("name")
+            );
+            applicantName = nameKey
+              ? documentData.document_fields[nameKey]
+              : "";
           }
         }
 

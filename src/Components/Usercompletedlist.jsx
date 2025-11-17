@@ -185,34 +185,27 @@ const CompletedApplicationsList = () => {
                       {new Date(document.uploaded_at).toLocaleString()}
                     </td>
                     <td className="px-4 py-3 border border-[#776D6DA8] text-center">
-                      {document?.document_fields ? (
-                        Array.isArray(document.document_fields) ? (
-                          document.document_fields.find(
-                            (field) => field.field_name === "APPLICANT NAME"
-                          ) ? (
-                            <p>
-                              {
-                                document.document_fields.find(
-                                  (field) =>
-                                    field.field_name === "APPLICANT NAME"
-                                ).field_value
-                              }
-                            </p>
-                          ) : (
-                            <p className="text-gray-500">
-                              No applicant name available
-                            </p>
-                          )
-                        ) : document.document_fields["APPLICANT NAME"] ? (
-                          <p>{document.document_fields["APPLICANT NAME"]}</p>
-                        ) : (
-                          <p className="text-gray-500">
-                            No applicant name available
-                          </p>
-                        )
-                      ) : (
-                        <p className="text-gray-500">No fields available</p>
-                      )}
+                                           {
+  Array.isArray(document.document_fields)
+    ? (
+        document.document_fields.find(
+          (f) =>
+            typeof f.field_name === "string" &&
+            f.field_name.toLowerCase().includes("name")
+        )?.field_value || "-"
+      )
+    : (
+        Object.keys(document.document_fields).find(
+          (key) => key.toLowerCase().includes("name")
+        )
+          ? document.document_fields[
+              Object.keys(document.document_fields).find((key) =>
+                key.toLowerCase().includes("name")
+              )
+            ]
+          : "-"
+      )
+}
                     </td>
 
                     <td className="px-4 py-3 border border-[#776D6DA8] text-center">

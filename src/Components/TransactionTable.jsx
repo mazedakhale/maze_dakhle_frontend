@@ -1,10 +1,16 @@
 // src/components/TransactionTable.jsx
-import React from "react";
+/* eslint-disable react/prop-types */
 
 export default function TransactionTable({ transactions = [] }) {
-  if (!transactions.length) {
-    return <p className="text-center py-4">No transactions to show.</p>;
+  
+  if (!transactions || transactions.length === 0) {
+    return (
+      <div className="bg-white rounded-lg shadow p-8 text-center">
+        <p className="text-gray-500 text-lg">No transactions to show.</p>
+      </div>
+    );
   }
+  
   return (
     <div className="overflow-x-auto">
       <table className="min-w-full divide-y divide-gray-200">

@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
   FaTachometerAlt,
   FaPlus,
@@ -25,19 +25,22 @@ import {
   FaEnvelope,
   FaExclamationTriangle,
   FaMoneyBill,
+  FaHeadphones,
 } from "react-icons/fa";
+import { TbLabelImportantFilled } from "react-icons/tb";
+import { IoMdContact } from "react-icons/io";
 
 import jwtDecode from "jwt-decode";
 import logo from "../assets/logo.png";
-import { FaMoneyBill1Wave, FaMoneyBillTransfer, FaRegCircleUser } from "react-icons/fa6";
+import { FaContao, FaHeading, FaMoneyBill1Wave, FaMoneyBillTransfer, FaRegCircleUser } from "react-icons/fa6";
 import { IoMdLogOut } from "react-icons/io";
 
 // Sidebar Component
 const Sidebar = ({ onNavigate }) => {
-  const [activePath, setActivePath] = useState("/");
+  const location = useLocation();
+  const activePath = location.pathname;
 
   const handleNavigation = (path) => {
-    setActivePath(path);
     onNavigate(path);
   };
 
@@ -70,6 +73,16 @@ const Sidebar = ({ onNavigate }) => {
                 label: "Add Services",
                 path: "/DocumentTable",
               },
+              {
+                icon: <IoMdContact />,
+                label: "Add Contact Info",
+                path: "/ContactinfoTable",
+              },
+              {
+                icon: <FaHeading />,
+                label: "Add Headers",
+                path: "/HeaderTable",
+              },
               { icon: <FaNewspaper />, label: "Add News", path: "/Newstable" },
               {
                 icon: <FaShieldAlt />,
@@ -80,6 +93,11 @@ const Sidebar = ({ onNavigate }) => {
                 icon: <FaYoutube />,
                 label: "Add Youtube Link",
                 path: "/Youtube",
+              },
+              {
+                icon: <TbLabelImportantFilled />,
+                label: "Add Important Document",
+                path: "/AddImpDoc",
               },
               {
                 icon: <FaEnvelope />,

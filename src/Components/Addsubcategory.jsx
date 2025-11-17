@@ -110,35 +110,77 @@ const Addsubcategory = () => {
   };
 
   const deleteSubcategory = async (id) => {
-    const confirmDelete = await Swal.fire({
+    // Ask for deletion code
+    const codeResult = await Swal.fire({
       title: "Enter Deletion Code",
-      text: "Please enter the code to confirm deletion.",
+      text: "Please enter the deletion code to confirm",
       input: "text",
-      inputPlaceholder: "Enter code here...",
+      inputPlaceholder: "Enter deletion code",
       showCancelButton: true,
       confirmButtonColor: "#d33",
       cancelButtonColor: "#3085d6",
-      confirmButtonText: "Delete",
-      preConfirm: (inputValue) => {
-        if (inputValue !== "0000") {
-          Swal.showValidationMessage("Incorrect code! Deletion not allowed.");
-          return false;
+      confirmButtonText: "Verify & Delete",
+      inputValidator: (value) => {
+        if (!value) {
+          return "Please enter the deletion code";
         }
-        return true;
       },
     });
 
-    if (confirmDelete.isConfirmed) {
-      Swal.fire("Deleted!", "Subcategory has been deleted.", "success");
+    if (!codeResult.isConfirmed) return;
 
-      try {
-        await axios.delete(`${API_BASE_URL}/subcategories/${id}`);
-        setSubcategories((prev) =>
-          prev.filter((sub) => sub.subcategory_id !== id)
-        );
-      } catch (error) {
-        console.error("Error deleting subcategory:", error);
-        Swal.fire("Error", "Failed to delete subcategory", "error");
+    try {
+      // Verify and delete
+      Swal.fire({
+        title: "Verifying...",
+        text: "Please wait",
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        },
+      });
+
+      await axios.delete(
+        `${API_BASE_URL}/subcategories/${id}`,
+        { data: { code: codeResult.value } }
+      );
+
+      // Success - remove from UI
+      setSubcategories((prev) =>
+        prev.filter((sub) => sub.subcategory_id !== id)
+      );
+
+      Swal.fire({
+        icon: "success",
+        title: "Deleted!",
+        text: "Subcategory has been deleted successfully.",
+        timer: 2000,
+        showConfirmButton: false,
+      });
+    } catch (error) {
+      console.error("Error during deletion:", error);
+      const errorMessage = error.response?.data?.message || "Failed to delete subcategory";
+      
+      if (errorMessage.includes("Invalid deletion code")) {
+        Swal.fire({
+          icon: "error",
+          title: "Invalid Deletion Code",
+          html: `
+            <p>${errorMessage}</p>
+            <p style="margin-top: 15px;">
+              <a href="/AdminDeletionCodeSettings" style="color: #f58a3b; text-decoration: underline;">
+                Forgot Code?  Change Code Here
+              </a>
+            </p>
+          `,
+          confirmButtonColor: "#f58a3b",
+        });
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: errorMessage,
+        });
       }
     }
   };

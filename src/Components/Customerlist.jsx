@@ -54,23 +54,66 @@ const CustomerList = () => {
   };
 
   const handleDeleteCustomer = async (id) => {
-    const confirm = await Swal.fire({
+    const codeResult = await Swal.fire({
       title: "Enter Deletion Code",
+      text: "Please enter the deletion code to confirm",
       input: "text",
-      inputPlaceholder: "0000",
+      inputPlaceholder: "Enter deletion code",
       showCancelButton: true,
-      preConfirm: (val) =>
-        val === "0000" || Swal.showValidationMessage("Wrong code"),
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Verify & Delete",
+      inputValidator: (value) => {
+        if (!value) return "Please enter the deletion code";
+      },
     });
 
-    if (confirm.isConfirmed) {
-      try {
-        await axios.delete(`/api/users/delete/${id}`);
-        setCustomers((prev) => prev.filter((c) => c.user_id !== id));
-        Swal.fire("Deleted!", "Customer removed.", "success");
-      } catch (error) {
-        console.error("Delete failed", error);
-        Swal.fire("Error", "Failed to delete", "error");
+    if (!codeResult.isConfirmed) return;
+
+    try {
+      Swal.fire({
+        title: "Verifying...",
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading(),
+      });
+
+      await axios.delete(`/api/users/${id}`, {
+        data: { code: codeResult.value }
+      });
+
+      setCustomers((prev) => prev.filter((c) => c.user_id !== id));
+
+      Swal.fire({
+        icon: "success",
+        title: "Deleted!",
+        text: "Customer deleted successfully",
+        timer: 2000,
+        showConfirmButton: false,
+      });
+    } catch (error) {
+      console.error("Error deleting customer:", error);
+      const errorMessage = error.response?.data?.message || "Failed to delete customer";
+      
+      if (errorMessage.includes("Invalid deletion code")) {
+        Swal.fire({
+          icon: "error",
+          title: "Invalid Deletion Code",
+          html: `
+            <p>${errorMessage}</p>
+            <p style="margin-top: 15px;">
+              <a href="/AdminDeletionCodeSettings" style="color: #f58a3b; text-decoration: underline;">
+                Forgot Code?  Change Code Here
+              </a>
+            </p>
+          `,
+          confirmButtonColor: "#f58a3b",
+        });
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: errorMessage,
+        });
       }
     }
   };

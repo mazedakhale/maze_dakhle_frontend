@@ -97,27 +97,69 @@ const FeedbackList = () => {
 
   // Delete with code confirm
   const handleDelete = async (id) => {
-    const { isConfirmed } = await Swal.fire({
+    const codeResult = await Swal.fire({
       title: "Enter Deletion Code",
-      input: "password",
-      inputPlaceholder: "Code...",
+      text: "Please enter the deletion code to confirm",
+      input: "text",
+      inputPlaceholder: "Enter deletion code",
       showCancelButton: true,
-      confirmButtonText: "Delete",
-      preConfirm: (code) => {
-        if (code !== "0000") Swal.showValidationMessage("Wrong code");
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Verify & Delete",
+      inputValidator: (value) => {
+        if (!value) return "Please enter the deletion code";
       },
     });
-    if (!isConfirmed) return;
 
-    setFeedbackList((prev) =>
-      prev.filter((f) => f.feedback_feedback_id !== id)
-    );
+    if (!codeResult.isConfirmed) return;
+
     try {
-      await axios.delete(`${API_BASE}/${id}`);
-      Swal.fire("Deleted", "Feedback removed.", "success");
-    } catch {
-      Swal.fire("Error", "Failed to delete.", "error");
-      fetchFeedback();
+      Swal.fire({
+        title: "Verifying...",
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading(),
+      });
+
+      await axios.delete(`${API_BASE}/${id}`, {
+        data: { code: codeResult.value }
+      });
+
+      setFeedbackList((prev) =>
+        prev.filter((f) => f.feedback_feedback_id !== id)
+      );
+
+      Swal.fire({
+        icon: "success",
+        title: "Deleted!",
+        text: "Feedback deleted successfully",
+        timer: 2000,
+        showConfirmButton: false,
+      });
+    } catch (error) {
+      console.error("Error deleting feedback:", error);
+      const errorMessage = error.response?.data?.message || "Failed to delete feedback";
+      
+      if (errorMessage.includes("Invalid deletion code")) {
+        Swal.fire({
+          icon: "error",
+          title: "Invalid Deletion Code",
+          html: `
+            <p>${errorMessage}</p>
+            <p style="margin-top: 15px;">
+              <a href="/AdminDeletionCodeSettings" style="color: #f58a3b; text-decoration: underline;">
+                Forgot Code?  Change Code Here
+              </a>
+            </p>
+          `,
+          confirmButtonColor: "#f58a3b",
+        });
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: errorMessage,
+        });
+      }
     }
   };
 

@@ -447,35 +447,27 @@ const Received = () => {
                   <td className="border p-2">{doc.category_name}</td>
                   <td className="border p-2">{doc.subcategory_name}</td>
                   <td className="px-4 py-2 border text-sm">
-                    {doc?.document_fields ? (
-                      Array.isArray(doc.document_fields) ? (
-                        // New format (array of objects)
-                        doc.document_fields.find(
-                          (field) => field.field_name === "APPLICANT NAME"
-                        ) ? (
-                          <p>
-                            {
-                              doc.document_fields.find(
-                                (field) => field.field_name === "APPLICANT NAME"
-                              ).field_value
-                            }
-                          </p>
-                        ) : (
-                          <p className="text-gray-500">
-                            No applicant name available
-                          </p>
-                        )
-                      ) : // Old format (object with key-value pairs)
-                      doc.document_fields["APPLICANT NAME"] ? (
-                        <p>{doc.document_fields["APPLICANT NAME"]}</p>
-                      ) : (
-                        <p className="text-gray-500">
-                          No applicant name available
-                        </p>
-                      )
-                    ) : (
-                      <p className="text-gray-500">No fields available</p>
-                    )}
+                                         {
+  Array.isArray(doc.document_fields)
+    ? (
+        doc.document_fields.find(
+          (f) =>
+            typeof f.field_name === "string" &&
+            f.field_name.toLowerCase().includes("name")
+        )?.field_value || "-"
+      )
+    : (
+        Object.keys(doc.document_fields).find(
+          (key) => key.toLowerCase().includes("name")
+        )
+          ? doc.document_fields[
+              Object.keys(doc.document_fields).find((key) =>
+                key.toLowerCase().includes("name")
+              )
+            ]
+          : "-"
+      )
+}
                   </td>
                   <td className="border p-2 break-words">{doc.name}</td>
 

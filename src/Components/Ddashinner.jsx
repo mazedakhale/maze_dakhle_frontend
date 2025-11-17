@@ -159,7 +159,7 @@ const Ddashinner = () => {
     
     if (token) {
       axios
-        .get(`http://72.60.206.65:3000/wallet`, {
+        .get(`/api/wallet`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -489,7 +489,7 @@ const Ddashinner = () => {
         {/* Categories and Subcategories Grid - Static structure with dynamic data */}
         <div className="grid grid-cols-3 gap-6 w-full max-w-7xl mx-auto mt-6">
           {!selectedCategory
-            ? categories.map((category) => (
+            ? categories?.map((category) => (
                 <div
                   key={category.category_id}
                   className="flex w-full rounded-lg shadow-[0px_2px_4px_rgba(0,0,0,0.4)] cursor-pointer transition-all duration-300 overflow-hidden"
