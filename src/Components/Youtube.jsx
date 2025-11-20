@@ -52,12 +52,26 @@ const Youtube = () => {
     payload.append("youtubeLink", formData.youtubeLink);
     payload.append("youtubeDescription", formData.youtubeDescription);
 
+    console.log('📤 Submitting image data:');
+    console.log('  - Has image file:', !!formData.image);
+    console.log('  - Description:', formData.description);
+    console.log('  - YouTube Link:', formData.youtubeLink);
+    console.log('  - YouTube Description:', formData.youtubeDescription);
+    console.log('📦 FormData entries:');
+    for (let [key, value] of payload.entries()) {
+      console.log(`  ${key}:`, value instanceof File ? `File: ${value.name}` : value);
+    }
+
     try {
       if (isEditing && editingImage) {
-        await axios.put(`${apiUrl}/${editingImage.id}`, payload);
+        console.log('🔄 Updating image ID:', editingImage.id);
+        const response = await axios.put(`${apiUrl}/${editingImage.id}`, payload);
+        console.log('✅ Update response:', response.data);
         Swal.fire("Success", "Image updated successfully!", "success");
       } else {
-        await axios.post(apiUrl, payload);
+        console.log('➕ Creating new image');
+        const response = await axios.post(apiUrl, payload);
+        console.log('✅ Create response:', response.data);
         Swal.fire("Success", "Image added successfully!", "success");
       }
       // reset
@@ -71,8 +85,10 @@ const Youtube = () => {
         youtubeDescription: "",
       });
       fetchImages();
-    } catch {
-      Swal.fire("Error", "Failed to save image", "error");
+    } catch (error) {
+      console.error('❌ Error submitting image:', error);
+      console.error('❌ Error response:', error.response?.data);
+      Swal.fire("Error", error.response?.data?.message || "Failed to save image", "error");
     }
   };
 

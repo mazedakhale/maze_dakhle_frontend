@@ -39,15 +39,27 @@ const ContactInfoTable = () => {
       return;
     }
 
+    const payload = {
+      phone: phone.trim(),
+      email: email.trim(),
+      address: address.trim()
+    };
+
+
     try {
-      await axios.post(apiUrl, newContact);
+      const response = await axios.post(apiUrl, payload, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
       Swal.fire("Success", "Contact info added!", "success");
       setIsAdding(false);
       setNewContact({ phone: "", email: "", address: "" });
       fetchContactInfo();
     } catch (error) {
-      console.error("Error adding contact info:", error);
-      Swal.fire("Error", "Failed to add contact info", "error");
+      console.error("❌ Error adding contact info:", error);
+      console.error("Error response:", error.response?.data);
+      Swal.fire("Error", error.response?.data?.message || "Failed to add contact info", "error");
     }
   };
 
@@ -81,13 +93,15 @@ const ContactInfoTable = () => {
 
   const handleUpdate = async (id) => {
     try {
-      await axios.put(`${apiUrl}/${id}`, updatedContact);
+      const response = await axios.put(`${apiUrl}/${id}`, updatedContact);
+      console.log('✅ Contact info updated successfully:', response.data);
       Swal.fire("Updated!", "Contact info updated.", "success");
       setEditingId(null);
       fetchContactInfo();
     } catch (error) {
-      console.error("Error updating contact info:", error);
-      Swal.fire("Error", "Failed to update", "error");
+      console.error("❌ Error updating contact info:", error);
+      console.error("Error response:", error.response?.data);
+      Swal.fire("Error", error.response?.data?.message || "Failed to update", "error");
     }
   };
 
