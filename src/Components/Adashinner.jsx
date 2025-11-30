@@ -61,7 +61,7 @@ const Adashinner = () => {
   // Static card definitions
   const staticCards = [
     {
-      id: "users",
+      id: "customers",
       icon: FaUsers,
       title: "Users",
       color: "bg-[#FE1008]",
@@ -273,7 +273,7 @@ const Adashinner = () => {
         {
           label: "Total Counts",
           data: [
-            counts?.users || 0,
+            counts?.customers || 0,
             counts?.distributors || 0,
             counts?.documents || 0,
             counts?.categories || 0,
