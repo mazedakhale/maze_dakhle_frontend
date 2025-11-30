@@ -3,14 +3,15 @@ import { FaTag, FaEdit, FaTrash, FaPlus, FaTimes } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
 import axios from "axios";
+import API_BASE_URL from "../config/api";
 import Swal from "sweetalert2";
 
 const NotificationManager = () => {
   const [notifications, setNotifications] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newNotification, setNewNotification] = useState({
-    distributor_notification: "",
-    customer_notification: "",
+    category: "Customer", // Default to Customer
+    content: "",
     notification_date: "",
   });
 
@@ -22,7 +23,7 @@ const NotificationManager = () => {
   // Fetch all notifications
   const fetchNotifications = async () => {
     try {
-      const response = await axios.get("/api/notifications"); // Adjust API URL as needed
+      const response = await axios.get(`${API_BASE_URL}/notifications`); // Adjust API URL as needed
       setNotifications(Array.isArray(response.data) ? response.data : []);
     } catch (err) {
       console.error("Error fetching notifications:", err);
@@ -43,16 +44,16 @@ const NotificationManager = () => {
   const handleAddNotification = async () => {
     try {
       const payload = {
-        ...newNotification,
-        notification_date:
-          newNotification.notification_date || new Date().toISOString(),
+        distributor_notification: newNotification.category === "Distributor" ? newNotification.content : "",
+        customer_notification: newNotification.category === "Customer" ? newNotification.content : "",
+        notification_date: newNotification.notification_date || new Date().toISOString(),
       };
-      await axios.post("/api/notifications", payload);
+      await axios.post(`${API_BASE_URL}/notifications`, payload);
       fetchNotifications();
       setIsModalOpen(false);
       setNewNotification({
-        distributor_notification: "",
-        customer_notification: "",
+        category: "Customer",
+        content: "",
         notification_date: "",
       });
     } catch (err) {
@@ -85,7 +86,7 @@ const NotificationManager = () => {
         didOpen: () => Swal.showLoading(),
       });
 
-      await axios.delete(`/api/notifications/${id}`, {
+      await axios.delete(`${API_BASE_URL}/notifications/${id}`, {
         data: { code: codeResult.value }
       });
 
@@ -133,8 +134,8 @@ const NotificationManager = () => {
     setEditingId(id);
     const notification = notifications.find((n) => n.notification_id === id);
     setEditData({
-      distributor_notification: notification.distributor_notification,
-      customer_notification: notification.customer_notification,
+      category: notification.distributor_notification ? "Distributor" : "Customer",
+      content: notification.distributor_notification || notification.customer_notification,
     });
   };
 
@@ -147,7 +148,11 @@ const NotificationManager = () => {
   // Save edited notification
   const handleSaveEdit = async (id) => {
     try {
-      await axios.put(`/api/notifications/${id}`, editData);
+      const updateData = {
+        distributor_notification: editData.category === "Distributor" ? editData.content : "",
+        customer_notification: editData.category === "Customer" ? editData.content : "",
+      };
+      await axios.put(`${API_BASE_URL}/notifications/${id}`, updateData);
       setEditingId(null);
       fetchNotifications();
     } catch (err) {
@@ -159,7 +164,7 @@ const NotificationManager = () => {
   const handleToggleStatus = async (id, currentStatus) => {
     try {
       const newStatus = currentStatus === "Active" ? "Inactive" : "Active";
-      await axios.patch(`/api/notifications/status/${id}`, {
+      await axios.patch(`${API_BASE_URL}/notifications/status/${id}`, {
         notification_status: newStatus,
       });
       fetchNotifications();
@@ -204,8 +209,8 @@ const NotificationManager = () => {
               <tr>
                 {[
                   "ID",
-                  "Distributor Notification",
-                  "Customer Notification",
+                  "Category",
+                  "Notification Content",
                   "Date",
                   "Status",
                   "Actions",
@@ -233,28 +238,36 @@ const NotificationManager = () => {
                     </td>
                     <td className="px-4 py-3 border border-[#776D6DA8] text-center">
                       {editingId === notification.notification_id ? (
-                        <input
-                          type="text"
-                          name="distributor_notification"
-                          value={editData.distributor_notification}
+                        <select
+                          name="category"
+                          value={editData.category}
                           onChange={handleEditChange}
                           className="border border-gray-400 p-2 rounded w-full"
-                        />
+                        >
+                          <option value="Customer">Customer</option>
+                          <option value="Distributor">Distributor</option>
+                        </select>
                       ) : (
-                        notification.distributor_notification
+                        <span className={`px-2 py-1 rounded text-white text-sm ${
+                          notification.distributor_notification ? 'bg-blue-500' : 'bg-green-500'
+                        }`}>
+                          {notification.distributor_notification ? 'Distributor' : 'Customer'}
+                        </span>
                       )}
                     </td>
                     <td className="px-4 py-3 border border-[#776D6DA8] text-center">
                       {editingId === notification.notification_id ? (
-                        <input
-                          type="text"
-                          name="customer_notification"
-                          value={editData.customer_notification}
+                        <textarea
+                          name="content"
+                          value={editData.content}
                           onChange={handleEditChange}
                           className="border border-gray-400 p-2 rounded w-full"
+                          rows="2"
                         />
                       ) : (
-                        notification.customer_notification
+                        <div className="max-w-xs truncate">
+                          {notification.distributor_notification || notification.customer_notification}
+                        </div>
                       )}
                     </td>
                     <td className="px-4 py-3 border border-[#776D6DA8] text-center">
@@ -348,21 +361,25 @@ const NotificationManager = () => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
           <div className="p-6 bg-white rounded-lg shadow-lg w-[400px]">
             <h3 className="text-xl font-semibold mb-4">Add Notification</h3>
-            <input
-              type="text"
-              name="distributor_notification"
-              placeholder="Distributor Notification"
-              value={newNotification.distributor_notification}
+            <select
+              name="category"
+              value={newNotification.category}
               onChange={handleNewInputChange}
               className="border border-gray-300 p-2 w-full mb-3"
-            />
-            <input
-              type="text"
-              name="customer_notification"
-              placeholder="Customer Notification"
-              value={newNotification.customer_notification}
+              required
+            >
+              <option value="">Select Category</option>
+              <option value="Customer">Customer</option>
+              <option value="Distributor">Distributor</option>
+            </select>
+            <textarea
+              name="content"
+              placeholder="Notification Content"
+              value={newNotification.content}
               onChange={handleNewInputChange}
               className="border border-gray-300 p-2 w-full mb-3"
+              rows="4"
+              required
             />
             <div className="flex justify-end">
               <button

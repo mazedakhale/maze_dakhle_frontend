@@ -4,6 +4,7 @@ import { FaFileInvoice, FaDownload, FaTimes } from "react-icons/fa"; // Document
 import jwtDecode from "jwt-decode"; // JWT decoder
 import Swal from "sweetalert2"; // Popup notifications
 import { useNavigate } from "react-router-dom";
+import API_BASE_URL from "../config/api";
 
 const PaymentRequest = () => {
  const [documents, setDocuments] = useState([]);
@@ -44,7 +45,7 @@ const PaymentRequest = () => {
    const fetchDocuments = async (distributorId) => {
      try {
        const response = await axios.get(
-         `/api/documents/list/${distributorId}`
+         `${API_BASE_URL}/documents/list/${distributorId}`
        );
  
        // Filter documents and sort by `uploaded_at` in descending order
@@ -66,7 +67,7 @@ const PaymentRequest = () => {
    // Fetch certificates
    const fetchCertificates = async () => {
      try {
-       const response = await axios.get("/api/certificates"); // Adjust URL if needed
+       const response = await axios.get(`${API_BASE_URL}/certificates`); // Adjust URL if needed
        console.log("Certificates API Response:", response.data);
        setCertificates(response.data);
      } catch (error) {
@@ -81,7 +82,7 @@ const PaymentRequest = () => {
        console.log("Fetching payment requests for distributor:", id);
        if (!id) return;
        const response = await axios.get(
-         `/api/payment-requests/distributor/${id}`
+         `${API_BASE_URL}/payment-requests/distributor/${id}`
        );
        const requestsMap = {};
        console.log("Payment Requests API Response:", response.data);
@@ -121,7 +122,7 @@ const PaymentRequest = () => {
 
       // Get the document price
       const priceResponse = await axios.get(
-        `/api/prices/category/${doc.category_id}/subcategory/${doc.subcategory_id}`
+        `${API_BASE_URL}/prices/category/${doc.category_id}/subcategory/${doc.subcategory_id}`
       );
 
       if (!priceResponse.data) {
@@ -147,7 +148,7 @@ const PaymentRequest = () => {
 
       // Create payment request
       const response = await axios.post(
-        "/api/payment-requests",
+        `${API_BASE_URL}/payment-requests`,
         {
           document_id: doc.document_id,
           application_id: doc.application_id,
@@ -200,7 +201,7 @@ const PaymentRequest = () => {
          `Fetching certificate for Certificate ID: ${certificate.certificate_id}`
        );
        const response = await axios.get(
-         `/api/certificates/${certificate.certificate_id}`
+         `${API_BASE_URL}/certificates/${certificate.certificate_id}`
        );
        console.log("View Certificate API Response:", response.data);
  
@@ -258,7 +259,7 @@ const PaymentRequest = () => {
    const handleDownloadCertificate = async (documentId, name) => {
      try {
        const response = await axios.get(
-         `/api/download-certificate/${documentId}`,
+         `${API_BASE_URL}/download-certificate/${documentId}`,
          {
            responseType: "blob", // Important to handle file downloads
          }

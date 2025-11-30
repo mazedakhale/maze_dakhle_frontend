@@ -8,7 +8,7 @@ import {
   FaTimes,
 } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-
+import API_BASE_URL from "../config/api";
 const ElistPage = () => {
   const [distributors, setDistributors] = useState([]);
   const [certificates, setCertificates] = useState([]);
@@ -20,7 +20,7 @@ const ElistPage = () => {
 
   useEffect(() => {
     axios
-      .get("/api/documents/list")
+      .get(`${API_BASE_URL}/documents/list`)
       .then((response) => {
         const sortedDocuments = response.data.documents.sort(
           (a, b) => new Date(b.uploaded_at) - new Date(a.uploaded_at)
@@ -30,18 +30,18 @@ const ElistPage = () => {
       .catch((error) => console.error("Error fetching documents:", error));
 
     axios
-      .get("/api/users/distributors")
+      .get(`${API_BASE_URL}/users/distributors`)
       .then((response) => setDistributors(response.data))
 
       .catch((error) => console.error("Error fetching distributors:", error));
 
     axios
-      .get("/api/certificates")
+      .get("http://localhost:3000/certificates")
       .then((response) => setCertificates(response.data))
       .catch((error) => console.error("Error fetching certificates:", error));
 
     axios
-      .get("/api/users/register")
+      .get("http://localhost:3000/users/register")
       .then((response) => setUsers(response.data))
       .catch((error) => console.error("Error fetching users:", error));
   }, []);
@@ -131,7 +131,7 @@ const ElistPage = () => {
     }
     try {
       const response = await axios.get(
-        `/api/certificates/${certificateId}`
+        `http://localhost:3000/certificates/${certificateId}`
       );
       if (response.data && response.data.file_url) {
         window.open(response.data.file_url, "_blank");
@@ -147,7 +147,7 @@ const ElistPage = () => {
   const handleDownloadCertificate = async (documentId, name) => {
     try {
       const response = await axios.get(
-        `/api/download-certificate/${documentId}`,
+        `http://localhost:3000/download-certificate/${documentId}`,
         {
           responseType: "blob", // Important to handle file downloads
         }

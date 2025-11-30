@@ -3,6 +3,7 @@ import { FaTag, FaEdit, FaTrash, FaPlus, FaTimes } from "react-icons/fa";
 import Swal from "sweetalert2";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import API_BASE_URL from "../config/api";
 
 const ContactTable = () => {
   const [key, setKey] = useState("");
@@ -11,7 +12,7 @@ const ContactTable = () => {
   const [updatedKey, setUpdatedKey] = useState("");
   const [isAdding, setIsAdding] = useState(false);
   const navigate = useNavigate();
-  const apiUrl = "/api/field";
+  const apiUrl = `${API_BASE_URL}/field`;
 
   // Fetch all fields
   useEffect(() => {

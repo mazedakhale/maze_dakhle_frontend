@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import { FaPlus, FaEdit, FaTrash, FaFile, FaLink, FaTimes, FaEye } from 'react-icons/fa';
-
+import API_BASE_URL from '../config/api';
 const AddImpDoc = () => {
   const [documents, setDocuments] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -23,7 +23,7 @@ const AddImpDoc = () => {
 
   const fetchDocuments = async () => {
     try {
-      const response = await axios.get('/api/important-documents');
+      const response = await axios.get(`${API_BASE_URL}/important-documents`);
       setDocuments(response.data);
     } catch (error) {
       console.error('Error fetching documents:', error);
@@ -74,12 +74,12 @@ const AddImpDoc = () => {
       }
 
       if (isEditing && currentDoc) {
-        await axios.put(`/api/important-documents/${currentDoc.id}`, data, {
+        await axios.put(`${API_BASE_URL}/important-documents/${currentDoc.id}`, data, {
           headers: { 'Content-Type': 'multipart/form-data' },
         });
         Swal.fire('Success', 'Document updated successfully!', 'success');
       } else {
-        await axios.post('/api/important-documents', data, {
+        await axios.post(`${API_BASE_URL}/important-documents`, data, {
           headers: { 'Content-Type': 'multipart/form-data' },
         });
         Swal.fire('Success', 'Document added successfully!', 'success');
@@ -120,7 +120,7 @@ const AddImpDoc = () => {
 
     if (result.isConfirmed) {
       try {
-        await axios.delete(`/api/important-documents/${id}`);
+        await axios.delete(`${API_BASE_URL}/important-documents/${id}`);
         Swal.fire('Deleted!', 'Document has been deleted.', 'success');
         fetchDocuments();
       } catch (error) {
@@ -132,7 +132,7 @@ const AddImpDoc = () => {
 
   const toggleActive = async (doc) => {
     try {
-      await axios.put(`/api/important-documents/${doc.id}`, {
+      await axios.put(`${API_BASE_URL}/important-documents/${doc.id}`, {
         is_active: !doc.is_active,
       });
       Swal.fire('Success', `Document ${doc.is_active ? 'deactivated' : 'activated'}!`, 'success');
@@ -170,7 +170,7 @@ const AddImpDoc = () => {
       window.open(url, '_blank');
     } else {
       // Local file path - append to localhost
-      window.open(`/api${url}`, '_blank');
+      window.open(`${API_BASE_URL}${url}`, '_blank');
     }
   };
 

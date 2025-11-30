@@ -3,6 +3,7 @@ import { FaTag, FaEdit, FaTrash, FaPlus, FaTimes } from "react-icons/fa";
 
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import API_BASE_URL from "../config/api";
 
 import Swal from "sweetalert2";
 
@@ -19,7 +20,7 @@ const ErrorRequests = () => {
 
   const fetchErrorRequests = async () => {
     try {
-      const response = await axios.get("/api/request-errors");
+      const response = await axios.get(`${API_BASE_URL}/request-errors`);
       setErrorRequests(response.data);
     } catch (error) {
       console.error("Error fetching error requests:", error);
@@ -28,7 +29,7 @@ const ErrorRequests = () => {
 
   const fetchCertificates = async () => {
     try {
-      const response = await axios.get("/api/certificates");
+      const response = await axios.get(`${API_BASE_URL}/certificates`);
       setCertificates(response.data);
     } catch (error) {
       console.error("Error fetching certificates:", error);
@@ -50,7 +51,7 @@ const ErrorRequests = () => {
     }
     try {
       const response = await axios.get(
-        `/api/certificates/${certificateId}`
+        `${API_BASE_URL}/certificates/${certificateId}`
       );
       if (response.data && response.data.file_url) {
         window.open(response.data.file_url, "_blank");
@@ -106,7 +107,7 @@ const ErrorRequests = () => {
 
     try {
       await axios.patch(
-        `/api/request-errors/update-status/${requestId}`,
+        `${API_BASE_URL}/request-errors/update-status/${requestId}`,
         {
           request_status: newStatus,
           rejectionReason,

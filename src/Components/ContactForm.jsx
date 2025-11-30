@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import API_BASE_URL from "../config/api";
 
 const ContactForm = () => {
   const [fields, setFields] = useState([]); // Stores keys fetched from the Field API
   const [formValues, setFormValues] = useState({}); // Stores key-value pairs for the Contact API
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false); // State to track form submission
-  const fieldApiUrl = "/api/field"; // API to fetch keys
-  const contactApiUrl = "/api/contact"; // API to save key-value pairs
+  const fieldApiUrl = `${API_BASE_URL}/field`; // API to fetch keys
+  const contactApiUrl = `${API_BASE_URL}/contact`; // API to save key-value pairs
 
   // Fetch keys from the Field API
   useEffect(() => {

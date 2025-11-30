@@ -3,7 +3,7 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import { FaTag, FaEdit, FaTrash, FaPlus, FaTimes } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-
+import API_BASE_URL from "../config/api";
 // Set default timeout for all axios requests
 axios.defaults.timeout = 30000; // 30 seconds
 const Employee = () => {
@@ -33,7 +33,7 @@ const Employee = () => {
   const fetchDocuments = async () => {
     setIsLoading(true);
     try {
-      const response = await axios.get("/api/employee");
+      const response = await axios.get(`${API_BASE_URL}/employee`);
       console.log("Fetched employee documents:", response.data);
       setDocuments(response.data);
     } catch (error) {
@@ -50,7 +50,7 @@ const Employee = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await axios.get("/api/categories");
+      const response = await axios.get(`${API_BASE_URL}/categories`);
       setCategories(response.data);
     } catch (error) {
       console.error("Error fetching categories:", error);
@@ -61,7 +61,7 @@ const Employee = () => {
   const fetchEmployees = async () => {
     try {
       // Using the same endpoint as in EmployeeList component
-      const response = await axios.get("/api/users/employee");
+      const response = await axios.get(`${API_BASE_URL}/users/employee`);
       setEmployees(response.data);
     } catch (error) {
       console.error("Error fetching employees:", error);
@@ -92,7 +92,7 @@ const Employee = () => {
     if (selectedCategoryId) {
       try {
         const response = await axios.get(
-          `/api/subcategories/category/${selectedCategoryId}`
+          `${API_BASE_URL}/subcategories/category/${selectedCategoryId}`
         );
         setSubcategories(response.data);
       } catch (error) {
@@ -150,7 +150,7 @@ const Employee = () => {
         didOpen: () => Swal.showLoading(),
       });
 
-      await axios.delete(`/api/employee/${id}`, {
+      await axios.delete(`${API_BASE_URL}/employee/${id}`, {
         data: { code: codeResult.value }
       });
 
@@ -203,7 +203,7 @@ const Employee = () => {
 
     try {
       const response = await axios.get(
-        `/api/subcategories/category/${groupedDoc.category_id}`
+        `${API_BASE_URL}/subcategories/category/${groupedDoc.category_id}`
       );
       setSubcategories(response.data);
     } catch (error) {
@@ -288,10 +288,10 @@ const Employee = () => {
 
       if (editId) {
         // For edit, use the PUT endpoint with the new API format
-        await axios.put(`/api/employee/${editId}`, dataToSend);
+        await axios.put(`${API_BASE_URL}/employee/${editId}`, dataToSend);
       } else {
         // For create, use the POST endpoint with the new API format
-        await axios.post("/api/employee", dataToSend);
+        await axios.post(`${API_BASE_URL}/employee`, dataToSend);
       }
 
       Swal.fire({

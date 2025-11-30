@@ -4,12 +4,14 @@ import { FaFileInvoice, FaDownload, FaTimes } from "react-icons/fa"; // Document
 import jwtDecode from "jwt-decode"; // JWT decoder
 import Swal from "sweetalert2"; // Popup notifications
 import { useNavigate } from "react-router-dom";
+import API_BASE_URL from "../config/api";
 const VerifyDocuments = () => {
   const [documents, setDocuments] = useState([]);
   const [certificates, setCertificates] = useState([]);
   const [distributorId, setDistributorId] = useState(null);
   const navigate = useNavigate();
   const [isAdding, setIsAdding] = useState(false);
+  
 
   // Decode token and extract user ID
   useEffect(() => {
@@ -38,7 +40,7 @@ const VerifyDocuments = () => {
   const fetchDocuments = async (distributorId) => {
     try {
       const response = await axios.get(
-        `/api/documents/list/${distributorId}`
+        `${API_BASE_URL}/documents/list/${distributorId}`
       );
 
       // Filter documents and sort by `uploaded_at` in descending order
@@ -61,7 +63,7 @@ const VerifyDocuments = () => {
   const fetchCertificates = async () => {
     try {
       console.log("Fetching certificates...");
-      const response = await axios.get("/api/certificates"); // Adjust URL if needed
+      const response = await axios.get(`${API_BASE_URL}/certificates`); // Adjust URL if needed
       console.log("Certificates API Response:", response.data);
       setCertificates(response.data);
     } catch (error) {
@@ -90,7 +92,7 @@ const VerifyDocuments = () => {
         `Fetching certificate for Certificate ID: ${certificate.certificate_id}`
       );
       const response = await axios.get(
-        `/api/certificates/${certificate.certificate_id}`
+        `${API_BASE_URL}/certificates/${certificate.certificate_id}`
       );
       console.log("View Certificate API Response:", response.data);
 
@@ -148,7 +150,7 @@ const VerifyDocuments = () => {
   const handleDownloadCertificate = async (documentId, name) => {
     try {
       const response = await axios.get(
-        `/api/download-certificate/${documentId}`,
+        `${API_BASE_URL}/download-certificate/${documentId}`,
         {
           responseType: "blob", // Important to handle file downloads
         }
@@ -184,7 +186,7 @@ const VerifyDocuments = () => {
       });
 
       const response = await axios.get(
-        `/api/download/${documentId}`,
+        `${API_BASE_URL}/download/${documentId}`,
         {
           responseType: "blob",
           timeout: 120000,

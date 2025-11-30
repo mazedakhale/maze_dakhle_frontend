@@ -25,8 +25,8 @@ export default function PaymentStatus() {
     }
 
     const statusUrl = import.meta.env.DEV
-      ? `/api/payment/status?merchantOrderId=${merchantOrderId}`
-      : `/api/payment/status?merchantOrderId=${merchantOrderId}`;
+      ? `http://localhost:3000/payment/status?merchantOrderId=${merchantOrderId}`
+      : `http://localhost:3000/payment/status?merchantOrderId=${merchantOrderId}`;
 
     const interval = setInterval(() => {
       axios
@@ -54,7 +54,7 @@ export default function PaymentStatus() {
             const txId = normalized.paymentDetails[0]?.transactionId;
             if (txId) {
               const cbUrl = import.meta.env.DEV
-                ? `/api/payment/callback`
+                ? `http://localhost:3000/payment/callback`
                 : `/payment/callback`;
 
               axios

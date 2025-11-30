@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { FaFileInvoice, FaDownload, FaTimes } from "react-icons/fa";
 import axios from "axios";
+import API_BASE_URL from "../config/api";
 import jwtDecode from "jwt-decode";
 import Swal from "sweetalert2";
 const DlistPage = () => {
@@ -36,13 +37,13 @@ const DlistPage = () => {
   useEffect(() => {
     if (categoryId) {
       axios
-        .get(`/api/categories/${categoryId}`)
+        .get(`${API_BASE_URL}/categories/${categoryId}`)
         .then((res) => setCategoryName(res.data.category_name))
         .catch((err) => console.error("Error loading category:", err));
     }
     if (subcategoryId) {
       axios
-        .get(`/api/subcategories/${subcategoryId}`)
+        .get(`${API_BASE_URL}/subcategories/${subcategoryId}`)
         .then((res) => setSubcategoryName(res.data.subcategory_name))
         .catch((err) => console.error("Error loading subcategory:", err));
     }
@@ -52,7 +53,7 @@ const DlistPage = () => {
   useEffect(() => {
     if (!categoryId || !subcategoryId || !distributorId) return;
 
-    const url = `/api/documents/${categoryId}/${subcategoryId}?distributorId=${distributorId}`;
+    const url = `${API_BASE_URL}/documents/${categoryId}/${subcategoryId}?distributorId=${distributorId}`;
     axios
       .get(url)
       .then((resp) => {
@@ -64,7 +65,7 @@ const DlistPage = () => {
       .catch((err) => console.error("Error fetching documents:", err));
 
     axios
-      .get("/api/certificates")
+      .get(`${API_BASE_URL}/certificates`)
       .then((resp) => setCertificates(resp.data))
       .catch((err) => console.error("Error fetching certificates:", err));
   }, [categoryId, subcategoryId, distributorId]);
@@ -102,7 +103,7 @@ const DlistPage = () => {
     if (!cert) return Swal.fire("Error", "Certificate not found.", "error");
     try {
       const resp = await axios.get(
-        `/api/certificates/${cert.certificate_id}`
+        `${API_BASE_URL}/certificates/${cert.certificate_id}`
       );
       const link = document.createElement("a");
       link.href = resp.data.file_url;

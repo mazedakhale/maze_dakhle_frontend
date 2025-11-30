@@ -3,6 +3,7 @@ import { FaTag, FaEdit, FaTrash, FaPlus, FaTimes } from "react-icons/fa";
 import Swal from "sweetalert2";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import API_BASE_URL from "../config/api";
 
 const CustomerList = () => {
   const [customers, setCustomers] = useState([]);
@@ -11,7 +12,7 @@ const CustomerList = () => {
   const [isAdding, setIsAdding] = useState(false);
   const [statusLoading, setStatusLoading] = useState({});
   const navigate = useNavigate();
-  const apiUrl = "/api/users/customers";
+  const apiUrl = `${API_BASE_URL}/users/customers`;
   const abortControllerRef = useRef(null);
 
   useEffect(() => {
@@ -35,7 +36,7 @@ const CustomerList = () => {
   const handleUpdateCustomer = async (id) => {
     try {
       if (updatedPassword) {
-        await axios.patch(`/api/users/password/${id}`, {
+        await axios.patch(`${API_BASE_URL}/users/password/${id}`, {
           newPassword: updatedPassword,
         });
       }
@@ -77,7 +78,7 @@ const CustomerList = () => {
         didOpen: () => Swal.showLoading(),
       });
 
-      await axios.delete(`/api/users/${id}`, {
+      await axios.delete(`${API_BASE_URL}/users/${id}`, {
         data: { code: codeResult.value }
       });
 
@@ -140,7 +141,7 @@ const CustomerList = () => {
       );
 
       // Update status in backend
-      await axios.patch(`/api/users/status/${id}`, {
+      await axios.patch(`${API_BASE_URL}/users/status/${id}`, {
         status: newStatus
       });
 
@@ -170,7 +171,7 @@ const CustomerList = () => {
 
   const updateEditRequestStatus = async (id, newStatus) => {
     try {
-      await axios.patch(`/api/users/request-edit/${id}`, {
+      await axios.patch(`${API_BASE_URL}/users/request-edit/${id}`, {
         status: newStatus,
       });
       setCustomers((prev) =>

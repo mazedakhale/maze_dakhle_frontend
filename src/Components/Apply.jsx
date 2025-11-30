@@ -3,6 +3,7 @@ import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import { FaTimes } from "react-icons/fa";
+import API_BASE_URL  from "../config/api";
 
 const Apply = () => {
   const location = useLocation();
@@ -80,7 +81,7 @@ const Apply = () => {
       const fetchRequiredDocuments = async () => {
         try {
           const response = await axios.get(
-            ` /api/required-documents/${formData.category_id}/${formData.subcategory_id}`
+            `${API_BASE_URL}/required-documents/${formData.category_id}/${formData.subcategory_id}`
           );
 
           let documentsArray = [];
@@ -135,7 +136,7 @@ const Apply = () => {
       const fetchFieldNames = async () => {
         try {
           const response = await axios.get(
-            `/api/field-names/${formData.category_id}/${formData.subcategory_id}`
+            `${API_BASE_URL}/field-names/${formData.category_id}/${formData.subcategory_id}`
           );
 
           let fieldsArray = [];
@@ -200,7 +201,7 @@ const Apply = () => {
       if (formData.category_id && formData.subcategory_id) {
         try {
           const response = await axios.get(
-            `/api/prices/category/${formData.category_id}/subcategory/${formData.subcategory_id}`
+            `${API_BASE_URL}/prices/category/${formData.category_id}/subcategory/${formData.subcategory_id}`
           );
           setApplicationFee(response.data.amount || 0);
         } catch (error) {
@@ -213,7 +214,7 @@ const Apply = () => {
     const fetchWalletBalance = async () => {
       if (userData.user_id) {
         try {
-          const response = await axios.get(`/api/wallet`, {
+          const response = await axios.get(`${API_BASE_URL}/wallet`, {
             headers: { Authorization: `Bearer ${token}` },
           });
           setWalletBalance(response.data.balance || 0);
@@ -451,7 +452,7 @@ const Apply = () => {
 
     try {
       const response = await axios.post(
-        "/api/documents/upload",
+        `${API_BASE_URL}/documents/upload`,
         formDataToSend,
         {
           timeout: 60000,

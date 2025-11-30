@@ -3,6 +3,7 @@ import axios from "axios";
 import { FaEdit, FaTrash, FaPlus, FaTimes } from "react-icons/fa";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
+import API_BASE_URL from "../config/api";
 
 const NewsTable = () => {
   const [newsList, setNewsList] = useState([]);
@@ -11,7 +12,7 @@ const NewsTable = () => {
   const [editingItem, setEditingItem] = useState(null);
 
   const navigate = useNavigate();
-  const apiUrl = "/api/news";
+  const apiUrl = `${API_BASE_URL}/news`;
 
   useEffect(() => {
     fetchNews();

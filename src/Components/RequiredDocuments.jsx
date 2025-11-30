@@ -3,7 +3,7 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import { FaEdit, FaTrash, FaPlus, FaSave, FaTimes } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-
+import API_BASE_URL from "../config/api";
 const RequiredDocuments = () => {
   const [documents, setDocuments] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -31,7 +31,7 @@ const RequiredDocuments = () => {
   const fetchDocuments = async () => {
     try {
       const response = await axios.get(
-        "/api/required-documents"
+        `${API_BASE_URL}/required-documents`
       );
       // Add default values for category and subcategory if they are null
       const documentsWithDefaults = response.data.map((doc) => ({
@@ -50,7 +50,7 @@ const RequiredDocuments = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await axios.get("/api/categories");
+      const response = await axios.get(`${API_BASE_URL}/categories`);
       setCategories(response.data);
     } catch (error) {
       console.error("Error fetching categories:", error);
@@ -61,7 +61,7 @@ const RequiredDocuments = () => {
     if (!categoryId) return;
     try {
       const response = await axios.get(
-        `/api/subcategories/category/${categoryId}`
+        `${API_BASE_URL}/subcategories/category/${categoryId}`
       );
       setSubcategories(response.data);
     } catch (error) {
@@ -104,7 +104,7 @@ const RequiredDocuments = () => {
         didOpen: () => Swal.showLoading(),
       });
 
-      await axios.delete(`/api/required-documents/${id}`, {
+      await axios.delete(`${API_BASE_URL}/required-documents/${id}`, {
         data: { code: codeResult.value }
       });
 
@@ -188,8 +188,8 @@ const RequiredDocuments = () => {
       }
 
       const url = editId
-        ? `/api/required-documents/${editId}`
-        : "/api/required-documents";
+        ? `${API_BASE_URL}/required-documents/${editId}`
+        : `${API_BASE_URL}/required-documents`;
 
       const method = editId ? "patch" : "post";
 

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import API_BASE_URL from '../config/api';
 import { Card, CardContent, Grid, Typography } from '@mui/material';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
@@ -22,7 +23,7 @@ const AdminWallet = () => {
   const fetchWalletData = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('/api/wallet', {
+      const response = await axios.get(`${API_BASE_URL}/wallet`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -39,7 +40,7 @@ const AdminWallet = () => {
   const fetchTransactions = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('/api/wallet/transactions', {
+      const response = await axios.get(`${API_BASE_URL}/wallet/transactions`, {
         headers: {
           Authorization: `Bearer ${token}`
         }

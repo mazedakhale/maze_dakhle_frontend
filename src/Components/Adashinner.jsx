@@ -22,6 +22,7 @@ import {
 } from "react-icons/fa";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
+import API_BASE_URL from "../config/api";
 import { Card, CardContent } from "@mui/material";
 
 // Register the chart.js components
@@ -155,12 +156,12 @@ const Adashinner = () => {
       try {
         // Create an array of promises for all API calls
         const promises = [
-          fetch("/api/statistics/counts").then((res) =>
+          fetch(`${API_BASE_URL}/statistics/counts`).then((res) =>
             res.json()
           ),
-          axios.get("/api/categories"),
-          axios.get("/api/subcategories"),
-          axios.get("/api/statistics/cscounts"),
+          axios.get(`${API_BASE_URL}/categories`),
+          axios.get(`${API_BASE_URL}/subcategories`),
+          axios.get(`${API_BASE_URL}/statistics/cscounts`),
         ];
 
         // Wait for all promises to resolve

@@ -3,6 +3,7 @@ import axios from "axios";
 import { FaEdit, FaTrash, FaPlus, FaTimes } from "react-icons/fa";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
+import API_BASE_URL from "../config/api";
 
 const Addsubcategory = () => {
   const [subcategories, setSubcategories] = useState([]);
@@ -18,7 +19,7 @@ const Addsubcategory = () => {
   const navigate = useNavigate();
 
   // Update the API_BASE_URL to match the backend URL
-  const API_BASE_URL = "/api";
+  // Using centralized API configuration
 
   useEffect(() => {
     const loadInitialData = async () => {

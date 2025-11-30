@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import jwtDecode from "jwt-decode";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import API_BASE_URL from "../config/api";
 
 const Login = () => {
   const [mode, setMode] = useState("login");
@@ -12,14 +13,14 @@ const Login = () => {
   const [subcategories, setSubcategories] = useState({});
   const navigate = useNavigate();
   // src/pages/Login.jsx
-  const SMS_URL = "/api/sms/send";
+  const SMS_URL = "http://localhost:3000/sms/send";
   const SMS_SENDER = "918308178738"; // your LiveOne “from” number
 
   // Fetch categories
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await fetch("/api/categories");
+        const response = await fetch(`${API_BASE_URL}/categories`);
         if (!response.ok) throw new Error("Failed to fetch categories");
         setCategories(await response.json());
       } catch (error) {
@@ -36,7 +37,7 @@ const Login = () => {
       try {
         for (const cat of categories) {
           const resp = await fetch(
-            `/api/subcategories/category/${cat.category_id}`
+            `${API_BASE_URL}/subcategories/category/${cat.category_id}`
           );
           result[cat.category_id] = resp.ok ? await resp.json() : [];
         }
@@ -70,7 +71,7 @@ const Login = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const resp = await fetch("/api/users/resend-verification", {
+          const resp = await fetch(`${API_BASE_URL}/users/resend-verification`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email }),
@@ -95,7 +96,7 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const resp = await fetch("/api/users/login", {
+      const resp = await fetch(`${API_BASE_URL}/users/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
@@ -155,7 +156,7 @@ const Login = () => {
   const handleForgot = async (e) => {
     e.preventDefault();
     try {
-      const resp = await fetch("/api/users/forgot-password", {
+      const resp = await fetch(`${API_BASE_URL}/users/forgot-password`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: formData.email }),

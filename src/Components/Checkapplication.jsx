@@ -3,6 +3,7 @@ import axios from "axios";
 import { FaFileAlt, FaTimes } from "react-icons/fa";
 import { useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import API_BASE_URL from "../config/api";
 
 // Function to format date to dd-mm-yyyy hh:mm:ss AM/PM
 const formatDate = (dateStr) => {
@@ -72,7 +73,8 @@ const SearchApplication = () => {
 
       axios
         .get(
-          `/api/userdashboard/fetch/${userId}/${applicationId.trim()}`,
+          `${API_BASE_URL}/userdashboard/fetch/${userId}/${applicationId.trim()}`,
+
           { cancelToken: cancelTokenRef.current.token }
         )
         .then((resp) => {

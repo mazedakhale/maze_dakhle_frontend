@@ -5,6 +5,7 @@ import { FaCheck, FaTimes, FaUserPlus } from "react-icons/fa";
 import logo1 from "../assets/logo.png";
 import getEmbeddableUrl from "../utils/getEmbeddableUrl";
 import jwtDecode from "jwt-decode";
+import API_BASE_URL from "../config/api";
 import { FaUserCircle, FaDownload } from "react-icons/fa";
 import Draggable from "react-draggable";
 import { useRef } from "react";
@@ -51,7 +52,7 @@ const InvoicePage = () => {
 
   useEffect(() => {
     axios
-      .get("/api/users/distributors")
+      .get(`${API_BASE_URL}/users/distributors`)
       .then((response) => setDistributors(response.data))
       .catch((error) => console.error("Error fetching distributors:", error));
   }, []);
@@ -75,7 +76,7 @@ const InvoicePage = () => {
 
     try {
       await axios.put(
-        `/api/documents/update-status/${documentId}`,
+        `${API_BASE_URL}/documents/update-status/${documentId}`,
         {
           status: newStatus,
           rejectionReason:
@@ -116,7 +117,7 @@ const InvoicePage = () => {
 
       // Make the API call to download the ZIP file with increased timeout
       const response = await axios.get(
-        `/api/download/${documentId}`,
+        `${API_BASE_URL}/download/${documentId}`,
         {
           responseType: "blob", // Handle binary data
           timeout: 60000, // Increase timeout to 60 seconds
@@ -255,7 +256,7 @@ const InvoicePage = () => {
     if (!distributorId) return;
     try {
       await axios.put(
-        `/api/documents/assign-distributor/${documentId}`,
+        `${API_BASE_URL}/documents/assign-distributor/${documentId}`,
         {
           distributor_id: distributorId,
         }
@@ -291,7 +292,7 @@ const InvoicePage = () => {
   const fetchCertificates = async () => {
     try {
       console.log("Fetching certificates...");
-      const response = await axios.get("/api/certificates", {
+      const response = await axios.get(`${API_BASE_URL}/certificates`, {
         timeout: 30000,
       });
       console.log("Certificates API Response:", response.data);
@@ -303,7 +304,7 @@ const InvoicePage = () => {
   const fetchDocumentData = useCallback(async () => {
     try {
       const response = await axios.get(
-        `/api/singledocument/documentby/${documentId}`
+        `${API_BASE_URL}/singledocument/documentby/${documentId}`
       );
       const data = response.data.document;
       setDocumentData(data);
@@ -313,7 +314,7 @@ const InvoicePage = () => {
 
       if (category && subcategory) {
         const fieldNamesResponse = await axios.get(
-          `/api/field-names/${category}/${subcategory}`
+          `${API_BASE_URL}/field-names/${category}/${subcategory}`
         );
         setDocumentNames(fieldNamesResponse.data);
       }
@@ -380,7 +381,7 @@ const InvoicePage = () => {
 
       try {
         const { data: updatedDocument } = await axios.post(
-          `/api/documents/reupload/${documentId}`,
+          `${API_BASE_URL}/documents/reupload/${documentId}`,
           formData,
           { headers: { "Content-Type": "multipart/form-data" } }
         );

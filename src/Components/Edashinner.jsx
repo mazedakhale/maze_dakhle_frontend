@@ -11,6 +11,7 @@ import {
   PointElement,
   LineElement,
 } from "chart.js";
+import API_BASE_URL from "../config/api";
 import {
   FaUsers,
   FaStore,
@@ -94,12 +95,12 @@ const Edashinner = () => {
           requiredDocsResponse,
           userAssignmentsResponse,
         ] = await Promise.all([
-          fetch("/api/statistics/counts").then((res) => res.json()),
-          axios.get("/api/categories"),
-          axios.get("/api/subcategories"),
-          axios.get("/api/statistics/cscounts"),
-          axios.get("/api/required-documents"),
-          axios.get(`/api/employee/employeeAsUser/${currentUserId}`),
+          fetch(`${API_BASE_URL}/statistics/counts`).then((res) => res.json()),
+          axios.get(`${API_BASE_URL}/categories`),
+          axios.get(`${API_BASE_URL}/subcategories`),
+          axios.get(`${API_BASE_URL}/statistics/cscounts`),
+          axios.get(`${API_BASE_URL}/required-documents`),
+          axios.get(`${API_BASE_URL}/employee/employeeAsUser/${currentUserId}`),
         ]);
 
         const totalCounts = countsData.totalCounts || DEFAULT_COUNTS;

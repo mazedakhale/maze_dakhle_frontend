@@ -15,21 +15,13 @@ import axios from "axios";
 import InsertChartIcon from "@mui/icons-material/InsertChart";
 import PeopleIcon from "@mui/icons-material/People";
 import VerifiedUserIcon from "@mui/icons-material/VerifiedUser";
+import API_BASE_URL  from '../config/api';
 
 ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
-// Base URL for API calls
-// const BASE_URL = " /api/api";
-const BASE_URL = " /api";
-
 // Configure axios for faster responses
 axios.defaults.timeout = 5000; // 5 second timeout
 const api = axios.create({
-  baseURL: BASE_URL,
-  // headers: {
-  //   "Cache-Control": "no-cache",
-  //   Pragma: "no-cache",
-  //   Expires: "0",
-  // },
+  baseURL: API_BASE_URL,
 });
 
 // Default notification
@@ -159,7 +151,7 @@ const Ddashinner = () => {
     
     if (token) {
       axios
-        .get(`/api/wallet`, {
+        .get(`${API_BASE_URL}/wallet`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -287,10 +279,11 @@ const Ddashinner = () => {
           <marquee
             style={{ color: "#FF0000", fontWeight: "bold", fontSize: "16px" }}
           >
-            {notifications.length > 0
-              ? notifications.map(
-                  (notif, index) => `📢 ${notif.distributor_notification} `
-                )
+            {notifications.filter(notif => notif.distributor_notification && notif.distributor_notification.trim() !== '').length > 0
+              ? notifications
+                  .filter(notif => notif.distributor_notification && notif.distributor_notification.trim() !== '')
+                  .map((notif, index) => `📢 ${notif.distributor_notification} `)
+                  .join('')
               : DEFAULT_NOTIFICATION}
           </marquee>
         </div>

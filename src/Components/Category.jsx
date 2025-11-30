@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { FaFilePdf, FaFileAlt, FaTimes } from "react-icons/fa";
+import API_BASE_URL from "../config/api";
 
 const Categories = () => {
   const navigate = useNavigate();
@@ -9,8 +10,8 @@ const Categories = () => {
   const [subcategories, setSubcategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [isAdding, setIsAdding] = useState(false);
-  const API_BASE_URL = "/api/categories";
-  const SUBCATEGORIES_API_URL = "/api/subcategories";
+  const CATEGORIES_API_URL = `${API_BASE_URL}/categories`;
+  const SUBCATEGORIES_API_URL = `${API_BASE_URL}/subcategories`;
 
   useEffect(() => {
     const fetchCategories = async () => {

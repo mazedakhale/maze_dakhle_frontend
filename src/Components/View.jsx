@@ -3,6 +3,7 @@ import axios from "axios";
 import { useLocation, useParams } from "react-router-dom";
 import logo1 from "../assets/logo.png";
 import { useNavigate } from "react-router-dom";
+import API_BASE_URL from "../config/api";
 import { FaFileInvoice, FaDownload, FaTimes } from "react-icons/fa"; // Document icon
 const ApplicationView = () => {
   const { documentId } = useParams();
@@ -27,7 +28,7 @@ const ApplicationView = () => {
   const fetchDocumentData = useCallback(async () => {
     try {
       const response = await axios.get(
-        `/api/singledocument/documentby/${documentId}`
+        `${API_BASE_URL}/singledocument/documentby/${documentId}`
       );
       const data = response.data.document;
       setDocumentData(data);
@@ -37,7 +38,7 @@ const ApplicationView = () => {
 
       if (category && subcategory) {
         const fieldNamesResponse = await axios.get(
-          `/api/field-names/${category}/${subcategory}`
+          `${API_BASE_URL}/field-names/${category}/${subcategory}`
         );
         setDocumentNames(fieldNamesResponse.data);
       }

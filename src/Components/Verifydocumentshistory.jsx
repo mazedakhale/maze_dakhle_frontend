@@ -31,7 +31,7 @@ const Verifydocumentshistory = () => {
   // Fetch assigned documents from the new API
   useEffect(() => {
     axios
-      .get("/api/documents/list")
+      .get("http://localhost:3000/documents/list")
       .then((response) => {
         const sortedDocuments = response.data.documents.sort(
           (a, b) => new Date(b.uploaded_at) - new Date(a.uploaded_at)
@@ -42,19 +42,19 @@ const Verifydocumentshistory = () => {
 
     // Fetch distributors
     axios
-      .get(`/api/users/distributors`)
+      .get(`http://localhost:3000/users/distributors`)
       .then((response) => setDistributors(response.data))
       .catch((error) => console.error("Error fetching distributors:", error));
 
     // Fetch certificates
     axios
-      .get("/api/certificates")
+      .get("http://localhost:3000/certificates")
       .then((response) => setCertificates(response.data))
       .catch((error) => console.error("Error fetching certificates:", error));
 
     // Fetch users
     axios
-      .get("/api/users/register")
+      .get("http://localhost:3000/users/register")
       .then((response) => setUsers(response.data))
       .catch((error) => console.error("Error fetching users:", error));
   }, []);
@@ -95,7 +95,7 @@ const Verifydocumentshistory = () => {
   const handleUpdateStatus = async (documentId, newStatus) => {
     try {
       await axios.put(
-        `/api/documents/update-status/${documentId}`,
+        `http://localhost:3000/documents/update-status/${documentId}`,
         {
           status: newStatus,
         }
@@ -166,7 +166,7 @@ const Verifydocumentshistory = () => {
     }
     try {
       const response = await axios.get(
-        `/api/certificates/${certificateId}`
+        `http://localhost:3000/certificates/${certificateId}`
       );
       if (response.data && response.data.file_url) {
         return response.data?.file_url
@@ -197,7 +197,7 @@ const Verifydocumentshistory = () => {
         });
   
         const response = await axios.get(
-          `/api/download/${documentId}`,
+          `http://localhost:3000/download/${documentId}`,
           {
             responseType: "blob",
             timeout: 120000,
@@ -327,7 +327,7 @@ const Verifydocumentshistory = () => {
 
       // Make the API call to download the file
       const response = await axios.get(
-        `/api/download-certificate/${documentId}`,
+        `http://localhost:3000/download-certificate/${documentId}`,
         {
           responseType: "blob", // Important to handle file downloads
         }

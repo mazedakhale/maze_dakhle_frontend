@@ -3,10 +3,10 @@ import { useState, useEffect, useCallback } from 'react'
 import axios from 'axios'
 import TransactionTable from './TransactionTable'
 import PaymentButton from './PaymentButton'
-
+import API_BASE_URL from "../config/api";
 export default function Wallet() {
-    const API = import.meta.env.VITE_API_URL || '/api'
-    // const API = import.meta.env.VITE_API_URL || 'https://mazedakhale.in/api'
+    const API = import.meta.env.VITE_API_URL || API_BASE_URL
+    // const API = import.meta.env.VITE_API_URL || 'https://mazedakhale.inhttp://localhost:3000'
 
     const [balance, setBalance] = useState(0)
     const [transactions, setTransactions] = useState([])

@@ -5,6 +5,7 @@ import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
 import { FaTimes } from "react-icons/fa";
 import Swal from "sweetalert2";
+import API_BASE_URL from "../config/api";
 
 export default function AddCertificateRequestPage() {
   const navigate = useNavigate();
@@ -56,7 +57,7 @@ export default function AddCertificateRequestPage() {
 
     try {
       const resp = await axios.post(
-        "/api/request-errors/create",
+        `${API_BASE_URL}/request-errors/create`,
         formData
       );
       if (resp.status === 201 || resp.status === 200) {

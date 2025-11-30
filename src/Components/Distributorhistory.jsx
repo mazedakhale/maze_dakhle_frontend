@@ -4,7 +4,7 @@ import Swal from "sweetalert2";
 import jwtDecode from "jwt-decode";
 import { FaDownload, FaTimes, FaEye } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-
+import API_BASE_URL from "../config/api";
 const ErrorRequests = () => {
   const [errorRequests, setErrorRequests] = useState([]);
   const [certificates, setCertificates] = useState([]);
@@ -38,7 +38,7 @@ const ErrorRequests = () => {
         `Fetching error requests for distributor ID: ${distributorId}`
       );
       const response = await axios.get(
-        ` /api/apirequest-errors/distributor/${distributorId}`
+        `${API_BASE_URL}/request-errors/distributor/${distributorId}`
       );
       console.log("Error Requests API Response:", response.data);
 
@@ -60,7 +60,7 @@ const ErrorRequests = () => {
     try {
       console.log("Fetching certificates...");
       const response = await axios.get(
-        " /api/apicertificates"
+        `${API_BASE_URL}/certificates`
       );
       console.log("Certificates API Response:", response.data);
       setCertificates(response.data);
@@ -91,7 +91,7 @@ const ErrorRequests = () => {
     try {
       console.log(`Fetching certificate for Certificate ID: ${certificateId}`);
       const response = await axios.get(
-        ` /api/apicertificates/${certificateId}`
+        `${API_BASE_URL}/certificates/${certificateId}`
       );
       console.log("View Certificate API Response:", response.data);
 
@@ -131,7 +131,7 @@ const ErrorRequests = () => {
       });
 
       const response = await axios.get(
-        `/api/download/${documentId}`,
+        `${API_BASE_URL}/download/${documentId}`,
         {
           responseType: "blob",
           timeout: 120000,
@@ -252,7 +252,7 @@ const ErrorRequests = () => {
   const handleDownloadCertificate = async (documentId, requestName) => {
     try {
       const response = await axios.get(
-        ` /api/apidownload-certificate/${documentId}`,
+        `${API_BASE_URL}/download-certificate/${documentId}`,
         {
           responseType: "blob", // Important to handle file downloads
         }

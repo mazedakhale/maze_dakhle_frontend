@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
+import  API_BASE_URL  from '../config/api';
 
 const PrivacyPolicy = () => {
   const [fileUrl, setFileUrl] = useState(null);
@@ -11,7 +12,7 @@ const PrivacyPolicy = () => {
       try {
         // Fetch only the "Privacy Policy" type
         const response = await axios.get(
-          "/api/privacy-policy/type/Privacy%20Policy"
+          `${API_BASE_URL}/privacy-policy/type/Privacy%20Policy`
         );
         const data = response.data;
 

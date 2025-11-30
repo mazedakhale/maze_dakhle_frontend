@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
 import { FaEdit, FaTrash, FaPlus, FaTimes } from "react-icons/fa";
+import API_BASE_URL from "../config/api";
 
 const Price = () => {
   const [prices, setPrices] = useState([]);
@@ -30,7 +31,7 @@ const Price = () => {
   // 1) load prices
   const fetchPrices = async () => {
     try {
-      const { data } = await axios.get("/api/prices");
+      const { data } = await axios.get(`${API_BASE_URL}/prices`);
       setPrices(data.map((p) => ({ ...p, amount: Number(p.amount) })));
     } catch {
       Swal.fire("Error", "Could not load prices", "error");
@@ -41,7 +42,7 @@ const Price = () => {
   const fetchCategoriesAndAllSubcats = async () => {
     try {
       const { data: cats } = await axios.get(
-        "/api/categories"
+        `${API_BASE_URL}/categories`
       );
       setCategories(cats);
 
@@ -50,7 +51,7 @@ const Price = () => {
       await Promise.all(
         cats.map(async (cat) => {
           const { data: subs } = await axios.get(
-            `/api/subcategories/category/${cat.category_id}`
+            `${API_BASE_URL}/subcategories/category/${cat.category_id}`
           );
           all.push(...subs);
         })
@@ -69,7 +70,7 @@ const Price = () => {
     }
     try {
       const { data } = await axios.get(
-        `/api/subcategories/category/${categoryId}`
+        `${API_BASE_URL}/subcategories/category/${categoryId}`
       );
       setSubcategories(data);
     } catch {
@@ -129,7 +130,7 @@ const Price = () => {
       });
 
       await axios.delete(
-        `/api/prices/${id}`,
+        `${API_BASE_URL}/prices/${id}`,
         { data: { code: codeResult.value } }
       );
 
@@ -181,10 +182,10 @@ const Price = () => {
         amount: parseFloat(amount),
       };
       if (editId) {
-        await axios.put(`/api/prices/${editId}`, payload);
+        await axios.put(`${API_BASE_URL}/prices/${editId}`, payload);
         Swal.fire("Updated!", "", "success");
       } else {
-        await axios.post("/api/prices", payload);
+        await axios.post(`${API_BASE_URL}/prices`, payload);
         Swal.fire("Added!", "", "success");
       }
       setModalOpen(false);

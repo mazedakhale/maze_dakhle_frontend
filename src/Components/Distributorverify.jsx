@@ -5,6 +5,7 @@ import jwtDecode from "jwt-decode";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 import getEmbeddableUrl from "../utils/getEmbeddableUrl";
+import  API_BASE_URL from '../config/api';
 
 const VerifyDocuments = () => {
   const [documents, setDocuments] = useState([]);
@@ -42,7 +43,7 @@ const VerifyDocuments = () => {
   // Get list of certificates
   const fetchCertificates = async () => {
     try {
-      const response = await axios.get("/api/certificates");
+      const response = await axios.get(`${API_BASE_URL}/certificates`);
       // assume response.data is an array of certificate objects
       setCertificates(response.data);
     } catch (err) {
@@ -79,7 +80,7 @@ const VerifyDocuments = () => {
   const fetchDocuments = async (distributorId) => {
     try {
       const response = await axios.get(
-        `/api/documents/list/${distributorId}`
+        `${API_BASE_URL}/documents/list/${distributorId}`
       );
       const filtered = response.data.documents.filter(
         (doc) => doc.status !== "Sent"
@@ -137,13 +138,13 @@ const VerifyDocuments = () => {
     formData.append("name", doc.name);
 
     try {
-      await axios.post("/api/certificates/upload", formData, {
+      await axios.post(`${API_BASE_URL}/certificates/upload`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       // re-fetch certificates and update document status
       await fetchCertificates();
       await axios.put(
-        `/api/documents/update-status/${documentId}`,
+        `http://localhost:3000/documents/update-status/${documentId}`,
         { status: "Uploaded" }
       );
       setDocuments((p) =>
@@ -169,7 +170,7 @@ const VerifyDocuments = () => {
       return Swal.fire("Error", "Certificate not found", "error");
     try {
       const res = await axios.get(
-        `/api/certificates/${certificateId}`
+        `${API_BASE_URL}/certificates/${certificateId}`
       );
       if (res.data.file_url) window.open(res.data.file_url, "_blank");
       else Swal.fire("Error", "Certificate file not found", "error");

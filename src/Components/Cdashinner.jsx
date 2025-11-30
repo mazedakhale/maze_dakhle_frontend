@@ -28,6 +28,7 @@ import {
   FaTimes,
   FaWallet,
 } from "react-icons/fa";
+import API_BASE_URL from "../config/api";
 
 export default function CustomerDashboard() {
   const navigate = useNavigate();
@@ -77,18 +78,18 @@ export default function CustomerDashboard() {
 
     // 1. Applied / Completed
     axios
-      .get(`/api/userdashboard/total-applied/${userId}`)
+      .get(`${API_BASE_URL}/userdashboard/total-applied/${userId}`)
       .then((res) => setAppliedCount(res.data.totalCount))
       .catch(console.error);
 
     axios
-      .get(`/api/userdashboard/total-completed/${userId}`)
+      .get(`${API_BASE_URL}/userdashboard/total-completed/${userId}`)
       .then((res) => setCompletedCount(res.data.totalCompleted))
       .catch(console.error);
 
     // 2. Wallet balance
     axios
-      .get(`/api/wallet`, { headers: authHeaders })
+      .get(`${API_BASE_URL}/wallet`, { headers: authHeaders })
       .then((res) => {
         const num = parseFloat(res.data.balance);
         setWalletBalance(isNaN(num) ? 0 : num);
@@ -97,7 +98,7 @@ export default function CustomerDashboard() {
 
     // 3. Status distribution
     axios
-      .get(`/api/userdashboard/status-count/${userId}`)
+      .get(`${API_BASE_URL}/userdashboard/status-count/${userId}`)
       .then((res) =>
         setStatusData(
           res.data.map((item) => ({
@@ -110,7 +111,7 @@ export default function CustomerDashboard() {
 
     // 4. Category / Subcategory counts
     axios
-      .get(`/api/userdashboard/category-counts/${userId}`)
+      .get(`${API_BASE_URL}/userdashboard/category-counts/${userId}`)
       .then((res) => {
         const withColors = res.data.categories.map((c, i) => ({
           name: c.category,
@@ -126,7 +127,7 @@ export default function CustomerDashboard() {
 
     // 5. Notifications
     axios
-      .get("/api/notifications/active")
+      .get(`${API_BASE_URL}/notifications/active`)
       .then((res) => setNotifications(res.data))
       .catch(console.error);
 
@@ -139,19 +140,19 @@ export default function CustomerDashboard() {
   // ─── Helper Fetchers ────────────────────────────────
   const fetchCategories = async () => {
     try {
-      const { data } = await axios.get("/api/categories");
+      const { data } = await axios.get(`${API_BASE_URL}/categories`);
       setCategories(data);
     } catch {}
   };
   const fetchSubcategories = async () => {
     try {
-      const { data } = await axios.get("/api/subcategories");
+      const { data } = await axios.get(`${API_BASE_URL}/subcategories`);
       setSubcategories(data);
     } catch {}
   };
   const fetchPrices = async () => {
     try {
-      const { data } = await axios.get("/api/prices");
+      const { data } = await axios.get(`${API_BASE_URL}/prices`);
       setPrices(data.map((p) => ({ ...p, amount: Number(p.amount) })));
     } catch {}
   };
@@ -160,7 +161,7 @@ export default function CustomerDashboard() {
   const openDocsModal = async (catId, subId) => {
     try {
       const { data } = await axios.get(
-        `/api/required-documents/${catId}/${subId}`
+        `${API_BASE_URL}/required-documents/${catId}/${subId}`
       );
       setRequiredDocuments(data);
       const files = {};
@@ -197,15 +198,17 @@ export default function CustomerDashboard() {
     <div className="ml-80 mt-14 p-6 bg-gray-100 min-h-screen">
       {/* Notifications */}
       <div className="mb-6">
-        {notifications.length ? (
-          notifications.map((n, i) => (
-            <marquee
-              key={i}
-              className="text-lg font-semibold text-blue-600 mb-2"
-            >
-              📢 {n.customer_notification}
-            </marquee>
-          ))
+        {notifications.filter(n => n.customer_notification && n.customer_notification.trim() !== '').length ? (
+          notifications
+            .filter(n => n.customer_notification && n.customer_notification.trim() !== '')
+            .map((n, i) => (
+              <marquee
+                key={i}
+                className="text-lg font-semibold text-blue-600 mb-2"
+              >
+                📢 {n.customer_notification}
+              </marquee>
+            ))
         ) : (
           <p className="text-gray-500 text-center">No notifications</p>
         )}

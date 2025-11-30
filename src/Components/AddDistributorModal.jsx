@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Swal from "sweetalert2";
 import axios from "axios";
+import API_BASE_URL  from '../config/api';
 
 const AddDistributorModal = ({ isOpen, onClose, fetchDistributors }) => {
   const [formData, setFormData] = useState({
@@ -87,7 +88,7 @@ const AddDistributorModal = ({ isOpen, onClose, fetchDistributors }) => {
 
     try {
       const response = await axios.post(
-        "/api/users/register",
+        `${API_BASE_URL}/users/register`,
         formDataToSend,
         {
           headers: {

@@ -6,6 +6,7 @@ import logo1 from "../assets/logo.png";
 import { FaUserCircle, FaDownload } from "react-icons/fa";
 import Draggable from "react-draggable";
 import { useRef } from "react";
+import API_BASE_URL from "../config/api";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 
@@ -139,14 +140,14 @@ const InvoicePage = () => {
 
   useEffect(() => {
     axios
-      .get("/api/users/distributors")
+      .get(`${API_BASE_URL}/users/distributors`)
       .then((response) => setDistributors(response.data))
       .catch((error) => console.error("Error fetching distributors:", error));
   }, []);
   const fetchDocumentData = useCallback(async () => {
     try {
       const response = await axios.get(
-        `/api/singledocument/documentby/${documentId}`
+        `${API_BASE_URL}/singledocument/documentby/${documentId}`
       );
       const data = response.data.document;
       setDocumentData(data);
@@ -156,7 +157,7 @@ const InvoicePage = () => {
 
       if (category && subcategory) {
         const fieldNamesResponse = await axios.get(
-          `/api/field-names/${category}/${subcategory}`
+          `${API_BASE_URL}/field-names/${category}/${subcategory}`
         );
         setDocumentNames(fieldNamesResponse.data);
       }
@@ -199,7 +200,7 @@ const InvoicePage = () => {
       console.log("Payload:", payload); // Debug: Log the payload
 
       const response = await axios.put(
-        `/api/documents/update-status/${documentId}`,
+        `http://localhost:3000/documents/update-status/${documentId}`,
         payload,
         {
           timeout: 30000, // Increase timeout to 30 seconds
@@ -242,7 +243,7 @@ const InvoicePage = () => {
 
       // Make the API call to download the ZIP file with increased timeout
       const response = await axios.get(
-        `/api/download/${documentId}`,
+        `${API_BASE_URL}/download/${documentId}`,
         {
           responseType: "blob", // Handle binary data
           timeout: 60000, // Increase timeout to 60 seconds
@@ -409,7 +410,7 @@ const InvoicePage = () => {
       setIsProcessing(true);
 
       const assignResponse = await axios.put(
-        `/api/documents/assign-distributor/${documentId}`,
+        `${API_BASE_URL}/documents/assign-distributor/${documentId}`,
         {
           distributor_id: distributorId,
           remark: distributorRemark,
@@ -418,7 +419,7 @@ const InvoicePage = () => {
       console.log("Assign Distributor Response:", assignResponse.data);
 
       const statusResponse = await axios.put(
-        `/api/documents/update-status/${documentId}`,
+        `http://localhost:3000/documents/update-status/${documentId}`,
         {
           status: "Approved",
         }

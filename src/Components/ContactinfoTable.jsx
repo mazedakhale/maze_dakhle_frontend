@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { FaEdit, FaTrash, FaPlus, FaTimes } from "react-icons/fa";
 import Swal from "sweetalert2";
 import axios from "axios";
-
+import API_BASE_URL from "../config/api";
 const ContactInfoTable = () => {
   const [contactInfos, setContactInfos] = useState([]);
   const [isAdding, setIsAdding] = useState(false);
@@ -17,7 +17,7 @@ const ContactInfoTable = () => {
     email: "",
     address: "",
   });
-  const apiUrl = "/api/contact-info"; // Replace with your actual backend API
+  const apiUrl = `${API_BASE_URL}/contact-info`;
 
   useEffect(() => {
     fetchContactInfo();
@@ -92,6 +92,9 @@ const ContactInfoTable = () => {
   };
 
   const handleUpdate = async (id) => {
+    console.log('📤 Updating contact info ID:', id);
+    console.log('📦 Update payload:', updatedContact);
+    
     try {
       const response = await axios.put(`${apiUrl}/${id}`, updatedContact);
       console.log('✅ Contact info updated successfully:', response.data);

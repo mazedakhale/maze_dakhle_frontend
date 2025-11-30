@@ -9,7 +9,7 @@ import {
 import jwtDecode from "jwt-decode";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
-
+import API_BASE_URL from "../config/api";
 const CustomerHistory = () => {
   const [documents, setDocuments] = useState([]);
   const [certificates, setCertificates] = useState([]);
@@ -33,7 +33,7 @@ const CustomerHistory = () => {
   useEffect(() => {
     if (userId) {
       axios
-        .get(` /api/documents/list`)
+        .get(` ${API_BASE_URL}/documents/list`)
         .then((response) => {
           const allDocuments = response.data.documents;
           // Filter documents where status is "Completed"
@@ -47,7 +47,7 @@ const CustomerHistory = () => {
         .catch((error) => console.error("Error fetching documents:", error));
 
       axios
-        .get(" /api/certificates")
+        .get(` ${API_BASE_URL}/certificates`)
         .then((response) => setCertificates(response.data))
         .catch((error) => console.error("Error fetching certificates:", error));
     }
@@ -93,7 +93,7 @@ const CustomerHistory = () => {
 
     try {
       const response = await axios.get(
-        ` /api/certificates/${certificateId}`
+        ` ${API_BASE_URL}/certificates/${certificateId}`
       );
 
       if (response.data && response.data.file_url) {
@@ -110,7 +110,7 @@ const CustomerHistory = () => {
   const handleDownloadCertificate = async (documentId, name) => {
     try {
       const response = await axios.get(
-        ` /api/download-certificate/${documentId}`,
+        ` ${API_BASE_URL}/download-certificate/${documentId}`,
         {
           responseType: "blob", // Important to handle file downloads
         }
@@ -146,7 +146,7 @@ const CustomerHistory = () => {
       });
 
       const response = await axios.get(
-        `/api/download/${documentId}`,
+        `${API_BASE_URL}/download/${documentId}`,
         {
           responseType: "blob",
           timeout: 120000,

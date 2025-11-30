@@ -8,6 +8,7 @@ import {
   FaTimes,
 } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import API_BASE_URL from "../config/api";
 
 const ErrorRequests = () => {
   const [errorRequests, setErrorRequests] = useState([]);
@@ -24,7 +25,7 @@ const ErrorRequests = () => {
   // Fetch error requests (only completed ones)
   const fetchErrorRequests = async () => {
     try {
-      const response = await axios.get("/api/request-errors");
+      const response = await axios.get(`${API_BASE_URL}/request-errors`);
 
       // ✅ Filter requests to include only those with status "Completed"
       const completedRequests = response.data.filter(
@@ -40,7 +41,7 @@ const ErrorRequests = () => {
   // Fetch certificates
   const fetchCertificates = async () => {
     try {
-      const response = await axios.get("/api/certificates");
+      const response = await axios.get(`${API_BASE_URL}/certificates`);
       setCertificates(response.data);
     } catch (error) {
       console.error("Error fetching certificates:", error);
@@ -64,7 +65,7 @@ const ErrorRequests = () => {
     }
     try {
       const response = await axios.get(
-        `/api/certificates/${certificateId}`
+        `${API_BASE_URL}/certificates/${certificateId}`
       );
       if (response.data && response.data.file_url) {
         window.open(response.data.file_url, "_blank");
@@ -81,7 +82,7 @@ const ErrorRequests = () => {
   const handleDownloadCertificate = async (documentId, requestName) => {
     try {
       const response = await axios.get(
-        `/api/download-certificate/${documentId}`,
+        `${API_BASE_URL}/download-certificate/${documentId}`,
         {
           responseType: "blob", // Important to handle file downloads
         }

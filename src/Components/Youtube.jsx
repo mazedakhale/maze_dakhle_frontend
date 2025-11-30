@@ -3,6 +3,7 @@ import axios from "axios";
 import { FaEdit, FaTrash, FaPlus, FaTimes } from "react-icons/fa";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
+import API_BASE_URL from "../config/api";
 
 const Youtube = () => {
   const [images, setImages] = useState([]);
@@ -19,7 +20,7 @@ const Youtube = () => {
   });
 
   const navigate = useNavigate();
-  const apiUrl = "/api/images";
+  const apiUrl = `${API_BASE_URL}/images`;
 
   // Fetch all images
   const fetchImages = async () => {

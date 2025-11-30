@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { FaTag, FaEdit, FaTrash, FaPlus, FaTimes } from "react-icons/fa";
 import Swal from "sweetalert2";
 import axios from "axios";
+import API_BASE_URL from "../config/api";
 import { useNavigate } from "react-router-dom";
 
 const AddCategory = () => {
@@ -12,7 +13,7 @@ const AddCategory = () => {
   const [isAdding, setIsAdding] = useState(false);
   const navigate = useNavigate();
 
-  const apiUrl = "/api/categories";
+  const apiUrl = `${API_BASE_URL}/categories`;
 
   useEffect(() => {
     fetchCategories();

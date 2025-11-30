@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import Swal from "sweetalert2";
+import API_BASE_URL from "../config/api";
 import {
   isValidEmail,
   isValidPhone,
@@ -10,7 +11,7 @@ import {
 } from "../utils/formValidators";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import "../index.css";
-const SMS_URL = "/api/sms/send";
+const SMS_URL = `${API_BASE_URL}/sms/send`;
 const SMS_SENDER = "918308178738"; // your LiveOne-registered “from” number
 
 const Register = () => {
@@ -419,7 +420,7 @@ const Register = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch("/api/categories")
+    fetch(`${API_BASE_URL}/categories`)
       .then((res) => res.json())
       .then(setCategories)
       .catch(console.error);
@@ -430,7 +431,7 @@ const Register = () => {
       const data = {};
       for (const category of categories) {
         const res = await fetch(
-          `/api/subcategories/category/${category.category_id}`
+          `${API_BASE_URL}/subcategories/category/${category.category_id}`
         );
         data[category.category_id] = res.ok ? await res.json() : [];
       }
@@ -596,7 +597,7 @@ const Register = () => {
       }
 
       const res = await fetch(
-        "/api/users/register",
+        `${API_BASE_URL}/users/register`,
         {
           method: "POST",
           body: payload,

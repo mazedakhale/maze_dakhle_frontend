@@ -3,6 +3,7 @@ import { FaEdit, FaTrash, FaPlus, FaTimes } from "react-icons/fa";
 import Swal from "sweetalert2";
 import axios from "axios";
 import { validateRegistration } from "../utils/formValidators";
+import API_BASE_URL from "../config/api";
 import { useNavigate } from "react-router-dom";
 const EmployeeList = () => {
   const [employees, setEmployees] = useState([]);
@@ -21,7 +22,7 @@ const EmployeeList = () => {
   });
 
   const navigate = useNavigate();
-  const apiUrl = "/api/users";
+  const apiUrl = `${API_BASE_URL}/users`;
 
   useEffect(() => {
     fetchEmployees();

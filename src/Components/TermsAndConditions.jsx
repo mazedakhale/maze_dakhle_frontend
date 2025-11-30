@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
+import API_BASE_URL  from '../config/api';
 
 const TermsAndConditions = () => {
   const [fileUrl, setFileUrl] = useState(null);
@@ -9,7 +10,7 @@ const TermsAndConditions = () => {
     const fetchTnC = async () => {
       try {
         const response = await axios.get(
-          "/api/privacy-policy/type/" +
+          `${API_BASE_URL}/privacy-policy/type/` +
             encodeURIComponent("Terms and Conditions")
         );
         const data = response.data;

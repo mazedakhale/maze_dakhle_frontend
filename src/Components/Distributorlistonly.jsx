@@ -3,7 +3,7 @@ import { FaTag, FaEdit, FaTrash, FaPlus, FaTimes } from "react-icons/fa";
 import Swal from "sweetalert2";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-
+import API_BASE_URL from "../config/api";
 // Set default timeout for all axios requests
 axios.defaults.timeout = 30000; // 30 seconds
 // Import form validators
@@ -43,7 +43,7 @@ const UserTable = () => {
   });
   const navigate = useNavigate();
 
-  const apiUrl = "/api/users/distributors";
+  const apiUrl = `${API_BASE_URL}/users/distributors`;
 
   useEffect(() => {
     fetchDistributors();
@@ -66,7 +66,7 @@ const UserTable = () => {
   const checkEmailExists = async (email) => {
     try {
       const response = await axios.get(
-        `/api/users/check-email/${email}`,
+        `${API_BASE_URL}/users/check-email/${email}`,
         { timeout: 30000 }
       );
       return response.data.exists;
@@ -296,7 +296,7 @@ const UserTable = () => {
 
     try {
       const response = await axios.post(
-        "/api/users/register",
+        `${API_BASE_URL}/users/register`,
         formDataToSend,
         {
           headers: {
@@ -347,7 +347,7 @@ const UserTable = () => {
     try {
       if (updatedPassword) {
         await axios.patch(
-          `/api/users/password/${id}`,
+          `${API_BASE_URL}/users/password/${id}`,
           { newPassword: updatedPassword },
           { timeout: 30000 }
         );
@@ -401,7 +401,7 @@ const UserTable = () => {
         didOpen: () => Swal.showLoading(),
       });
 
-      await axios.delete(`/api/users/${id}`, {
+      await axios.delete(`${API_BASE_URL}/users/${id}`, {
         data: { code: codeResult.value }
       });
 
@@ -456,7 +456,7 @@ const UserTable = () => {
       );
 
       await axios.patch(
-        `/api/users/status/${id}`,
+        `${API_BASE_URL}/users/status/${id}`,
         { status: newStatus },
         { timeout: 30000 }
       );
@@ -479,7 +479,7 @@ const UserTable = () => {
   };
   const updateEditRequestStatus = async (id, newStatus) => {
     try {
-      await axios.patch(`/api/users/request-edit/${id}`, {
+      await axios.patch(`${API_BASE_URL}/users/request-edit/${id}`, {
         status: newStatus,
       });
       setDistributors((prev) =>

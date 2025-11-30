@@ -4,14 +4,15 @@ import { FaTag, FaEdit, FaTrash, FaPlus, FaTimes } from "react-icons/fa";
 import axios from "axios";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
+import API_BASE_URL from "../config/api";
 
 const Contact = () => {
   const [contacts, setContacts] = useState([]);
   const [fieldKeys, setFieldKeys] = useState([]);
   const [isAdding, setIsAdding] = useState(false); // fields from Field API
   const navigate = useNavigate();
-  const contactApiUrl = "/api/contact";
-  const fieldApiUrl = "/api/field";
+  const contactApiUrl = `${API_BASE_URL}/contact`;
+  const fieldApiUrl = `${API_BASE_URL}/field`;
 
   useEffect(() => {
     fetchData();

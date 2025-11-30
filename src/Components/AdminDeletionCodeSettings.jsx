@@ -5,7 +5,7 @@ import Swal from 'sweetalert2';
 const AdminDeletionCodeSettings = () => {
   const [currentCode, setCurrentCode] = useState('');
   const [loading, setLoading] = useState(false);
-  const BASE_URL = import.meta.env.VITE_API_URL || '/api';
+  const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
   // Fetch current deletion code (masked)
   useEffect(() => {

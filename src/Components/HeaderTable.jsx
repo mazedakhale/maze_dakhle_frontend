@@ -3,6 +3,7 @@ import axios from "axios";
 import { FaEdit, FaTrash, FaPlus, FaTimes } from "react-icons/fa";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
+import API_BASE_URL from "../config/api";
 const HeaderTable = () => {
   const [headerList, setHeaderList] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -10,7 +11,7 @@ const HeaderTable = () => {
   const [editingItem, setEditingItem] = useState(null);
 
   const navigate = useNavigate();
-  const apiUrl = "/api/header";
+  const apiUrl = `${API_BASE_URL}/header`;
 
   useEffect(() => {
     fetchHeaders();

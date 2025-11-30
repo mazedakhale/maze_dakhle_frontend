@@ -3,6 +3,7 @@ import axios from 'axios';
 import Swal from 'sweetalert2';
 import { FaFile, FaLink, FaEye, FaDownload, FaTimes } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
+import API_BASE_URL from "../config/api";
 
 const ViewImpDoc = () => {
   const [documents, setDocuments] = useState([]);
@@ -32,7 +33,7 @@ const ViewImpDoc = () => {
 
   const fetchDocuments = async () => {
     try {
-      const response = await axios.get('/api/important-documents/active');
+      const response = await axios.get('http://localhost:3000/important-documents/active');
       setDocuments(response.data);
       setFilteredDocs(response.data);
     } catch (error) {
@@ -48,7 +49,7 @@ const ViewImpDoc = () => {
       window.open(url, '_blank');
     } else {
       // Local file path - append to localhost
-      window.open(`/api${url}`, '_blank');
+      window.open(`${API_BASE_URL}${url}`, '_blank');
     }
   };
 
@@ -61,7 +62,7 @@ const ViewImpDoc = () => {
         Swal.fire('Info', 'Opening Google Drive file. You can download it from there.', 'info');
       } else {
         // Local file - download via axios
-        const response = await axios.get(`/api${url}`, {
+        const response = await axios.get(`${API_BASE_URL}${url}`, {
           responseType: 'blob',
         });
         

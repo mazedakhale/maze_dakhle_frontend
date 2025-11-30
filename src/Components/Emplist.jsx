@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { FaRegFileAlt, FaFileInvoice } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import API_BASE_URL from "../config/api";
 const Emplist = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
@@ -24,7 +25,7 @@ const Emplist = () => {
   useEffect(() => {
     // Fetch documents without a distributor assigned
     axios
-      .get("/api/documents/list")
+      .get(`${API_BASE_URL}/documents/list`)
       .then((response) => {
         const sortedDocuments = response.data.documents.sort(
           (a, b) => new Date(b.uploaded_at) - new Date(a.uploaded_at)
@@ -35,14 +36,14 @@ const Emplist = () => {
 
     // Fetch users
     axios
-      .get("/api/users/register")
+      .get(`${API_BASE_URL}/users/register`)
       .then((response) => setUsers(response.data))
       .catch((error) => console.error("Error fetching users:", error));
 
     // Fetch employee assignments if userId is available
     if (userId) {
       axios
-        .get("/api/employee")
+        .get(`${API_BASE_URL}/employee`)
         .then((response) => {
           console.log("Employee assignments:", response.data);
           setEmployeeAssignments(response.data);

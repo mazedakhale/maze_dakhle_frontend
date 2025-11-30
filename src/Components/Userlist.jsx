@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import API_BASE_URL from '../config/api';
 
 const UserTable = () => {
   const [users, setUsers] = useState([]);
@@ -12,7 +13,7 @@ const UserTable = () => {
     const fetchUsers = async () => {
       try {
         const response = await axios.get(
-          "/api/users/register"
+          `${API_BASE_URL}/users/register`
         );
         const distributors = response.data.filter(
           (user) => user.role === "Customer"

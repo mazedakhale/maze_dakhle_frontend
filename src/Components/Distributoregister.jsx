@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import API_BASE_URL from '../config/api';
 import "../index.css"; // Ensure Tailwind & CSS are imported
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -77,7 +78,7 @@ const Register = () => {
     };
 
     try {
-      const response = await fetch("/api/users/register", {
+      const response = await fetch(`${API_BASE_URL}/users/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(userData),

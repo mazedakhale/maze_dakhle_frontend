@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-
+import API_BASE_URL from '../config/api';
 const TransactionHistory = () => {
   const [analytics, setAnalytics] = useState({
     totalCustomers: 0,
@@ -14,8 +14,9 @@ const TransactionHistory = () => {
   const [activeTab, setActiveTab] = useState('analytics');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-
-  const API_BASE = '/api';
+  const API_BASE = API_BASE_URL;
+  
+  // const API_BASE = API_BASE_URL;
 
   useEffect(() => {
     fetchAnalytics();

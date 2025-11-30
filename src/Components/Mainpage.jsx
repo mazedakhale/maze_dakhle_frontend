@@ -47,7 +47,7 @@ const Header = () => {
   const [contactInfo, setContactInfo] = useState(null);
   useEffect(() => {
     axios
-      .get("/api/contact-info")
+      .get("http://localhost:3000/contact-info")
       .then((res) => setContactInfo(res.data[0] || {}))
       .catch(() => setContactInfo(null));
   }, []);
@@ -105,7 +105,7 @@ const PurpleBanner = () => {
   const [description, setDescription] = useState("");
   useEffect(() => {
     axios
-      .get("/api/header")
+      .get("http://localhost:3000/header")
       .then((res) =>
         setDescription(
           res.data[0]?.description || "Welcome to our website! 📞 0998766534"
@@ -134,7 +134,7 @@ const Footer = () => {
   const [contactInfo, setContactInfo] = useState(null);
   useEffect(() => {
     axios
-      .get("/api/contact-info")
+      .get("http://localhost:3000/contact-info")
       .then((res) => setContactInfo(res.data[0] || {}))
       .catch(() => setContactInfo(null));
   }, []);
@@ -220,12 +220,12 @@ const Mainpage = () => {
 
   useEffect(() => {
     axios
-      .get("/api/document-types")
+      .get("http://localhost:3000/document-types")
       .then((res) => setDocumentTypes(res.data))
       .catch(() => setError("Failed to load documents"));
 
     axios
-      .get("/api/news")
+      .get("http://localhost:3000/news")
       .then((res) => setNewsList(res.data))
       .catch(() => setError("Failed to load news"))
       .finally(() => setLoading(false));

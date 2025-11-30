@@ -10,6 +10,7 @@ import {
 } from "react-icons/fa";
 import jwtDecode from "jwt-decode";
 import { useNavigate } from "react-router-dom";
+import API_BASE_URL from "../config/api";
 import Swal from "sweetalert2";
 
 const CustomerApply = () => {
@@ -46,7 +47,7 @@ const CustomerApply = () => {
       "Sent"
     ];
     axios
-      .get("/api/documents/list")
+      .get(`${API_BASE_URL}/documents/list`)
       .then((response) => {
         const allDocs = response.data.documents;
         const filtered = allDocs
@@ -60,7 +61,7 @@ const CustomerApply = () => {
       .catch((err) => console.error("Error fetching documents:", err));
 
     axios
-      .get("/api/certificates")
+      .get(`${API_BASE_URL}/certificates`)
       .then((res) => setCertificates(res.data))
       .catch((err) => console.error("Error fetching certificates:", err));
   }, [userId]);
@@ -128,7 +129,7 @@ const CustomerApply = () => {
     }
     try {
       const { data } = await axios.get(
-        `/api/certificates/${cert.certificate_id}`
+        `${API_BASE_URL}/certificates/${cert.certificate_id}`
       );
       if (data.file_url) window.open(data.file_url, "_blank");
       else throw new Error("No file URL");

@@ -7,6 +7,7 @@ import { FaUserCircle, FaDownload, FaTimes, FaFileAlt } from "react-icons/fa";
 import Draggable from "react-draggable";
 import Swal from "sweetalert2";
 import logo1 from "../assets/logo.png";
+import API_BASE_URL from "../config/api";
 
 const InvoicePage = () => {
   const { documentId } = useParams();
@@ -95,12 +96,12 @@ const InvoicePage = () => {
 
     try {
       await axios.post(
-        `/api/documents/upload-receipt/${documentId}`,
+        `${API_BASE_URL}/documents/upload-receipt/${documentId}`,
         form,
         { headers: { "Content-Type": "multipart/form-data" }, timeout: 30000 }
       );
       await axios.put(
-        `/api/documents/update-status/${documentId}`,
+        `http://localhost:3000/documents/update-status/${documentId}`,
         { status: "Sent" },
         { timeout: 30000 }
       );
@@ -160,14 +161,14 @@ const InvoicePage = () => {
 
     try {
       // 1️⃣ Upload the cert file
-      await axios.post("/api/certificates/upload", form, {
+      await axios.post(`${API_BASE_URL}/certificates/upload`, form, {
         headers: { "Content-Type": "multipart/form-data" },
         timeout: 30000,
       });
 
       // 2️⃣ THEN update the document status
       await axios.put(
-        `/api/documents/update-status/${documentId}`,
+        `http://localhost:3000/documents/update-status/${documentId}`,
         { status: "Uploaded" },
         { timeout: 30000 }
       );
@@ -204,7 +205,7 @@ const InvoicePage = () => {
 
     try {
       const response = await axios.get(
-        `/api/download/all/${documentId}`,
+        `${API_BASE_URL}/download/all/${documentId}`,
         {
           responseType: "blob",
           timeout: 120000,
@@ -286,7 +287,7 @@ const InvoicePage = () => {
           .map((doc) => documentNames[doc.document_type] || doc.document_type),
       };
       await axios.put(
-        `/api/documents/update-status/${documentId}`,
+        `http://localhost:3000/documents/update-status/${documentId}`,
         payload,
         { timeout: 30000 }
       );
@@ -310,7 +311,7 @@ const InvoicePage = () => {
   // --- Fetchers & effects ---
   const fetchCertificates = useCallback(async () => {
     try {
-      const res = await axios.get("/api/certificates", {
+      const res = await axios.get(`${API_BASE_URL}/certificates`, {
         timeout: 30000,
       });
       setCertificates(res.data);
@@ -322,7 +323,7 @@ const InvoicePage = () => {
   const fetchDocumentData = useCallback(async () => {
     try {
       const res = await axios.get(
-        `/api/singledocument/documentby/${documentId}`
+        `${API_BASE_URL}/singledocument/documentby/${documentId}`
       );
       const doc = res.data.document;
       setDocumentData(doc);
@@ -331,7 +332,7 @@ const InvoicePage = () => {
       const sub = stateSubcategoryId || doc.subcategory_id;
       if (cat && sub) {
         const fn = await axios.get(
-          `/api/field-names/${cat}/${sub}`
+          `${API_BASE_URL}/field-names/${cat}/${sub}`
         );
         setDocumentNames(fn.data);
       }
@@ -349,7 +350,7 @@ const InvoicePage = () => {
       } catch {}
     }
     axios
-      .get("/api/users/distributors")
+      .get(`${API_BASE_URL}/users/distributors`)
       .then((r) => setDistributors(r.data))
       .catch(console.error);
 

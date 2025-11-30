@@ -8,6 +8,7 @@ import {
   FaTimes,
 } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import API_BASE_URL from "../config/api";
 
 const AssignedDistributorsList = () => {
   const [distributors, setDistributors] = useState([]);
@@ -21,7 +22,7 @@ const AssignedDistributorsList = () => {
 
   useEffect(() => {
     axios
-      .get(`/api/documents/assigned-list`)
+      .get(`${API_BASE_URL}/documents/assigned-list`)
       .then((response) => {
         console.log("API Response:", response.data); // Log full response
         const sortedDocuments = response.data.documents.sort(
@@ -35,19 +36,19 @@ const AssignedDistributorsList = () => {
 
     // Fetch distributors
     axios
-      .get(`/api/users/distributors`)
+      .get(`${API_BASE_URL}/users/distributors`)
       .then((response) => setDistributors(response.data))
       .catch((error) => console.error("Error fetching distributors:", error));
 
     // Fetch certificates
     axios
-      .get("/api/certificates")
+      .get(`${API_BASE_URL}/certificates`)
       .then((response) => setCertificates(response.data))
       .catch((error) => console.error("Error fetching certificates:", error));
 
     // Fetch users
     axios
-      .get("/api/users/register")
+      .get(`${API_BASE_URL}/users/register`)
       .then((response) => setUsers(response.data))
       .catch((error) => console.error("Error fetching users:", error));
   }, []);
@@ -64,7 +65,7 @@ const AssignedDistributorsList = () => {
   const handleUpdateStatus = async (documentId, newStatus) => {
     try {
       await axios.put(
-        `/api/documents/update-status/${documentId}`,
+        `${API_BASE_URL}/documents/update-status/${documentId}`,
         {
           status: newStatus,
           status_updated_at: new Date().toISOString(), // Add timestamp
@@ -141,7 +142,7 @@ const AssignedDistributorsList = () => {
     }
     try {
       const response = await axios.get(
-        `/api/certificates/${certificateId}`
+        `${API_BASE_URL}/certificates/${certificateId}`
       );
       if (response.data && response.data.file_url) {
         window.open(response.data.file_url, "_blank");
@@ -165,7 +166,7 @@ const AssignedDistributorsList = () => {
 
       // Make the API call to download the file
       const response = await axios.get(
-        `/api/download-certificate/${documentId}`,
+        `${API_BASE_URL}/download-certificate/${documentId}`,
         {
           responseType: "blob", // Important to handle file downloads
         }

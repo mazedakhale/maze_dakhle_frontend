@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
+import API_BASE_URL from '../config/api';
 const DistributorEdit = () => {
   const { user_id } = useParams(); // Get user ID from URL
   const navigate = useNavigate(); // For navigation
@@ -14,7 +15,7 @@ const DistributorEdit = () => {
 
   useEffect(() => {
     axios
-      .get(`/api/users/edit/${user_id}`)
+      .get(`${API_BASE_URL}/users/edit/${user_id}`)
       .then((response) => {
         setFormData(response.data);
       })
@@ -30,7 +31,7 @@ const DistributorEdit = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     axios
-      .put(`/api/users/edit/${user_id}`, formData)
+      .put(`${API_BASE_URL}/users/edit/${user_id}`, formData)
       .then(() => {
         alert("Distributor updated successfully!");
         navigate("/distributor-list"); // Redirect after update
