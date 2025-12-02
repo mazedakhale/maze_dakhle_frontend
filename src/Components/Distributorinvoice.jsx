@@ -101,7 +101,7 @@ const InvoicePage = () => {
         { headers: { "Content-Type": "multipart/form-data" }, timeout: 30000 }
       );
       await axios.put(
-        `http://localhost:3000/documents/update-status/${documentId}`,
+        `${API_BASE_URL}/documents/update-status/${documentId}`,
         { status: "Sent" },
         { timeout: 30000 }
       );
@@ -168,7 +168,7 @@ const InvoicePage = () => {
 
       // 2️⃣ THEN update the document status
       await axios.put(
-        `http://localhost:3000/documents/update-status/${documentId}`,
+        `${API_BASE_URL}/documents/update-status/${documentId}`,
         { status: "Uploaded" },
         { timeout: 30000 }
       );
@@ -287,7 +287,7 @@ const InvoicePage = () => {
           .map((doc) => documentNames[doc.document_type] || doc.document_type),
       };
       await axios.put(
-        `http://localhost:3000/documents/update-status/${documentId}`,
+        `${API_BASE_URL}/documents/update-status/${documentId}`,
         payload,
         { timeout: 30000 }
       );

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import  API_BASE_URL  from "../config/api";
 import {
   FaRegFileAlt,
   FaDownload,
@@ -23,7 +24,7 @@ const Rejecteddocuments = () => {
   useEffect(() => {
     // Fetch assigned documents from the new API
     axios
-      .get(`http://localhost:3000/documents/list`)
+      .get(`${API_BASE_URL}/documents/list`)
       .then((response) => {
         const sortedDocuments = response.data.documents.sort(
           (a, b) => new Date(b.uploaded_at) - new Date(a.uploaded_at)
@@ -36,19 +37,19 @@ const Rejecteddocuments = () => {
 
     // Fetch distributors
     axios
-      .get(`http://localhost:3000/users/distributors`)
+      .get(`${API_BASE_URL}/users/distributors`)
       .then((response) => setDistributors(response.data))
       .catch((error) => console.error("Error fetching distributors:", error));
 
     // Fetch certificates
     axios
-      .get("http://localhost:3000/certificates")
+      .get(`${API_BASE_URL}/certificates`)
       .then((response) => setCertificates(response.data))
       .catch((error) => console.error("Error fetching certificates:", error));
 
     // Fetch users
     axios
-      .get("http://localhost:3000/users/register")
+      .get(`${API_BASE_URL}/users/register`)
       .then((response) => setUsers(response.data))
       .catch((error) => console.error("Error fetching users:", error));
   }, []);
@@ -65,7 +66,7 @@ const Rejecteddocuments = () => {
   const handleUpdateStatus = async (documentId, newStatus) => {
     try {
       await axios.put(
-        `http://localhost:3000/documents/update-status/${documentId}`,
+        `${API_BASE_URL}/documents/update-status/${documentId}`,
         {
           status: newStatus,
         }
@@ -133,7 +134,7 @@ const Rejecteddocuments = () => {
     }
     try {
       const response = await axios.get(
-        `http://localhost:3000/certificates/${certificateId}`
+        `${API_BASE_URL}/certificates/${certificateId}`
       );
       if (response.data && response.data.file_url) {
         window.open(response.data.file_url, "_blank");
@@ -157,7 +158,7 @@ const Rejecteddocuments = () => {
 
       // Make the API call to download the file
       const response = await axios.get(
-        `http://localhost:3000/download-certificate/${documentId}`,
+        `${API_BASE_URL}/download-certificate/${documentId}`,
         {
           responseType: "blob", // Important to handle file downloads
         }
@@ -208,7 +209,7 @@ const Rejecteddocuments = () => {
           formData.append("documentType", documentType);
 
           const response = await axios.post(
-            `http://localhost:3000/documents/reupload/${documentId}`,
+            `${API_BASE_URL}/documents/reupload/${documentId}`,
             formData,
             {
               headers: {

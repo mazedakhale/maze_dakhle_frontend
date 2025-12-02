@@ -3,10 +3,11 @@ import axios from "axios";
 import StarIcon from "@mui/icons-material/Star";
 import jwtDecode from "jwt-decode";
 import Swal from "sweetalert2";
+import API_BASE_URL from "../config/api";
 import { useNavigate } from "react-router-dom";
 import { FaTag, FaEdit, FaTrash, FaPlus, FaTimes } from "react-icons/fa";
 
-const API_BASE = "http://localhost:3000/feedback";
+const API_BASE = `${API_BASE_URL}/feedback`;
 
 const FeedbackList = () => {
   const [feedbackList, setFeedbackList] = useState([]);

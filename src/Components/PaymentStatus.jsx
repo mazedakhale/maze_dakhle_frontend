@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
+import API_BASE_URL from "../config/api";
 
 export default function PaymentStatus() {
   const { search } = useLocation();
@@ -24,9 +25,7 @@ export default function PaymentStatus() {
       return;
     }
 
-    const statusUrl = import.meta.env.DEV
-      ? `http://localhost:3000/payment/status?merchantOrderId=${merchantOrderId}`
-      : `http://localhost:3000/payment/status?merchantOrderId=${merchantOrderId}`;
+    const statusUrl = `${API_BASE_URL}/payment/status?merchantOrderId=${merchantOrderId}`;
 
     const interval = setInterval(() => {
       axios
@@ -54,7 +53,7 @@ export default function PaymentStatus() {
             const txId = normalized.paymentDetails[0]?.transactionId;
             if (txId) {
               const cbUrl = import.meta.env.DEV
-                ? `http://localhost:3000/payment/callback`
+                ? `${API_BASE_URL}/payment/callback`
                 : `/payment/callback`;
 
               axios

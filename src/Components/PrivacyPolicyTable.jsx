@@ -4,6 +4,7 @@ import axios from "axios";
 import { FaEdit, FaTrash, FaPlus, FaTimes } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
+import API_BASE_URL from "../config/api";
 
 const PrivacyPolicyTable = () => {
   const [policies, setPolicies] = useState([]);
@@ -15,7 +16,7 @@ const PrivacyPolicyTable = () => {
     policyType: "",
   });
 
-  const apiUrl = "http://localhost:3000/privacy-policy";
+  const apiUrl = `${API_BASE_URL}/privacy-policy`;
   const navigate = useNavigate();
 
   useEffect(() => {

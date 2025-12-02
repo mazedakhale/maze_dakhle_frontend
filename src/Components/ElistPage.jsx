@@ -36,12 +36,12 @@ const ElistPage = () => {
       .catch((error) => console.error("Error fetching distributors:", error));
 
     axios
-      .get("http://localhost:3000/certificates")
+      .get(`${API_BASE_URL}/certificates`)
       .then((response) => setCertificates(response.data))
       .catch((error) => console.error("Error fetching certificates:", error));
 
     axios
-      .get("http://localhost:3000/users/register")
+      .get(`${API_BASE_URL}/users/register`)
       .then((response) => setUsers(response.data))
       .catch((error) => console.error("Error fetching users:", error));
   }, []);
@@ -131,7 +131,7 @@ const ElistPage = () => {
     }
     try {
       const response = await axios.get(
-        `http://localhost:3000/certificates/${certificateId}`
+        `${API_BASE_URL}/certificates/${certificateId}`
       );
       if (response.data && response.data.file_url) {
         window.open(response.data.file_url, "_blank");
@@ -147,7 +147,7 @@ const ElistPage = () => {
   const handleDownloadCertificate = async (documentId, name) => {
     try {
       const response = await axios.get(
-        `http://localhost:3000/download-certificate/${documentId}`,
+        `${API_BASE_URL}/download-certificate/${documentId}`,
         {
           responseType: "blob", // Important to handle file downloads
         }

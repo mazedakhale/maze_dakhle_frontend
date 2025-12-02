@@ -50,7 +50,7 @@ const DistributorPaymentRequest = () => {
 
     if (result.isConfirmed) {
       try {
-        await axios.put(`http://localhost:3000/payment-requests/${requestId}/status`, {
+        await axios.put(`${API_BASE_URL}/payment-requests/${requestId}/status`, {
           status: 'Approved',
         });
         Swal.fire('Approved!', 'Payment has been processed successfully.', 'success');
@@ -87,7 +87,7 @@ const DistributorPaymentRequest = () => {
 
     if (reason) {
       try {
-        await axios.put(`http://localhost:3000/payment-requests/${requestId}/status`, {
+        await axios.put(`${API_BASE_URL}/payment-requests/${requestId}/status`, {
           status: 'Rejected',
           rejection_reason: reason,
         });

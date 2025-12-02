@@ -200,7 +200,7 @@ const InvoicePage = () => {
       console.log("Payload:", payload); // Debug: Log the payload
 
       const response = await axios.put(
-        `http://localhost:3000/documents/update-status/${documentId}`,
+        `${API_BASE_URL}/documents/update-status/${documentId}`,
         payload,
         {
           timeout: 30000, // Increase timeout to 30 seconds
@@ -419,7 +419,7 @@ const InvoicePage = () => {
       console.log("Assign Distributor Response:", assignResponse.data);
 
       const statusResponse = await axios.put(
-        `http://localhost:3000/documents/update-status/${documentId}`,
+        `${API_BASE_URL}/documents/update-status/${documentId}`,
         {
           status: "Approved",
         }

@@ -104,7 +104,7 @@ const Distributorrejected = () => {
 
       // Make the API call to update the status with a longer timeout
       const response = await axios.put(
-        `http://localhost:3000/documents/update-status/${documentId}`,
+        `${API_BASE_URL}/documents/update-status/${documentId}`,
         { status: newStatus },
         { timeout: 30000 } // Set timeout to 30 seconds
       );

@@ -33,7 +33,7 @@ const ViewImpDoc = () => {
 
   const fetchDocuments = async () => {
     try {
-      const response = await axios.get('http://localhost:3000/important-documents/active');
+      const response = await axios.get(`${API_BASE_URL}/important-documents/active`);
       setDocuments(response.data);
       setFilteredDocs(response.data);
     } catch (error) {

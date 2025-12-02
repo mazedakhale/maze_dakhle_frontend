@@ -13,7 +13,7 @@ const Login = () => {
   const [subcategories, setSubcategories] = useState({});
   const navigate = useNavigate();
   // src/pages/Login.jsx
-  const SMS_URL = "http://localhost:3000/sms/send";
+  const SMS_URL = `${API_BASE_URL}/sms/send`;
   const SMS_SENDER = "918308178738"; // your LiveOne “from” number
 
   // Fetch categories

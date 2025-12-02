@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import API_BASE_URL  from "../config/api";
 import {
   FaFileAlt,
   FaDownload,
@@ -28,7 +29,7 @@ const CompletedApplicationsList = () => {
     const fetchCompletedDocuments = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:3000/userdashboard/completed/${userId}`
+          `${API_BASE_URL}/userdashboard/completed/${userId}`
         );
         const sortedDocs = response.data.sort(
           (a, b) => new Date(b.uploaded_at) - new Date(a.uploaded_at)
@@ -41,7 +42,7 @@ const CompletedApplicationsList = () => {
 
     const fetchCertificates = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/certificates");
+        const response = await axios.get(`${API_BASE_URL}/certificates`);
         setCertificates(response.data);
       } catch (error) {
         console.error("Error fetching certificates:", error);
@@ -78,7 +79,7 @@ const CompletedApplicationsList = () => {
 
     try {
       const response = await axios.get(
-        `http://localhost:3000/certificates/${certificateId}`
+        `${API_BASE_URL}/certificates/${certificateId}`
       );
 
       if (response.data && response.data.file_url) {

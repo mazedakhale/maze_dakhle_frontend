@@ -5,6 +5,7 @@ import axios from "axios";
 import jwtDecode from "jwt-decode";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
+import API_BASE_URL from "../config/api";
 
 const ReceiptErrorRequests = () => {
   const [errorRequests, setErrorRequests] = useState([]);
@@ -35,7 +36,7 @@ const ReceiptErrorRequests = () => {
 
   const fetchErrorRequests = async () => {
     try {
-      const { data } = await axios.get("http://localhost:3000/request-errors");
+      const { data } = await axios.get(`${API_BASE_URL}/request-errors`);
       setErrorRequests(data);
     } catch (err) {
       console.error("Error fetching error requests:", err);
@@ -44,7 +45,7 @@ const ReceiptErrorRequests = () => {
 
   const fetchUsers = async () => {
     try {
-      const { data } = await axios.get("http://localhost:3000/users/register");
+      const { data } = await axios.get(`${API_BASE_URL}/users/register`);
       setUsers(data);
     } catch (err) {
       console.error("Error fetching users:", err);
@@ -54,7 +55,7 @@ const ReceiptErrorRequests = () => {
   const fetchDistributors = async () => {
     try {
       const { data } = await axios.get(
-        "http://localhost:3000/users/distributors"
+        `${API_BASE_URL}/users/distributors`
       );
       setDistributors(data);
     } catch (err) {
@@ -81,7 +82,7 @@ const ReceiptErrorRequests = () => {
   const handleDownloadReceipt = async (applicationId) => {
     try {
       const { data } = await axios.get(
-        `http://localhost:3000//documents/receipt/${applicationId}`
+        `${API_BASE_URL}/documents/receipt/${applicationId}`
       );
       const url = data.receipt_url;
       const appId = data.application_id;
@@ -110,7 +111,7 @@ const ReceiptErrorRequests = () => {
   const handleDownloadCertificate = async (applicationId) => {
     try {
       const { data } = await axios.get(
-        `http://localhost:3000/certificates/certificate/${applicationId}`
+        `${API_BASE_URL}/certificates/certificate/${applicationId}`
       );
       const url = data.certificate_url;
       const appId = data.application_id;
@@ -163,7 +164,7 @@ const ReceiptErrorRequests = () => {
 
     try {
       await axios.patch(
-        `http://localhost:3000/request-errors/update-status/${requestId}`,
+        `${API_BASE_URL}/request-errors/update-status/${requestId}`,
         { request_status: newStatus, rejectionReason }
       );
     } catch (err) {

@@ -15,6 +15,7 @@ import {
 } from "react-icons/fa";
 import { BsStopCircle } from "react-icons/bs";
 import Logo from "../assets/logo.png";
+import API_BASE_URL from "../config/api";
 const navLabels = [
   "Home",
   "Login",
@@ -174,7 +175,7 @@ const News = () => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:3000/news")
+      .get(`${API_BASE_URL}/news`)
       .then((res) => setNewsList(res.data))
       .catch((err) => {
         console.error(err);

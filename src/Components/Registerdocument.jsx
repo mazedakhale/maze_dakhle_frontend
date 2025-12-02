@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Swal from "sweetalert2";
+import API_BASE_URL from "../config/api";
 
 const RegisterDocument = () => {
   const { id, role } = useParams(); // Get user ID and role from URL params
@@ -65,7 +66,7 @@ const RegisterDocument = () => {
     });
 
     try {
-      const response = await fetch(`http://localhost:3000/users/update/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/users/update/${id}`, {
         method: "PUT",
         body: formDataObj,
       });

@@ -144,7 +144,7 @@ const VerifyDocuments = () => {
       // re-fetch certificates and update document status
       await fetchCertificates();
       await axios.put(
-        `http://localhost:3000/documents/update-status/${documentId}`,
+        `${API_BASE_URL}/documents/update-status/${documentId}`,
         { status: "Uploaded" }
       );
       setDocuments((p) =>

@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import Swal from 'sweetalert2';
+import API_BASE_URL  from '../config/api';
 
 const AdminDeletionCodeSettings = () => {
   const [currentCode, setCurrentCode] = useState('');
   const [loading, setLoading] = useState(false);
-  const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
   // Fetch current deletion code (masked)
   useEffect(() => {
@@ -14,7 +14,7 @@ const AdminDeletionCodeSettings = () => {
 
   const fetchCurrentCode = async () => {
     try {
-      const response = await axios.get(`${BASE_URL}/admin-settings/deletion-code`);
+      const response = await axios.get(`${API_BASE_URL}/admin-settings/deletion-code`);
       setCurrentCode(response.data.code);
     } catch (error) {
       console.error('Failed to fetch current code:', error);
@@ -45,7 +45,7 @@ const AdminDeletionCodeSettings = () => {
     // Step 2: Request OTP
     setLoading(true);
     try {
-      await axios.post(`${BASE_URL}/admin-settings/request-code-change`, { email });
+      await axios.post(`${API_BASE_URL}/admin-settings/request-code-change`, { email });
       
       Swal.fire({
         icon: 'success',
@@ -102,7 +102,7 @@ const AdminDeletionCodeSettings = () => {
       }
 
       // Step 5: Verify OTP and update code
-      const response = await axios.post(`${BASE_URL}/admin-settings/verify-code-change`, {
+      const response = await axios.post(`${API_BASE_URL}/admin-settings/verify-code-change`, {
         email,
         otp,
         newDeletionCode: newCode,

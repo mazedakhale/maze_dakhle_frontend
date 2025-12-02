@@ -7,6 +7,7 @@ import {
   FaExclamationTriangle,
   FaTimes,
 } from "react-icons/fa";
+import API_BASE_URL from "../config/api";
 import { useNavigate } from "react-router-dom";
 import StarIcon from "@mui/icons-material/Star";
 import jwtDecode from "jwt-decode"; // To decode token
@@ -49,7 +50,7 @@ const Feedback = () => {
     }
 
     try {
-      await axios.post("http://localhost:3000/feedback", {
+      await axios.post(`${API_BASE_URL}/feedback`, {
         comment,
         rating,
         user_id: storedUser.user_id, // ✅ Extract user_id correctly

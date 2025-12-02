@@ -20,6 +20,7 @@ import {
   FaLinkedinIn,
   FaTwitter,
 } from "react-icons/fa";
+import API_BASE_URL from "../config/api";
 import { BsStopCircle } from "react-icons/bs";
 import Logo from "../assets/logo.png";
 import MainBanner from "../assets/mainp.jpg";
@@ -47,7 +48,7 @@ const Header = () => {
   const [contactInfo, setContactInfo] = useState(null);
   useEffect(() => {
     axios
-      .get("http://localhost:3000/contact-info")
+      .get(`${API_BASE_URL}/contact-info`)
       .then((res) => setContactInfo(res.data[0] || {}))
       .catch(() => setContactInfo(null));
   }, []);
@@ -105,7 +106,7 @@ const PurpleBanner = () => {
   const [description, setDescription] = useState("");
   useEffect(() => {
     axios
-      .get("http://localhost:3000/header")
+      .get(`${API_BASE_URL}/header`)
       .then((res) =>
         setDescription(
           res.data[0]?.description || "Welcome to our website! 📞 0998766534"
@@ -134,7 +135,7 @@ const Footer = () => {
   const [contactInfo, setContactInfo] = useState(null);
   useEffect(() => {
     axios
-      .get("http://localhost:3000/contact-info")
+      .get(`${API_BASE_URL}/contact-info`)
       .then((res) => setContactInfo(res.data[0] || {}))
       .catch(() => setContactInfo(null));
   }, []);
@@ -220,12 +221,12 @@ const Mainpage = () => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:3000/document-types")
+      .get(`${API_BASE_URL}/document-types`)
       .then((res) => setDocumentTypes(res.data))
       .catch(() => setError("Failed to load documents"));
 
     axios
-      .get("http://localhost:3000/news")
+      .get(`${API_BASE_URL}/news`)
       .then((res) => setNewsList(res.data))
       .catch(() => setError("Failed to load news"))
       .finally(() => setLoading(false));

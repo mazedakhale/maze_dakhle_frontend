@@ -9,6 +9,8 @@ import {
   FaCheck,
   FaTimes,
 } from "react-icons/fa";
+import API_BASE_URL from "../config/api";
+
 const EmployeeDocumentList = () => {
   const [documents, setDocuments] = useState([]);
   const [loading, setLoading] = useState(false); // Start with loading false
@@ -94,7 +96,7 @@ const EmployeeDocumentList = () => {
       if (userRole === "Admin" || userRole === "Employee") {
         // Use the API endpoint
         const response = await axios.get(
-          `http://localhost:3000/documents/category-docs/${categoryId}/${subcategoryId}/${userId}`
+          `${API_BASE_URL}/documents/category-docs/${categoryId}/${subcategoryId}/${userId}`
         );
 
         if (response.data.error) {
@@ -233,7 +235,7 @@ const EmployeeDocumentList = () => {
   const handleViewCertificate = async (documentId) => {
     try {
       const response = await axios.get(
-        `http://localhost:3000/certificates/by-document/${documentId}`
+        `${API_BASE_URL}/certificates/by-document/${documentId}`
       );
       if (response.data && response.data.file_url) {
         window.open(response.data.file_url, "_blank");

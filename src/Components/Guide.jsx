@@ -8,8 +8,9 @@ import {
   FaExclamationTriangle,
   FaTimes,
 } from "react-icons/fa";
+import API_BASE_URL from "../config/api";
 
-const GUIDE_API_URL = "http://localhost:3000/images";
+const GUIDE_API_URL = `${API_BASE_URL}/images`;
 
 export default function Guide() {
   const [images, setImages] = useState([]);

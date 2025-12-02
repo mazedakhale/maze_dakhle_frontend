@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import API_BASE_URL  from "../config/api";
 import {
   FaFileAlt,
   FaFileInvoice,
@@ -38,7 +39,7 @@ const Userpendinglist = () => {
     const allowedStatuses = ["Pending"];
 
     axios
-      .get("http://localhost:3000/documents/list")
+      .get(`${API_BASE_URL}/documents/list`)
       .then((response) => {
         const allDocuments = response.data.documents;
         const filteredDocs = allDocuments
@@ -53,7 +54,7 @@ const Userpendinglist = () => {
 
     // Fetch certificates
     axios
-      .get("http://localhost:3000/certificates")
+      .get(`${API_BASE_URL}/certificates`)
       .then((response) => setCertificates(response.data))
       .catch((error) => console.error("Error fetching certificates:", error));
   }, [userId]);
@@ -86,7 +87,7 @@ const Userpendinglist = () => {
           formData.append("documentType", documentType);
 
           const response = await axios.post(
-            ` http://localhost:3000/documents/reupload/${documentId}`,
+            `${API_BASE_URL}/documents/reupload/${documentId}`,
             formData,
             {
               headers: {
@@ -155,7 +156,7 @@ const Userpendinglist = () => {
 
     try {
       const response = await axios.get(
-        ` http://localhost:3000/certificates/${certificate.certificate_id}`
+        `${API_BASE_URL}/certificates/${certificate.certificate_id}`
       );
       if (response.data && response.data.file_url) {
         newTab.location.href = response.data.file_url;

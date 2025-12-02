@@ -17,12 +17,12 @@ import {
   FaUserShield,
 } from "react-icons/fa";
 import { BsStopCircle } from "react-icons/bs";
-
+import API_BASE_URL from "../config/api";
 import Logo from "../assets/logo.png";
 
-const API_CATEGORIES = "http://localhost:3000/categories";
-const API_SUBCATEGORIES = "http://localhost:3000/subcategories";
-const API_PRICES = "http://localhost:3000/prices";
+const API_CATEGORIES = `${API_BASE_URL}/categories`;
+const API_SUBCATEGORIES = `${API_BASE_URL}/subcategories`;
+const API_PRICES = `${API_BASE_URL}/prices`;
 
 // Footer links
 const navLabels = [

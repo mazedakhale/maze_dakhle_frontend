@@ -1,4 +1,5 @@
 import axios from "axios";
+import  API_BASE_URL  from "../config/api";
 import React, { useEffect, useState } from "react";
 import { FaRegFileAlt, FaDownload, FaCheck, FaTimes } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
@@ -21,12 +22,12 @@ const RecentApplications = () => {
 
   useEffect(() => {
     // Fetch all data in parallel
-    const docsReq = axios.get("http://localhost:3000/documents/recent", {
+    const docsReq = axios.get(`${API_BASE_URL}/documents/recent`, {
       timeout: 120000,
     });
-    const distReq = axios.get("http://localhost:3000/users/distributors");
-    const certReq = axios.get("http://localhost:3000/certificates");
-    const usersReq = axios.get("http://localhost:3000/users/register");
+    const distReq = axios.get(`${API_BASE_URL}/users/distributors`);
+    const certReq = axios.get(`${API_BASE_URL}/certificates`);
+    const usersReq = axios.get(`${API_BASE_URL}/users/register`);
 
     Promise.all([docsReq, distReq, certReq, usersReq])
       .then(([docsResp, distResp, certResp, usersResp]) => {
@@ -76,7 +77,7 @@ const RecentApplications = () => {
     });
     try {
       await axios.put(
-        `http://localhost:3000/documents/update-status/${documentId}`,
+        `${API_BASE_URL}/documents/update-status/${documentId}`,
         { status: newStatus },
         { timeout: 30000 }
       );
@@ -102,7 +103,7 @@ const RecentApplications = () => {
     if (reason) {
       try {
         await axios.put(
-          `http://localhost:3000/documents/update-status/${documentId}`,
+          `${API_BASE_URL}/documents/update-status/${documentId}`,
           { status: "Rejected", rejectionReason: reason }
         );
         setApplications((apps) =>
@@ -367,7 +368,7 @@ const RecentApplications = () => {
                               doc.document_id
                             );
                             window.open(
-                              `http://localhost:3000/certificates/${certId}`,
+                              `${API_BASE_URL}/certificates/${certId}`,
                               "_blank"
                             );
                           }}

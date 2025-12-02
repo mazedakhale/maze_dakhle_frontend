@@ -9,8 +9,9 @@ import {
   isValidPhone,
   isValidPassword,
 } from "../utils/formValidators"; // Import your validators
+import API_BASE_URL from "../config/api";
 
-const USER_API_BASE = "http://localhost:3000/users";
+const USER_API_BASE = `${API_BASE_URL}/users`;
 const PASSWORD_API = `${USER_API_BASE}/password`;
 export default function ProfilePage() {
   const [user, setUser] = useState(null);

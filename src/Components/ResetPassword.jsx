@@ -4,8 +4,8 @@ import { useNavigate, useLocation, Link } from "react-router-dom";
 import Swal from "sweetalert2";
 import jwtDecode from "jwt-decode";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-const SMS_URL = "http://localhost:3000/sms/send";
-const SMS_SENDER = "918308178738"; // your LiveOne-registered “from” number
+import  API_BASE_URL  from "../config/api";
+const SMS_SENDER = "918308178738"; // your LiveOne-registered "from" number
 
 const ResetPassword = () => {
   const navigate = useNavigate();
@@ -32,7 +32,7 @@ const ResetPassword = () => {
 
     try {
       // 1️⃣ Call reset-password endpoint
-      const resp = await fetch("http://localhost:3000/users/reset-password", {
+      const resp = await fetch(`${API_BASE_URL}/users/reset-password`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -62,7 +62,7 @@ const ResetPassword = () => {
 
       // 5️⃣ Fire-and-forget the SMS
       if (phoneE164) {
-        fetch(SMS_URL, {
+        fetch(`${API_BASE_URL}/sms/send`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({

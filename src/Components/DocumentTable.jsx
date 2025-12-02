@@ -3,6 +3,8 @@ import axios from "axios";
 import { FaEdit, FaTrash, FaPlus, FaTimes } from "react-icons/fa";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
+import API_BASE_URL from "../config/api";
+
 const DocumentTable = () => {
   const [documents, setDocuments] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -21,7 +23,7 @@ const DocumentTable = () => {
 
   const fetchDocuments = async () => {
     try {
-      const { data } = await axios.get("http://localhost:3000/document-types");
+      const { data } = await axios.get(`${API_BASE_URL}/document-types`);
       setDocuments(data);
     } catch (error) {
       console.error("Error fetching documents:", error);
@@ -36,11 +38,11 @@ const DocumentTable = () => {
     try {
       if (editingDoc) {
         await axios.put(
-          `http://localhost:3000/document-types/${editingDoc.doc_type_id}`,
+          `${API_BASE_URL}/document-types/${editingDoc.doc_type_id}`,
           formData
         );
       } else {
-        await axios.post("http://localhost:3000/document-types/", formData);
+        await axios.post(`${API_BASE_URL}/document-types/`, formData);
       }
       setIsModalOpen(false);
       setEditingDoc(null);
@@ -65,7 +67,7 @@ const DocumentTable = () => {
     });
     if (res.isConfirmed) {
       try {
-        await axios.delete(`http://localhost:3000/document-types/${id}`);
+        await axios.delete(`${API_BASE_URL}/document-types/${id}`);
         fetchDocuments();
         Swal.fire("Deleted!", "Document has been deleted.", "success");
       } catch {
