@@ -16,7 +16,7 @@ const Categories = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await axios.get(API_BASE_URL);
+        const response = await axios.get(CATEGORIES_API_URL);
         setCategories(response.data);
       } catch (error) {
         console.error("Error fetching categories:", error);
@@ -87,6 +87,7 @@ const Categories = () => {
 
         <div className="grid grid-cols-3 gap-4 w-full max-w-7xl mx-auto mt-4">
           {/* ✅ Categories Section */}
+          {console.log(categories)}
           {!selectedCategory ? (
             categories.map((category) => (
               <div

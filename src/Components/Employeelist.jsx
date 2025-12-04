@@ -275,11 +275,14 @@ const EmployeeList = () => {
                   <td className="border px-4 py-2">{emp.address}</td>
                   <td className="border px-4 py-2 text-center">
                     {emp.profile_picture ? (
-                      <img
-                        src={emp.profile_picture}
-                        alt="Profile"
-                        className="w-10 h-10 rounded-full object-cover mx-auto"
-                      />
+                      <a
+                        href={emp.profile_picture}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:underline"
+                      >
+                        View
+                      </a>
                     ) : (
                       "-"
                     )}

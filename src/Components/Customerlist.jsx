@@ -221,7 +221,7 @@ const CustomerList = () => {
                 "Profile Photo",
                 "Status",
                 "Edit Request",
-                "Update",
+                // "Update",
                 "Actions",
               ].map((h, i) => (
                 <th key={i} className="px-3 py-2 border text-black">
@@ -268,11 +268,14 @@ const CustomerList = () => {
                 </td>
                 <td className="px-4 py-3 border border-[#776D6DA8] text-center">
                   {customer.profile_picture ? (
-                    <img
-                      src={customer.profile_picture}
-                      alt="Profile"
-                      className="h-10 w-10 rounded-full object-cover mx-auto"
-                    />
+                    <a
+                        href={customer.profile_picture}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:underline"
+                      >
+                        View
+                      </a>
                   ) : (
                     <span className="text-gray-400 italic">No Image</span>
                   )}
@@ -334,7 +337,7 @@ const CustomerList = () => {
                     </button>
                   </div>
                 </td>
-                <td className="text-center border">
+                {/* <td className="text-center border">
                   {editingId === customer.user_id ? (
                     <button
                       onClick={() => handleUpdateCustomer(customer.user_id)}
@@ -352,7 +355,7 @@ const CustomerList = () => {
                       <FaEdit />
                     </button>
                   )}
-                </td>
+                </td> */}
                 <td className="text-center border">
                   <button
                     onClick={() => handleDeleteCustomer(customer.user_id)}

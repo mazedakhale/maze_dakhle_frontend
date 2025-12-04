@@ -129,6 +129,12 @@ const Edashinner = () => {
         const userCategories = [];
 
         userAssignments.forEach((assignment) => {
+          // Add null checks for assignment.category
+          if (!assignment.category || !assignment.category.category_id) {
+            // console.warn("Assignment missing category data:", assignment);
+            return; // Skip this assignment
+          }
+
           let categoryEntry = userCategories.find(
             (cat) => cat.category_id === assignment.category.category_id
           );
@@ -140,7 +146,8 @@ const Edashinner = () => {
             };
             userCategories.push(categoryEntry);
           }
-          if (assignment.subcategory && !categoryEntry.assignedSubcategories.includes(assignment.subcategory.subcategory_id)) {
+          if (assignment.subcategory && assignment.subcategory.subcategory_id && 
+              !categoryEntry.assignedSubcategories.includes(assignment.subcategory.subcategory_id)) {
             categoryEntry.assignedSubcategories.push(assignment.subcategory.subcategory_id);
           }
         });

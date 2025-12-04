@@ -442,13 +442,32 @@ const Apply = () => {
       formDataToSend.append(key, value);
     });
 
-    // Append files and matching document types
-    Object.entries(formData.files).forEach(([docName, file]) => {
-      if (file) {
-        formDataToSend.append("files", file);
-        formDataToSend.append("document_types", docName);
+    // Append files and matching document types in correct order
+    const filesArray = [];
+    const documentTypesArray = [];
+    
+    // Ensure consistent order by iterating through documentNames
+    documentNames.forEach((docName) => {
+      if (formData.files[docName]) {
+        filesArray.push(formData.files[docName]);
+        documentTypesArray.push(docName);
       }
     });
+    
+    // Append all files
+    filesArray.forEach(file => {
+      formDataToSend.append("files", file);
+    });
+    
+    // Append document types as individual entries (backend expects array)
+    documentTypesArray.forEach(docType => {
+      formDataToSend.append("document_types", docType);
+    });
+
+    // Debug logging
+    console.log("📤 Files being sent:", filesArray.length);
+    console.log("📤 Document types:", documentTypesArray);
+    console.log("📤 Files and types match:", filesArray.length === documentTypesArray.length);
 
     try {
       const response = await axios.post(

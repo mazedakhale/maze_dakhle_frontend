@@ -196,11 +196,14 @@ const Youtube = () => {
                   >
                     <td className="px-4 py-2 text-center border">{img.id}</td>
                     <td className="px-4 py-2 text-center border">
-                      <img
-                        src={img.imageUrl}
-                        alt="preview"
-                        className="max-w-[100px] max-h-[100px] mx-auto"
-                      />
+                      <a
+                        href={img.imageUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:underline"
+                      >
+                        View
+                      </a>
                     </td>
                     <td className="px-4 py-2 text-center border">
                       <a

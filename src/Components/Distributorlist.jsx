@@ -618,11 +618,19 @@ const DistributorList = () => {
                       </td>
                       <td className="px-4 py-3 border border-[#776D6DA8] text-center">
                         {distributor.profile_picture ? (
-                          <img
-                            src={distributor.profile_picture}
-                            alt="Profile"
-                            className="h-10 w-10 rounded-full object-cover mx-auto"
-                          />
+                          <a
+                        href={distributor.profile_picture}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:underline"
+                      >
+                        View
+                      </a>
+                          // <img
+                          //   src={distributor.profile_picture}
+                          //   alt="Profile"
+                          //   className="h-10 w-10 rounded-full object-cover mx-auto"
+                          // />
                         ) : (
                           <span className="text-gray-400 italic">No Image</span>
                         )}

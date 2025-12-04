@@ -464,14 +464,22 @@ export default function CustomerDashboard() {
             </h2>
             <ul className="mb-4">
               {requiredDocuments.map((doc) => (
-                <li key={doc.id} className="mb-4">
+                <li key={doc.id} className="mb-4 flex flex-col">
                   <span className="font-semibold">{doc.document_names}</span>
                   {selectedFiles[doc.id] && (
-                    <img
-                      src={selectedFiles[doc.id]}
-                      alt={doc.document_names}
-                      className="mt-2 w-full rounded"
-                    />
+                    // <img
+                    //   src={selectedFiles[doc.id]}
+                    //   alt={doc.document_names}
+                    //   className="mt-2 w-full rounded"
+                    // />
+                    <a
+                        href={selectedFiles[doc.id]}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:underline"
+                      >
+                        View
+                      </a>
                   )}
                 </li>
               ))}
