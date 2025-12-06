@@ -309,7 +309,7 @@ const Adashinner = () => {
 
   const pendingCount =
     counts?.documentStatus?.find(({ status }) => status === "Pending")?.count ||
-    "-";
+    "0";
 
   // Get count for a specific card
   const getCountForCard = (cardId) => {

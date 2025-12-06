@@ -138,6 +138,58 @@ const InvoicePage = () => {
   const [isAdding, setIsAdding] = useState(false);
   const nodeRef = useRef(null);
 
+  // Multilingual name detection function
+  const getApplicantName = (documentFields) => {
+    if (!documentFields) return "Unknown";
+    
+    const namePatterns = [
+      'APPLICANT NAME', 'NAME', 'नाम', 'आवेदक का नाम', 'नाव', 'अर्जदाराचे नाव',
+      'APPLICANT_NAME', 'APPLICATION_NAME', 'CUSTOMER_NAME', 'USER_NAME'
+    ];
+    
+    const isNameField = (fieldName) => {
+      const normalizedFieldName = fieldName.toUpperCase().trim();
+      return namePatterns.some(pattern => 
+        normalizedFieldName.includes(pattern.toUpperCase()) ||
+        fieldName.includes(pattern)
+      ) || /नाम|नाव/.test(fieldName);
+    };
+
+    const findBestNameField = (fields) => {
+      const nameFields = fields.filter(field => 
+        field.field_name && field.field_value && 
+        field.field_value.trim() !== '' &&
+        isNameField(field.field_name)
+      );
+
+      if (nameFields.length === 0) return null;
+      if (nameFields.length === 1) return nameFields[0];
+
+      const priorityOrder = ['APPLICANT NAME', 'NAME', 'नाम', 'आवेदक का नाम', 'नाव', 'अर्जदाराचे नाव'];
+      for (const priority of priorityOrder) {
+        const found = nameFields.find(field => 
+          field.field_name.toUpperCase().includes(priority.toUpperCase()) ||
+          field.field_name.includes(priority)
+        );
+        if (found) return found;
+      }
+
+      return nameFields[0];
+    };
+
+    let fieldsArray = documentFields;
+    if (!Array.isArray(documentFields)) {
+      if (typeof documentFields === 'object' && documentFields !== null) {
+        fieldsArray = Object.values(documentFields);
+      } else {
+        return "Unknown";
+      }
+    }
+
+    const bestField = findBestNameField(fieldsArray);
+    return bestField ? bestField.field_value : "Unknown";
+  };
+
   useEffect(() => {
     axios
       .get(`${API_BASE_URL}/users/distributors`)
@@ -280,32 +332,11 @@ const InvoicePage = () => {
 
       // If no filename was found in the header, use a fallback
       if (!filename) {
-        // Try to get applicant name from document_fields
-        let applicantName = "";
-
-        if (documentData && documentData.document_fields) {
-          // Handle both array and object formats
-          if (Array.isArray(documentData.document_fields)) {
-            // Array format: find field with "name" in field_name
-            const nameField = documentData.document_fields.find(
-              (f) =>
-                typeof f.field_name === "string" &&
-                f.field_name.toLowerCase().includes("name")
-            );
-            applicantName = nameField?.field_value || "";
-          } else if (typeof documentData.document_fields === "object") {
-            // Object format: find key with "name" in it
-            const nameKey = Object.keys(documentData.document_fields).find(
-              (key) => key.toLowerCase().includes("name")
-            );
-            applicantName = nameKey
-              ? documentData.document_fields[nameKey]
-              : "";
-          }
-        }
+        // Use multilingual name detection
+        const applicantName = getApplicantName(documentData?.document_fields);
 
         // If applicant name was found, use it for the filename
-        if (applicantName) {
+        if (applicantName && applicantName !== "Unknown") {
           filename = `${applicantName.replace(/\s+/g, "_")}.zip`;
         } else {
           // Use "Document_ID" when applicant name isn't available

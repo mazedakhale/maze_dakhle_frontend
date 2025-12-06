@@ -18,6 +18,61 @@ const Rejecteddocuments = () => {
   const [users, setUsers] = useState([]);
   const [isAdding, setIsAdding] = useState(false);
 
+  // Multilingual name detection function
+  const getApplicantName = (documentFields) => {
+    if (!documentFields) return "Unknown";
+    
+    const namePatterns = [
+      'APPLICANT NAME', 'NAME', 'नाम', 'आवेदक का नाम', 'नाव', 'अर्जदाराचे नाव',
+      'APPLICANT_NAME', 'APPLICATION_NAME', 'CUSTOMER_NAME', 'USER_NAME'
+    ];
+    
+    const isNameField = (fieldName) => {
+      const normalizedFieldName = fieldName.toUpperCase().trim();
+      return namePatterns.some(pattern => 
+        normalizedFieldName.includes(pattern.toUpperCase()) ||
+        fieldName.includes(pattern)
+      ) || /नाम|नाव/.test(fieldName);
+    };
+
+    const findBestNameField = (fields) => {
+      const nameFields = fields.filter(field => 
+        field.field_name && field.field_value && 
+        field.field_value.trim() !== '' &&
+        isNameField(field.field_name)
+      );
+
+      if (nameFields.length === 0) return null;
+      if (nameFields.length === 1) return nameFields[0];
+
+      const priorityOrder = ['APPLICANT NAME', 'NAME', 'नाम', 'आवेदक का नाम', 'नाव', 'अर्जदाराचे नाव'];
+      for (const priority of priorityOrder) {
+        const found = nameFields.find(field => 
+          field.field_name.toUpperCase().includes(priority.toUpperCase()) ||
+          field.field_name.includes(priority)
+        );
+        if (found) return found;
+      }
+
+      return nameFields[0];
+    };
+
+    let fieldsArray = documentFields;
+    if (!Array.isArray(documentFields)) {
+      if (typeof documentFields === 'object' && documentFields !== null) {
+        fieldsArray = Object.entries(documentFields).map(([key, value]) => ({
+          field_name: key,
+          field_value: value
+        }));
+      } else {
+        return "Unknown";
+      }
+    }
+
+    const bestField = findBestNameField(fieldsArray);
+    return bestField ? bestField.field_value : "Unknown";
+  };
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -359,29 +414,7 @@ const Rejecteddocuments = () => {
                     })()}
                   </td>
                   <td className="px-4 py-2 border text-sm">
-                    {(() => {
-                      const fields = doc.document_fields;
-                      let name = null;
-
-                      if (Array.isArray(fields)) {
-                        // array case
-                        const found = fields.find(
-                          (f) => f.field_name === "APPLICANT NAME"
-                        );
-                        name = found?.field_value;
-                      } else if (fields && typeof fields === "object") {
-                        // object/map case
-                        name = fields["APPLICANT NAME"];
-                      }
-
-                      return name ? (
-                        <span>{name}</span>
-                      ) : (
-                        <span className="text-gray-500">
-                          No applicant name available
-                        </span>
-                      );
-                    })()}
+                    {getApplicantName(doc.document_fields)}
                   </td>
 
                   <td className="border p-2">{doc.category_name}</td>

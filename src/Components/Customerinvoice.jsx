@@ -28,6 +28,58 @@ const InvoicePage = () => {
   const [userEmail, setUserEmail] = useState("");
   const [checkedDocs, setCheckedDocs] = useState({});
   const [openContainer, setOpenContainer] = useState(null);
+
+  // Multilingual name detection function
+  const getApplicantName = (documentFields) => {
+    if (!documentFields) return "Unknown";
+    
+    const namePatterns = [
+      'APPLICANT NAME', 'NAME', 'नाम', 'आवेदक का नाम', 'नाव', 'अर्जदाराचे नाव',
+      'APPLICANT_NAME', 'APPLICATION_NAME', 'CUSTOMER_NAME', 'USER_NAME'
+    ];
+    
+    const isNameField = (fieldName) => {
+      const normalizedFieldName = fieldName.toUpperCase().trim();
+      return namePatterns.some(pattern => 
+        normalizedFieldName.includes(pattern.toUpperCase()) ||
+        fieldName.includes(pattern)
+      ) || /नाम|नाव/.test(fieldName);
+    };
+
+    const findBestNameField = (fields) => {
+      const nameFields = fields.filter(field => 
+        field.field_name && field.field_value && 
+        field.field_value.trim() !== '' &&
+        isNameField(field.field_name)
+      );
+
+      if (nameFields.length === 0) return null;
+      if (nameFields.length === 1) return nameFields[0];
+
+      const priorityOrder = ['APPLICANT NAME', 'NAME', 'नाम', 'आवेदक का नाम', 'नाव', 'अर्जदाराचे नाव'];
+      for (const priority of priorityOrder) {
+        const found = nameFields.find(field => 
+          field.field_name.toUpperCase().includes(priority.toUpperCase()) ||
+          field.field_name.includes(priority)
+        );
+        if (found) return found;
+      }
+
+      return nameFields[0];
+    };
+
+    let fieldsArray = documentFields;
+    if (!Array.isArray(documentFields)) {
+      if (typeof documentFields === 'object' && documentFields !== null) {
+        fieldsArray = Object.values(documentFields);
+      } else {
+        return "Unknown";
+      }
+    }
+
+    const bestField = findBestNameField(fieldsArray);
+    return bestField ? bestField.field_value : "Unknown";
+  };
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedDistributor, setSelectedDistributor] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -153,26 +205,11 @@ const InvoicePage = () => {
       }
 
       if (!filename) {
-        // Try to get applicant name from document_fields if available
-        let applicantName = "";
-
-        // Safely check if document_fields exists and is an array
-        if (
-          documentData &&
-          documentData.document_fields &&
-          Array.isArray(documentData.document_fields)
-        ) {
-          const applicantField = documentData.document_fields.find(
-            (field) => field.field_name === "APPLICANT NAME"
-          );
-
-          if (applicantField && applicantField.field_value) {
-            applicantName = applicantField.field_value;
-          }
-        }
+        // Use multilingual name detection
+        const applicantName = getApplicantName(documentData?.document_fields);
 
         // If applicant name was found, use it for the filename
-        if (applicantName) {
+        if (applicantName && applicantName !== "Unknown") {
           filename = `${applicantName.replace(/\s+/g, "_")}.zip`;
         } else {
           // Use "Document_ID" when applicant name isn't available

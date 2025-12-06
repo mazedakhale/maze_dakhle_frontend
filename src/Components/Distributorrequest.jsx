@@ -65,16 +65,63 @@ const ErrorRequests = () => {
     }
   };
 
-  // ← new helper to pull “APPLICANT NAME” out of that document’s fields
+  // Enhanced multilingual name detection function
   const getApplicantName = (req) => {
     const doc = assignedDocs.find((d) => d.document_id === req.document_id);
     if (!doc) return "-";
-    const f = doc.document_fields;
-    if (Array.isArray(f)) {
-      const entry = f.find((x) => x.field_name === "APPLICANT NAME");
-      return entry?.field_value ?? "-";
+    
+    const documentFields = doc.document_fields;
+    if (!documentFields) return "-";
+    
+    const namePatterns = [
+      'APPLICANT NAME', 'NAME', 'नाम', 'आवेदक का नाम', 'नाव', 'अर्जदाराचे नाव',
+      'APPLICANT_NAME', 'APPLICATION_NAME', 'CUSTOMER_NAME', 'USER_NAME'
+    ];
+    
+    const isNameField = (fieldName) => {
+      const normalizedFieldName = fieldName.toUpperCase().trim();
+      return namePatterns.some(pattern => 
+        normalizedFieldName.includes(pattern.toUpperCase()) ||
+        fieldName.includes(pattern)
+      ) || /नाम|नाव/.test(fieldName);
+    };
+
+    const findBestNameField = (fields) => {
+      const nameFields = fields.filter(field => 
+        field.field_name && field.field_value && 
+        field.field_value.trim() !== '' &&
+        isNameField(field.field_name)
+      );
+
+      if (nameFields.length === 0) return null;
+      if (nameFields.length === 1) return nameFields[0];
+
+      const priorityOrder = ['APPLICANT NAME', 'NAME', 'नाम', 'आवेदक का नाम', 'नाव', 'अर्जदाराचे नाव'];
+      for (const priority of priorityOrder) {
+        const found = nameFields.find(field => 
+          field.field_name.toUpperCase().includes(priority.toUpperCase()) ||
+          field.field_name.includes(priority)
+        );
+        if (found) return found;
+      }
+
+      return nameFields[0];
+    };
+
+    let fieldsArray = documentFields;
+    if (!Array.isArray(documentFields)) {
+      if (typeof documentFields === 'object' && documentFields !== null) {
+        fieldsArray = Object.entries(documentFields).map(([key, value]) => ({
+          field_name: key,
+          field_value: value
+        }));
+      } else {
+        return "-";
+      }
     }
-    return f?.["APPLICANT NAME"] ?? "-";
+
+    const bestField = findBestNameField(fieldsArray);
+    return bestField ? bestField.field_value : "-";
   };
 
   const handleReject = async (requestId) => {

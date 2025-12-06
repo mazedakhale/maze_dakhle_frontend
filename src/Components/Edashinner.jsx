@@ -190,12 +190,12 @@ const Edashinner = () => {
     return null;
   };
 
-  const pendingCount = counts?.documentStatus?.find(({ status }) => status === "Pending")?.count || "-";
+  const pendingCount = counts?.documentStatus?.find(({ status }) => status === "Pending")?.count || "0";
 
   // Static cards
   const staticCards = [
     {
-      id: "users",
+      id: "customers",
       icon: FaUsers,
       title: "Users",
       color: "bg-[#FE1008]",
@@ -234,7 +234,7 @@ const Edashinner = () => {
       icon: FaClipboardList,
       title: "View Recent Applications",
       color: "bg-[#F97316]",
-      onClick: () => navigate("/Recentapplications"),
+      onClick: () => navigate("/EmployeeRecent"),
     },
   ];
 

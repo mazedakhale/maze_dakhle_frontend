@@ -102,6 +102,7 @@ import TransactionHistory from "./Components/TransactionHistory";
 import DistributorPaymentRequest from "./Components/DistributorPaymentRequest";
 import AdminWallet from "./Components/AdminWallet";
 import AdminDeletionCodeSettings from "./Components/AdminDeletionCodeSettings";
+import EmployeeRecentApplications from "./Components/EmployeeRecentApplications";
 function App() {
   return (
     <Router>
@@ -246,6 +247,7 @@ function App() {
         <Route path="/ViewImpDocE" element={<ProtectedRoute allowedRoles={['Employee']}><Employeedashboard><ViewImpDoc /></Employeedashboard></ProtectedRoute>} />
 
         <Route path="/Employee" element={<ProtectedRoute allowedRoles={['Employee']}><Employeedashboard><Employee /></Employeedashboard></ProtectedRoute>} />
+        <Route path="/EmployeeRecent" element={<ProtectedRoute allowedRoles={['Employee']}><Employeedashboard><EmployeeRecentApplications/></Employeedashboard></ProtectedRoute>} />
         <Route path="/Spage" element={<ProtectedRoute allowedRoles={['Employee']}><Employeedashboard><Spage /></Employeedashboard></ProtectedRoute>} />
 
 

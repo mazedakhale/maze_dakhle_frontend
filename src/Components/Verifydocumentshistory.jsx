@@ -29,6 +29,95 @@ const Verifydocumentshistory = () => {
 
   const navigate = useNavigate();
 
+  // Helper function to detect name fields in multiple languages
+  const getApplicantName = (documentFields) => {
+    if (!documentFields) return "-";
+
+    // Define name field patterns in different languages
+    const namePatterns = [
+      // English
+      "name", "applicant name", "full name", "customer name", "person name",
+      // Hindi
+      "नाम", "आवेदक का नाम", "पूरा नाम", "व्यक्ति का नाम", "ग्राहक का नाम",
+      // Marathi
+      "नाव", "अर्जदाराचे नाव", "पूर्ण नाव", "व्यक्तीचे नाव", "ग्राहकाचे नाव",
+      // Additional common patterns
+      "applicant", "अर्जदार", "आवेदक"
+    ];
+
+    const isNameField = (fieldName) => {
+      if (!fieldName || typeof fieldName !== "string") return false;
+      
+      const lowerFieldName = fieldName.toLowerCase().trim();
+      
+      // First check predefined patterns
+      const matchesPattern = namePatterns.some(pattern => 
+        lowerFieldName.includes(pattern.toLowerCase()) ||
+        fieldName.includes(pattern) // For non-Latin scripts
+      );
+
+      if (matchesPattern) return true;
+
+      // Fallback: Check for common name-like characteristics
+      // Look for fields that might contain person names (heuristic approach)
+      const nameIndicators = [
+        // English indicators
+        /\bname\b/i, /\bfull\b/i, /\bfirst\b/i, /\blast\b/i, /\bapplicant\b/i,
+        // Look for fields that end with common name suffixes
+        /name$/i, /नाम$/i, /नाव$/i,
+        // Look for fields that start with name prefixes
+        /^name/i, /^नाम/i, /^नाव/i, /^full/i, /^applicant/i
+      ];
+
+      return nameIndicators.some(pattern => pattern.test(fieldName));
+    };
+
+    const findBestNameField = (fields) => {
+      // Priority order for selecting the best name field
+      const priorities = [
+        /full.*name|name.*full/i,  // Full name gets highest priority
+        /applicant.*name|name.*applicant/i,  // Applicant name second
+        /^name$/i,  // Simple "name" field third
+        /name/i,    // Any field containing "name" last
+        /नाम|नाव/   // Hindi/Marathi name fields
+      ];
+
+      for (const priority of priorities) {
+        const match = fields.find(field => priority.test(field.key));
+        if (match) return match;
+      }
+
+      // If no priority match, return the first name-like field
+      return fields[0];
+    };
+
+    // Handle array format
+    if (Array.isArray(documentFields)) {
+      const nameFields = documentFields
+        .filter(field => isNameField(field.field_name))
+        .map(field => ({ key: field.field_name, value: field.field_value }));
+      
+      if (nameFields.length === 0) return "-";
+      
+      const bestField = findBestNameField(nameFields);
+      return bestField?.value || "-";
+    }
+
+    // Handle object format
+    if (typeof documentFields === "object") {
+      const nameFields = Object.keys(documentFields)
+        .filter(key => isNameField(key))
+        .map(key => ({ key, value: documentFields[key] }));
+      
+      if (nameFields.length === 0) return "-";
+      
+      const bestField = findBestNameField(nameFields);
+      return bestField?.value || "-";
+    }
+
+    return "-";
+  };
+
   // Fetch assigned documents from the new API
   useEffect(() => {
     axios
@@ -182,6 +271,39 @@ const Verifydocumentshistory = () => {
     }
   };
 
+  const handleDownloadCertificateURL = async (documentId, documentName) => {
+    const certificateId = getCertificateByDocumentId(documentId);
+    if (!certificateId) {
+      Swal.fire("Error", "Certificate not found.", "error");
+      return;
+    }
+    try {
+      const response = await axios.get(
+        `${API_BASE_URL}/certificates/${certificateId}`
+      );
+      if (response.data && response.data.file_url) {
+        // Extract the file extension from the URL
+        const fileExtension = response.data.file_url.split(".").pop().toLowerCase();
+        // Generate the file name
+        const fileName = `${documentName}_certificate.${fileExtension}`;
+        
+        // Create a temporary <a> element to trigger the download (same as receipt)
+        const link = document.createElement("a");
+        link.href = response.data.file_url;
+        link.download = fileName;
+        link.style.display = "none";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } else {
+        Swal.fire("Error", "Certificate file not found.", "error");
+      }
+    } catch (error) {
+      console.error("Error downloading certificate:", error);
+      Swal.fire("Error", "Failed to download certificate.", "error");
+    }
+  };
+
   const handleDownloadAllDocuments = async (documentId, doc) => {
       try {
         setIsAdding(true);
@@ -232,27 +354,10 @@ const Verifydocumentshistory = () => {
   
         // If no filename from header, extract from document data
         if (!filename) {
-          let applicantName = "";
-  
-          if (doc && doc.document_fields) {
-            // Handle both array and object formats
-            if (Array.isArray(doc.document_fields)) {
-              const nameField = doc.document_fields.find(
-                (f) =>
-                  typeof f.field_name === "string" &&
-                  f.field_name.toLowerCase().includes("name")
-              );
-              applicantName = nameField?.field_value || "";
-            } else if (typeof doc.document_fields === "object") {
-              const nameKey = Object.keys(doc.document_fields).find((key) =>
-                key.toLowerCase().includes("name")
-              );
-              applicantName = nameKey ? doc.document_fields[nameKey] : "";
-            }
-          }
+          const applicantName = getApplicantName(doc.document_fields);
   
           // Use applicant name or fallback to application ID
-          if (applicantName) {
+          if (applicantName && applicantName !== "-") {
             filename = `${applicantName.replace(/\s+/g, "_")}.zip`;
           } else {
             filename = `${doc.application_id || `Document_${documentId}`}.zip`;
@@ -365,7 +470,7 @@ const Verifydocumentshistory = () => {
       alert("Failed to download file.");
     }
   };
-
+console.log(filteredDocuments)
   return (
     <div className="ml-[250px] flex flex-col items-center min-h-screen p-6 bg-gray-100">
       <div className="w-[90%] max-w-6xl bg-white shadow-lg rounded-lg">
@@ -482,27 +587,7 @@ const Verifydocumentshistory = () => {
                     })()}
                   </td>
                   <td className="px-4 py-2 border text-sm">
-                                          {
-  Array.isArray(doc.document_fields)
-    ? (
-        doc.document_fields.find(
-          (f) =>
-            typeof f.field_name === "string" &&
-            f.field_name.toLowerCase().includes("name")
-        )?.field_value || "-"
-      )
-    : (
-        Object.keys(doc.document_fields).find(
-          (key) => key.toLowerCase().includes("name")
-        )
-          ? doc.document_fields[
-              Object.keys(doc.document_fields).find((key) =>
-                key.toLowerCase().includes("name")
-              )
-            ]
-          : "-"
-      )
-}
+                    {getApplicantName(doc.document_fields)}
                   </td>
 
                   <td className="border p-2">{doc.category_name}</td>
@@ -621,22 +706,24 @@ const Verifydocumentshistory = () => {
                   <td className="border p-2 text-center">
                     {getCertificateByDocumentId(doc.document_id) ? (
                       <>
-                      <button
-                        onClick={() => handleViewCertificate(doc.document_id)}
-                        className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 transition text-xs"
-                      >
-                        <FaCheck className="mr-1" /> Certificate
-                      </button>
-                      <button
+                        <button
                           onClick={async() => {
-                           const filePath= await handleViewCertificate(doc.document_id)
-
-                           console.log("CHeck",filePath)
-                            const embeddableUrl = getEmbeddableUrl(filePath);
-                            setPreviewFile(embeddableUrl);
+                            await handleDownloadCertificateURL(doc.document_id, doc.name);
+                          }}
+                          className="bg-blue-500 text-white px-3 py-1 rounded flex justify-center items-center hover:bg-blue-600 transition"
+                        >
+                          <FaDownload className="mr-1" /> Certificate
+                        </button>
+                        <button
+                          onClick={async() => {
+                            const filePath = await handleViewCertificate(doc.document_id);
+                            if (filePath) {
+                              const embeddableUrl = getEmbeddableUrl(filePath);
+                              setPreviewFile(embeddableUrl);
+                            }
                           }}
                           className="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600 transition ml-2"
-                          title="Preview Receipt"
+                          title="Preview Certificate"
                         >
                           <FaEye className="mr-1" /> View
                         </button>
@@ -677,7 +764,7 @@ const Verifydocumentshistory = () => {
               &times;
             </button>
             <h3 className="text-xl font-medium mb-4 text-center">
-              Receipt Preview
+              Document Preview
             </h3>
             
             {/* Enhanced iframe with error handling */}

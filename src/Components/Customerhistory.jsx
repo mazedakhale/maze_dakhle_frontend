@@ -18,6 +18,39 @@ const CustomerHistory = () => {
   const [isAdding, setIsAdding] = useState(false);
   const navigate = useNavigate();
 
+  // Helper function to detect name fields in multiple languages
+  const getApplicantName = (documentFields) => {
+    if (!documentFields) return "-";
+    const namePatterns = ["name", "applicant name", "full name", "customer name", "person name", "नाम", "आवेदक का नाम", "पूरा नाम", "व्यक्ति का नाम", "ग्राहक का नाम", "नाव", "अर्जदाराचे नाव", "पूर्ण नाव", "व्यक्तीचे नाव", "ग्राहकाचे नाव", "applicant", "अर्जदार", "आवेदक"];
+    const isNameField = (fieldName) => {
+      if (!fieldName || typeof fieldName !== "string") return false;
+      const lowerFieldName = fieldName.toLowerCase().trim();
+      const matchesPattern = namePatterns.some(pattern => lowerFieldName.includes(pattern.toLowerCase()) || fieldName.includes(pattern));
+      if (matchesPattern) return true;
+      const nameIndicators = [/\bname\b/i, /\bfull\b/i, /\bfirst\b/i, /\blast\b/i, /\bapplicant\b/i, /name$/i, /नाम$/i, /नाव$/i, /^name/i, /^नाम/i, /^नाव/i, /^full/i, /^applicant/i];
+      return nameIndicators.some(pattern => pattern.test(fieldName));
+    };
+    const findBestNameField = (fields) => {
+      const priorities = [/full.*name|name.*full/i, /applicant.*name|name.*applicant/i, /^name$/i, /name/i, /नाम|नाव/];
+      for (const priority of priorities) {
+        const match = fields.find(field => priority.test(field.key));
+        if (match) return match;
+      }
+      return fields[0];
+    };
+    if (Array.isArray(documentFields)) {
+      const nameFields = documentFields.filter(field => isNameField(field.field_name)).map(field => ({ key: field.field_name, value: field.field_value }));
+      if (nameFields.length === 0) return "-";
+      return findBestNameField(nameFields)?.value || "-";
+    }
+    if (typeof documentFields === "object") {
+      const nameFields = Object.keys(documentFields).filter(key => isNameField(key)).map(key => ({ key, value: documentFields[key] }));
+      if (nameFields.length === 0) return "-";
+      return findBestNameField(nameFields)?.value || "-";
+    }
+    return "-";
+  };
+
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -178,36 +211,17 @@ const CustomerHistory = () => {
         }
       }
 
-      // If no filename from header, extract from document data
-      if (!filename) {
-        let applicantName = "";
+        // If no filename from header, extract from document data
+        if (!filename) {
+          const applicantName = getApplicantName(doc.document_fields);
 
-        if (doc && doc.document_fields) {
-          // Handle both array and object formats
-          if (Array.isArray(doc.document_fields)) {
-            const nameField = doc.document_fields.find(
-              (f) =>
-                typeof f.field_name === "string" &&
-                f.field_name.toLowerCase().includes("name")
-            );
-            applicantName = nameField?.field_value || "";
-          } else if (typeof doc.document_fields === "object") {
-            const nameKey = Object.keys(doc.document_fields).find((key) =>
-              key.toLowerCase().includes("name")
-            );
-            applicantName = nameKey ? doc.document_fields[nameKey] : "";
+          // Use applicant name or fallback to application ID
+          if (applicantName && applicantName !== "-") {
+            filename = `${applicantName.replace(/\s+/g, "_")}.zip`;
+          } else {
+            filename = `${doc.application_id || `Document_${documentId}`}.zip`;
           }
-        }
-
-        // Use applicant name or fallback to application ID
-        if (applicantName) {
-          filename = `${applicantName.replace(/\s+/g, "_")}.zip`;
-        } else {
-          filename = `${doc.application_id || `Document_${documentId}`}.zip`;
-        }
-      }
-
-      // Create download link
+        }      // Create download link
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement("a");
       link.href = url;
@@ -408,27 +422,7 @@ const CustomerHistory = () => {
                     </td>
                     {/* Applicant Name */}
                     <td className="px-4 py-4 border border-[#776D6DA8] text-center">
-                      {
-  Array.isArray(doc.document_fields)
-    ? (
-        doc.document_fields.find(
-          (f) =>
-            typeof f.field_name === "string" &&
-            f.field_name.toLowerCase().includes("name")
-        )?.field_value || "-"
-      )
-    : (
-        Object.keys(doc.document_fields).find(
-          (key) => key.toLowerCase().includes("name")
-        )
-          ? doc.document_fields[
-              Object.keys(doc.document_fields).find((key) =>
-                key.toLowerCase().includes("name")
-              )
-            ]
-          : "-"
-      )
-}
+                      {getApplicantName(doc.document_fields)}
                     </td>
 
                     <td className="border p-2">

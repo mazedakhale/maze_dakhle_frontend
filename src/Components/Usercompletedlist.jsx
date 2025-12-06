@@ -15,6 +15,39 @@ const CompletedApplicationsList = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isAdding, setIsAdding] = useState(false);
   const navigate = useNavigate();
+
+  // Helper function to detect name fields in multiple languages
+  const getApplicantName = (documentFields) => {
+    if (!documentFields) return "-";
+    const namePatterns = ["name", "applicant name", "full name", "customer name", "person name", "नाम", "आवेदक का नाम", "पूरा नाम", "व्यक्ति का नाम", "ग्राहक का नाम", "नाव", "अर्जदाराचे नाव", "पूर्ण नाव", "व्यक्तीचे नाव", "ग्राहकाचे नाव", "applicant", "अर्जदार", "आवेदक"];
+    const isNameField = (fieldName) => {
+      if (!fieldName || typeof fieldName !== "string") return false;
+      const lowerFieldName = fieldName.toLowerCase().trim();
+      const matchesPattern = namePatterns.some(pattern => lowerFieldName.includes(pattern.toLowerCase()) || fieldName.includes(pattern));
+      if (matchesPattern) return true;
+      const nameIndicators = [/\bname\b/i, /\bfull\b/i, /\bfirst\b/i, /\blast\b/i, /\bapplicant\b/i, /name$/i, /नाम$/i, /नाव$/i, /^name/i, /^नाम/i, /^नाव/i, /^full/i, /^applicant/i];
+      return nameIndicators.some(pattern => pattern.test(fieldName));
+    };
+    const findBestNameField = (fields) => {
+      const priorities = [/full.*name|name.*full/i, /applicant.*name|name.*applicant/i, /^name$/i, /name/i, /नाम|नाव/];
+      for (const priority of priorities) {
+        const match = fields.find(field => priority.test(field.key));
+        if (match) return match;
+      }
+      return fields[0];
+    };
+    if (Array.isArray(documentFields)) {
+      const nameFields = documentFields.filter(field => isNameField(field.field_name)).map(field => ({ key: field.field_name, value: field.field_value }));
+      if (nameFields.length === 0) return "-";
+      return findBestNameField(nameFields)?.value || "-";
+    }
+    if (typeof documentFields === "object") {
+      const nameFields = Object.keys(documentFields).filter(key => isNameField(key)).map(key => ({ key, value: documentFields[key] }));
+      if (nameFields.length === 0) return "-";
+      return findBestNameField(nameFields)?.value || "-";
+    }
+    return "-";
+  };
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -186,27 +219,7 @@ const CompletedApplicationsList = () => {
                       {new Date(document.uploaded_at).toLocaleString()}
                     </td>
                     <td className="px-4 py-3 border border-[#776D6DA8] text-center">
-                                           {
-  Array.isArray(document.document_fields)
-    ? (
-        document.document_fields.find(
-          (f) =>
-            typeof f.field_name === "string" &&
-            f.field_name.toLowerCase().includes("name")
-        )?.field_value || "-"
-      )
-    : (
-        Object.keys(document.document_fields).find(
-          (key) => key.toLowerCase().includes("name")
-        )
-          ? document.document_fields[
-              Object.keys(document.document_fields).find((key) =>
-                key.toLowerCase().includes("name")
-              )
-            ]
-          : "-"
-      )
-}
+                      {getApplicantName(document.document_fields)}
                     </td>
 
                     <td className="px-4 py-3 border border-[#776D6DA8] text-center">

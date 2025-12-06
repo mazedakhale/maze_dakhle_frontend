@@ -8,7 +8,7 @@ import Draggable from "react-draggable";
 import getEmbeddableUrl from "../utils/getEmbeddableUrl.js";
 import "../styles/style.css";
 
-const RecentApplications = () => {
+const EmployeeRecentApplications = () => {
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -20,10 +20,21 @@ const RecentApplications = () => {
   const [distributors, setDistributors] = useState([]);
   const [certificates, setCertificates] = useState([]);
   const [users, setUsers] = useState([]);
+  const [employeeAssignments, setEmployeeAssignments] = useState([]);
   const [previewFile, setPreviewFile] = useState(null);
   const nodeRef = useRef(null);
 
   const navigate = useNavigate();
+
+  // Get userId from token
+  const token = localStorage.getItem("token");
+  let userId = null;
+  try {
+    const tokenData = JSON.parse(atob(token.split(".")[1]));
+    userId = tokenData.user_id;
+  } catch (error) {
+    console.error("Error parsing token:", error);
+  }
 
   // Helper function to detect name fields in multiple languages
   const getApplicantName = (documentFields) => {
@@ -113,6 +124,34 @@ const RecentApplications = () => {
     return "-";
   };
 
+  // Get employee assignments for the logged-in employee
+  const getEmployeeAssignments = (userId) => {
+    return employeeAssignments
+      .filter((assignment) => assignment.user_id === parseInt(userId))
+      .map((assignment) => ({
+        category_id: assignment.category?.category_id || assignment.category_id,
+        subcategory_id: assignment.subcategory?.subcategory_id || assignment.subcategory_id,
+      }));
+  };
+
+  // Check if document matches employee's assignments
+  const isDocumentAssignedToEmployee = (doc) => {
+    if (!userId) return false;
+    
+    const assignments = getEmployeeAssignments(userId);
+    
+    // If no assignments, don't show any documents
+    if (assignments.length === 0) return false;
+    
+    // Check if document's category and subcategory match any assignment
+    return assignments.some((assignment) => {
+      return (
+        assignment.category_id === doc.category_id &&
+        assignment.subcategory_id === doc.subcategory_id
+      );
+    });
+  };
+
   useEffect(() => {
     // Fetch all data in parallel
     const docsReq = axios.get(`${API_BASE_URL}/documents/recent`, {
@@ -121,13 +160,40 @@ const RecentApplications = () => {
     const distReq = axios.get(`${API_BASE_URL}/users/distributors`);
     const certReq = axios.get(`${API_BASE_URL}/certificates`);
     const usersReq = axios.get(`${API_BASE_URL}/users/register`);
+    const empAssignReq = userId ? axios.get(`${API_BASE_URL}/employee`) : Promise.resolve({ data: [] });
 
-    Promise.all([docsReq, distReq, certReq, usersReq])
-      .then(([docsResp, distResp, certResp, usersResp]) => {
-        setApplications(docsResp.data);
+    Promise.all([docsReq, distReq, certReq, usersReq, empAssignReq])
+      .then(([docsResp, distResp, certResp, usersResp, empAssignResp]) => {
+        // Filter applications to only show those assigned to this employee
+        const allApplications = docsResp.data;
+        setEmployeeAssignments(empAssignResp.data);
+        
         setDistributors(distResp.data);
         setCertificates(certResp.data);
         setUsers(usersResp.data);
+
+        // Filter applications after assignments are set
+        const filteredApps = allApplications.filter(app => {
+          if (!userId) return false;
+          
+          const assignments = empAssignResp.data
+            .filter((assignment) => assignment.user_id === parseInt(userId))
+            .map((assignment) => ({
+              category_id: assignment.category?.category_id || assignment.category_id,
+              subcategory_id: assignment.subcategory?.subcategory_id || assignment.subcategory_id,
+            }));
+          
+          if (assignments.length === 0) return false;
+          
+          return assignments.some((assignment) => {
+            return (
+              assignment.category_id === app.category_id &&
+              assignment.subcategory_id === app.subcategory_id
+            );
+          });
+        });
+
+        setApplications(filteredApps);
       })
       .catch((err) => {
         console.error(err);
@@ -136,7 +202,7 @@ const RecentApplications = () => {
       .finally(() => {
         setLoading(false);
       });
-  }, []);
+  }, [userId]);
 
   const handleStatusFilterChange = (e) => {
     setStatusFilter(e.target.value);
@@ -271,6 +337,7 @@ const RecentApplications = () => {
       Swal.fire("Error", "Failed to download certificate.", "error");
     }
   };
+  
   const getDistributorName = (distributorId) => {
     const u = users.find((u) => Number(u.user_id) === Number(distributorId));
     return u ? u.name : "";
@@ -312,10 +379,10 @@ const RecentApplications = () => {
       <div className="w-[90%] max-w-6xl bg-white rounded-lg shadow">
         <div className="relative border-t-4 border-orange-400 bg-[#F4F4F4] p-4 rounded-t-lg">
           <h2 className="text-2xl font-bold text-gray-800 text-center">
-            Recent Applications List
+            View Recent Applications
           </h2>
           <button
-            onClick={() => navigate("/Adashinner")}
+            onClick={() => navigate("/Edashinner")}
             className="absolute top-1/2 right-4 transform -translate-y-1/2 text-gray-600 hover:text-gray-800"
           >
             <FaTimes size={20} />
@@ -368,7 +435,7 @@ const RecentApplications = () => {
                   "VLE Phone",
                   "Distributor",
                   "Status",
-                  "Completed / Rejected",
+                //   "Actions",
                   "View",
                   "Receipt",
                   "Certificate",
@@ -383,144 +450,139 @@ const RecentApplications = () => {
               </tr>
             </thead>
             <tbody>
-              {filteredDocs.map((doc, i) => {
-                const date = new Date(doc.uploaded_at);
-                const day = String(date.getDate()).padStart(2, "0");
-                const mon = String(date.getMonth() + 1).padStart(2, "0");
-                const ym = `${day}-${mon}-${date.getFullYear()}`;
-                const tm = date.toLocaleTimeString("en-US", {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                  second: "2-digit",
-                  hour12: true,
-                });
+              {filteredDocs.length === 0 ? (
+                <tr>
+                  <td colSpan="15" className="border p-4 text-center text-gray-500">
+                    No applications assigned to you yet.
+                  </td>
+                </tr>
+              ) : (
+                filteredDocs.map((doc, i) => {
+                  const date = new Date(doc.uploaded_at);
+                  const day = String(date.getDate()).padStart(2, "0");
+                  const mon = String(date.getMonth() + 1).padStart(2, "0");
+                  const ym = `${day}-${mon}-${date.getFullYear()}`;
+                  const tm = date.toLocaleTimeString("en-US", {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    second: "2-digit",
+                    hour12: true,
+                  });
 
-                return (
-                  <tr
-                    key={doc.document_id}
-                    className={`border-t ${
-                      i % 2 ? "bg-white" : "bg-white"
-                    } hover:bg-gray-100`}
-                  >
-                    <td className="border p-2 text-center">{i + 1}</td>
-                    <td className="border p-2 text-center">
-                      {doc.application_id}
-                    </td>
-                    <td className="border p-2 text-center">
-                      <div>{ym}</div>
-                      <div className="text-xs text-gray-600">{tm}</div>
-                    </td>
-                    <td className="border p-2">{doc.category_name}</td>
-                    <td className="border p-2">{doc.subcategory_name}</td>
-                    <td className="border px-4 py-2 text-sm">
-                      {getApplicantName(doc.document_fields)}
-                    </td>
-                    <td className="border p-2 break-words">{doc.name}</td>
-                    <td className="border p-2 break-words">{doc.email}</td>
-                    <td className="border p-2 break-words">{doc.phone}</td>
-                    <td className="border p-2">
-                      {getDistributorName(doc.distributor_id)}
-                    </td>
-                    <td className="border p-2 text-center">
-                      <span
-                        className={`px-3 py-1 rounded-full text-white text-xs ${
-                          doc.status === "Approved"
-                            ? "bg-green-500"
-                            : doc.status === "Rejected"
-                            ? "bg-red-500"
-                            : doc.status === "Pending"
-                            ? "bg-yellow-500"
-                            : "bg-blue-500"
-                        }`}
-                      >
-                        {doc.status}
-                      </span>
-                    </td>
-                    <td className="border p-2">
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() =>
-                            handleUpdateStatus(doc.document_id, "Completed")
-                          }
-                          className="bg-green-500 px-3 py-1 rounded hover:bg-green-600 text-white text-xs flex items-center"
+                  return (
+                    <tr
+                      key={doc.document_id}
+                      className={`border-t ${
+                        i % 2 ? "bg-white" : "bg-white"
+                      } hover:bg-gray-100`}
+                    >
+                      <td className="border p-2 text-center">{i + 1}</td>
+                      <td className="border p-2 text-center">
+                        {doc.application_id}
+                      </td>
+                      <td className="border p-2 text-center">
+                        <div>{ym}</div>
+                        <div className="text-xs text-gray-600">{tm}</div>
+                      </td>
+                      <td className="border p-2">{doc.category_name}</td>
+                      <td className="border p-2">{doc.subcategory_name}</td>
+                      <td className="border px-4 py-2 text-sm">
+                        {getApplicantName(doc.document_fields)}
+                      </td>
+                      <td className="border p-2 break-words">{doc.name}</td>
+                      <td className="border p-2 break-words">{doc.email}</td>
+                      <td className="border p-2 break-words">{doc.phone}</td>
+                      <td className="border p-2">
+                        {getDistributorName(doc.distributor_id)}
+                      </td>
+                      <td className="border p-2 text-center">
+                        <span
+                          className={`px-3 py-1 rounded-full text-white text-xs ${
+                            doc.status === "Approved"
+                              ? "bg-green-500"
+                              : doc.status === "Rejected"
+                              ? "bg-red-500"
+                              : doc.status === "Pending"
+                              ? "bg-yellow-500"
+                              : "bg-blue-500"
+                          }`}
                         >
-                          <FaCheck className="mr-1" /> Complete
-                        </button>
-                        <button
-                          onClick={() =>
-                            handleRejectWithReason(doc.document_id)
-                          }
-                          className="bg-red-500 px-3 py-1 rounded hover:bg-red-600 text-white text-xs flex items-center"
-                        >
-                          <FaTimes className="mr-1" /> Reject
-                        </button>
-                      </div>
-                    </td>
-                    <td className="border p-2 text-center">
-                      <button
-                        onClick={() =>
-                          navigate(`/View/${doc.document_id}`, {
-                            state: {
-                              categoryId: doc.category_id,
-                              subcategoryId: doc.subcategory_id,
-                            },
-                          })
-                        }
-                        className="bg-indigo-500 px-3 py-1 rounded hover:bg-indigo-600 text-white text-xs flex items-center"
-                      >
-                        <FaRegFileAlt className="mr-1" /> View
-                      </button>
-                    </td>
-                    <td className="border p-3 text-center">
-                      {doc.receipt_url ? (
-                        <button
-                          onClick={() =>
-                            handleDownloadReceipt(doc.receipt_url, doc.name)
-                          }
-                          className="bg-orange-500 px-3 py-1 rounded hover:bg-blue-600 text-white flex items-center"
-                        >
-                          <FaDownload className="mr-1" /> Receipt
-                        </button>
-                      ) : (
-                        <span className="text-gray-500 text-xs">
-                          Not Available
+                          {doc.status}
                         </span>
-                      )}
-                    </td>
-                    <td className="border p-2 text-center">
-                      {getCertificateByDocumentId(doc.document_id) ? (
-                        <>
+                      </td>
+                      {/* <td className="border p-2">
+                        <div className="flex gap-2">
                           <button
-                            onClick={async() => {
-                              await handleDownloadCertificateURL(doc.document_id, doc.name);
-                            }}
-                            className="bg-blue-500 px-3 py-1 rounded hover:bg-blue-600 text-white text-xs flex items-center mb-1"
+                            onClick={() =>
+                              handleUpdateStatus(doc.document_id, "Completed")
+                            }
+                            className="bg-green-500 px-3 py-1 rounded hover:bg-green-600 text-white text-xs flex items-center"
                           >
-                            <FaDownload className="mr-1" /> Certificate
+                            <FaCheck className="mr-1" /> Complete
                           </button>
-                          {/* <button
-                            onClick={async() => {
-                              const filePath = await handleViewCertificate(doc.document_id);
-                              if (filePath) {
-                                const embeddableUrl = getEmbeddableUrl(filePath);
-                                setPreviewFile(embeddableUrl);
-                              }
-                            }}
-                            className="bg-green-500 px-2 py-1 rounded hover:bg-green-600 text-white text-xs flex items-center"
-                            title="Preview Certificate"
+                          <button
+                            onClick={() =>
+                              handleRejectWithReason(doc.document_id)
+                            }
+                            className="bg-red-500 px-3 py-1 rounded hover:bg-red-600 text-white text-xs flex items-center"
                           >
-                            <FaEye className="mr-1" /> View
-                          </button> */}
-                        </>
-                      ) : (
-                        <span className="text-gray-500 text-xs">
-                          Not Available
-                        </span>
-                      )}
-                    </td>
-                  </tr>
-                );
-              })}
+                            <FaTimes className="mr-1" /> Reject
+                          </button>
+                        </div>
+                      </td> */}
+                      <td className="border p-2 text-center">
+                        <button
+                          onClick={() =>
+                            navigate(`/Invoice/${doc.document_id}`, {
+                              state: {
+                                categoryId: doc.category_id,
+                                subcategoryId: doc.subcategory_id,
+                              },
+                            })
+                          }
+                          className="bg-indigo-500 px-3 py-1 rounded hover:bg-indigo-600 text-white text-xs flex items-center"
+                        >
+                          <FaRegFileAlt className="mr-1" /> View
+                        </button>
+                      </td>
+                      <td className="border p-3 text-center">
+                        {doc.receipt_url ? (
+                          <button
+                            onClick={() =>
+                              handleDownloadReceipt(doc.receipt_url, doc.name)
+                            }
+                            className="bg-orange-500 px-3 py-1 rounded hover:bg-blue-600 text-white flex items-center"
+                          >
+                            <FaDownload className="mr-1" /> Receipt
+                          </button>
+                        ) : (
+                          <span className="text-gray-500 text-xs">
+                            Not Available
+                          </span>
+                        )}
+                      </td>
+                      <td className="border p-2 text-center">
+                        {getCertificateByDocumentId(doc.document_id) ? (
+                          <>
+                            <button
+                              onClick={async() => {
+                                await handleDownloadCertificateURL(doc.document_id, doc.name);
+                              }}
+                              className="bg-blue-500 px-3 py-1 rounded hover:bg-blue-600 text-white text-xs flex items-center mb-1"
+                            >
+                              <FaDownload className="mr-1" /> Certificate
+                            </button>
+                          </>
+                        ) : (
+                          <span className="text-gray-500 text-xs">
+                            Not Available
+                          </span>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
             </tbody>
           </table>
         </div>
@@ -574,4 +636,4 @@ const RecentApplications = () => {
   );
 };
 
-export default RecentApplications;
+export default EmployeeRecentApplications;
