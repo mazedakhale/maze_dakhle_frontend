@@ -14,6 +14,8 @@ import {
   FaShapes,
   FaCheckCircle,
   FaSignOutAlt,
+  FaInbox,
+  FaFileUpload,
 } from "react-icons/fa";
 import { IoMdLogOut } from "react-icons/io";
 import { FaRegCircleUser } from "react-icons/fa6";
@@ -44,9 +46,54 @@ const Sidebar = ({ onNavigate }) => {
                 path: "/Edashinner",
               },
               {
-                icon: <FaTachometerAlt />,
-                label: "Assigned List",
+                icon: <FaList />,
+                label: "Recent Applications",
+                path: "/EmployeeRecent",
+              },
+              // {
+              //   icon: <FaCheckCircle />,
+              //   label: "Verify Documents",
+              //   path: "/Employee",
+              // },
+              {
+                icon: <FaUserShield />,
+                label: "Assign Distributors",
+                path: "/Spage",
+              },
+              {
+                icon: <FaList />,
+                label: "Assigned Distributor List",
+                path: "/ViewImpDocE",
+              },
+              {
+                icon: <FaFileAlt />,
+                label: "Document History",
                 path: "/Emplist",
+              },
+              {
+                icon: <FaInbox />,
+                label: "Receipt List",
+                path: "/EmployeeReceiptList",
+              },
+              {
+                icon: <FaFileUpload />,
+                label: "Certificate List",
+                path: "/EmployeeCertificateList",
+              },
+              {
+                icon: <FaExclamationTriangle />,
+                label: "Rejected Documents",
+                path: "/EmployeeRejectedDocs",
+              },
+              {
+                icon: <FaBell />,
+                label: "Manage Customers",
+                path: "/EmployeeCustomers",
+              },
+              {
+                icon: <FaHistory />,
+                label: "Activity Log",
+                path: "/EmployeeActivityLog",
               },
 
               // { icon: <FaPlus />, label: "Add Category", path: "/Spage" },

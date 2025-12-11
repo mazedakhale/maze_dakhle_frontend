@@ -11,6 +11,8 @@ const RequiredDocuments = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
   const [submitDisabled, setSubmitDisabled] = useState(false);
+  const [isBulkMode, setIsBulkMode] = useState(false);
+  const [multipleDocuments, setMultipleDocuments] = useState([{ name: "", file: null }]);
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -169,42 +171,89 @@ const RequiredDocuments = () => {
     // Validate category and subcategory
     if (!formData.category_id || !formData.subcategory_id) {
       Swal.fire("Error!", "Please select a category and subcategory.", "error");
-      return;
-    }
-
-    // Validate that a file is uploaded for new documents
-    if (!editId && !formData.file) {
-      Swal.fire("Error!", "Please upload a file.", "error");
+      setSubmitDisabled(false);
       return;
     }
 
     try {
-      const formDataToSend = new FormData();
-      formDataToSend.append("category_id", formData.category_id);
-      formDataToSend.append("subcategory_id", formData.subcategory_id);
-      formDataToSend.append("document_names", formData.document_names);
-      if (formData.file) {
-        formDataToSend.append("file", formData.file);
+      if (isBulkMode) {
+        // Filter out empty documents
+        const validDocuments = multipleDocuments.filter(doc => doc.name.trim() !== "");
+        if (validDocuments.length === 0) {
+          Swal.fire("Error!", "Please add at least one document name", "error");
+          setSubmitDisabled(false);
+          return;
+        }
+        
+        // Use sequential API calls since bulk endpoint doesn't exist
+        let successCount = 0;
+        let errorCount = 0;
+        
+        for (const doc of validDocuments) {
+          try {
+            const formDataToSend = new FormData();
+            formDataToSend.append("category_id", formData.category_id);
+            formDataToSend.append("subcategory_id", formData.subcategory_id);
+            formDataToSend.append("document_names", doc.name);
+            if (doc.file) {
+              formDataToSend.append("file", doc.file);
+            }
+            
+            await axios.post(`${API_BASE_URL}/required-documents`, formDataToSend, {
+              headers: {
+                "Content-Type": "multipart/form-data",
+              },
+              timeout: 30000,
+            });
+            
+            successCount++;
+          } catch (error) {
+            console.error("Error creating document:", error);
+            errorCount++;
+          }
+        }
+        
+        if (successCount > 0) {
+          Swal.fire("Success!", `${successCount} Documents added successfully${errorCount > 0 ? ` (${errorCount} failed)` : ''}`, "success");
+        } else {
+          Swal.fire("Error!", "Failed to add any documents", "error");
+        }
+      } else {
+        // Validate that a file is uploaded for new documents
+        if (!editId && !formData.file) {
+          Swal.fire("Error!", "Please upload a file.", "error");
+          setSubmitDisabled(false);
+          return;
+        }
+
+        const formDataToSend = new FormData();
+        formDataToSend.append("category_id", formData.category_id);
+        formDataToSend.append("subcategory_id", formData.subcategory_id);
+        formDataToSend.append("document_names", formData.document_names);
+        if (formData.file) {
+          formDataToSend.append("file", formData.file);
+        }
+
+        const url = editId
+          ? `${API_BASE_URL}/required-documents/${editId}`
+          : `${API_BASE_URL}/required-documents`;
+
+        const method = editId ? "patch" : "post";
+
+        const response = await axios[method](url, formDataToSend, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+          timeout: 30000,
+        });
+
+        Swal.fire(
+          "Success!",
+          `Document ${editId ? "updated" : "added"} successfully`,
+          "success"
+        );
       }
-
-      const url = editId
-        ? `${API_BASE_URL}/required-documents/${editId}`
-        : `${API_BASE_URL}/required-documents`;
-
-      const method = editId ? "patch" : "post";
-
-      const response = await axios[method](url, formDataToSend, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-        timeout: 30000, // Increase timeout to 30 seconds
-      });
-
-      Swal.fire(
-        "Success!",
-        `Document ${editId ? "updated" : "added"} successfully`,
-        "success"
-      );
+      
       setModalOpen(false);
       setFormData({
         category_id: "",
@@ -212,22 +261,47 @@ const RequiredDocuments = () => {
         document_names: "",
         file: null,
       });
+      setMultipleDocuments([{ name: "", file: null }]);
+      setIsBulkMode(false);
       setEditId(null);
       fetchDocuments();
     } catch (error) {
       console.error("Error submitting document:", error);
+      const errorMessage = error.response?.data?.message || `Failed to ${editId ? "update" : "add"} document(s)`;
       if (error.code === "ECONNABORTED") {
         Swal.fire("Error!", "Request timed out. Please try again.", "error");
       } else {
-        Swal.fire(
-          "Error!",
-          `Failed to ${editId ? "update" : "add"} document`,
-          "error"
-        );
+        Swal.fire("Error!", errorMessage, "error");
       }
     } finally {
       setSubmitDisabled(false);
       setEditId(null);
+    }
+  };
+
+  const addDocumentInput = () => {
+    setMultipleDocuments([...multipleDocuments, { name: "", file: null }]);
+  };
+
+  const removeDocumentInput = (index) => {
+    if (multipleDocuments.length > 1) {
+      const newDocuments = multipleDocuments.filter((_, i) => i !== index);
+      setMultipleDocuments(newDocuments);
+    }
+  };
+
+  const updateDocumentValue = (index, field, value) => {
+    const newDocuments = [...multipleDocuments];
+    newDocuments[index][field] = value;
+    setMultipleDocuments(newDocuments);
+  };
+
+  const toggleBulkMode = () => {
+    setIsBulkMode(!isBulkMode);
+    if (!isBulkMode) {
+      setMultipleDocuments([{ name: "", file: null }]);
+    } else {
+      setFormData({ ...formData, document_names: "", file: null });
     }
   };
 
@@ -367,15 +441,27 @@ const RequiredDocuments = () => {
       {/* Add / Edit Document Modal */}
       {modalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-          <div className="p-6 bg-white rounded-lg shadow-lg w-[400px]">
-            <h3 className="text-xl font-semibold mb-4">
-              {editId ? "Edit Document" : "Add Document"}
-            </h3>
+          <div className="p-6 bg-white rounded-lg shadow-lg w-[500px] max-h-[80vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xl font-semibold">
+                {editId ? "Edit Document" : isBulkMode ? "Add Multiple Documents" : "Add Document"}
+              </h3>
+              {!editId && (
+                <button
+                  type="button"
+                  onClick={toggleBulkMode}
+                  className="text-sm bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+                >
+                  {isBulkMode ? "Single Mode" : "Bulk Mode"}
+                </button>
+              )}
+            </div>
             <form onSubmit={handleSubmit}>
               <select
                 className="border border-gray-300 p-2 rounded w-full mb-4"
                 value={formData.category_id}
                 onChange={handleCategoryChange}
+                disabled={editId}
               >
                 <option value="">Select Category</option>
                 {categories.map((category) => (
@@ -393,6 +479,7 @@ const RequiredDocuments = () => {
                 onChange={(e) =>
                   setFormData({ ...formData, subcategory_id: e.target.value })
                 }
+                disabled={editId}
               >
                 <option value="">Select Subcategory</option>
                 {subcategories.map((subcategory) => (
@@ -404,33 +491,78 @@ const RequiredDocuments = () => {
                   </option>
                 ))}
               </select>
-              <input
-                type="text"
-                className="border border-gray-300 p-2 rounded w-full mb-4"
-                placeholder="Enter document name"
-                value={formData.document_names}
-                onChange={(e) =>
-                  setFormData({ ...formData, document_names: e.target.value })
-                }
-              />
-              {/* Show File Upload Only for Adding New Documents */}
-              {!editId && (
-                <input
-                  type="file"
-                  className="border border-gray-300 p-2 rounded w-full mb-4"
-                  onChange={(e) =>
-                    setFormData({ ...formData, file: e.target.files[0] })
-                  }
-                  required
-                />
+              
+              {isBulkMode && !editId ? (
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Documents (Add Multiple)
+                  </label>
+                  {multipleDocuments.map((document, index) => (
+                    <div key={index} className="border border-gray-200 p-3 rounded mb-3">
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="text-sm font-medium text-gray-600">Document {index + 1}</span>
+                        <button
+                          type="button"
+                          onClick={() => removeDocumentInput(index)}
+                          className="bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600 disabled:opacity-50"
+                          disabled={multipleDocuments.length === 1}
+                        >
+                          <FaTimes />
+                        </button>
+                      </div>
+                      <input
+                        type="text"
+                        className="border border-gray-300 p-2 rounded w-full mb-2"
+                        placeholder={`Document Name ${index + 1}`}
+                        value={document.name}
+                        onChange={(e) => updateDocumentValue(index, 'name', e.target.value)}
+                      />
+                      <input
+                        type="file"
+                        className="border border-gray-300 p-2 rounded w-full"
+                        onChange={(e) => updateDocumentValue(index, 'file', e.target.files[0])}
+                      />
+                    </div>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={addDocumentInput}
+                    className="bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600 flex items-center gap-1"
+                  >
+                    <FaPlus size={12} /> Add Another Document
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <input
+                    type="text"
+                    className="border border-gray-300 p-2 rounded w-full mb-4"
+                    placeholder="Enter document name"
+                    value={formData.document_names}
+                    onChange={(e) =>
+                      setFormData({ ...formData, document_names: e.target.value })
+                    }
+                  />
+                  {/* Show File Upload Only for Adding New Documents */}
+                  {!editId && (
+                    <input
+                      type="file"
+                      className="border border-gray-300 p-2 rounded w-full mb-4"
+                      onChange={(e) =>
+                        setFormData({ ...formData, file: e.target.files[0] })
+                      }
+                      required
+                    />
+                  )}
+                </>
               )}
+              
               <div className="flex justify-end space-x-3">
                 <button
                   type="submit"
                   disabled={submitDisabled}
                   className={` text-white px-4 py-2 rounded ${!submitDisabled ? "bg-orange-500 hover:bg-orange-600":"bg-gray-500 hover:bg-gray-600"}`}
                 >
-      
                   {submitDisabled ? "Submitting..." : ""}
                   {!submitDisabled && `${editId ? "Update" : "Save"}`}
                 </button>

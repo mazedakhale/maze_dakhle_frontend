@@ -223,7 +223,6 @@ const Verifydocumentshistory = () => {
         doc.address?.toLowerCase().includes(lowerQuery)
       );
     });
-
   const getDistributorName = (distributorId) => {
     const distributor = users.find(
       (user) => Number(user.user_id) === Number(distributorId)

@@ -370,7 +370,7 @@ const EmployeeRecentApplications = () => {
         doc.application_id?.toLowerCase().includes(q)
       );
     });
-
+console.log(filteredDocs)
   if (loading) return <p>Loading…</p>;
   if (error) return <p className="text-red-600">{error}</p>;
 

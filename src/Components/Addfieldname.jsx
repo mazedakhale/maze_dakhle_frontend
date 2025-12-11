@@ -19,6 +19,8 @@ const FieldNames = () => {
   const [editId, setEditId] = useState(null);
   const [editableField, setEditableField] = useState("");
   const [isAdding, setIsAdding] = useState(false);
+  const [isBulkMode, setIsBulkMode] = useState(false);
+  const [multipleFields, setMultipleFields] = useState([""]);
   const navigate = useNavigate();
   // Fetch fields and categories
   useEffect(() => {
@@ -154,14 +156,62 @@ const FieldNames = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post(`${API_BASE_URL}/field-names`, formData);
-      Swal.fire("Added!", "Field Name added successfully", "success");
+      if (isBulkMode) {
+        // Filter out empty fields
+        const validFields = multipleFields.filter(field => field.trim() !== "");
+        if (validFields.length === 0) {
+          Swal.fire("Error!", "Please add at least one field name", "error");
+          return;
+        }
+        
+        const bulkData = {
+          category_id: formData.category_id,
+          subcategory_id: formData.subcategory_id,
+          document_fields: validFields
+        };
+        
+        await axios.post(`${API_BASE_URL}/field-names/bulk`, bulkData);
+        Swal.fire("Added!", `${validFields.length} Field Names added successfully`, "success");
+      } else {
+        await axios.post(`${API_BASE_URL}/field-names`, formData);
+        Swal.fire("Added!", "Field Name added successfully", "success");
+      }
+      
       fetchFields();
       setModalOpen(false);
       setFormData({ category_id: "", subcategory_id: "", document_fields: "" });
+      setMultipleFields([""]);
+      setIsBulkMode(false);
       setEditId(null);
     } catch (error) {
-      Swal.fire("Error!", "Failed to save Field Name", "error");
+      const errorMessage = error.response?.data?.message || "Failed to save Field Name(s)";
+      Swal.fire("Error!", errorMessage, "error");
+    }
+  };
+
+  const addFieldInput = () => {
+    setMultipleFields([...multipleFields, ""]);
+  };
+
+  const removeFieldInput = (index) => {
+    if (multipleFields.length > 1) {
+      const newFields = multipleFields.filter((_, i) => i !== index);
+      setMultipleFields(newFields);
+    }
+  };
+
+  const updateFieldValue = (index, value) => {
+    const newFields = [...multipleFields];
+    newFields[index] = value;
+    setMultipleFields(newFields);
+  };
+
+  const toggleBulkMode = () => {
+    setIsBulkMode(!isBulkMode);
+    if (!isBulkMode) {
+      setMultipleFields([""]);
+    } else {
+      setFormData({ ...formData, document_fields: "" });
     }
   };
 
@@ -281,8 +331,19 @@ const FieldNames = () => {
       {/* Add / Edit Field Name Modal */}
       {modalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-          <div className="p-6 bg-white rounded-lg shadow-lg w-[400px]">
-            <h3 className="text-xl font-semibold mb-4">Add Field Name</h3>
+          <div className="p-6 bg-white rounded-lg shadow-lg w-[450px]">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xl font-semibold">
+                {isBulkMode ? "Add Multiple Field Names" : "Add Field Name"}
+              </h3>
+              <button
+                type="button"
+                onClick={toggleBulkMode}
+                className="text-sm bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+              >
+                {isBulkMode ? "Single Mode" : "Bulk Mode"}
+              </button>
+            </div>
             <form onSubmit={handleSubmit}>
               <select
                 className="border border-gray-300 p-2 rounded w-full mb-4"
@@ -317,15 +378,49 @@ const FieldNames = () => {
                   </option>
                 ))}
               </select>
-              <input
-                type="text"
-                className="border border-gray-300 p-2 rounded w-full mb-4"
-                placeholder="Field Name"
-                value={formData.document_fields}
-                onChange={(e) =>
-                  setFormData({ ...formData, document_fields: e.target.value })
-                }
-              />
+              {isBulkMode ? (
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Field Names (Add Multiple)
+                  </label>
+                  {multipleFields.map((field, index) => (
+                    <div key={index} className="flex items-center mb-2">
+                      <input
+                        type="text"
+                        className="border border-gray-300 p-2 rounded flex-1 mr-2"
+                        placeholder={`Field Name ${index + 1}`}
+                        value={field}
+                        onChange={(e) => updateFieldValue(index, e.target.value)}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeFieldInput(index)}
+                        className="bg-red-500 text-white px-2 py-2 rounded hover:bg-red-600 disabled:opacity-50"
+                        disabled={multipleFields.length === 1}
+                      >
+                        <FaTimes />
+                      </button>
+                    </div>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={addFieldInput}
+                    className="bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600 flex items-center gap-1"
+                  >
+                    <FaPlus size={12} /> Add Another Field
+                  </button>
+                </div>
+              ) : (
+                <input
+                  type="text"
+                  className="border border-gray-300 p-2 rounded w-full mb-4"
+                  placeholder="Field Name"
+                  value={formData.document_fields}
+                  onChange={(e) =>
+                    setFormData({ ...formData, document_fields: e.target.value })
+                  }
+                />
+              )}
               <div className="flex justify-end space-x-3">
                 <button
                   type="submit"

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import {
   FaRegFileAlt,
   FaDownload,
@@ -13,7 +13,7 @@ import API_BASE_URL from "../config/api";
 
 const EmployeeDocumentList = () => {
   const [documents, setDocuments] = useState([]);
-  const [loading, setLoading] = useState(false); // Start with loading false
+  const [loading, setLoading] = useState(false);
   const [categoryInfo, setCategoryInfo] = useState({
     categoryId: "",
     categoryName: "",
@@ -22,7 +22,11 @@ const EmployeeDocumentList = () => {
   });
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
+  const [employeeAssignments, setEmployeeAssignments] = useState([]);
+  const [isAuthorized, setIsAuthorized] = useState(false);
   const navigate = useNavigate();
+  const params = useParams();
+  const location = useLocation();
 
   // Helper function to detect name fields in multiple languages
   const getApplicantName = (documentFields) => {
@@ -58,65 +62,286 @@ const EmployeeDocumentList = () => {
   };
 
   useEffect(() => {
-    // Get selected category and subcategory from localStorage
-    const categoryId = localStorage.getItem("selectedCategoryId");
-    const categoryName = localStorage.getItem("selectedCategoryName");
-    const subcategoryId = localStorage.getItem("selectedSubcategoryId");
-    const subcategoryName = localStorage.getItem("selectedSubcategoryName");
-
-    setCategoryInfo({
-      categoryId,
-      categoryName,
-      subcategoryId,
-      subcategoryName,
-    });
-
-    // Get token from localStorage
+    // Get token and user info first
     const token = localStorage.getItem("token");
+    if (!token) {
+      Swal.fire("Error", "User token not found. Please login again.", "error")
+        .then(() => navigate("/login"));
+      return;
+    }
 
-    // If we have the required IDs, fetch documents
-    if (categoryId && subcategoryId && token) {
-      // Decode token manually
-      try {
-        const base64Url = token.split(".")[1];
-        const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
-        const jsonPayload = decodeURIComponent(
-          atob(base64)
-            .split("")
-            .map(function (c) {
-              return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
-            })
-            .join("")
-        );
+    // Decode token to get user info
+    try {
+      const base64Url = token.split(".")[1];
+      const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+      const jsonPayload = decodeURIComponent(
+        atob(base64)
+          .split("")
+          .map(function (c) {
+            return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
+          })
+          .join("")
+      );
 
-        const userData = JSON.parse(jsonPayload);
+      const userData = JSON.parse(jsonPayload);
 
-        if (userData && userData.user_id) {
-          fetchDocuments(
-            categoryId,
-            subcategoryId,
-            userData.user_id,
-            userData.role
-          );
-        } else {
-          Swal.fire("Error", "User information not found in token", "error");
-        }
-      } catch (error) {
-        console.error("Error decoding token:", error);
-        Swal.fire("Error", "Invalid token format", "error");
+      if (!userData || !userData.user_id) {
+        Swal.fire("Error", "User information not found in token", "error");
+        return;
       }
-    } else {
+
+      // For Admin, allow access to all categories
+      if (userData.role === "Admin") {
+        handleCategoryAccess(userData);
+      } 
+      // For Employee, check their assignments first
+      else if (userData.role === "Employee") {
+        fetchEmployeeAssignments(userData);
+      } else {
+        handleUnauthorized();
+      }
+
+    } catch (error) {
+      console.error("Error decoding token:", error);
+      Swal.fire("Error", "Invalid token format", "error");
+    }
+  }, [params, location, navigate]);
+
+  // Fetch employee's assigned categories and subcategories
+  const fetchEmployeeAssignments = async (userData) => {
+    try {
+      setLoading(true);
+      console.log("Fetching assignments for user ID:", userData.user_id);
+      
+      // Fetch employee assignments using the correct API endpoint
+      const response = await axios.get(
+        `${API_BASE_URL}/employee/employeeAsUser/${userData.user_id}`,
+      );
+      console.log("Employee assignments response:", response.data);
+
+      // Check if response.data is an array
+      if (!Array.isArray(response.data)) {
+        console.error("Expected array but got:", typeof response.data, response.data);
+        throw new Error("Invalid response format: expected array of assignments");
+      }
+
+      // Transform the response to match expected structure
+      const assignments = response.data.map(assignment => ({
+        id: assignment.id,
+        category_id: assignment.category?.category_id,
+        category_name: assignment.category?.category_name,
+        subcategory_id: assignment.subcategory?.subcategory_id,
+        subcategory_name: assignment.subcategory?.subcategory_name,
+        user_id: assignment.user_id
+      }));
+
+      console.log("Transformed assignments:", assignments);
+      setEmployeeAssignments(assignments);
+
+      // Check if employee has any assignments
+      if (assignments.length === 0) {
+        console.warn("Employee has no assignments");
+        Swal.fire({
+          title: "No Assignments",
+          text: "You are not assigned to any categories yet. Please contact your administrator.",
+          icon: "warning",
+          confirmButtonText: "OK"
+        }).then(() => {
+          navigate("/dashboard");
+        });
+        setLoading(false);
+        return;
+      }
+
+      // Now check if current category/subcategory is in assignments
+      handleCategoryAccess(userData, assignments);
+      
+    } catch (error) {
+      console.error("Error fetching employee assignments:", error);
+      console.error("Error details:", {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status,
+        statusText: error.response?.statusText
+      });
+      
+      // Show more detailed error message
+      let errorMessage = "Unable to fetch employee assignments.";
+      if (error.response?.status === 401) {
+        errorMessage = "Authentication failed. Please login again.";
+      } else if (error.response?.status === 404) {
+        errorMessage = "Employee assignments not found. You may not be assigned to any categories yet.";
+      } else if (error.response?.data?.message) {
+        errorMessage = `Error: ${error.response.data.message}`;
+      }
+      
+      Swal.fire(
+        "Error", 
+        errorMessage, 
+        "error"
+      );
+      setLoading(false);
+    }
+  };
+
+  // Handle category access validation and data fetching
+  const handleCategoryAccess = (userData, assignments = []) => {
+    console.log("handleCategoryAccess called with:", { userData: userData.user_id, assignmentsCount: assignments.length });
+    
+    // Try to get category and subcategory info from multiple sources
+    let categoryId, categoryName, subcategoryId, subcategoryName;
+
+    // 1. Try to get from URL parameters
+    if (params.categoryId && params.subcategoryId) {
+      categoryId = params.categoryId;
+      subcategoryId = params.subcategoryId;
+      console.log("Got from URL params:", { categoryId, subcategoryId });
+    }
+    
+    // 2. Try to get from location state (passed via navigate)
+    if (location.state) {
+      categoryId = location.state.categoryId || categoryId;
+      subcategoryId = location.state.subcategoryId || subcategoryId;
+      categoryName = location.state.categoryName || categoryName;
+      subcategoryName = location.state.subcategoryName || subcategoryName;
+      console.log("Got from location state:", { categoryId, subcategoryId, categoryName, subcategoryName });
+    }
+    
+    // 3. Fallback to localStorage
+    if (!categoryId || !subcategoryId) {
+      categoryId = categoryId || localStorage.getItem("selectedCategoryId");
+      categoryName = categoryName || localStorage.getItem("selectedCategoryName");
+      subcategoryId = subcategoryId || localStorage.getItem("selectedSubcategoryId");
+      subcategoryName = subcategoryName || localStorage.getItem("selectedSubcategoryName");
+      console.log("Got from localStorage:", { categoryId, subcategoryId, categoryName, subcategoryName });
+    }
+
+    console.log("Final values:", { categoryId, subcategoryId, categoryName, subcategoryName });
+
+    // Check if employee is authorized for this category/subcategory
+    if (userData.role === "Employee" && assignments.length > 0) {
+      // If no specific category/subcategory is provided, show all assigned documents
       if (!categoryId || !subcategoryId) {
-        Swal.fire(
-          "Error",
-          "Category or subcategory information is missing",
-          "error"
-        );
-      } else if (!token) {
-        Swal.fire("Error", "User token not found", "error");
+        console.log("No specific category/subcategory provided, showing all assigned documents");
+        setIsAuthorized(true);
+        setCategoryInfo({
+          categoryId: "all",
+          categoryName: "All Assigned Categories",
+          subcategoryId: "all",
+          subcategoryName: "All Assigned Subcategories",
+        });
+        // Fetch all documents for this employee across all their assignments
+        fetchAllAssignedDocuments(userData.user_id, userData.role, assignments);
+        return;
+      }
+
+      // First check if we have valid categoryId and subcategoryId
+      if (!categoryId || !subcategoryId) {
+        console.warn("Missing categoryId or subcategoryId:", { categoryId, subcategoryId });
+        setIsAuthorized(false);
+        setLoading(false);
+        Swal.fire({
+          title: "Missing Information",
+          text: "Category or subcategory information is missing. Please select a category and subcategory first.",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonText: "Go to Categories",
+          cancelButtonText: "Go Back"
+        }).then((result) => {
+          if (result.isConfirmed) {
+            navigate("/categories");
+          } else {
+            navigate(-1);
+          }
+        });
+        return;
+      }
+
+      const isAssigned = assignments.some(assignment => 
+        assignment.category_id?.toString() === categoryId.toString() && 
+        assignment.subcategory_id?.toString() === subcategoryId.toString()
+      );
+
+      if (!isAssigned) {
+        setIsAuthorized(false);
+        setLoading(false);
+        Swal.fire({
+          title: "Access Denied",
+          text: "You are not assigned to this category and subcategory.",
+          icon: "error",
+          confirmButtonText: "Go to Assigned Categories"
+        }).then(() => {
+          // Navigate to a page showing their assigned categories
+          navigate("/employee-assignments");
+        });
+        return;
       }
     }
-  }, []);
+
+    setIsAuthorized(true);
+
+    if (!categoryId || !subcategoryId) {
+      setLoading(false);
+      Swal.fire({
+        title: "Missing Information",
+        text: "Category or subcategory information is missing. Please select a category and subcategory first.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Go to Categories",
+        cancelButtonText: "Go Back"
+      }).then((result) => {
+        if (result.isConfirmed) {
+          navigate("/categories");
+        } else {
+          navigate(-1);
+        }
+      });
+      return;
+    }
+
+    // Set category info and fetch documents
+    if (categoryId && subcategoryId && (!categoryName || !subcategoryName)) {
+      fetchCategoryInfo(categoryId, subcategoryId).then((info) => {
+        setCategoryInfo({
+          categoryId,
+          categoryName: info.categoryName || categoryName || "Unknown Category",
+          subcategoryId,
+          subcategoryName: info.subcategoryName || subcategoryName || "Unknown Subcategory",
+        });
+      });
+    } else {
+      setCategoryInfo({
+        categoryId: categoryId || "",
+        categoryName: categoryName || "Unknown Category",
+        subcategoryId: subcategoryId || "",
+        subcategoryName: subcategoryName || "Unknown Subcategory",
+      });
+    }
+
+    // Fetch documents
+    fetchDocuments(categoryId, subcategoryId, userData.user_id, userData.role);
+  };
+
+  // Helper function to fetch category and subcategory names
+  const fetchCategoryInfo = async (categoryId, subcategoryId) => {
+    try {
+      const [categoryResponse, subcategoryResponse] = await Promise.all([
+        axios.get(`${API_BASE_URL}/categories/${categoryId}`),
+        axios.get(`${API_BASE_URL}/subcategories/${subcategoryId}`)
+      ]);
+      
+      return {
+        categoryName: categoryResponse.data?.category_name || "Unknown Category",
+        subcategoryName: subcategoryResponse.data?.subcategory_name || "Unknown Subcategory"
+      };
+    } catch (error) {
+      console.error("Error fetching category info:", error);
+      return {
+        categoryName: "Unknown Category",
+        subcategoryName: "Unknown Subcategory"
+      };
+    }
+  };
 
   const fetchDocuments = async (
     categoryId,
@@ -125,18 +350,37 @@ const EmployeeDocumentList = () => {
     userRole
   ) => {
     try {
+      setLoading(true);
+      
       // Check if user role is Admin or Employee
       if (userRole === "Admin" || userRole === "Employee") {
         // Use the API endpoint
         const response = await axios.get(
-          `${API_BASE_URL}/documents/category-docs/${categoryId}/${subcategoryId}/${userId}`
+          `${API_BASE_URL}/documents/category-docs/${categoryId}/${subcategoryId}/${userId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`
+            }
+          }
         );
 
         if (response.data.error) {
           Swal.fire("Error", response.data.error, "error");
           setDocuments([]);
         } else {
-          setDocuments(response.data);
+          // For employees, additional filter to ensure they only see documents 
+          // from categories/subcategories they're assigned to
+          if (userRole === "Employee" && employeeAssignments.length > 0) {
+            const authorizedDocs = response.data.filter(doc => {
+              return employeeAssignments.some(assignment => 
+                assignment.category_id.toString() === categoryId.toString() && 
+                assignment.subcategory_id.toString() === subcategoryId.toString()
+              );
+            });
+            setDocuments(authorizedDocs);
+          } else {
+            setDocuments(response.data);
+          }
         }
       } else {
         handleUnauthorized();
@@ -145,6 +389,72 @@ const EmployeeDocumentList = () => {
       console.error("Error fetching documents:", error);
       Swal.fire("Error", "Failed to fetch documents", "error");
       setDocuments([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch all documents for employee's assigned categories/subcategories
+  const fetchAllAssignedDocuments = async (userId, userRole, assignments) => {
+    try {
+      setLoading(true);
+      
+      if (userRole === "Employee" && assignments.length > 0) {
+        // Fetch documents for all assignments
+        const allDocuments = [];
+        
+        for (const assignment of assignments) {
+          try {
+            const response = await axios.get(
+              `${API_BASE_URL}/documents/category-docs/${assignment.category_id}/${assignment.subcategory_id}/${userId}`,
+              {
+                headers: {
+                  Authorization: `Bearer ${localStorage.getItem("token")}`
+                }
+              }
+            );
+
+            if (response.data && !response.data.error) {
+              // Add category and subcategory info to each document
+              const docsWithCategoryInfo = response.data.map(doc => ({
+                ...doc,
+                category_name: assignment.category_name,
+                subcategory_name: assignment.subcategory_name,
+                assignment_category_id: assignment.category_id,
+                assignment_subcategory_id: assignment.subcategory_id
+              }));
+              allDocuments.push(...docsWithCategoryInfo);
+            }
+          } catch (assignmentError) {
+            console.error(`Error fetching documents for assignment ${assignment.id}:`, assignmentError);
+            // Continue with other assignments even if one fails
+          }
+        }
+
+        // Remove duplicates based on document_id
+        const uniqueDocuments = allDocuments.filter((doc, index, self) => 
+          index === self.findIndex(d => d.document_id === doc.document_id)
+        );
+
+        console.log("All assigned documents:", uniqueDocuments);
+        setDocuments(uniqueDocuments);
+      } else if (userRole === "Admin") {
+        // For admin, fetch all documents (this is a fallback case)
+        const response = await axios.get(`${API_BASE_URL}/documents/list`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`
+          }
+        });
+        setDocuments(response.data.documents || response.data);
+      } else {
+        handleUnauthorized();
+      }
+    } catch (error) {
+      console.error("Error fetching all assigned documents:", error);
+      Swal.fire("Error", "Failed to fetch assigned documents", "error");
+      setDocuments([]);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -230,6 +540,36 @@ const EmployeeDocumentList = () => {
     );
   }
 
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="ml-[300px] mt-[80px] p-6 w-[calc(100%-260px)]">
+        <div className="bg-white p-6 rounded-lg shadow-md text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading documents...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show unauthorized message for employees trying to access unassigned categories
+  if (!isAuthorized) {
+    return (
+      <div className="ml-[300px] mt-[80px] p-6 w-[calc(100%-260px)]">
+        <div className="bg-white p-6 rounded-lg shadow-md">
+          <h2 className="text-xl font-semibold text-red-500">Access Denied</h2>
+          <p className="mt-2">You are not assigned to this category and subcategory.</p>
+          <button
+            onClick={() => navigate("/employee-assignments")}
+            className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          >
+            View Your Assignments
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   // Handle view document
   const handleView = (documentId, categoryId, subcategoryId) => {
     navigate(`/View/${documentId}`, { state: { categoryId, subcategoryId } });
@@ -281,6 +621,8 @@ const EmployeeDocumentList = () => {
     }
   };
 
+  console.log(filteredDocuments)
+
   return (
     <div className="w-[calc(100%-350px)] ml-[310px] mt-[80px] p-6">
       {/* Outer Container */}
@@ -291,6 +633,13 @@ const EmployeeDocumentList = () => {
             {categoryInfo.categoryName} &gt; {categoryInfo.subcategoryName}{" "}
             Documents
           </h2>
+          {getUserRole() === "Employee" && (
+            <div className="mt-2">
+              <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">
+                ✓ Assigned Category - You have access to view these documents
+              </span>
+            </div>
+          )}
         </div>
 
         {/* Search Bar and Status Filter */}
@@ -426,9 +775,9 @@ const EmployeeDocumentList = () => {
                   <td className="border p-2">
                     {doc.subcategory_name || categoryInfo.subcategoryName}
                   </td>
-                  <td className="border p-2">{doc.user?.name || "N/A"}</td>
-                  <td className="border p-2">{doc.user?.email || "N/A"}</td>
-                  <td className="border p-2">{doc.user?.phone || "N/A"}</td>
+                  <td className="border p-2">{doc?.name || "N/A"}</td>
+                  <td className="border p-2">{doc?.email || "N/A"}</td>
+                  <td className="border p-2">{doc?.phone || "N/A"}</td>
                   <td className="border p-2">
                     <div className="flex flex-col gap-1">
                       {/* Status Badge */}

@@ -68,6 +68,8 @@ import Edashinner from "./Components/Edashinner";
 import Employeedashboard from "./Components/Employeedashboard";
 import Employee from "./Components/Employee";
 import Spage from "./Components/EmployeeDocumentList"
+import EmployeeReceiptList from "./Components/EmployeeReceiptList";
+import EmployeeCertificateList from "./Components/EmployeeCertificateList";
 import Received from "./Components/Received";
 import Dsentlist from "./Components/Dsentlist";
 import Distributorrejected from "./Components/Distributorrejected";
@@ -249,6 +251,8 @@ function App() {
         <Route path="/Employee" element={<ProtectedRoute allowedRoles={['Employee']}><Employeedashboard><Employee /></Employeedashboard></ProtectedRoute>} />
         <Route path="/EmployeeRecent" element={<ProtectedRoute allowedRoles={['Employee']}><Employeedashboard><EmployeeRecentApplications/></Employeedashboard></ProtectedRoute>} />
         <Route path="/Spage" element={<ProtectedRoute allowedRoles={['Employee']}><Employeedashboard><Spage /></Employeedashboard></ProtectedRoute>} />
+        <Route path="/EmployeeReceiptList" element={<ProtectedRoute allowedRoles={['Employee']}><Employeedashboard><EmployeeReceiptList /></Employeedashboard></ProtectedRoute>} />
+        <Route path="/EmployeeCertificateList" element={<ProtectedRoute allowedRoles={['Employee']}><Employeedashboard><EmployeeCertificateList /></Employeedashboard></ProtectedRoute>} />
 
 
         {/* Invoice & Document Routes */}

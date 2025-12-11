@@ -169,7 +169,7 @@ const Youtube = () => {
                 {[
                   "ID",
                   "Preview",
-                  "URL",
+                  // "URL",
                   "Description",
                   "YouTube Link",
                   "YouTube Desc",
@@ -205,7 +205,7 @@ const Youtube = () => {
                         View
                       </a>
                     </td>
-                    <td className="px-4 py-2 text-center border">
+                    {/* <td className="px-4 py-2 text-center border">
                       <a
                         href={img.imageUrl}
                         target="_blank"
@@ -214,7 +214,7 @@ const Youtube = () => {
                       >
                         View
                       </a>
-                    </td>
+                    </td> */}
                     <td className="px-4 py-2 text-center border">
                       {img.description || "-"}
                     </td>
