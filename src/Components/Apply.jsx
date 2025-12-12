@@ -361,8 +361,12 @@ const Apply = () => {
       return;
     }
 
-    // ✅ Check wallet balance before proceeding
-    if (walletBalance < applicationFee) {
+
+    // ✅ Check wallet balance before proceeding - Convert to numbers for proper comparison
+    const numericWalletBalance = Number(walletBalance);
+    const numericApplicationFee = Number(applicationFee);
+    
+    if (numericWalletBalance < numericApplicationFee) {
       Swal.fire({
         icon: "warning",
         title: "Insufficient Wallet Balance",

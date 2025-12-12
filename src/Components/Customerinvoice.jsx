@@ -457,7 +457,7 @@ const InvoicePage = () => {
           <img src={logo1} alt="Logo" className="h-10 mr-3" />
           <span className="text-xl font-bold">Vendor Management System</span>
         </div>
-        <div className="relative border-t-4 border-orange-400 bg-[#F4F4F4] p-4 rounded-t-lg">
+        <div className="relative  border-orange-400  p-4 rounded-t-lg">
           {/* Replace this block: */}
 
           {/* Cross button */}
@@ -466,7 +466,7 @@ const InvoicePage = () => {
               setIsAdding(false);
               navigate("/Cdashinner");
             }}
-            className="absolute top-1/2 right-4 transform -translate-y-1/2 text-gray-600 hover:text-gray-800"
+            className="absolute top-1/2 right-4 transform -translate-y-1/2  hover:text-gray-300"
           >
             <FaTimes size={20} />
           </button>

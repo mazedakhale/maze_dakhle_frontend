@@ -16,6 +16,7 @@ import {
   FaSignOutAlt,
   FaInbox,
   FaFileUpload,
+  FaFile
 } from "react-icons/fa";
 import { IoMdLogOut } from "react-icons/io";
 import { FaRegCircleUser } from "react-icons/fa6";
@@ -61,8 +62,8 @@ const Sidebar = ({ onNavigate }) => {
                 path: "/Spage",
               },
               {
-                icon: <FaList />,
-                label: "Assigned Distributor List",
+                icon: <FaFile />,
+                label: "Important Documents",
                 path: "/ViewImpDocE",
               },
               {

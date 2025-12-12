@@ -345,8 +345,11 @@ const Edashinner = () => {
                     {category.subcategories
                       .filter((subcategory) => category.assignedSubcategories.includes(subcategory.subcategory_id))
                       .map((subcategory) => {
+                        // Match subcategory by name instead of ID
                         const subcategoryCount =
-                          subcategoryCounts.find((count) => count.subcategoryId === subcategory.subcategory_id)?.pendingCount || "0";
+                          subcategoryCounts.find((count) => 
+                            count.subcategoryName === subcategory.subcategory_name
+                          )?.pendingCount || "0";
 
                         return (
                           <div
