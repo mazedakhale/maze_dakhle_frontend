@@ -152,7 +152,23 @@ const Edashinner = () => {
           }
         });
 
-        setCounts(totalCounts);
+        // Calculate total pending count for assigned subcategories
+        let totalAssignedPendingCount = 0;
+        userCategories.forEach((category) => {
+          category.assignedSubcategories.forEach((subcategoryId) => {
+            const subcategory = category.subcategories.find(
+              (sub) => sub.subcategory_id === subcategoryId
+            );
+            if (subcategory) {
+              const subcategoryCount = subcategoryCounts.find((count) => 
+                count.subcategoryName === subcategory.subcategory_name
+              )?.pendingCount || 0;
+              totalAssignedPendingCount += parseInt(subcategoryCount) || 0;
+            }
+          });
+        });
+
+        setCounts({...totalCounts, assignedPendingCount: totalAssignedPendingCount});
         setCategoryWiseCounts(categoryWiseCounts);
         setCategories(categories);
         setSubcategoriesMap(subcategoriesObj);
@@ -191,9 +207,18 @@ const Edashinner = () => {
   };
 
   const pendingCount = counts?.documentStatus?.find(({ status }) => status === "Pending")?.count || "0";
+  const assignedPendingCount = counts?.assignedPendingCount || 0;
 
   // Static cards
   const staticCards = [
+    // {
+    //   id: "assignedPendingCount",
+    //   icon: FaClipboardList,
+    //   title: "My Assigned Pending",
+    //   color: "bg-[#DC2626]",
+    //   count: assignedPendingCount,
+    //   linkTo: null,
+    // },
     {
       id: "customers",
       icon: FaUsers,
@@ -245,7 +270,7 @@ const Edashinner = () => {
 
       {pendingCount !== "-" && (
         <div className="fixed top-4 left-1/2 transform -translate-x-1/2 p-4 bg-white text-red-600 font-semibold rounded-lg shadow-xl border border-red-400 flex items-center justify-between w-[500px] z-[9999]">
-          <p className="text-lg">🚨 Pending Count: {pendingCount}</p>
+          <p className="text-lg">🚨 Pending Count: {assignedPendingCount}</p>
           <button className="text-red-600 text-xl font-bold hover:text-red-800" onClick={() => setShowPendingModal(false)}>
             &times;
           </button>
@@ -256,7 +281,7 @@ const Edashinner = () => {
       <h2 className="text-2xl font-bold mb-4">Total Counts</h2>
       <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-3 gap-6 mb-8">
         {staticCards.map((card) => {
-          const count = getCountForCard(card.id);
+          const count = card.count !== undefined ? card.count : getCountForCard(card.id);
           return (
             <div
               key={card.id}

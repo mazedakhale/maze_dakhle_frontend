@@ -81,21 +81,21 @@ const Sidebar = ({ onNavigate }) => {
                 label: "Certificate List",
                 path: "/EmployeeCertificateList",
               },
-              {
-                icon: <FaExclamationTriangle />,
-                label: "Rejected Documents",
-                path: "/EmployeeRejectedDocs",
-              },
-              {
-                icon: <FaBell />,
-                label: "Manage Customers",
-                path: "/EmployeeCustomers",
-              },
-              {
-                icon: <FaHistory />,
-                label: "Activity Log",
-                path: "/EmployeeActivityLog",
-              },
+              // {
+              //   icon: <FaExclamationTriangle />,
+              //   label: "Rejected Documents",
+              //   path: "/EmployeeRejectedDocs",
+              // },
+              // {
+              //   icon: <FaBell />,
+              //   label: "Manage Customers",
+              //   path: "/EmployeeCustomers",
+              // },
+              // {
+              //   icon: <FaHistory />,
+              //   label: "Activity Log",
+              //   path: "/EmployeeActivityLog",
+              // },
 
               // { icon: <FaPlus />, label: "Add Category", path: "/Spage" },
               // { icon: <FaList />, label: "Subcategory", path: "/Addsubcategory" },

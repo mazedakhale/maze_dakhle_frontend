@@ -620,8 +620,8 @@ const EmployeeDocumentList = () => {
       Swal.fire("Error", "Failed to fetch certificate.", "error");
     }
   };
+  
 
-  console.log(filteredDocuments)
 
   return (
     <div className="w-[calc(100%-350px)] ml-[310px] mt-[80px] p-6">
@@ -736,8 +736,8 @@ const EmployeeDocumentList = () => {
               <th className="border p-2 font-bold">VLE Email</th>
               <th className="border p-2 font-bold">VLE Phone</th>
               <th className="border p-2 font-bold">Verification</th>
-              <th className="border p-2 font-bold">Action</th>
               <th className="border p-2 font-bold">View</th>
+              <th className="border p-2 font-bold">Action</th>
               <th className="border p-2 font-bold">Receipt</th>
               <th className="border p-2 font-bold">Certificate</th>
             </tr>
@@ -821,9 +821,10 @@ const EmployeeDocumentList = () => {
                     </div>
                   </td>
                   <td className="border p-2">
+                    {console.log( "Document path:", doc.document_path)}
                     <button
                       className="bg-blue-500 text-white px-3 py-1 rounded text-xs"
-                      onClick={() => window.open(doc.document_path, "_blank")}
+                      onClick={() => handleView(doc.document_id)}
                     >
                       <FaRegFileAlt className="inline mr-1" /> View
                     </button>
