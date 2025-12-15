@@ -275,7 +275,7 @@ const Mainpage = () => {
                   <Icon className="text-[#F79711] text-3xl mb-2" />
                   <h3 className="text-lg font-semibold">{doc.doc_type_name}</h3>
                   <p className="text-gray-600 text-sm mt-1">
-                    Register your {doc.doc_type_name}
+                    {doc?.description}
                   </p>
                 </div>
               );
@@ -332,7 +332,7 @@ const Mainpage = () => {
                   <Icon className="text-[#F79711] text-3xl mb-2" />
                   <h3 className="text-lg font-semibold">{doc.doc_type_name}</h3>
                   <p className="text-gray-600 text-sm mt-1">
-                    Register your {doc.doc_type_name}
+                    {doc?.description}
                   </p>
                 </div>
               );
