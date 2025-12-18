@@ -19,7 +19,6 @@ const FieldNames = () => {
   const [editId, setEditId] = useState(null);
   const [editableField, setEditableField] = useState("");
   const [isAdding, setIsAdding] = useState(false);
-  const [isBulkMode, setIsBulkMode] = useState(false);
   const [multipleFields, setMultipleFields] = useState([""]);
   const navigate = useNavigate();
   // Fetch fields and categories
@@ -156,32 +155,26 @@ const FieldNames = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      if (isBulkMode) {
-        // Filter out empty fields
-        const validFields = multipleFields.filter(field => field.trim() !== "");
-        if (validFields.length === 0) {
-          Swal.fire("Error!", "Please add at least one field name", "error");
-          return;
-        }
-        
-        const bulkData = {
-          category_id: formData.category_id,
-          subcategory_id: formData.subcategory_id,
-          document_fields: validFields
-        };
-        
-        await axios.post(`${API_BASE_URL}/field-names/bulk`, bulkData);
-        Swal.fire("Added!", `${validFields.length} Field Names added successfully`, "success");
-      } else {
-        await axios.post(`${API_BASE_URL}/field-names`, formData);
-        Swal.fire("Added!", "Field Name added successfully", "success");
+      // Filter out empty fields
+      const validFields = multipleFields.filter(field => field.trim() !== "");
+      if (validFields.length === 0) {
+        Swal.fire("Error!", "Please add at least one field name", "error");
+        return;
       }
+      
+      const bulkData = {
+        category_id: formData.category_id,
+        subcategory_id: formData.subcategory_id,
+        document_fields: validFields
+      };
+      
+      await axios.post(`${API_BASE_URL}/field-names/bulk`, bulkData);
+      Swal.fire("Added!", `${validFields.length} Field Names added successfully`, "success");
       
       fetchFields();
       setModalOpen(false);
       setFormData({ category_id: "", subcategory_id: "", document_fields: "" });
       setMultipleFields([""]);
-      setIsBulkMode(false);
       setEditId(null);
     } catch (error) {
       const errorMessage = error.response?.data?.message || "Failed to save Field Name(s)";
@@ -206,14 +199,19 @@ const FieldNames = () => {
     setMultipleFields(newFields);
   };
 
-  const toggleBulkMode = () => {
-    setIsBulkMode(!isBulkMode);
-    if (!isBulkMode) {
-      setMultipleFields([""]);
-    } else {
-      setFormData({ ...formData, document_fields: "" });
+  // Group fields by category and subcategory
+  const groupedFields = fields.reduce((acc, field) => {
+    const key = `${field.category.category_id}-${field.subcategory.subcategory_id}`;
+    if (!acc[key]) {
+      acc[key] = {
+        category: field.category,
+        subcategory: field.subcategory,
+        fields: []
+      };
     }
-  };
+    acc[key].fields.push(field);
+    return acc;
+  }, {});
 
   return (
     <div className="ml-[300px] mt-[80px] p-6 w-[calc(100%-260px)] overflow-x-hidden">
@@ -244,87 +242,113 @@ const FieldNames = () => {
           </button>
         </div>
 
-        {/* Table */}
-        <div className="p-6 overflow-x-auto">
-          <table className="w-full border border-[#776D6DA8] text-sm bg-white shadow-md rounded-md">
-            <thead className="bg-[#F58A3B14] border-b-2 border-[#776D6DA8]">
-              <tr>
-                {["Field Name", "Category", "Subcategory", "Actions"].map(
-                  (header, index) => (
-                    <th
-                      key={index}
-                      className="px-4 py-3 border border-[#776D6DA8] text-black font-semibold text-center"
-                    >
-                      {header}
-                    </th>
-                  )
-                )}
-              </tr>
-            </thead>
-            <tbody>
-              {fields.length > 0 ? (
-                fields.map((field, index) => (
-                  <tr
-                    key={field.id}
-                    className={`${
-                      index % 2 === 0 ? "bg-[#FFFFFF]" : "bg-[#F58A3B14]"
-                    } hover:bg-orange-100 transition duration-200`}
-                  >
-                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">
-                      {editId === field.id ? (
-                        <input
-                          type="text"
-                          value={editableField}
-                          onChange={(e) => setEditableField(e.target.value)}
-                          className="border border-gray-400 p-2 rounded w-full"
-                        />
-                      ) : (
-                        field.document_fields
-                      )}
-                    </td>
-                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">
-                      {field.category.category_name}
-                    </td>
-                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">
-                      {field.subcategory.subcategory_name}
-                    </td>
-                    <td className="px-4 py-3 border border-[#776D6DA8] text-center">
-                      {editId === field.id ? (
-                        <button
-                          onClick={() => handleSave(field.id)}
-                          className="bg-green-500 text-white px-3 py-1 rounded mr-2 hover:bg-green-600"
-                        >
-                          <FaSave />
-                        </button>
-                      ) : (
-                        <button
-                          onClick={() => handleEdit(field)}
-                          className="bg-blue-500 text-white px-3 py-1 rounded mr-2 hover:bg-blue-600"
-                        >
-                          <FaEdit />
-                        </button>
-                      )}
-                      <button
-                        onClick={() => handleDelete(field.id)}
-                        className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+        {/* Cards Display */}
+        <div className="p-6 space-y-6">
+          {Object.keys(groupedFields).length > 0 ? (
+            Object.values(groupedFields).map((group, groupIndex) => (
+              <div
+                key={`${group.category.category_id}-${group.subcategory.subcategory_id}`}
+                className="bg-white border border-gray-200 rounded-lg shadow-md overflow-hidden"
+              >
+                {/* Card Header */}
+                <div className="bg-gradient-to-r from-orange-50 to-orange-100 border-b border-gray-200 p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-800">
+                        {group.category.category_name}
+                      </h3>
+                      <p className="text-sm text-gray-600 mt-1">
+                        Subcategory: {group.subcategory.subcategory_name}
+                      </p>
+                    </div>
+                    <div className="text-sm bg-orange-500 text-white px-3 py-1 rounded-full">
+                      {group.fields.length} field{group.fields.length !== 1 ? 's' : ''}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Field Names List */}
+                <div className="p-4">
+                  <div className="grid gap-3">
+                    {group.fields.map((field, fieldIndex) => (
+                      <div
+                        key={field.id}
+                        className={`
+                          flex items-center justify-between p-3 rounded-lg border
+                          ${fieldIndex % 2 === 0 ? 'bg-gray-50' : 'bg-white'}
+                          hover:bg-orange-50 transition duration-200
+                        `}
                       >
-                        <FaTrash />
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td
-                    colSpan="4"
-                    className="px-4 py-3 border border-[#776D6DA8] text-center"
-                  >
-                    No field names found.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+                        <div className="flex-1">
+                          {editId === field.id ? (
+                            <input
+                              type="text"
+                              value={editableField}
+                              onChange={(e) => setEditableField(e.target.value)}
+                              className="border border-gray-400 p-2 rounded w-full focus:outline-none focus:ring-2 focus:ring-orange-500"
+                              autoFocus
+                            />
+                          ) : (
+                            <span className="text-gray-800 font-medium">
+                              {field.document_fields}
+                            </span>
+                          )}
+                        </div>
+                        
+                        {/* Action Buttons */}
+                        <div className="flex items-center space-x-2 ml-4">
+                          {editId === field.id ? (
+                            <>
+                              <button
+                                onClick={() => handleSave(field.id)}
+                                className="bg-green-500 text-white px-3 py-2 rounded-lg hover:bg-green-600 transition duration-200 flex items-center"
+                                title="Save"
+                              >
+                                <FaSave />
+                              </button>
+                              <button
+                                onClick={() => {
+                                  setEditId(null);
+                                  setEditableField("");
+                                }}
+                                className="bg-gray-500 text-white px-3 py-2 rounded-lg hover:bg-gray-600 transition duration-200 flex items-center"
+                                title="Cancel"
+                              >
+                                <FaTimes />
+                              </button>
+                            </>
+                          ) : (
+                            <button
+                              onClick={() => handleEdit(field)}
+                              className="bg-blue-500 text-white px-3 py-2 rounded-lg hover:bg-blue-600 transition duration-200 flex items-center"
+                              title="Edit"
+                            >
+                              <FaEdit />
+                            </button>
+                          )}
+                          <button
+                            onClick={() => handleDelete(field.id)}
+                            className="bg-red-500 text-white px-3 py-2 rounded-lg hover:bg-red-600 transition duration-200 flex items-center"
+                            title="Delete"
+                          >
+                            <FaTrash />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="bg-white border border-gray-200 rounded-lg shadow-md p-8 text-center">
+              <div className="text-gray-500">
+                <FaPlus className="mx-auto mb-4 text-4xl" />
+                <h3 className="text-lg font-medium mb-2">No field names found</h3>
+                <p className="text-sm">Add your first field name using the button above.</p>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -334,15 +358,8 @@ const FieldNames = () => {
           <div className="p-6 bg-white rounded-lg shadow-lg w-[450px]">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-xl font-semibold">
-                {isBulkMode ? "Add Multiple Field Names" : "Add Field Name"}
+                Add Multiple Field Names
               </h3>
-              <button
-                type="button"
-                onClick={toggleBulkMode}
-                className="text-sm bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
-              >
-                {isBulkMode ? "Single Mode" : "Bulk Mode"}
-              </button>
             </div>
             <form onSubmit={handleSubmit}>
               <select
@@ -378,49 +395,37 @@ const FieldNames = () => {
                   </option>
                 ))}
               </select>
-              {isBulkMode ? (
-                <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Field Names (Add Multiple)
-                  </label>
-                  {multipleFields.map((field, index) => (
-                    <div key={index} className="flex items-center mb-2">
-                      <input
-                        type="text"
-                        className="border border-gray-300 p-2 rounded flex-1 mr-2"
-                        placeholder={`Field Name ${index + 1}`}
-                        value={field}
-                        onChange={(e) => updateFieldValue(index, e.target.value)}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => removeFieldInput(index)}
-                        className="bg-red-500 text-white px-2 py-2 rounded hover:bg-red-600 disabled:opacity-50"
-                        disabled={multipleFields.length === 1}
-                      >
-                        <FaTimes />
-                      </button>
-                    </div>
-                  ))}
-                  <button
-                    type="button"
-                    onClick={addFieldInput}
-                    className="bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600 flex items-center gap-1"
-                  >
-                    <FaPlus size={12} /> Add Another Field
-                  </button>
-                </div>
-              ) : (
-                <input
-                  type="text"
-                  className="border border-gray-300 p-2 rounded w-full mb-4"
-                  placeholder="Field Name"
-                  value={formData.document_fields}
-                  onChange={(e) =>
-                    setFormData({ ...formData, document_fields: e.target.value })
-                  }
-                />
-              )}
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Field Names (Add Multiple)
+                </label>
+                {multipleFields.map((field, index) => (
+                  <div key={index} className="flex items-center mb-2">
+                    <input
+                      type="text"
+                      className="border border-gray-300 p-2 rounded flex-1 mr-2"
+                      placeholder={`Field Name ${index + 1}`}
+                      value={field}
+                      onChange={(e) => updateFieldValue(index, e.target.value)}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removeFieldInput(index)}
+                      className="bg-red-500 text-white px-2 py-2 rounded hover:bg-red-600 disabled:opacity-50"
+                      disabled={multipleFields.length === 1}
+                    >
+                      <FaTimes />
+                    </button>
+                  </div>
+                ))}
+                <button
+                  type="button"
+                  onClick={addFieldInput}
+                  className="bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600 flex items-center gap-1"
+                >
+                  <FaPlus size={12} /> Add Another Field
+                </button>
+              </div>
               <div className="flex justify-end space-x-3">
                 <button
                   type="submit"

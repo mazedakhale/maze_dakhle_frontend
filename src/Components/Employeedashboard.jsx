@@ -137,6 +137,7 @@ const Sidebar = ({ onNavigate }) => {
 // Employee Dashboard Component
 const Employeedashboard = ({ children }) => {
   const [userEmail, setUserEmail] = useState("");
+  const [userName, setUserName] = useState("");
   const [showEmail, setShowEmail] = useState(false);
   const navigate = useNavigate();
 
@@ -146,6 +147,7 @@ const Employeedashboard = ({ children }) => {
       try {
         const decodedToken = jwtDecode(token);
         setUserEmail(decodedToken.email);
+        setUserName(decodedToken.name || decodedToken.full_name || decodedToken.username || "Employee");
       } catch (error) {
         console.error("Invalid token:", error);
       }
@@ -166,7 +168,7 @@ const Employeedashboard = ({ children }) => {
       <div className="flex-1 p-6 ml-[00%] pt-[70px] overflow-auto">
         {/* Top Navbar */}
         <div className="flex items-center justify-between bg-[#F88F2A] text-white px-4 py-2 shadow-md fixed top-0 left-[20%] w-[80%] z-10 h-[73px] rounded-md">
-          <span className="text-lg font-bold">Employee Dashboard</span>
+          <span className="text-lg font-bold">Welcome, {userName || 'Employee'}</span>
 
           <div className="flex items-center gap-6 relative">
             {/* Profile Icon */}

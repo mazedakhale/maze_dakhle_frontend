@@ -105,6 +105,7 @@ const Sidebar = ({ onNavigate }) => {
 // Distributor Dashboard Component
 const Distributordashboard = ({ children }) => {
   const [userEmail, setUserEmail] = useState("");
+  const [userName, setUserName] = useState("");
   const [showEmail, setShowEmail] = useState(false);
   const navigate = useNavigate();
 
@@ -114,6 +115,7 @@ const Distributordashboard = ({ children }) => {
       try {
         const decodedToken = jwtDecode(token);
         setUserEmail(decodedToken.email || "No email found");
+        setUserName(decodedToken.name || decodedToken.full_name || decodedToken.username || "Distributor");
       } catch (error) {
         console.error("Invalid token:", error);
       }
@@ -134,7 +136,7 @@ const Distributordashboard = ({ children }) => {
       <div className="flex-1 p-6 ml-1/5 pt-[70px]">
         {/* Top Navbar */}
         <div className="flex items-center justify-between bg-[#F88F2A] text-white px-4 py-2 shadow-md fixed top-0 left-[20%] w-[80%] z-10 h-[73px] rounded-md">
-          <span className="text-lg font-bold">Distributor Dashboard</span>
+          <span className="text-lg font-bold">Welcome, {userName || 'Distributor'}</span>
 
           <div className="flex items-center gap-6 relative">
             {/* Profile Icon */}
