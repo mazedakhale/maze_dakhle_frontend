@@ -161,6 +161,47 @@ const FieldNames = () => {
         Swal.fire("Error!", "Please add at least one field name", "error");
         return;
       }
+
+      // Check for duplicates within the input fields
+      const fieldCounts = {};
+      const duplicateFields = [];
+      
+      validFields.forEach(field => {
+        const trimmedField = field.trim().toLowerCase();
+        if (fieldCounts[trimmedField]) {
+          duplicateFields.push(field.trim());
+        } else {
+          fieldCounts[trimmedField] = 1;
+        }
+      });
+
+      if (duplicateFields.length > 0) {
+        Swal.fire("Error!", `Duplicate field names detected: ${duplicateFields.join(", ")}`, "error");
+        return;
+      }
+
+      // Check for existing field names in the same subcategory
+      const existingFieldsInSubcategory = fields.filter(field => 
+        field.subcategory.subcategory_id.toString() === formData.subcategory_id
+      );
+
+      const existingFieldNames = existingFieldsInSubcategory.map(field => 
+        field.document_fields.toLowerCase().trim()
+      );
+
+      const conflictingFields = validFields.filter(newField => 
+        existingFieldNames.includes(newField.toLowerCase().trim())
+      );
+
+      if (conflictingFields.length > 0) {
+        Swal.fire({
+          icon: "error",
+          title: "Field Names Already Exist!",
+          text: `The following field names already exist in this subcategory: ${conflictingFields.join(", ")}`,
+          confirmButtonColor: "#f58a3b",
+        });
+        return;
+      }
       
       const bulkData = {
         category_id: formData.category_id,

@@ -174,6 +174,39 @@ const RequiredDocuments = () => {
     try {
       if (editId) {
         // Edit mode - single document
+        if (!formData.document_names.trim()) {
+          Swal.fire("Error!", "Please enter a document name", "error");
+          setSubmitDisabled(false);
+          return;
+        }
+
+        if (!formData.file) {
+          Swal.fire("Error!", "Please select a file to upload", "error");
+          setSubmitDisabled(false);
+          return;
+        }
+
+        // Check for existing document names in the same subcategory (excluding current document)
+        const existingDocsInSubcategory = documents.filter(doc => 
+          doc.subcategory.subcategory_id.toString() === formData.subcategory_id &&
+          doc.id !== editId
+        );
+
+        const existingDocNames = existingDocsInSubcategory.map(doc => 
+          doc.document_names.toLowerCase().trim()
+        );
+
+        if (existingDocNames.includes(formData.document_names.toLowerCase().trim())) {
+          Swal.fire({
+            icon: "error",
+            title: "Document Name Already Exists!",
+            text: `The document name "${formData.document_names}" already exists in this subcategory`,
+            confirmButtonColor: "#f58a3b",
+          });
+          setSubmitDisabled(false);
+          return;
+        }
+
         const formDataToSend = new FormData();
         formDataToSend.append("category_id", formData.category_id);
         formDataToSend.append("subcategory_id", formData.subcategory_id);
@@ -198,6 +231,60 @@ const RequiredDocuments = () => {
           setSubmitDisabled(false);
           return;
         }
+
+        // Check if all valid documents have files
+        const documentsWithoutFiles = validDocuments.filter(doc => !doc.file);
+        if (documentsWithoutFiles.length > 0) {
+          const missingFileNames = documentsWithoutFiles.map((doc, index) => 
+            doc.name || `Document ${multipleDocuments.indexOf(doc) + 1}`
+          ).join(", ");
+          Swal.fire("Error!", `Please select files for the following documents: ${missingFileNames}`, "error");
+          setSubmitDisabled(false);
+          return;
+        }
+
+        // Check for duplicates within the input documents
+        const docCounts = {};
+        const duplicateDocs = [];
+        
+        validDocuments.forEach(doc => {
+          const trimmedDocName = doc.name.trim().toLowerCase();
+          if (docCounts[trimmedDocName]) {
+            duplicateDocs.push(doc.name.trim());
+          } else {
+            docCounts[trimmedDocName] = 1;
+          }
+        });
+
+        if (duplicateDocs.length > 0) {
+          Swal.fire("Error!", `Duplicate document names detected: ${duplicateDocs.join(", ")}`, "error");
+          setSubmitDisabled(false);
+          return;
+        }
+
+        // Check for existing document names in the same subcategory
+        const existingDocsInSubcategory = documents.filter(doc => 
+          doc.subcategory.subcategory_id.toString() === formData.subcategory_id
+        );
+
+        const existingDocNames = existingDocsInSubcategory.map(doc => 
+          doc.document_names.toLowerCase().trim()
+        );
+
+        const conflictingDocs = validDocuments.filter(newDoc => 
+          existingDocNames.includes(newDoc.name.toLowerCase().trim())
+        );
+
+        if (conflictingDocs.length > 0) {
+          Swal.fire({
+            icon: "error",
+            title: "Document Names Already Exist!",
+            text: `The following document names already exist in this subcategory: ${conflictingDocs.map(doc => doc.name).join(", ")}`,
+            confirmButtonColor: "#f58a3b",
+          });
+          setSubmitDisabled(false);
+          return;
+        }
         
         let successCount = 0;
         let errorCount = 0;
@@ -212,12 +299,13 @@ const RequiredDocuments = () => {
               formDataToSend.append("file", doc.file);
             }
             
-            await axios.post(`${API_BASE_URL}/required-documents`, formDataToSend, {
+            const response = await axios.post(`${API_BASE_URL}/required-documents`, formDataToSend, {
               headers: {
                 "Content-Type": "multipart/form-data",
               },
               timeout: 30000,
             });
+            console.log("Document created:", response.data);
             
             successCount++;
           } catch (error) {
@@ -476,19 +564,26 @@ const RequiredDocuments = () => {
                     onChange={(e) =>
                       setFormData({ ...formData, document_names: e.target.value })
                     }
+                    required
                   />
-                  <input
-                    type="file"
-                    className="border border-gray-300 p-2 rounded w-full mb-4"
-                    onChange={(e) =>
-                      setFormData({ ...formData, file: e.target.files[0] })
-                    }
-                  />
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      File Upload <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="file"
+                      className="border border-gray-300 p-2 rounded w-full"
+                      onChange={(e) =>
+                        setFormData({ ...formData, file: e.target.files[0] })
+                      }
+                      required
+                    />
+                  </div>
                 </>
               ) : (
                 <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Documents (Add Multiple)
+                    Documents (Add Multiple) <span className="text-red-500">* All fields required</span>
                   </label>
                   {multipleDocuments.map((document, index) => (
                     <div key={index} className="border border-gray-200 p-3 rounded mb-3">
@@ -506,15 +601,22 @@ const RequiredDocuments = () => {
                       <input
                         type="text"
                         className="border border-gray-300 p-2 rounded w-full mb-2"
-                        placeholder={`Document Name ${index + 1}`}
+                        placeholder={`Document Name ${index + 1} *`}
                         value={document.name}
                         onChange={(e) => updateDocumentValue(index, 'name', e.target.value)}
+                        required
                       />
-                      <input
-                        type="file"
-                        className="border border-gray-300 p-2 rounded w-full"
-                        onChange={(e) => updateDocumentValue(index, 'file', e.target.files[0])}
-                      />
+                      <div>
+                        <label className="block text-xs font-medium text-gray-600 mb-1">
+                          File Upload <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="file"
+                          className="border border-gray-300 p-2 rounded w-full"
+                          onChange={(e) => updateDocumentValue(index, 'file', e.target.files[0])}
+                          required
+                        />
+                      </div>
                     </div>
                   ))}
                   <button
