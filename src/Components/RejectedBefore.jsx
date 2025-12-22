@@ -366,7 +366,7 @@ const Rejecteddocuments = () => {
                 {/* <th className="border p-2 font-bold">Completed</th> */}
                 <th className="border p-2 font-bold">Action</th>
                 <th className="border p-2 font-bold">View</th>
-                <th className="border p-2 font-bold">Rejecetd Reason</th>
+                <th className="border p-2 font-bold">Rejected Reason</th>
                 {/* <th className="border p-2 font-bold">Reupload</th> */}
 
                 {/* <th className="border p-2 font-bold">Certificate</th>

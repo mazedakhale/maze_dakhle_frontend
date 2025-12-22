@@ -43,11 +43,11 @@ const Sidebar = ({ onNavigate }) => {
   const handleNavigation = (path) => {
     onNavigate(path);
   };
-
+  
   return (
-    <div className="w-1/5 bg-[#FFF3E6] p-4 h-screen fixed top-0 left-0 overflow-y-auto scrollbar-hide flex justify-center z-50">
+    <div className="w-1/5 bg-[#FFF3E6]  p-4 h-screen fixed top-0 left-0 overflow-y-auto scrollbar-hide flex justify-center z-50">
       {/* Sidebar Card */}
-      <div className="bg-white text-black rounded-xl shadow-md border border-gray w-full min-h-max pb-10">
+      <div className="bg-[#f1a966] text-black rounded-xl shadow-md border border-gray w-full min-h-max pb-10">
         {/* Logo Section */}
         <div className="flex flex-col items-center py-6">
           <img src={logo} alt="Logo" className="h-12 w-auto mb-2" />
@@ -62,13 +62,104 @@ const Sidebar = ({ onNavigate }) => {
                 label: "Dashboard",
                 path: "/Adashinner",
               },
+              {
+                icon: <FaHistory />,
+                label: "Applications History",
+                path: "/Verifydocumentshistory",
+              },
+              {
+                icon: <FaCheckCircle />,
+                label: "Customer Request",
+                path: "/Verifydocuments",
+              },
+              {
+                icon: <FaFileUpload />,
+                label: "Certificate List",
+                // label: "Uploaded List",
+                path: "/Uploadeddocuments",
+              },
+              { icon: <FaInbox />, 
+                label: "Receipt List", 
+                // label: "Received List", 
+                path: "/Received" },
+              {
+                icon: <FaTimesCircle />,
+                label: "Rejected List",
+                path: "/RejectedBefore",
+              },
+              {
+                icon: <FaExclamationTriangle />,
+                label: "Error Request",
+                path: "/ReceiptErrorRequests",
+              },
+              {
+                icon: <FaTimesCircle />,
+                label: "Assigned Distributor Rejected List",
+                path: "/Rejecteddocuments",
+              },
+              {
+                icon: <FaUserTie />,
+                label: "Assigned Distributor List",
+                path: "/Assigndistributorlist",
+              },
               { icon: <FaPlus />, label: "Add Category", path: "/Addcategory" },
               {
                 icon: <FaListAlt />,
                 label: "Subcategory",
                 path: "/Addsubcategory",
               },
-              {
+                {
+                  icon: <FaFileAlt />,
+                  label: "Required Documents",
+                  path: "/Requireddocuments",
+                },
+                {
+                  icon: <FaShapes />,
+                  label: "Field Names",
+                  path: "/Addfieldname",
+                },
+                { icon: <FaFileAlt />, label: "Add Price", path: "/Price" },
+                {
+                  icon: <TbLabelImportantFilled />,
+                  label: "Add Important Document",
+                  path: "/AddImpDoc",
+                },
+                {
+                  icon: <FaMoneyBill />,
+                  label: "Admin Wallet",
+                  path:"/AdminWallet"
+                },
+                {
+                  icon: <FaMoneyBill1Wave />,
+                  label: "Transaction History",
+                  path: "/CustomerTransactions",
+                },
+                {
+                  icon: <FaMoneyBillTransfer />,
+                  label: "Distributor Payment Request",
+                  path: "/DistributorPaymentRequest",
+                },
+                {
+                  icon: <FaUserTie />,
+                  label: "Distributor Credentials",
+                  path: "/Distributorlist",
+                },
+                {
+                  icon: <FaUserCheck />,
+                  label: "Employee Credentials",
+                  path: "/Employeelist",},
+                  { icon: <FaUserTie />, label: "Employee", path: "/Employee" },
+                  {
+                    icon: <FaUserCheck />,
+                    label: "Customer Credentials",
+                    path: "/Customerlist",
+                  },
+                  {
+                    icon: <FaBell />,
+                    label: "Notifications",
+                    path: "/Addnotifications",
+                  },
+                  {
                 icon: <FaClipboardList />,
                 label: "Add Services",
                 path: "/DocumentTable",
@@ -95,11 +186,6 @@ const Sidebar = ({ onNavigate }) => {
                 path: "/Youtube",
               },
               {
-                icon: <TbLabelImportantFilled />,
-                label: "Add Important Document",
-                path: "/AddImpDoc",
-              },
-              {
                 icon: <FaEnvelope />,
                 label: "Add Contact Form",
                 path: "/ContactTable",
@@ -109,93 +195,7 @@ const Sidebar = ({ onNavigate }) => {
                 label: "Users Contact Forms",
                 path: "/Contact",
               },
-              {
-                icon: <FaExclamationTriangle />,
-                label: "Error Request",
-                path: "/ReceiptErrorRequests",
-              },
-              {
-                icon: <FaUserTie />,
-                label: "Distributor Credentials",
-                path: "/Distributorlist",
-              },
-              {
-                icon: <FaUserCheck />,
-                label: "Employee Credentials",
-                path: "/Employeelist",
-              },
-              { icon: <FaUserTie />, label: "Employee", path: "/Employee" },
-              {
-                icon: <FaUserCheck />,
-                label: "Customer Credentials",
-                path: "/Customerlist",
-              },
-              {
-                icon: <FaBell />,
-                label: "Notifications",
-                path: "/Addnotifications",
-              },
-              {
-                icon: <FaFileAlt />,
-                label: "Required Documents",
-                path: "/Requireddocuments",
-              },
-              { icon: <FaFileAlt />, label: "Add Price", path: "/Price" },
-              {
-                icon: <FaShapes />,
-                label: "Field Names",
-                path: "/Addfieldname",
-              },
-              {
-                icon: <FaCheckCircle />,
-                label: "Customer Request",
-                path: "/Verifydocuments",
-              },
-              {
-                icon: <FaTimesCircle />,
-                label: "Rejected List",
-                path: "/RejectedBefore",
-              },
-              {
-                icon: <FaTimesCircle />,
-                label: "Assigned Distributor Rejected List",
-                path: "/Rejecteddocuments",
-              },
-              {
-                icon: <FaHistory />,
-                label: "Applications History",
-                path: "/Verifydocumentshistory",
-              },
-              {
-                icon: <FaMoneyBill />,
-                label: "Admin Wallet",
-                path:"/AdminWallet"
-              },
-              {
-                icon: <FaMoneyBill1Wave />,
-                label: "Transaction History",
-                path: "/CustomerTransactions",
-              },
-              {
-                icon: <FaMoneyBillTransfer />,
-                label: "Distributor Payment Request",
-                path: "/DistributorPaymentRequest",
-              },
-              {
-                icon: <FaUserTie />,
-                label: "Assigned Distributor List",
-                path: "/Assigndistributorlist",
-              },
-              {
-                icon: <FaFileUpload />,
-                label: "Certificate List",
-                // label: "Uploaded List",
-                path: "/Uploadeddocuments",
-              },
-              { icon: <FaInbox />, 
-                label: "Receipt List", 
-                // label: "Received List", 
-                path: "/Received" },
+              
               {
                 icon: <FaCommentDots />,
                 label: "Feedback List",
