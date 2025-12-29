@@ -21,6 +21,7 @@ const Price = () => {
     category_id: "",
     subcategory_id: "",
     amount: "",
+    distributor_commission: "",
   });
 
   useEffect(() => {
@@ -32,7 +33,11 @@ const Price = () => {
   const fetchPrices = async () => {
     try {
       const { data } = await axios.get(`${API_BASE_URL}/prices`);
-      setPrices(data.map((p) => ({ ...p, amount: Number(p.amount) })));
+      setPrices(data.map((p) => ({ 
+        ...p, 
+        amount: Number(p.amount),
+        distributor_commission: Number(p.distributor_commission || 0)
+      })));
     } catch {
       Swal.fire("Error", "Could not load prices", "error");
     }
@@ -87,7 +92,7 @@ const Price = () => {
 
   const openAddModal = () => {
     setEditId(null);
-    setFormData({ category_id: "", subcategory_id: "", amount: "" });
+    setFormData({ category_id: "", subcategory_id: "", amount: "", distributor_commission: "" });
     setSubcategories([]);
     setModalOpen(true);
   };
@@ -98,6 +103,7 @@ const Price = () => {
       category_id: price.category_id.toString(),
       subcategory_id: price.subcategory_id.toString(),
       amount: price.amount.toString(),
+      distributor_commission: (price.distributor_commission || 0).toString(),
     });
     fetchSubcategories(price.category_id);
     setModalOpen(true);
@@ -171,15 +177,16 @@ const Price = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const { category_id, subcategory_id, amount } = formData;
+    const { category_id, subcategory_id, amount, distributor_commission } = formData;
     if (!category_id || !subcategory_id || !amount) {
-      return Swal.fire("Error", "All fields required", "error");
+      return Swal.fire("Error", "Category, Subcategory, and Amount are required", "error");
     }
     try {
       const payload = {
         category_id: +category_id,
         subcategory_id: +subcategory_id,
         amount: parseFloat(amount),
+        distributor_commission: distributor_commission ? parseFloat(distributor_commission) : 0,
       };
       if (editId) {
         await axios.put(`${API_BASE_URL}/prices/${editId}`, payload);
@@ -220,7 +227,7 @@ const Price = () => {
           <table className="w-full border text-sm bg-white shadow rounded">
             <thead className="bg-[#F58A3B14] border-b-2">
               <tr>
-                {["Category", "Subcategory", "Amount", "Actions"].map((h) => (
+                {["Category", "Subcategory", "Amount", "Distributor Commission", "Actions"].map((h) => (
                   <th
                     key={h}
                     className="px-4 py-3 border text-center font-semibold"
@@ -246,6 +253,9 @@ const Price = () => {
                     <td className="px-4 py-3 border text-center">
                       {p.amount.toFixed(2)}
                     </td>
+                    <td className="px-4 py-3 border text-center">
+                      {(p.distributor_commission || 0).toFixed(2)}
+                    </td>
                     <td className="px-4 py-3 border text-center space-x-2">
                       <button
                         onClick={() => openEditModal(p)}
@@ -264,7 +274,7 @@ const Price = () => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={4} className="px-4 py-3 border text-center">
+                  <td colSpan={5} className="px-4 py-3 border text-center">
                     No prices found.
                   </td>
                 </tr>
@@ -329,6 +339,22 @@ const Price = () => {
                     })
                   }
                   className="w-full border p-2 rounded"
+                  placeholder="e.g., 1000"
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block font-semibold">Distributor Commission</label>
+                <input
+                  type="number"
+                  value={formData.distributor_commission}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      distributor_commission: e.target.value,
+                    })
+                  }
+                  className="w-full border p-2 rounded"
+                  placeholder="e.g., 200"
                 />
               </div>
               <div className="flex justify-end gap-2">

@@ -164,7 +164,7 @@ const PaymentRequest = () => {
         return;
       }
 
-      const amount = priceResponse.data.amount;
+      const amount = priceResponse.data.distributor_commission || 0;
 
       // Get applicant name using multilingual detection
       const applicantName = getApplicantName(doc.document_fields);

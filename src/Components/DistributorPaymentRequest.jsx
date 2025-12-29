@@ -9,6 +9,7 @@ const DistributorPaymentRequest = () => {
   const [statistics, setStatistics] = useState(null);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState('All');
+  const [selectedRequests, setSelectedRequests] = useState([]);
 
   useEffect(() => {
     fetchPaymentRequests();
@@ -38,22 +39,36 @@ const DistributorPaymentRequest = () => {
   };
 
   const handleApprove = async (requestId) => {
-    const result = await Swal.fire({
+    const request = paymentRequests.find(r => r.request_id === requestId);
+    
+    const { value: formValues } = await Swal.fire({
       title: 'Approve Payment Request?',
-      text: 'This will deduct the amount from the customer wallet and mark as paid.',
+      html: `
+        <p>Amount: <strong>₹${request?.amount || 0}</strong></p>
+        <input id="utr-input" class="swal2-input" placeholder="Enter UTR Number (Required)">
+      `,
       icon: 'question',
       showCancelButton: true,
       confirmButtonColor: '#10b981',
       cancelButtonColor: '#6b7280',
       confirmButtonText: 'Yes, approve it!',
+      preConfirm: () => {
+        const utr = document.getElementById('utr-input').value.trim();
+        if (!utr) {
+          Swal.showValidationMessage('UTR Number is required');
+          return false;
+        }
+        return { utr };
+      }
     });
 
-    if (result.isConfirmed) {
+    if (formValues) {
       try {
         await axios.put(`${API_BASE_URL}/payment-requests/${requestId}/status`, {
           status: 'Approved',
+          utr_number: formValues.utr || null,
         });
-        Swal.fire('Approved!', 'Payment has been processed successfully.', 'success');
+        Swal.fire('Approved!', `Payment has been processed successfully.${formValues.utr ? `\nUTR: ${formValues.utr}` : ''}`, 'success');
         fetchPaymentRequests();
         fetchStatistics();
       } catch (error) {
@@ -98,6 +113,83 @@ const DistributorPaymentRequest = () => {
         console.error('Error rejecting payment:', error);
         Swal.fire('Error', 'Failed to reject payment request', 'error');
       }
+    }
+  };
+
+  const handleBulkApprove = async () => {
+    if (selectedRequests.length === 0) {
+      Swal.fire('Warning', 'Please select at least one payment request', 'warning');
+      return;
+    }
+
+    const totalAmount = selectedRequests.reduce((sum, id) => {
+      const request = paymentRequests.find(r => r.request_id === id);
+      return sum + (request ? Number(request.amount) : 0);
+    }, 0);
+
+    const { value: utrNumber } = await Swal.fire({
+      title: 'Approve Selected Payments?',
+      html: `
+        <p>You are about to approve <strong>${selectedRequests.length}</strong> payment request(s)</p>
+        <p class="text-2xl font-bold text-green-600 mt-2 mb-4">Total: ₹${totalAmount.toFixed(2)}</p>
+        <input id="utr-input" class="swal2-input" placeholder="Enter UTR Number (Required)">
+      `,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#10b981',
+      cancelButtonColor: '#6b7280',
+      confirmButtonText: 'Yes, approve all!',
+      preConfirm: () => {
+        const utr = document.getElementById('utr-input').value.trim();
+        if (!utr) {
+          Swal.showValidationMessage('UTR Number is required');
+          return false;
+        }
+        return utr;
+      }
+    });
+
+    if (utrNumber !== undefined) {
+      try {
+        // Approve each selected request with UTR
+        await Promise.all(
+          selectedRequests.map(requestId =>
+            axios.put(`${API_BASE_URL}/payment-requests/${requestId}/status`, {
+              status: 'Approved',
+              utr_number: utrNumber || null,
+            })
+          )
+        );
+        
+        Swal.fire('Success!', `${selectedRequests.length} payment(s) approved successfully. Total: ₹${totalAmount.toFixed(2)}${utrNumber ? `\nUTR: ${utrNumber}` : ''}`, 'success');
+        setSelectedRequests([]);
+        fetchPaymentRequests();
+        fetchStatistics();
+      } catch (error) {
+        console.error('Error approving payments:', error);
+        Swal.fire(
+          'Error',
+          error.response?.data?.message || 'Failed to approve some payment requests',
+          'error'
+        );
+      }
+    }
+  };
+
+  const toggleSelectRequest = (requestId) => {
+    setSelectedRequests(prev =>
+      prev.includes(requestId)
+        ? prev.filter(id => id !== requestId)
+        : [...prev, requestId]
+    );
+  };
+
+  const toggleSelectAll = () => {
+    const pendingRequests = filteredRequests.filter(r => r.status === 'Pending');
+    if (selectedRequests.length === pendingRequests.length) {
+      setSelectedRequests([]);
+    } else {
+      setSelectedRequests(pendingRequests.map(r => r.request_id));
     }
   };
 
@@ -187,7 +279,7 @@ const DistributorPaymentRequest = () => {
 
       {/* Filter */}
       <div className="bg-white rounded-lg shadow p-4 mb-6">
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4 flex-wrap">
           <label className="text-sm font-medium text-gray-700">Filter by Status:</label>
           <select
             value={statusFilter}
@@ -200,6 +292,20 @@ const DistributorPaymentRequest = () => {
             <option value="Paid">Paid</option>
             <option value="Rejected">Rejected</option>
           </select>
+          
+          {selectedRequests.length > 0 && (
+            <button
+              onClick={handleBulkApprove}
+              className="ml-auto bg-green-500 text-white px-6 py-2 rounded-lg hover:bg-green-600 transition flex items-center gap-2 font-semibold"
+            >
+              <FaCheckCircle /> Approve Selected ({selectedRequests.length}) - ₹
+              {selectedRequests.reduce((sum, id) => {
+                const req = paymentRequests.find(r => r.request_id === id);
+                return sum + (req ? Number(req.amount) : 0);
+              }, 0).toFixed(2)}
+            </button>
+          )}
+          
           <span className="text-sm text-gray-600 ml-auto">
             Showing {filteredRequests.length} request(s)
           </span>
@@ -212,6 +318,14 @@ const DistributorPaymentRequest = () => {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <input
+                    type="checkbox"
+                    checked={selectedRequests.length > 0 && selectedRequests.length === filteredRequests.filter(r => r.status === 'Pending').length}
+                    onChange={toggleSelectAll}
+                    className="w-4 h-4 text-orange-600 rounded focus:ring-orange-500"
+                  />
+                </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Request ID
                 </th>
@@ -231,6 +345,9 @@ const DistributorPaymentRequest = () => {
                   Status
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  UTR Number
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Created Date
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -241,13 +358,23 @@ const DistributorPaymentRequest = () => {
             <tbody className="bg-white divide-y divide-gray-200">
               {filteredRequests.length === 0 ? (
                 <tr>
-                  <td colSpan="8" className="px-6 py-4 text-center text-gray-500">
+                  <td colSpan="10" className="px-6 py-4 text-center text-gray-500">
                     No payment requests found
                   </td>
                 </tr>
               ) : (
                 filteredRequests.map((request) => (
                   <tr key={request.request_id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {request.status === 'Pending' && (
+                        <input
+                          type="checkbox"
+                          checked={selectedRequests.includes(request.request_id)}
+                          onChange={() => toggleSelectRequest(request.request_id)}
+                          className="w-4 h-4 text-orange-600 rounded focus:ring-orange-500"
+                        />
+                      )}
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                       #{request.request_id}
                     </td>
@@ -276,6 +403,15 @@ const DistributorPaymentRequest = () => {
                       >
                         {request.status}
                       </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {request.utr_number ? (
+                        <span className="font-mono bg-blue-50 px-2 py-1 rounded text-blue-700">
+                          {request.utr_number}
+                        </span>
+                      ) : (
+                        <span className="text-gray-400">-</span>
+                      )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {formatDate(request.created_at)}
