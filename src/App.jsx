@@ -105,6 +105,8 @@ import DistributorPaymentRequest from "./Components/DistributorPaymentRequest";
 import AdminWallet from "./Components/AdminWallet";
 import AdminDeletionCodeSettings from "./Components/AdminDeletionCodeSettings";
 import EmployeeRecentApplications from "./Components/EmployeeRecentApplications";
+import DistributorCommissions from "./Components/DistributorCommissions";
+
 function App() {
   return (
     <Router>
@@ -170,6 +172,7 @@ function App() {
         <Route path="/DistributorPaymentRequest" element={<ProtectedRoute allowedRoles={['Admin']}><Admindashboard><DistributorPaymentRequest /></Admindashboard></ProtectedRoute>} />
         <Route path="/AdminWallet" element={<ProtectedRoute allowedRoles={['Admin']}><Admindashboard><AdminWallet /></Admindashboard></ProtectedRoute>} />
         <Route path="/AdminDeletionCodeSettings" element={<ProtectedRoute allowedRoles={['Admin']}><Admindashboard><AdminDeletionCodeSettings /></Admindashboard></ProtectedRoute>} />
+        <Route path="/DistributorCommissions" element={<ProtectedRoute allowedRoles={['Admin']}><Admindashboard><DistributorCommissions /></Admindashboard></ProtectedRoute>} />
 
         <Route path="/Lazycharts" element={<ProtectedRoute allowedRoles={['Admin']}><Admindashboard><LazyCharts /></Admindashboard></ProtectedRoute>} />
         <Route path="/Received" element={<ProtectedRoute allowedRoles={['Admin']}><Admindashboard><Received /></Admindashboard></ProtectedRoute>} />

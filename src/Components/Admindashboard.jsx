@@ -145,6 +145,11 @@ const Sidebar = ({ onNavigate }) => {
                   path: "/Distributorlist",
                 },
                 {
+                  icon: <FaMoneyBillTransfer />,
+                  label: "Distributor Commissions",
+                  path: "/DistributorCommissions",
+                },
+                {
                   icon: <FaUserCheck />,
                   label: "Employee Credentials",
                   path: "/Employeelist",},
