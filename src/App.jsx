@@ -106,6 +106,7 @@ import AdminWallet from "./Components/AdminWallet";
 import AdminDeletionCodeSettings from "./Components/AdminDeletionCodeSettings";
 import EmployeeRecentApplications from "./Components/EmployeeRecentApplications";
 import DistributorCommissions from "./Components/DistributorCommissions";
+import DistributorCommissionView from "./Components/DistributorCommissionView";
 
 function App() {
   return (
@@ -240,6 +241,7 @@ function App() {
         <Route path="/Dsentlist" element={<ProtectedRoute allowedRoles={['Distributor']}><Distributordashboard><Dsentlist /></Distributordashboard></ProtectedRoute>} />
         <Route path="/Distributorrejected" element={<ProtectedRoute allowedRoles={['Distributor']}><Distributordashboard><Distributorrejected /></Distributordashboard></ProtectedRoute>} />
         <Route path="/PaymentRequest" element={<ProtectedRoute allowedRoles={['Distributor']}><Distributordashboard><PaymentRequest /></Distributordashboard></ProtectedRoute>} />
+        <Route path="/MyCommissions" element={<ProtectedRoute allowedRoles={['Distributor']}><Distributordashboard><DistributorCommissionView /></Distributordashboard></ProtectedRoute>} />
         <Route path="/ViewImpDocD" element={<ProtectedRoute allowedRoles={['Distributor']}><Distributordashboard><ViewImpDoc /></Distributordashboard></ProtectedRoute>} />
 
         <Route path="/Distributorinvoice/:documentId" element={<ProtectedRoute allowedRoles={['Distributor']}><Distributorinvoice /></ProtectedRoute>} />

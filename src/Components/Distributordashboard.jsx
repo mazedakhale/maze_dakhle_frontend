@@ -8,6 +8,7 @@ import {
   FaClockRotateLeft,
   FaUserCheck,
   FaFileSignature,
+  FaMoneyBillTransfer,
 } from "react-icons/fa6";
 import { IoMdLogOut } from "react-icons/io";
 import { FaRegCircleUser } from "react-icons/fa6";
@@ -75,6 +76,11 @@ const Sidebar = ({ onNavigate }) => {
                 icon: <FaMoneyBill />,
                 label: "Payment Request",
                 path: "/PaymentRequest",
+              },
+              {
+                icon: <FaMoneyBillTransfer />,
+                label: "My Commissions",
+                path: "/MyCommissions",
               },
               {
                 icon: <FaFileSignature />,

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
-import { FaEdit, FaTrash, FaPlus } from "react-icons/fa";
+import { FaSave } from "react-icons/fa";
 import API_BASE_URL from "../config/api";
 
 const DistributorCommissions = () => {
@@ -9,23 +9,32 @@ const DistributorCommissions = () => {
   const [distributors, setDistributors] = useState([]);
   const [categories, setCategories] = useState([]);
   const [allSubcategories, setAllSubcategories] = useState([]);
-  const [subcategories, setSubcategories] = useState([]);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [editId, setEditId] = useState(null);
+  const [selectedDistributor, setSelectedDistributor] = useState("");
+  const [commissionInputs, setCommissionInputs] = useState({});
   const [searchTerm, setSearchTerm] = useState("");
-
-  const [formData, setFormData] = useState({
-    distributor_id: "",
-    category_id: "",
-    subcategory_id: "",
-    commission_amount: "",
-  });
+  const [distributorSearch, setDistributorSearch] = useState("");
+  const [showDistributorDropdown, setShowDistributorDropdown] = useState(false);
 
   useEffect(() => {
     fetchCommissions();
     fetchDistributors();
     fetchCategoriesAndAllSubcats();
+
+    // Close dropdown when clicking outside
+    const handleClickOutside = (e) => {
+      if (!e.target.closest('.distributor-dropdown-container')) {
+        setShowDistributorDropdown(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  useEffect(() => {
+    if (selectedDistributor) {
+      loadCommissionsForDistributor();
+    }
+  }, [selectedDistributor, commissions]);
 
   const fetchCommissions = async () => {
     try {
@@ -57,7 +66,7 @@ const DistributorCommissions = () => {
           const { data: subs } = await axios.get(
             `${API_BASE_URL}/subcategories/category/${cat.category_id}`
           );
-          all.push(...subs);
+          all.push(...subs.map(sub => ({ ...sub, category_id: cat.category_id })));
         })
       );
       setAllSubcategories(all);
@@ -66,105 +75,90 @@ const DistributorCommissions = () => {
     }
   };
 
-  const fetchSubcategories = async (categoryId) => {
-    if (!categoryId) {
-      setSubcategories([]);
-      return;
-    }
-    try {
-      const { data } = await axios.get(
-        `${API_BASE_URL}/subcategories/category/${categoryId}`
-      );
-      setSubcategories(data);
-    } catch {
-      setSubcategories([]);
-      Swal.fire("Error", "Could not load subcategories", "error");
-    }
-  };
-
-  const handleCategoryChange = (e) => {
-    const category_id = e.target.value;
-    setFormData({ ...formData, category_id, subcategory_id: "" });
-    fetchSubcategories(category_id);
-  };
-
-  const openAddModal = () => {
-    setEditId(null);
-    setFormData({ distributor_id: "", category_id: "", subcategory_id: "", commission_amount: "" });
-    setSubcategories([]);
-    setModalOpen(true);
-  };
-
-  const openEditModal = (commission) => {
-    setEditId(commission.id);
-    setFormData({
-      distributor_id: commission.distributor_id.toString(),
-      category_id: commission.category_id.toString(),
-      subcategory_id: commission.subcategory_id.toString(),
-      commission_amount: commission.commission_amount.toString(),
-    });
-    fetchSubcategories(commission.category_id);
-    setModalOpen(true);
-  };
-
-  const handleDelete = async (id) => {
-    const result = await Swal.fire({
-      title: "Are you sure?",
-      text: "Delete this custom commission rate?",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#d33",
-      cancelButtonColor: "#3085d6",
-      confirmButtonText: "Yes, delete it!",
-    });
-
-    if (!result.isConfirmed) return;
-
-    try {
-      await axios.delete(`${API_BASE_URL}/distributor-commissions/${id}`);
-      setCommissions((p) => p.filter((x) => x.id !== id));
-      Swal.fire("Deleted!", "Commission rate deleted successfully", "success");
-    } catch (error) {
-      Swal.fire("Error", error.response?.data?.message || "Failed to delete", "error");
-    }
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const { distributor_id, category_id, subcategory_id, commission_amount } = formData;
+  const loadCommissionsForDistributor = () => {
+    if (!selectedDistributor) return;
     
-    if (!distributor_id || !category_id || !subcategory_id || !commission_amount) {
-      return Swal.fire("Error", "All fields are required", "error");
+    const inputs = {};
+    allSubcategories.forEach(sub => {
+      const key = `${sub.category_id}_${sub.subcategory_id}`;
+      const existing = commissions.find(
+        c => c.distributor_id === +selectedDistributor && 
+             c.category_id === sub.category_id && 
+             c.subcategory_id === sub.subcategory_id
+      );
+      inputs[key] = existing ? existing.commission_amount.toString() : "";
+    });
+    setCommissionInputs(inputs);
+  };
+
+  const handleCommissionChange = (categoryId, subcategoryId, value) => {
+    const key = `${categoryId}_${subcategoryId}`;
+    setCommissionInputs(prev => ({ ...prev, [key]: value }));
+  };
+
+  const handleSaveAll = async () => {
+    if (!selectedDistributor) {
+      return Swal.fire("Error", "Please select a distributor", "error");
+    }
+
+    const updates = [];
+    Object.keys(commissionInputs).forEach(key => {
+      const value = commissionInputs[key];
+      if (value && value.trim() !== "") {
+        const [category_id, subcategory_id] = key.split("_").map(Number);
+        updates.push({
+          distributor_id: +selectedDistributor,
+          category_id,
+          subcategory_id,
+          commission_amount: parseFloat(value)
+        });
+      }
+    });
+
+    if (updates.length === 0) {
+      return Swal.fire("Info", "No commissions to save", "info");
     }
 
     try {
-      const payload = {
-        distributor_id: +distributor_id,
-        category_id: +category_id,
-        subcategory_id: +subcategory_id,
-        commission_amount: parseFloat(commission_amount),
-      };
+      await Promise.all(
+        updates.map(payload => {
+          const existing = commissions.find(
+            c => c.distributor_id === payload.distributor_id &&
+                 c.category_id === payload.category_id &&
+                 c.subcategory_id === payload.subcategory_id
+          );
+          
+          if (existing) {
+            return axios.put(`${API_BASE_URL}/distributor-commissions/${existing.id}`, {
+              commission_amount: payload.commission_amount
+            });
+          } else {
+            return axios.post(`${API_BASE_URL}/distributor-commissions`, payload);
+          }
+        })
+      );
 
-      if (editId) {
-        await axios.put(`${API_BASE_URL}/distributor-commissions/${editId}`, {
-          commission_amount: payload.commission_amount
-        });
-        Swal.fire("Updated!", "", "success");
-      } else {
-        await axios.post(`${API_BASE_URL}/distributor-commissions`, payload);
-        Swal.fire("Added!", "", "success");
-      }
-      
-      setModalOpen(false);
+      Swal.fire("Success!", "Commissions saved successfully", "success");
       fetchCommissions();
     } catch (error) {
-      Swal.fire("Error", error.response?.data?.message || "Failed to save", "error");
+      Swal.fire("Error", error.response?.data?.message || "Failed to save commissions", "error");
     }
   };
 
   const getDistributorName = (id) => {
-    const dist = distributors.find(d => d.user_id === id);
-    return dist ? (dist.name || dist.full_name || dist.username || "Unknown") : "Unknown";
+    const dist = distributors.find(d => d.user_id === +id);
+    return dist ? (dist.name || dist.full_name || dist.username || `User ${id}`) : "";
+  };
+
+  const filteredDistributors = distributors.filter(d => {
+    const name = (d.name || d.full_name || d.username || "").toLowerCase();
+    return name.includes(distributorSearch.toLowerCase());
+  });
+
+  const handleSelectDistributor = (id) => {
+    setSelectedDistributor(id);
+    setDistributorSearch(getDistributorName(id));
+    setShowDistributorDropdown(false);
   };
 
   const getCategoryName = (id) => {
@@ -177,19 +171,12 @@ const DistributorCommissions = () => {
     return sub ? sub.subcategory_name : "N/A";
   };
 
-  const filteredCommissions = commissions.filter((c) => {
-    const distributorName = getDistributorName(c.distributor_id).toLowerCase();
-    const categoryName = getCategoryName(c.category_id).toLowerCase();
-    const subcategoryName = getSubcategoryName(c.subcategory_id).toLowerCase();
-    const commissionAmt = c.commission_amount.toString();
+  const filteredSubcategories = allSubcategories.filter(sub => {
+    const categoryName = getCategoryName(sub.category_id).toLowerCase();
+    const subcategoryName = sub.subcategory_name.toLowerCase();
     const search = searchTerm.toLowerCase();
-
-    return (
-      distributorName.includes(search) ||
-      categoryName.includes(search) ||
-      subcategoryName.includes(search) ||
-      commissionAmt.includes(search)
-    );
+    
+    return categoryName.includes(search) || subcategoryName.includes(search);
   });
 
   return (
@@ -200,161 +187,111 @@ const DistributorCommissions = () => {
           <p className="text-center text-gray-600 text-sm mt-1">Set custom commission rates for individual distributors</p>
         </div>
         
-        <div className="p-4 flex justify-between items-center">
-          <input
-            type="text"
-            placeholder="Search by distributor, category, subcategory, or amount..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="border border-gray-300 rounded px-4 py-2 w-1/2 focus:outline-none focus:ring-2 focus:ring-orange-400"
-          />
-          <button
-            onClick={openAddModal}
-            className="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600 flex items-center gap-2"
-          >
-            <FaPlus /> Add Custom Commission
-          </button>
-        </div>
-
-        <div className="p-6 overflow-x-auto">
-          <table className="w-full border text-sm bg-white shadow rounded">
-            <thead className="bg-[#F58A3B14] border-b-2">
-              <tr>
-                {["Distributor", "Category", "Subcategory", "Commission Amount", "Actions"].map((h) => (
-                  <th key={h} className="px-4 py-3 border text-center font-semibold">
-                    {h}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {filteredCommissions.length ? (
-                filteredCommissions.map((c) => (
-                  <tr key={c.id} className="hover:bg-orange-100">
-                    <td className="px-4 py-3 border text-center">{getDistributorName(c.distributor_id)}</td>
-                    <td className="px-4 py-3 border text-center">{getCategoryName(c.category_id)}</td>
-                    <td className="px-4 py-3 border text-center">{getSubcategoryName(c.subcategory_id)}</td>
-                    <td className="px-4 py-3 border text-center font-semibold text-green-600">
-                      ₹{Number(c.commission_amount).toFixed(2)}
-                    </td>
-                    <td className="px-4 py-3 border text-center space-x-2">
-                      <button
-                        onClick={() => openEditModal(c)}
-                        className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+        <div className="p-6 space-y-4">
+          <div className="flex gap-4 items-center">
+            <div className="flex-1 relative distributor-dropdown-container">
+              <label className="block font-semibold mb-2">Select Distributor</label>
+              <input
+                type="text"
+                placeholder="Search and select distributor..."
+                value={distributorSearch}
+                onChange={(e) => {
+                  setDistributorSearch(e.target.value);
+                  setShowDistributorDropdown(true);
+                  if (!e.target.value) setSelectedDistributor("");
+                }}
+                onFocus={() => setShowDistributorDropdown(true)}
+                className="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-400"
+              />
+              {showDistributorDropdown && (
+                <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded shadow-lg max-h-60 overflow-y-auto">
+                  {filteredDistributors.length > 0 ? (
+                    filteredDistributors.map((d) => (
+                      <div
+                        key={d.user_id}
+                        onClick={() => handleSelectDistributor(d.user_id)}
+                        className="px-4 py-2 hover:bg-orange-100 cursor-pointer"
                       >
-                        <FaEdit />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(c.id)}
-                        className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-                      >
-                        <FaTrash />
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={5} className="px-4 py-3 border text-center">
-                    {searchTerm ? "No matching commissions found." : "No custom commissions set. All distributors use default rates."}
-                  </td>
-                </tr>
+                        {d.name || d.full_name || d.username || `User ${d.user_id}`}
+                      </div>
+                    ))
+                  ) : (
+                    <div className="px-4 py-2 text-gray-500">No distributors found</div>
+                  )}
+                </div>
               )}
-            </tbody>
-          </table>
+            </div>
+            <div className="flex-1">
+              <label className="block font-semibold mb-2">Search Categories/Subcategories</label>
+              <input
+                type="text"
+                placeholder="Search..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-400"
+              />
+            </div>
+          </div>
+
+          {selectedDistributor ? (
+            <>
+              <div className="overflow-x-auto max-h-[600px] overflow-y-auto">
+                <table className="w-full border text-sm bg-white shadow rounded">
+                  <thead className="bg-[#F58A3B14] border-b-2 sticky top-0">
+                    <tr>
+                      <th className="px-4 py-3 border text-center font-semibold">Category</th>
+                      <th className="px-4 py-3 border text-center font-semibold">Subcategory</th>
+                      <th className="px-4 py-3 border text-center font-semibold">Commission Amount (₹)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredSubcategories.length ? (
+                      filteredSubcategories.map((sub) => {
+                        const key = `${sub.category_id}_${sub.subcategory_id}`;
+                        return (
+                          <tr key={key} className="hover:bg-orange-50">
+                            <td className="px-4 py-3 border text-center">{getCategoryName(sub.category_id)}</td>
+                            <td className="px-4 py-3 border text-center">{sub.subcategory_name}</td>
+                            <td className="px-4 py-3 border text-center">
+                              <input
+                                type="number"
+                                step="0.01"
+                                placeholder="Enter amount"
+                                value={commissionInputs[key] || ""}
+                                onChange={(e) => handleCommissionChange(sub.category_id, sub.subcategory_id, e.target.value)}
+                                className="w-32 border border-gray-300 rounded px-3 py-1 text-center focus:outline-none focus:ring-2 focus:ring-orange-400"
+                              />
+                            </td>
+                          </tr>
+                        );
+                      })
+                    ) : (
+                      <tr>
+                        <td colSpan={3} className="px-4 py-3 border text-center text-gray-500">
+                          {searchTerm ? "No matching categories/subcategories found" : "No categories/subcategories available"}
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="flex justify-end pt-4">
+                <button
+                  onClick={handleSaveAll}
+                  className="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600 flex items-center gap-2"
+                >
+                  <FaSave /> Save All Commissions
+                </button>
+              </div>
+            </>
+          ) : (
+            <div className="text-center text-gray-500 py-8">
+              Please select a distributor to set commission rates
+            </div>
+          )}
         </div>
       </div>
-
-      {/* Add/Edit Modal */}
-      {modalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white p-6 rounded shadow-lg w-[500px]">
-            <h3 className="text-xl font-semibold mb-4">
-              {editId ? "Edit Commission" : "Add Custom Commission"}
-            </h3>
-            <form onSubmit={handleSubmit}>
-              <div className="mb-4">
-                <label className="block font-semibold">Distributor</label>
-                <select
-                  value={formData.distributor_id}
-                  onChange={(e) => setFormData({ ...formData, distributor_id: e.target.value })}
-                  className="w-full border p-2 rounded"
-                  disabled={editId}
-                >
-                  <option value="">-- Select Distributor --</option>
-                  {distributors.map((d) => (
-                    <option key={d.user_id} value={d.user_id}>
-                      {d.name || d.full_name || d.username || `User ${d.user_id}`}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="mb-4">
-                <label className="block font-semibold">Category</label>
-                <select
-                  value={formData.category_id}
-                  onChange={handleCategoryChange}
-                  className="w-full border p-2 rounded"
-                  disabled={editId}
-                >
-                  <option value="">-- Select Category --</option>
-                  {categories.map((c) => (
-                    <option key={c.category_id} value={c.category_id}>
-                      {c.category_name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="mb-4">
-                <label className="block font-semibold">Subcategory</label>
-                <select
-                  value={formData.subcategory_id}
-                  onChange={(e) => setFormData({ ...formData, subcategory_id: e.target.value })}
-                  className="w-full border p-2 rounded"
-                  disabled={editId}
-                >
-                  <option value="">-- Select Subcategory --</option>
-                  {subcategories.map((s) => (
-                    <option key={s.subcategory_id} value={s.subcategory_id}>
-                      {s.subcategory_name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="mb-4">
-                <label className="block font-semibold">Commission Amount (₹)</label>
-                <input
-                  type="number"
-                  step="0.01"
-                  value={formData.commission_amount}
-                  onChange={(e) => setFormData({ ...formData, commission_amount: e.target.value })}
-                  className="w-full border p-2 rounded"
-                  placeholder="e.g., 250"
-                />
-              </div>
-
-              <div className="flex justify-end gap-2">
-                <button
-                  type="button"
-                  onClick={() => setModalOpen(false)}
-                  className="px-4 py-2 bg-gray-400 text-white rounded"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-blue-500 text-white rounded"
-                >
-                  {editId ? "Save Changes" : "Add Commission"}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
