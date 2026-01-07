@@ -10,6 +10,7 @@ const DistributorPaymentRequest = () => {
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState('All');
   const [selectedRequests, setSelectedRequests] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     fetchPaymentRequests();
@@ -20,7 +21,34 @@ const DistributorPaymentRequest = () => {
     try {
       setLoading(true);
       const response = await axios.get(`${API_BASE_URL}/payment-requests`);
-      setPaymentRequests(response.data);
+      const requests = response.data;
+      
+      // Get unique distributor IDs
+      const distributorIds = [...new Set(requests.map(r => r.distributor_id))];
+      
+      // Fetch distributor details for each unique ID
+      const distributorPromises = distributorIds.map(id =>
+        axios.get(`${API_BASE_URL}/users/${id}`).catch(() => null)
+      );
+      
+      const distributorResponses = await Promise.all(distributorPromises);
+      
+      // Create a map of distributor_id to distributor_name
+      const distributorMap = {};
+      distributorResponses.forEach((res, index) => {
+        if (res && res.data) {
+          const distributor = res.data;
+          distributorMap[distributorIds[index]] = distributor.name || distributor.full_name || distributor.username || 'Unknown';
+        }
+      });
+      
+      // Add distributor names to payment requests
+      const requestsWithDistributors = requests.map(req => ({
+        ...req,
+        distributor_name: distributorMap[req.distributor_id] || 'Unknown'
+      }));
+      
+      setPaymentRequests(requestsWithDistributors);
     } catch (error) {
       console.error('Error fetching payment requests:', error);
       Swal.fire('Error', 'Failed to fetch payment requests', 'error');
@@ -210,9 +238,26 @@ const DistributorPaymentRequest = () => {
     });
   };
 
-  const filteredRequests = statusFilter === 'All'
-    ? paymentRequests
-    : paymentRequests.filter(req => req.status === statusFilter);
+  const filteredRequests = paymentRequests.filter(req => {
+    // Status filter
+    const matchesStatus = statusFilter === 'All' || req.status === statusFilter;
+    
+    // Search filter - search across available fields including distributor name
+    const searchLower = searchTerm.toLowerCase();
+    const matchesSearch = !searchTerm || (
+      req.distributor_name?.toLowerCase().includes(searchLower) ||
+      req.applicant_name?.toLowerCase().includes(searchLower) ||
+      req.category_name?.toLowerCase().includes(searchLower) ||
+      req.subcategory_name?.toLowerCase().includes(searchLower) ||
+      req.amount?.toString().includes(searchLower) ||
+      req.request_id?.toString().includes(searchLower) ||
+      req.application_id?.toLowerCase().includes(searchLower) ||
+      req.utr_number?.toLowerCase().includes(searchLower) ||
+      req.status?.toLowerCase().includes(searchLower)
+    );
+    
+    return matchesStatus && matchesSearch;
+  });
 
   if (loading) {
     return (
@@ -280,23 +325,42 @@ const DistributorPaymentRequest = () => {
       {/* Filter */}
       <div className="bg-white rounded-lg shadow p-4 mb-6">
         <div className="flex items-center gap-4 flex-wrap">
-          <label className="text-sm font-medium text-gray-700">Filter by Status:</label>
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
-          >
-            <option value="All">All</option>
-            <option value="Pending">Pending</option>
-            <option value="Approved">Approved</option>
-            <option value="Paid">Paid</option>
-            <option value="Rejected">Rejected</option>
-          </select>
+          <div className="flex-1 min-w-[300px]">
+            <input
+              type="text"
+              placeholder="Search by distributor, applicant, category, application ID, amount, UTR..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
+            />
+          </div>
+          
+          <div className="flex items-center gap-2">
+            <label className="text-sm font-medium text-gray-700">Status:</label>
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
+            >
+              <option value="All">All</option>
+              <option value="Pending">Pending</option>
+              <option value="Approved">Approved</option>
+              <option value="Paid">Paid</option>
+              <option value="Rejected">Rejected</option>
+            </select>
+          </div>
+        </div>
+        
+        <div className="flex items-center justify-between mt-4">
+          <span className="text-sm text-gray-600">
+            Showing {filteredRequests.length} of {paymentRequests.length} request(s)
+            {searchTerm && <span className="ml-2 text-orange-600 font-semibold">(Filtered by search)</span>}
+          </span>
           
           {selectedRequests.length > 0 && (
             <button
               onClick={handleBulkApprove}
-              className="ml-auto bg-green-500 text-white px-6 py-2 rounded-lg hover:bg-green-600 transition flex items-center gap-2 font-semibold"
+              className="bg-green-500 text-white px-6 py-2 rounded-lg hover:bg-green-600 transition flex items-center gap-2 font-semibold shadow-md"
             >
               <FaCheckCircle /> Approve Selected ({selectedRequests.length}) - ₹
               {selectedRequests.reduce((sum, id) => {
@@ -305,10 +369,6 @@ const DistributorPaymentRequest = () => {
               }, 0).toFixed(2)}
             </button>
           )}
-          
-          <span className="text-sm text-gray-600 ml-auto">
-            Showing {filteredRequests.length} request(s)
-          </span>
         </div>
       </div>
 
@@ -331,6 +391,9 @@ const DistributorPaymentRequest = () => {
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Application ID
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Distributor
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Applicant Name
@@ -358,7 +421,7 @@ const DistributorPaymentRequest = () => {
             <tbody className="bg-white divide-y divide-gray-200">
               {filteredRequests.length === 0 ? (
                 <tr>
-                  <td colSpan="10" className="px-6 py-4 text-center text-gray-500">
+                  <td colSpan="11" className="px-6 py-4 text-center text-gray-500">
                     No payment requests found
                   </td>
                 </tr>
@@ -380,6 +443,9 @@ const DistributorPaymentRequest = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       {request.application_id}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">
+                      {request.distributor_name || 'N/A'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       {request.applicant_name || 'N/A'}
