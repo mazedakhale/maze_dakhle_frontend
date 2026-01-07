@@ -325,7 +325,7 @@ const DistributorPaymentRequest = () => {
       {/* Filter */}
       <div className="bg-white rounded-lg shadow p-4 mb-6">
         <div className="flex items-center gap-4 flex-wrap">
-          <div className="flex-1 min-w-[300px]">
+          <div className="w-[500px]">
             <input
               type="text"
               placeholder="Search by distributor, applicant, category, application ID, amount, UTR..."
