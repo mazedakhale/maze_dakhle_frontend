@@ -78,6 +78,11 @@ const Sidebar = ({ onNavigate }) => {
                 path: "/PaymentRequest",
               },
               {
+                icon: <FaMoneyBill />,
+                label: "Payment Details",
+                path: "/PaymentDetails",
+              },
+              {
                 icon: <FaMoneyBillTransfer />,
                 label: "My Commissions",
                 path: "/MyCommissions",

@@ -443,6 +443,51 @@ const Ddashinner = () => {
           </Grid>
         </Grid>
 
+        {/* Quick Actions Section */}
+        <Grid container spacing={3} style={{ marginTop: "20px" }}>
+          <Grid item xs={12} sm={6} md={4}>
+            <Card
+              style={{
+                display: "flex",
+                alignItems: "center",
+                backgroundColor: "#8b5cf6",
+                color: "white",
+                padding: "15px",
+                borderRadius: "8px",
+                boxShadow: "0px 4px 8px rgba(0,0,0,0.1)",
+                cursor: "pointer",
+                transition: "transform 0.2s, box-shadow 0.2s",
+              }}
+              onClick={() => navigate('/PaymentDetails')}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = "translateY(-2px)";
+                e.currentTarget.style.boxShadow = "0px 6px 12px rgba(0,0,0,0.15)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = "translateY(0)";
+                e.currentTarget.style.boxShadow = "0px 4px 8px rgba(0,0,0,0.1)";
+              }}
+            >
+              <span style={{ fontSize: "35px", marginRight: "15px" }}>💳</span>
+              <div style={{ flexGrow: 1 }}>
+                <Typography
+                  variant="h6"
+                  style={{ fontSize: "16px", fontWeight: "bold", marginBottom: "5px" }}
+                >
+                  Payment Details
+                </Typography>
+                <Typography
+                  variant="body2"
+                  style={{ fontSize: "12px", opacity: 0.9 }}
+                >
+                  Manage bank account, UPI & QR code
+                </Typography>
+              </div>
+              <span style={{ fontSize: "20px", opacity: 0.8 }}>➤</span>
+            </Card>
+          </Grid>
+        </Grid>
+
         {/* Application Section Header - Static */}
         <Card
           style={{

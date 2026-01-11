@@ -69,43 +69,327 @@ const DistributorPaymentRequest = () => {
   const handleApprove = async (requestId) => {
     const request = paymentRequests.find(r => r.request_id === requestId);
     
-    const { value: formValues } = await Swal.fire({
-      title: 'Approve Payment Request?',
-      html: `
-        <p>Amount: <strong>₹${request?.amount || 0}</strong></p>
-        <input id="utr-input" class="swal2-input" placeholder="Enter UTR Number (Required)">
-      `,
-      icon: 'question',
-      showCancelButton: true,
-      confirmButtonColor: '#10b981',
-      cancelButtonColor: '#6b7280',
-      confirmButtonText: 'Yes, approve it!',
-      preConfirm: () => {
-        const utr = document.getElementById('utr-input').value.trim();
-        if (!utr) {
-          Swal.showValidationMessage('UTR Number is required');
-          return false;
-        }
-        return { utr };
-      }
-    });
-
-    if (formValues) {
+    try {
+      // Fetch distributor payment details
+      let paymentDetails = null;
       try {
-        await axios.put(`${API_BASE_URL}/payment-requests/${requestId}/status`, {
-          status: 'Approved',
-          utr_number: formValues.utr || null,
-        });
-        Swal.fire('Approved!', `Payment has been processed successfully.${formValues.utr ? `\nUTR: ${formValues.utr}` : ''}`, 'success');
-        fetchPaymentRequests();
-        fetchStatistics();
-      } catch (error) {
-        console.error('Error approving payment:', error);
-        Swal.fire(
-          'Error',
-          error.response?.data?.message || 'Failed to approve payment request',
-          'error'
+        const paymentDetailsResponse = await axios.get(
+          `${API_BASE_URL}/distributor-payment-details/distributor/${request.distributor_id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('token')}`
+            }
+          }
         );
+        paymentDetails = paymentDetailsResponse.data;
+      } catch (paymentDetailsError) {
+        console.error('Error fetching distributor payment details:', paymentDetailsError);
+        if (paymentDetailsError.response && paymentDetailsError.response.status === 404) {
+          console.log(`Distributor ${request.distributor_id} has not set up payment details yet`);
+        }
+      }
+      
+      // Create payment method options based on available details
+      let paymentMethodOptions = '';
+      if (paymentDetails?.qr_code_url) {
+        paymentMethodOptions += '<option value="qr">QR Code</option>';
+      }
+      if (paymentDetails?.upi_id) {
+        paymentMethodOptions += '<option value="upi">UPI ID</option>';
+      }
+      if (paymentDetails?.account_number && paymentDetails?.bank_name) {
+        paymentMethodOptions += '<option value="bank">Bank Account</option>';
+      }
+      
+      if (!paymentMethodOptions) {
+        Swal.fire({
+          title: 'No Payment Details',
+          text: 'This distributor has not set up their payment details yet. Please ask them to add their bank account, UPI ID, or QR code information before approving payment.',
+          icon: 'warning',
+          confirmButtonText: 'OK'
+        });
+        return;
+      }
+      
+      const { value: formValues } = await Swal.fire({
+        title: 'Approve Payment Request',
+        html: `
+          <div style="text-align: left; max-width: 550px; margin: 0 auto; padding: 10px;">
+            <!-- Request Summary -->
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 15px; border-radius: 8px; color: white; margin-bottom: 20px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <span style="font-size: 14px; opacity: 0.9;">Distributor:</span>
+                <span style="font-weight: bold; font-size: 16px;">${request.distributor_name}</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 14px; opacity: 0.9;">Payment Amount:</span>
+                <span style="font-weight: bold; font-size: 20px;">₹${request?.amount || 0}</span>
+              </div>
+            </div>
+            
+            <!-- Payment Method Selection -->
+            <div style="margin-bottom: 20px;">
+              <label for="payment-method-select" style="font-weight: 600; display: block; margin-bottom: 8px; color: #374151; font-size: 14px;">
+                <svg style="display: inline-block; width: 16px; height: 16px; margin-right: 5px; vertical-align: middle;" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4z"></path>
+                  <path fill-rule="evenodd" d="M18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z" clip-rule="evenodd"></path>
+                </svg>
+                Select Payment Method
+              </label>
+              <select id="payment-method-select" class="swal2-select" 
+                      style="width: 100%; padding: 10px; border: 2px solid #e5e7eb; border-radius: 6px; font-size: 14px; background: white; cursor: pointer; transition: all 0.2s;">
+                <option value="">Choose payment method...</option>
+                ${paymentMethodOptions}
+              </select>
+            </div>
+            
+            <!-- Payment Details Display -->
+            <div id="payment-details-display" 
+                 style="background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); 
+                        padding: 20px; 
+                        border-radius: 8px; 
+                        margin-bottom: 20px; 
+                        display: none; 
+                        border: 2px solid #bae6fd;
+                        box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+              <!-- Payment details will be inserted here -->
+            </div>
+            
+            <!-- UTR Input -->
+            <div style="margin-bottom: 10px;">
+              <label for="utr-input" style="font-weight: 600; display: block; margin-bottom: 8px; color: #374151; font-size: 14px;">
+                <svg style="display: inline-block; width: 16px; height: 16px; margin-right: 5px; vertical-align: middle;" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path>
+                </svg>
+                Transaction Reference Number (UTR)
+              </label>
+              <input id="utr-input" class="swal2-input" 
+                     placeholder="Enter UTR/Transaction ID (Required)" 
+                     style="width: 100%; 
+                            padding: 10px; 
+                            border: 2px solid #e5e7eb; 
+                            border-radius: 6px; 
+                            font-size: 14px; 
+                            font-family: 'Courier New', monospace;
+                            margin: 0;">
+            </div>
+          </div>
+        `,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#10b981',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: '✓ Approve Payment',
+        cancelButtonText: '✕ Cancel',
+        width: '650px',
+        didOpen: () => {
+          const paymentMethodSelect = document.getElementById('payment-method-select');
+          const paymentDetailsDisplay = document.getElementById('payment-details-display');
+          
+          paymentMethodSelect.addEventListener('change', (e) => {
+            const selectedMethod = e.target.value;
+            
+            if (!selectedMethod) {
+              paymentDetailsDisplay.style.display = 'none';
+              paymentMethodSelect.style.borderColor = '#e5e7eb';
+              return;
+            }
+            
+            // Highlight selected dropdown
+            paymentMethodSelect.style.borderColor = '#3b82f6';
+            paymentMethodSelect.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1)';
+            
+            let detailsHtml = '';
+            
+            if (selectedMethod === 'qr' && paymentDetails.qr_code_url) {
+              detailsHtml = `
+                <div style="text-align: center;">
+                  <div style="display: inline-flex; align-items: center; gap: 10px; margin-bottom: 15px; background: white; padding: 8px 16px; border-radius: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    <svg style="width: 20px; height: 20px; color: #2563eb;" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h3a1 1 0 011 1v3a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm2 2V5h1v1H5zM3 13a1 1 0 011-1h3a1 1 0 011 1v3a1 1 0 01-1 1H4a1 1 0 01-1-1v-3zm2 2v-1h1v1H5zM13 3a1 1 0 00-1 1v3a1 1 0 001 1h3a1 1 0 001-1V4a1 1 0 00-1-1h-3zm1 2v1h1V5h-1z" clip-rule="evenodd"></path>
+                      <path d="M11 4a1 1 0 10-2 0v1a1 1 0 002 0V4zM10 7a1 1 0 011 1v1h2a1 1 0 110 2h-3a1 1 0 01-1-1V8a1 1 0 011-1zM16 9a1 1 0 100 2 1 1 0 000-2zM9 13a1 1 0 011-1h1a1 1 0 110 2v2a1 1 0 11-2 0v-3zM7 11a1 1 0 100-2H4a1 1 0 100 2h3zM17 13a1 1 0 01-1 1h-2a1 1 0 110-2h2a1 1 0 011 1zM16 17a1 1 0 100-2h-3a1 1 0 100 2h3z"></path>
+                    </svg>
+                    <span style="font-weight: 600; color: #1e40af; font-size: 16px;">QR Code Payment</span>
+                  </div>
+                  <div style="background: white; padding: 15px; border-radius: 12px; display: inline-block; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                    <img src="${API_BASE_URL}/uploads/${paymentDetails.qr_code_url.split('/uploads/')[1]}" 
+                         alt="QR Code" 
+                         style="max-width: 220px; max-height: 220px; border-radius: 8px; display: block;" 
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                    <p style="display: none; color: #ef4444; margin: 20px 0; font-weight: 500;">⚠️ QR Code image not available</p>
+                  </div>
+                  ${paymentDetails.upi_id ? `
+                    <div style="margin-top: 12px; padding: 10px; background: white; border-radius: 8px; display: inline-block;">
+                      <div style="font-size: 12px; color: #6b7280; margin-bottom: 4px;">UPI ID</div>
+                      <code style="background: #f3f4f6; padding: 6px 12px; border-radius: 6px; font-size: 13px; color: #1f2937; font-weight: 500;">${paymentDetails.upi_id}</code>
+                    </div>
+                  ` : ''}
+                  <div style="margin-top: 12px; font-size: 12px; color: #6b7280;">
+                    📱 Scan this QR code with any UPI app to pay
+                  </div>
+                </div>
+              `;
+            } else if (selectedMethod === 'upi' && paymentDetails.upi_id) {
+              detailsHtml = `
+                <div>
+                  <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px; justify-content: center;">
+                    <svg style="width: 24px; height: 24px; color: #059669;" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z"></path>
+                    </svg>
+                    <span style="font-weight: 600; color: #047857; font-size: 18px;">UPI Payment</span>
+                  </div>
+                  <div style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                    <div style="margin-bottom: 12px;">
+                      <div style="font-size: 12px; color: #6b7280; margin-bottom: 6px; text-align: left;">UPI ID</div>
+                      <div style="display: flex; align-items: center; gap: 10px; background: #f0fdf4; padding: 12px; border-radius: 8px; border: 1px solid #bbf7d0;">
+                        <code style="flex: 1; font-size: 15px; color: #065f46; font-weight: 600; word-break: break-all;">${paymentDetails.upi_id}</code>
+                        <button type="button" onclick="navigator.clipboard.writeText('${paymentDetails.upi_id}'); this.innerHTML='✓ Copied'; setTimeout(() => this.innerHTML='📋 Copy', 2000);" 
+                                style="background: #10b981; color: white; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; white-space: nowrap; font-weight: 500; transition: all 0.2s;">
+                          📋 Copy
+                        </button>
+                      </div>
+                    </div>
+                    <div style="font-size: 12px; color: #6b7280; text-align: center; margin-top: 10px;">
+                      💳 Use this UPI ID in your payment app
+                    </div>
+                  </div>
+                </div>
+              `;
+            } else if (selectedMethod === 'bank' && paymentDetails.account_number && paymentDetails.bank_name) {
+              detailsHtml = `
+                <div>
+                  <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px; justify-content: center;">
+                    <svg style="width: 24px; height: 24px; color: #7c3aed;" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4z"></path>
+                      <path fill-rule="evenodd" d="M18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z" clip-rule="evenodd"></path>
+                    </svg>
+                    <span style="font-weight: 600; color: #6d28d9; font-size: 18px;">Bank Transfer</span>
+                  </div>
+                  <div style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                    <div style="display: grid; gap: 14px;">
+                      <div style="text-align: left;">
+                        <div style="font-size: 11px; color: #6b7280; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">Account Holder</div>
+                        <div style="font-weight: 600; color: #1f2937; font-size: 15px;">${paymentDetails.account_holder_name || 'N/A'}</div>
+                      </div>
+                      <div style="text-align: left;">
+                        <div style="font-size: 11px; color: #6b7280; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">Bank Name</div>
+                        <div style="font-weight: 600; color: #1f2937; font-size: 15px;">${paymentDetails.bank_name}</div>
+                      </div>
+                      <div style="text-align: left; background: #faf5ff; padding: 10px; border-radius: 6px; border: 1px solid #e9d5ff;">
+                        <div style="font-size: 11px; color: #6b7280; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">Account Number</div>
+                        <code style="font-size: 16px; color: #6d28d9; font-weight: 600; letter-spacing: 1px;">${paymentDetails.account_number}</code>
+                      </div>
+                      <div style="text-align: left; background: #faf5ff; padding: 10px; border-radius: 6px; border: 1px solid #e9d5ff;">
+                        <div style="font-size: 11px; color: #6b7280; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">IFSC Code</div>
+                        <code style="font-size: 16px; color: #6d28d9; font-weight: 600; letter-spacing: 1px;">${paymentDetails.ifsc_code || 'N/A'}</code>
+                      </div>
+                    </div>
+                    <div style="font-size: 12px; color: #6b7280; text-align: center; margin-top: 14px; padding-top: 12px; border-top: 1px solid #e5e7eb;">
+                      🏦 Use these details for bank transfer or NEFT/RTGS/IMPS
+                    </div>
+                  </div>
+                </div>
+              `;
+            }
+            
+            // Fade in animation
+            paymentDetailsDisplay.style.opacity = '0';
+            paymentDetailsDisplay.style.display = 'block';
+            paymentDetailsDisplay.innerHTML = detailsHtml;
+            
+            setTimeout(() => {
+              paymentDetailsDisplay.style.transition = 'opacity 0.3s ease-in-out';
+              paymentDetailsDisplay.style.opacity = '1';
+            }, 10);
+          });
+        },
+        preConfirm: () => {
+          const utr = document.getElementById('utr-input').value.trim();
+          const paymentMethod = document.getElementById('payment-method-select').value;
+          
+          if (!paymentMethod) {
+            Swal.showValidationMessage('Please select a payment method');
+            return false;
+          }
+          if (!utr) {
+            Swal.showValidationMessage('UTR Number is required');
+            return false;
+          }
+          return { utr, paymentMethod };
+        }
+      });
+
+      if (formValues) {
+        try {
+          await axios.put(`${API_BASE_URL}/payment-requests/${requestId}/status`, {
+            status: 'Approved',
+            utr_number: formValues.utr || null,
+            payment_method: formValues.paymentMethod || null,
+          });
+          
+          const methodText = formValues.paymentMethod === 'qr' ? 'QR Code' : 
+                            formValues.paymentMethod === 'upi' ? 'UPI' : 'Bank Transfer';
+          
+          Swal.fire(
+            'Payment Approved!', 
+            `Payment has been processed successfully via ${methodText}.\nUTR: ${formValues.utr}`, 
+            'success'
+          );
+          fetchPaymentRequests();
+          fetchStatistics();
+        } catch (error) {
+          console.error('Error approving payment:', error);
+          Swal.fire(
+            'Error',
+            error.response?.data?.message || 'Failed to approve payment request',
+            'error'
+          );
+        }
+      }
+    } catch (paymentDetailsError) {
+      console.error('Error fetching payment details:', paymentDetailsError);
+      
+      // Fallback to simple approval if payment details are not available
+      const { value: formValues } = await Swal.fire({
+        title: 'Approve Payment Request',
+        html: `
+          <p><strong>Distributor:</strong> ${request.distributor_name}</p>
+          <p><strong>Amount:</strong> ₹${request?.amount || 0}</p>
+          <p style="color: #f59e0b; font-size: 14px; margin-top: 10px;">⚠️ Payment details not available for this distributor</p>
+          <input id="utr-input" class="swal2-input" placeholder="Enter UTR Number (Required)">
+        `,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#10b981',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'Yes, approve it!',
+        preConfirm: () => {
+          const utr = document.getElementById('utr-input').value.trim();
+          if (!utr) {
+            Swal.showValidationMessage('UTR Number is required');
+            return false;
+          }
+          return { utr };
+        }
+      });
+      
+      if (formValues) {
+        try {
+          await axios.put(`${API_BASE_URL}/payment-requests/${requestId}/status`, {
+            status: 'Approved',
+            utr_number: formValues.utr || null,
+          });
+          Swal.fire('Approved!', `Payment has been processed successfully.\nUTR: ${formValues.utr}`, 'success');
+          fetchPaymentRequests();
+          fetchStatistics();
+        } catch (error) {
+          console.error('Error approving payment:', error);
+          Swal.fire(
+            'Error',
+            error.response?.data?.message || 'Failed to approve payment request',
+            'error'
+          );
+        }
       }
     }
   };
