@@ -12,6 +12,57 @@ const DistributorPaymentRequest = () => {
   const [selectedRequests, setSelectedRequests] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
 
+  // Helper function to convert Google Drive URLs to direct image URLs
+  const convertGoogleDriveUrl = (url) => {
+    if (!url) return url;
+    
+    // Check if it's a Google Drive URL
+    if (url.includes('drive.google.com')) {
+      // Extract file ID from various Google Drive URL formats
+      let fileId = null;
+      
+      // Format: https://drive.google.com/file/d/FILE_ID/view or preview
+      const match1 = url.match(/\/file\/d\/([^\/]+)/);
+      if (match1) {
+        fileId = match1[1];
+      }
+      
+      // Format: https://drive.google.com/open?id=FILE_ID
+      const match2 = url.match(/[?&]id=([^&]+)/);
+      if (match2) {
+        fileId = match2[1];
+      }
+      
+      // If we found a file ID, convert to thumbnail URL (more reliable than direct view)
+      if (fileId) {
+        // Using Google Drive thumbnail API which is more reliable
+        return `https://drive.google.com/thumbnail?id=${fileId}&sz=w400`;
+      }
+    }
+    
+    // Return original URL if not a Google Drive link
+    return url;
+  };
+
+  // Function to get the original Google Drive view URL
+  const getGoogleDriveViewUrl = (url) => {
+    if (!url) return url;
+    
+    if (url.includes('drive.google.com')) {
+      let fileId = null;
+      const match1 = url.match(/\/file\/d\/([^\/]+)/);
+      if (match1) fileId = match1[1];
+      const match2 = url.match(/[?&]id=([^&]+)/);
+      if (match2) fileId = match2[1];
+      
+      if (fileId) {
+        return `https://drive.google.com/file/d/${fileId}/view`;
+      }
+    }
+    
+    return url;
+  };
+
   useEffect(() => {
     fetchPaymentRequests();
     fetchStatistics();
@@ -202,6 +253,9 @@ const DistributorPaymentRequest = () => {
             let detailsHtml = '';
             
             if (selectedMethod === 'qr' && paymentDetails.qr_code_url) {
+              const qrImageUrl = convertGoogleDriveUrl(paymentDetails.qr_code_url);
+              const qrViewUrl = getGoogleDriveViewUrl(paymentDetails.qr_code_url);
+              
               detailsHtml = `
                 <div style="text-align: center;">
                   <div style="display: inline-flex; align-items: center; gap: 10px; margin-bottom: 15px; background: white; padding: 8px 16px; border-radius: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
@@ -211,12 +265,18 @@ const DistributorPaymentRequest = () => {
                     </svg>
                     <span style="font-weight: 600; color: #1e40af; font-size: 16px;">QR Code Payment</span>
                   </div>
-                  <div style="background: white; padding: 15px; border-radius: 12px; display: inline-block; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
-                    <img src="${API_BASE_URL}/uploads/${paymentDetails.qr_code_url.split('/uploads/')[1]}" 
-                         alt="QR Code" 
-                         style="max-width: 220px; max-height: 220px; border-radius: 8px; display: block;" 
-                         onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-                    <p style="display: none; color: #ef4444; margin: 20px 0; font-weight: 500;">⚠️ QR Code image not available</p>
+                  
+                  <div style="background: white; padding: 20px; border-radius: 12px; display: inline-block; box-shadow: 0 4px 12px rgba(0,0,0,0.1); max-width: 300px;">
+                    <div style="background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 2px dashed #3b82f6;">
+                      <p style="color: #1e40af; margin: 0 0 12px 0; font-weight: 600; font-size: 14px;">📱 View QR Code to Pay</p>
+                      <a href="${qrViewUrl}" target="_blank" 
+                         style="display: inline-block; background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; box-shadow: 0 4px 6px rgba(59, 130, 246, 0.3); transition: all 0.2s; width: 100%;"
+                         onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 10px rgba(59, 130, 246, 0.4)';"
+                         onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 6px rgba(59, 130, 246, 0.3)';">
+                        🔗 Open QR Code
+                      </a>
+                      <p style="font-size: 11px; color: #64748b; margin: 10px 0 0 0; line-height: 1.4;">Click above to open QR code in new window, then scan with your UPI app</p>
+                    </div>
                   </div>
                   ${paymentDetails.upi_id ? `
                     <div style="margin-top: 12px; padding: 10px; background: white; border-radius: 8px; display: inline-block;">

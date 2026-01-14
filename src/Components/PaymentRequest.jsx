@@ -153,19 +153,38 @@ const PaymentRequest = () => {
       // Mark this document as being processed
       setProcessingRequests(prev => ({ ...prev, [doc.document_id]: true }));
 
-      // Get the document price
-      const priceResponse = await axios.get(
-        `${API_BASE_URL}/prices/category/${doc.category_id}/subcategory/${doc.subcategory_id}`
-      );
-
+      // Get the document price and distributor-specific commission
+      const [priceResponse, distributorCommissionResponse] = await Promise.all([
+        axios.get(`${API_BASE_URL}/prices/category/${doc.category_id}/subcategory/${doc.subcategory_id}`),
+        axios.get(`${API_BASE_URL}/distributor-commissions`)
+      ]);
+      
+      // Debug logging to check the response structure
+     
       if (!priceResponse.data) {
         Swal.fire("Error", "Price not found for this document type.", "error");
         setProcessingRequests(prev => ({ ...prev, [doc.document_id]: false }));
         return;
       }
 
-      const amount = priceResponse.data.distributor_commission || 0;
-
+      // Find distributor-specific commission for this category/subcategory
+      const distributorCommission = distributorCommissionResponse.data.find(comm => 
+        comm.distributor_id === distributorId && 
+        comm.category_id === doc.category_id && 
+        comm.subcategory_id === doc.subcategory_id
+      );
+      
+      // Use distributor-specific commission if available, otherwise fall back to general commission
+      const amount = distributorCommission ? 
+        parseFloat(distributorCommission.commission_amount || distributorCommission.amount || 0) :
+        parseFloat(priceResponse.data.distributor_commission || 0);
+    
+      
+      if (amount <= 0) {
+        Swal.fire("Error", "No commission amount set for this document type and distributor.", "error");
+        setProcessingRequests(prev => ({ ...prev, [doc.document_id]: false }));
+        return;
+      }
       // Get applicant name using multilingual detection
       const applicantName = getApplicantName(doc.document_fields);
 
