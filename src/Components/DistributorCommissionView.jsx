@@ -8,6 +8,7 @@ const DistributorCommissionView = () => {
   const [commissions, setCommissions] = useState([]);
   const [categories, setCategories] = useState([]);
   const [allSubcategories, setAllSubcategories] = useState([]);
+  const [prices, setPrices] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
 
@@ -39,6 +40,10 @@ const DistributorCommissionView = () => {
       // Fetch categories
       const { data: cats } = await axios.get(`${API_BASE_URL}/categories`);
       setCategories(cats);
+
+      // Fetch prices to get standard rates
+      const { data: allPrices } = await axios.get(`${API_BASE_URL}/prices`);
+      setPrices(allPrices);
 
       // Fetch all subcategories
       const all = [];
@@ -75,6 +80,13 @@ const DistributorCommissionView = () => {
       c => c.category_id === categoryId && c.subcategory_id === subcategoryId
     );
     return commission ? commission.commission_amount : null;
+  };
+
+  const getStandardRate = (categoryId, subcategoryId) => {
+    const price = prices.find(
+      p => p.category_id === categoryId && p.subcategory_id === subcategoryId
+    );
+    return price ? price.distributor_commission : null;
   };
 
   const filteredSubcategories = allSubcategories.filter(sub => {
@@ -129,15 +141,24 @@ const DistributorCommissionView = () => {
                 {filteredSubcategories.length ? (
                   filteredSubcategories.map((sub) => {
                     const commission = getCommissionForDocument(sub.category_id, sub.subcategory_id);
+                    const standardRate = getStandardRate(sub.category_id, sub.subcategory_id);
                     return (
                       <tr key={`${sub.category_id}_${sub.subcategory_id}`} className={commission ? "bg-green-50" : "hover:bg-gray-50"}>
                         <td className="px-4 py-3 border text-center">{getCategoryName(sub.category_id)}</td>
                         <td className="px-4 py-3 border text-center">{sub.subcategory_name}</td>
                         <td className="px-4 py-3 border text-center">
                           {commission ? (
-                            <span className="font-semibold text-green-600">₹{Number(commission).toFixed(2)}</span>
+                            <div>
+                              <span className="font-semibold text-green-600">₹{Number(commission).toFixed(2)}</span>
+                              {/* <span className="text-xs text-gray-500 block mt-1">(Custom Rate)</span> */}
+                            </div>
+                          ) : standardRate !== null && standardRate !== undefined ? (
+                            <div>
+                              <span className="text-gray-700">₹{Number(standardRate).toFixed(2)}</span>
+                              {/* <span className="text-xs text-gray-500 block mt-1">(Standard Rate)</span> */}
+                            </div>
                           ) : (
-                            <span className="text-gray-400">Default Rate</span>
+                            <span className="text-gray-400">Not Set</span>
                           )}
                         </td>
                         <td className="px-4 py-3 border text-center">
