@@ -1,11 +1,41 @@
 import { Navigate } from 'react-router-dom';
 import jwtDecode from 'jwt-decode';
+import Swal from 'sweetalert2';
+import { useEffect, useState } from 'react';
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
+  const [shouldRedirect, setShouldRedirect] = useState(false);
   const token = localStorage.getItem('token');
 
+  useEffect(() => {
+    if (!token) return;
+
+    try {
+      const decodedToken = jwtDecode(token);
+      const currentTime = Date.now() / 1000;
+
+      // Check if token is expired
+      if (decodedToken.exp && decodedToken.exp < currentTime) {
+        console.log('⏰ Token expired, removing from localStorage');
+        localStorage.removeItem('token');
+        
+        Swal.fire({
+          icon: 'warning',
+          title: 'Session Expired',
+          text: 'Your login session has expired. Please login again.',
+          confirmButtonText: 'OK',
+          confirmButtonColor: '#3085d6'
+        }).then(() => {
+          setShouldRedirect(true);
+        });
+      }
+    } catch (error) {
+      console.error('❌ Token decode error:', error);
+    }
+  }, [token]);
+
   // Check if user is logged in
-  if (!token) {
+  if (!token || shouldRedirect) {
     console.log('🔒 No token found, redirecting to login');
     return <Navigate to="/Login" replace />;
   }
@@ -14,6 +44,12 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
     // Decode token to get user role
     const decodedToken = jwtDecode(token);
     const userRole = decodedToken.role;
+
+    // Check if token is expired
+    const currentTime = Date.now() / 1000; // Convert to seconds
+    if (decodedToken.exp && decodedToken.exp < currentTime) {
+      return null; // Will be handled by useEffect
+    }
 
     console.log('👤 User role:', userRole);
     console.log('✅ Allowed roles:', allowedRoles);
