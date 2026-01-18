@@ -14,7 +14,7 @@ import { IoMdLogOut } from "react-icons/io";
 import { FaRegCircleUser } from "react-icons/fa6";
 import jwtDecode from "jwt-decode";
 import logo from "../assets/logo.png";
-import { FaMoneyBill } from "react-icons/fa";
+import { FaHistory, FaMoneyBill } from "react-icons/fa";
 import { TbLabelImportantFilled } from "react-icons/tb";
 
 // Sidebar Component
@@ -33,7 +33,7 @@ const Sidebar = ({ onNavigate }) => {
           <img src={logo} alt="Logo" className="h-12 w-auto mb-2" />
         </div>
 
-        <nav className="mt-4 px-4">
+        <nav className="mt-4 px-4 overflow-auto scrollbar-hide">
           <ul>
             {[
               {
@@ -76,6 +76,11 @@ const Sidebar = ({ onNavigate }) => {
                 icon: <FaMoneyBill />,
                 label: "Payment Request",
                 path: "/PaymentRequest",
+              },
+              {
+                icon: <FaHistory />,
+                label: "Payment History",
+                path: "/PaymentHistory",
               },
               {
                 icon: <FaMoneyBill />,

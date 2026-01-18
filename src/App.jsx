@@ -108,6 +108,7 @@ import EmployeeRecentApplications from "./Components/EmployeeRecentApplications"
 import DistributorCommissions from "./Components/DistributorCommissions";
 import DistributorCommissionView from "./Components/DistributorCommissionView";
 import DistributorPaymentDetails from "./Components/DistributorPaymentDetails";
+import DistributorPaymentHistory from "./Components/DistributorPaymentHistory";
 
 function App() {
   return (
@@ -242,6 +243,7 @@ function App() {
         <Route path="/Dsentlist" element={<ProtectedRoute allowedRoles={['Distributor']}><Distributordashboard><Dsentlist /></Distributordashboard></ProtectedRoute>} />
         <Route path="/Distributorrejected" element={<ProtectedRoute allowedRoles={['Distributor']}><Distributordashboard><Distributorrejected /></Distributordashboard></ProtectedRoute>} />
         <Route path="/PaymentRequest" element={<ProtectedRoute allowedRoles={['Distributor']}><Distributordashboard><PaymentRequest /></Distributordashboard></ProtectedRoute>} />
+        <Route path="/PaymentHistory" element={<ProtectedRoute allowedRoles={['Distributor']}><Distributordashboard><DistributorPaymentHistory /></Distributordashboard></ProtectedRoute>} />
         <Route path="/MyCommissions" element={<ProtectedRoute allowedRoles={['Distributor']}><Distributordashboard><DistributorCommissionView /></Distributordashboard></ProtectedRoute>} />
         <Route path="/PaymentDetails" element={<ProtectedRoute allowedRoles={['Distributor']}><Distributordashboard><DistributorPaymentDetails /></Distributordashboard></ProtectedRoute>} />
         <Route path="/ViewImpDocD" element={<ProtectedRoute allowedRoles={['Distributor']}><Distributordashboard><ViewImpDoc /></Distributordashboard></ProtectedRoute>} />

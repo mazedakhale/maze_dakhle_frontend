@@ -76,6 +76,16 @@ const Apply = () => {
     }
   }, [userData]);
 
+  // Debug formData changes
+  useEffect(() => {
+    console.log('FormData updated:', {
+      category_id: formData.category_id,
+      subcategory_id: formData.subcategory_id,
+      category_name: formData.category_name,
+      subcategory_name: formData.subcategory_name
+    });
+  }, [formData.category_id, formData.subcategory_id]);
+
   useEffect(() => {
     if (formData.category_id && formData.subcategory_id) {
       const fetchRequiredDocuments = async () => {
@@ -135,9 +145,15 @@ const Apply = () => {
     if (formData.category_id && formData.subcategory_id) {
       const fetchFieldNames = async () => {
         try {
+          console.log(`Fetching field names for category: ${formData.category_id}, subcategory: ${formData.subcategory_id}`);
           const response = await axios.get(
             `${API_BASE_URL}/field-names/${formData.category_id}/${formData.subcategory_id}`
           );
+
+          console.log('Field names API response status:', response.status);
+          console.log('Field names API response data:', response.data);
+          console.log('Response data type:', typeof response.data);
+          console.log('Response data is array:', Array.isArray(response.data));
 
           let fieldsArray = [];
 
@@ -158,6 +174,9 @@ const Apply = () => {
               .map((field) => field.trim())
               .filter((field) => field.length > 0);
           }
+          
+          console.log('Processed fields array:', fieldsArray);
+          
           if (fieldsArray.length > 0) {
             setFieldNames(fieldsArray);
             setFormData((prev) => ({
@@ -169,6 +188,7 @@ const Apply = () => {
             }));
           } else {
             // No fields found
+            console.warn('No field names found for this category/subcategory');
             setFieldNames([]);
             setFormData((prev) => ({
               ...prev,
@@ -177,6 +197,9 @@ const Apply = () => {
           }
         } catch (error) {
           console.error("Error fetching field names:", error);
+          console.error("Error response:", error.response);
+          console.error("Error status:", error.response?.status);
+          console.error("Error data:", error.response?.data);
           setFieldNames([]);
           setFormData((prev) => ({
             ...prev,
@@ -235,9 +258,11 @@ const Apply = () => {
   };
 
   const handleFieldChange = (e, fieldName) => {
+    const value = e.target.value;
+    console.log('Field change:', fieldName, 'Value:', value);
     setFormData((prev) => ({
       ...prev,
-      document_fields: { ...prev.document_fields, [fieldName]: e.target.value },
+      document_fields: { ...prev.document_fields, [fieldName]: value },
     }));
     setErrors((prev) => ({ ...prev, [fieldName]: "" }));
   };
@@ -431,6 +456,11 @@ const Apply = () => {
       field_name: fieldName,
       field_value: formData.document_fields[fieldName] || "",
     }));
+    
+    console.log('Document fields being sent:', orderedDocumentFields);
+    console.log('Full formData.document_fields:', formData.document_fields);
+    console.log('JSON being sent:', JSON.stringify(orderedDocumentFields));
+    
     formDataToSend.append(
       "document_fields",
       JSON.stringify(orderedDocumentFields)
@@ -463,16 +493,10 @@ const Apply = () => {
       formDataToSend.append("files", file);
     });
     
-    // Append document types as individual entries (backend expects array)
-    documentTypesArray.forEach(docType => {
-      formDataToSend.append("document_types", docType);
-    });
+    // Append document types array as JSON string to preserve full names
+    formDataToSend.append("document_types", JSON.stringify(documentTypesArray));
 
-    // Debug logging
-    console.log("📤 Files being sent:", filesArray.length);
-    console.log("📤 Document types:", documentTypesArray);
-    console.log("📤 Files and types match:", filesArray.length === documentTypesArray.length);
-
+ 
     try {
       const response = await axios.post(
         `${API_BASE_URL}/documents/upload`,
