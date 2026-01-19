@@ -19,6 +19,12 @@ import {
   FaBoxes,
   FaClipboardList,
   FaFilePdf,
+  FaMoneyBillWave,
+  FaCheckCircle,
+  FaTimesCircle,
+  FaHourglassHalf,
+  FaWallet,
+  FaChartLine,
 } from "react-icons/fa";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
@@ -56,6 +62,20 @@ const Adashinner = () => {
   const [subcategoryCounts, setSubcategoryCounts] = useState([]);
   const [showPendingModal, setShowPendingModal] = useState(true);
   const [showCharts, setShowCharts] = useState(false);
+  const [paymentStats, setPaymentStats] = useState({
+    total: 0,
+    totalAmount: 0,
+    pending: 0,
+    pendingAmount: 0,
+    approved: 0,
+    approvedAmount: 0,
+    rejected: 0,
+    todayAmount: 0,
+    todayCommission: 0,
+    monthAmount: 0,
+    monthCommission: 0,
+  });
+  const [walletBalance, setWalletBalance] = useState(0);
   const navigate = useNavigate();
 
   // Static card definitions
@@ -144,6 +164,10 @@ const Adashinner = () => {
           setSubcategoriesMap(parsedData.subcategoriesMap || {});
           setCategoryCounts(parsedData.categoryCounts || []);
           setSubcategoryCounts(parsedData.subcategoryCounts || []);
+          if (parsedData.paymentStats) {
+            setPaymentStats(parsedData.paymentStats);
+            setWalletBalance(parsedData.paymentStats.approvedAmount || 0);
+          }
           return;
         } catch (error) {
           console.error("Error parsing cached data:", error);
@@ -162,6 +186,10 @@ const Adashinner = () => {
           axios.get(`${API_BASE_URL}/categories`),
           axios.get(`${API_BASE_URL}/subcategories`),
           axios.get(`${API_BASE_URL}/statistics/cscounts`),
+          axios.get(`${API_BASE_URL}/payment-requests`).catch(err => {
+            console.error('Error fetching payment requests:', err);
+            return { data: [] };
+          }),
         ];
 
         // Wait for all promises to resolve
@@ -170,6 +198,7 @@ const Adashinner = () => {
           categoriesResponse,
           subcategoriesResponse,
           csCountsResponse,
+          paymentsResponse,
         ] = await Promise.all(promises);
 
         // Process the data
@@ -193,6 +222,59 @@ const Adashinner = () => {
         const subcategoryCounts =
           csCountsResponse.data?.pendingSubcategoryCounts || [];
 
+        // Process payment statistics
+        const payments = Array.isArray(paymentsResponse.data) ? paymentsResponse.data : [];
+        
+        
+        // Get today's date at midnight in local timezone
+        const now = new Date();
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        
+        // Get first day of this month at midnight
+        const thisMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+
+        // Debug: Check payment dates with proper parsing
+        const todayPayments = payments.filter(p => {
+          const paymentDate = new Date(p.updated_at);
+          // Create date at midnight for comparison
+          const paymentDateOnly = new Date(
+            paymentDate.getFullYear(), 
+            paymentDate.getMonth(), 
+            paymentDate.getDate()
+          );
+          const isToday = paymentDateOnly.getTime() === today.getTime();
+          if (isToday) {
+            console.log('✅ Today payment found:', p.updated_at, '-> Parsed:', paymentDate, '-> Match!');
+          }
+          return isToday;
+        });
+
+        const monthPayments = payments.filter(p => {
+          const paymentDate = new Date(p.created_at);
+          return paymentDate >= thisMonth && paymentDate <= now;
+        });
+
+        console.log('📅 Today payments count:', todayPayments.length);
+        console.log('📊 Month payments count:', monthPayments.length);
+
+        const paymentStats = {
+          total: payments.length,
+          totalAmount: payments.reduce((sum, p) => sum + Number(p.amount || 0), 0),
+          pending: payments.filter(p => p.status === 'Pending').length,
+          pendingAmount: payments.filter(p => p.status === 'Pending').reduce((sum, p) => sum + Number(p.amount || 0), 0),
+          approved: payments.filter(p => p.status === 'Approved' || p.status === 'Paid').length,
+          approvedAmount: payments.filter(p => p.status === 'Approved' || p.status === 'Paid').reduce((sum, p) => sum + Number(p.amount || 0), 0),
+          rejected: payments.filter(p => p.status === 'Rejected').length,
+          todayAmount: todayPayments.reduce((sum, p) => sum + Number(p.amount || 0), 0),
+          todayCommission: todayPayments.filter(p => p.status === 'Approved' || p.status === 'Paid').reduce((sum, p) => sum + Number(p.amount || 0), 0),
+          monthAmount: monthPayments.reduce((sum, p) => sum + Number(p.amount || 0), 0),
+          monthCommission: monthPayments.filter(p => p.status === 'Approved' || p.status === 'Paid').reduce((sum, p) => sum + Number(p.amount || 0), 0),
+        };
+
+        console.log('💰 Payment Stats:', paymentStats);
+
+        
         // Update state
         setCounts(totalCounts);
         setCategoryWiseCounts(categoryWiseCounts);
@@ -200,6 +282,8 @@ const Adashinner = () => {
         setSubcategoriesMap(subcategoriesObj);
         setCategoryCounts(categoryCounts);
         setSubcategoryCounts(subcategoryCounts);
+        setPaymentStats(paymentStats);
+        setWalletBalance(paymentStats.approvedAmount);
 
         // Cache the data
         const cacheData = {
@@ -209,6 +293,7 @@ const Adashinner = () => {
           subcategoriesMap: subcategoriesObj,
           categoryCounts,
           subcategoryCounts,
+          paymentStats: paymentStats,
         };
         localStorage.setItem("dashboardData", JSON.stringify(cacheData));
         localStorage.setItem("dashboardDataTimestamp", Date.now().toString());
@@ -306,6 +391,9 @@ const Adashinner = () => {
     }),
     [categoryWiseCounts]
   );
+  console.log(
+    paymentStats
+  )
 
   const pendingCount =
     counts?.documentStatus?.find(({ status }) => status === "Pending")?.count ||
@@ -395,6 +483,101 @@ const Adashinner = () => {
           );
         })}
       </div>
+
+      {/* Payment & Commission Analytics Section */}
+      {paymentStats && (
+        <div className="mb-8">
+          <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+            <FaChartLine className="text-orange-500" />
+            Payment & Commission Analytics
+          </h2>
+          
+          {/* Payment Statistics Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+            <div className="bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm opacity-90">Total Requests</p>
+                  <p className="text-3xl font-bold">{paymentStats.total}</p>
+                </div>
+                <FaMoneyBillWave className="text-4xl opacity-80" />
+              </div>
+              <p className="text-sm mt-2 opacity-90">₹{paymentStats.totalAmount.toFixed(2)}</p>
+            </div>
+
+            <div className="bg-gradient-to-br from-yellow-500 to-yellow-600 text-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm opacity-90">Pending</p>
+                  <p className="text-3xl font-bold">{paymentStats.pending}</p>
+                </div>
+                <FaHourglassHalf className="text-4xl opacity-80" />
+              </div>
+              <p className="text-sm mt-2 opacity-90">₹{paymentStats.pendingAmount.toFixed(2)}</p>
+            </div>
+
+            <div className="bg-gradient-to-br from-green-500 to-green-600 text-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm opacity-90">Approved/Paid</p>
+                  <p className="text-3xl font-bold">{paymentStats.approved}</p>
+                </div>
+                <FaCheckCircle className="text-4xl opacity-80" />
+              </div>
+              <p className="text-sm mt-2 opacity-90">₹{paymentStats.approvedAmount.toFixed(2)}</p>
+            </div>
+
+            <div className="bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm opacity-90">Wallet Balance</p>
+                  <p className="text-3xl font-bold">₹{walletBalance.toFixed(2)}</p>
+                </div>
+                <FaWallet className="text-4xl opacity-80" />
+              </div>
+              <p className="text-sm mt-2 opacity-90">Total Revenue</p>
+            </div>
+          </div>
+
+          {/* Commission Statistics */}
+          <div className="bg-white rounded-lg shadow-lg p-6">
+            <h3 className="text-xl font-bold text-gray-800 mb-4">Commission Statistics</h3>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              <div className="bg-gradient-to-br from-orange-50 to-orange-100 p-4 rounded-lg border-2 border-orange-200">
+                <div className="flex items-center gap-2 mb-2">
+                  <FaMoneyBillWave className="text-orange-500" />
+                  <p className="text-sm font-medium text-gray-700">Today's Payment</p>
+                </div>
+                <p className="text-2xl font-bold text-gray-900">₹{paymentStats.todayAmount.toFixed(2)}</p>
+              </div>
+
+              <div className="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-lg border-2 border-green-200">
+                <div className="flex items-center gap-2 mb-2">
+                  <FaCheckCircle className="text-green-500" />
+                  <p className="text-sm font-medium text-gray-700">Today's Commission</p>
+                </div>
+                <p className="text-2xl font-bold text-gray-900">₹{paymentStats.todayCommission.toFixed(2)}</p>
+              </div>
+
+              <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-lg border-2 border-blue-200">
+                <div className="flex items-center gap-2 mb-2">
+                  <FaMoneyBillWave className="text-blue-500" />
+                  <p className="text-sm font-medium text-gray-700">Monthly Payment</p>
+                </div>
+                <p className="text-2xl font-bold text-gray-900">₹{paymentStats.monthAmount.toFixed(2)}</p>
+              </div>
+
+              <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-4 rounded-lg border-2 border-purple-200">
+                <div className="flex items-center gap-2 mb-2">
+                  <FaCheckCircle className="text-purple-500" />
+                  <p className="text-sm font-medium text-gray-700">Monthly Commission</p>
+                </div>
+                <p className="text-2xl font-bold text-gray-900">₹{paymentStats.monthCommission.toFixed(2)}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Categories & Subcategories Section */}
       <Card
