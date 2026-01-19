@@ -236,10 +236,10 @@ const DistributorPaymentHistory = () => {
                   UTR Number
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Created Date
+                  Request Raised
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Updated Date
+                  Transaction Date
                 </th>
               </tr>
             </thead>
